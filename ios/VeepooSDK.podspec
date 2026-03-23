@@ -18,7 +18,6 @@ Pod::Spec.new do |s|
     'VeepooSDK/Frameworks/JL_BLEKit.framework',
     'VeepooSDK/Frameworks/JLDialUnit.framework',
     'VeepooSDK/Frameworks/GRDFUSDK.framework',
-    'VeepooSDK/Frameworks/DFUnits.framework',
     'VeepooSDK/Frameworks/ABParTool.framework',
     'VeepooSDK/Frameworks/ZipZap.framework'
   ]
