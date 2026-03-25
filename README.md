@@ -591,7 +591,7 @@ interface PersonalInfo {
   weight: number;    // 体重（kg）
   age: number;       // 年龄
   stepAim: number;   // 步数目标
-  sleepAim: number;  // 睡眠目标（小时）
+  sleepAim: number;  // 睡眠目标（分钟）
 }
 ```
 
@@ -605,7 +605,7 @@ const success = await VeepooSDK.syncPersonalInfo({
   weight: 70,
   age: 30,
   stepAim: 10000,
-  sleepAim: 8,
+  sleepAim: 480,
 });
 ```
 
@@ -1798,7 +1798,7 @@ interface PersonalInfo {
   weight: number;   // kg
   age: number;
   stepAim: number;  // 步数目标
-  sleepAim: number; // 睡眠目标（小时）
+  sleepAim: number; // 睡眠目标（分钟）
 }
 ```
 
@@ -2039,7 +2039,7 @@ interface VeepooError {
 ```typescript
 // hooks/useVeepooSDK.ts
 import { useEffect, useCallback, useRef, useState } from 'react';
-import { PermissionsAndroid, Platform, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import VeepooSDK from '@gaozh1024/expo-veepoo-sdk';
 import type {
   VeepooDevice,
@@ -2116,39 +2116,9 @@ export const useVeepooSDK = () => {
 
   // 请求蓝牙权限
   const requestBluetoothPermissions = useCallback(async (): Promise<boolean> => {
-    if (Platform.OS !== 'android') {
-      return true;
-    }
-
     try {
-      if (Number(Platform.Version) >= 31) {
-        const granted = await PermissionsAndroid.requestMultiple([
-          PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        ]);
-
-        const allGranted =
-          granted['android.permission.BLUETOOTH_SCAN'] === PermissionsAndroid.RESULTS.GRANTED &&
-          granted['android.permission.BLUETOOTH_CONNECT'] === PermissionsAndroid.RESULTS.GRANTED &&
-          granted['android.permission.ACCESS_FINE_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED;
-
-        if (!allGranted) {
-          Alert.alert('权限不足', '需要蓝牙和位置权限才能扫描和连接设备');
-          return false;
-        }
-      } else {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        );
-
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert('权限不足', '需要位置权限才能扫描蓝牙设备');
-          return false;
-        }
-      }
-
-      return true;
+      const permission = await VeepooSDK.requestPermissions();
+      return permission.granted;
     } catch (error) {
       console.error('请求权限失败:', error);
       return false;
@@ -2812,19 +2782,15 @@ npx expo run:ios
 
 **解决方法:**
 1. 检查 `AndroidManifest.xml` 中是否包含必要权限
-2. 在运行时请求权限（Android 12+ 必须）
+2. 在运行时调用 `VeepooSDK.requestPermissions()` 请求权限
 3. 检查位置服务是否开启
 
 ```typescript
-// Android 12+ 权限请求
+// 统一权限请求
 const requestPermissions = async () => {
-  if (Platform.OS === 'android' && Number(Platform.Version) >= 31) {
-    const granted = await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-      PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    ]);
-    // 检查权限结果
+  const permission = await VeepooSDK.requestPermissions();
+  if (!permission.granted) {
+    // 引导用户去系统设置打开权限
   }
 };
 ```
