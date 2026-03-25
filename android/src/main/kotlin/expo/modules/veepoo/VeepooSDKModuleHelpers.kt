@@ -52,6 +52,35 @@ fun VeepooSDKModule.hasBluetoothPermissions(): Boolean {
   }
 }
 
+fun VeepooSDKModule.emitConnectionStatus(deviceId: String, status: String, code: Int? = null) {
+  val payload = mutableMapOf<String, Any>(
+    "deviceId" to deviceId,
+    "status" to status
+  )
+  if (code != null) {
+    payload["code"] = code
+  }
+  sendEvent(DEVICE_CONNECT_STATUS, payload)
+  sendEvent(CONNECTION_STATUS_CHANGED, mapOf(
+    "deviceId" to deviceId,
+    "status" to status
+  ))
+}
+
+fun VeepooSDKModule.emitBluetoothStatus() {
+  val enabled = isBluetoothEnabled()
+  val hasPermissions = hasBluetoothPermissions()
+
+  sendEvent(BLUETOOTH_STATE_CHANGED, mapOf(
+    "state" to if (enabled) "poweredOn" else "poweredOff",
+    "stateName" to if (enabled) "poweredOn" else "poweredOff",
+    "authorization" to if (hasPermissions) "allowedAlways" else "denied",
+    "authorizationName" to if (hasPermissions) "allowedAlways" else "denied",
+    "isScanning" to isScanning,
+    "pendingScanStart" to false
+  ))
+}
+
 // 密码状态标准化
 fun normalizePasswordStatus(status: String): String {
   val normalized = status.lowercase()
@@ -177,6 +206,7 @@ fun VeepooSDKModule.cleanup() {
   connectedDeviceId = null
   isInitialized = false
   cachedDeviceFunctions.clear()
+  emitBluetoothStatus()
 }
 
 // 压力测量循环

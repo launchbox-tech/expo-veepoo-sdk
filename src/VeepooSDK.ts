@@ -23,6 +23,7 @@ import type {
   PermissionsResult,
 } from './types.js';
 import type { NativeVeepooSDKInterface } from './NativeVeepooSDK.js';
+import { normalizeBluetoothStatus, normalizePermissionsResult } from './normalizers.js';
 
 type EventListener = (payload: unknown) => void;
 
@@ -69,7 +70,6 @@ export class VeepooSDK {
       'readOriginComplete',
       'originFiveMinuteData',
       'originHalfHourData',
-      'originSpo2Data',
       'sleepData',
       'sportStepData',
       'heartRateTestResult',
@@ -79,8 +79,6 @@ export class VeepooSDK {
       'stressData',
       'bloodGlucoseData',
       'batteryData',
-      'customSettingData',
-      'dataReceived',
       'connectionStatusChanged',
       'error',
     ];
@@ -97,11 +95,43 @@ export class VeepooSDK {
   }
 
   private emitLocal(event: VeepooEvent, payload: unknown): void {
+    const normalizedPayload =
+      event === 'bluetoothStateChanged' ? normalizeBluetoothStatus(payload) : payload;
+
+    if (event === 'bluetoothStateChanged') {
+      const bluetoothStatus = normalizedPayload as { isScanning?: boolean };
+      if (typeof bluetoothStatus.isScanning === 'boolean') {
+        this.isScanning = bluetoothStatus.isScanning;
+      }
+    }
+
+    if (event === 'deviceConnected') {
+      const device = normalizedPayload as { deviceId?: string };
+      if (typeof device.deviceId === 'string' && device.deviceId.length > 0) {
+        this.connectedDeviceId = device.deviceId;
+      }
+    }
+
+    if (event === 'deviceDisconnected') {
+      const device = normalizedPayload as { deviceId?: string };
+      if (!device.deviceId || this.connectedDeviceId === device.deviceId) {
+        this.connectedDeviceId = null;
+      }
+      this.isScanning = false;
+    }
+
+    if (event === 'deviceConnectStatus' || event === 'connectionStatusChanged') {
+      const connection = normalizedPayload as { deviceId?: string; status?: ConnectionStatus };
+      if (connection.status === 'disconnected' && (!connection.deviceId || this.connectedDeviceId === connection.deviceId)) {
+        this.connectedDeviceId = null;
+      }
+    }
+
     const eventListeners = this.listeners.get(event);
     if (eventListeners) {
       eventListeners.forEach((listener) => {
         try {
-          listener(payload);
+          listener(normalizedPayload);
         } catch (e) {
           console.error(`Error in event listener for ${event}:`, e);
         }
@@ -137,7 +167,7 @@ export class VeepooSDK {
 
   async requestPermissions(): Promise<PermissionsResult> {
     try {
-      return await NativeModule.requestPermissions();
+      return normalizePermissionsResult(await NativeModule.requestPermissions());
     } catch (error) {
       this.handleError(error, 'PERMISSION_DENIED');
       return { granted: false, status: 'denied', canAskAgain: true };
@@ -376,6 +406,9 @@ export class VeepooSDK {
     this.nativeSubscriptions = [];
     this.listeners.clear();
     this.eventListenersSetup = false;
+    this.isScanning = false;
+    this.connectedDeviceId = null;
+    this.isInitialized = false;
   }
 }
 

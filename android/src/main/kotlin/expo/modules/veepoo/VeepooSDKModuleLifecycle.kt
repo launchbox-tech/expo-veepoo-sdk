@@ -7,6 +7,7 @@ import expo.modules.kotlin.modules.ModuleDefinitionBuilder
 fun ModuleDefinitionBuilder.defineLifecycle(module: VeepooSDKModule) {
   OnStartObserving {
     Log.d("VeepooSDKModule", "Started observing events")
+    module.emitBluetoothStatus()
   }
 
   OnStopObserving {

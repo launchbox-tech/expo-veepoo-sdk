@@ -20,6 +20,7 @@ fun ModuleDefinitionBuilder.definePermissions(module: VeepooSDKModule) {
       val context = module.context
 
       if (module.hasBluetoothPermissions()) {
+        module.emitBluetoothStatus()
         promise.resolve(mapOf(
           "granted" to true,
           "status" to "granted"
@@ -41,6 +42,7 @@ fun ModuleDefinitionBuilder.definePermissions(module: VeepooSDKModule) {
       val permissionsToRequest = getBluetoothPermissionsToRequest(context)
 
       if (permissionsToRequest.isEmpty()) {
+        module.emitBluetoothStatus()
         promise.resolve(mapOf(
           "granted" to true,
           "status" to "granted"

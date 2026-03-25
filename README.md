@@ -74,8 +74,8 @@ yarn add @gaozh1024/expo-veepoo-sdk
 
 | 平台 | 最低版本 | Expo Go 支持 | 备注 |
 |------|----------|-------------|------|
-| iOS | 13.4+ | ❌ 不支持 | 需要开发构建 |
-| Android | 6.0+ (API 23+) | ✅ 支持 | 权限自动配置 |
+| iOS | 15.1+ | ❌ 不支持 | 需要开发构建 |
+| Android | 6.0+ (API 23+) | ❌ 不支持 | 需要开发构建 |
 
 > **重要提示**: iOS 端由于包含原生 frameworks，必须在开发构建中使用，不支持 Expo Go。
 
@@ -127,7 +127,7 @@ Android 端权限已自动配置，无需额外操作。
 - `POST_NOTIFICATIONS` (Android 13+)
 
 **Android 注意事项：**
-- ✅ 可以在 Expo Go 中使用
+- ⚠️ 本模块包含原生代码，**不能在 Expo Go 中使用**
 - ✅ 所有权限自动配置
 - ⚠️ Android 12+ 需要在运行时请求蓝牙权限
 
@@ -149,8 +149,8 @@ if (!isEnabled) {
 }
 
 // 3. 请求权限
-const hasPermission = await VeepooSDK.requestPermissions();
-if (!hasPermission) {
+const permission = await VeepooSDK.requestPermissions();
+if (!permission.granted) {
   console.log('请授予蓝牙权限');
   return;
 }
@@ -287,7 +287,7 @@ console.log('SDK 初始化完成');
 
 检查蓝牙是否已启用。
 
-**返回值:** `Promise<boolean>`
+**返回值:** `Promise<PermissionsResult>`
 
 **示例:**
 ```typescript
@@ -303,12 +303,12 @@ if (!isEnabled) {
 
 请求蓝牙和位置权限。
 
-**返回值:** `Promise<boolean>`
+**返回值:** `Promise<PermissionsResult>`
 
 **示例:**
 ```typescript
-const hasPermission = await VeepooSDK.requestPermissions();
-if (!hasPermission) {
+const permission = await VeepooSDK.requestPermissions();
+if (!permission.granted) {
   alert('请授予蓝牙权限');
 }
 ```
@@ -1579,34 +1579,6 @@ interface BloodGlucoseData {
 ---
 
 ### 其他事件
-
-#### customSettingData
-
-自定义设置数据时触发。
-
-**Payload:**
-```typescript
-{
-  deviceId: string;
-  data: CustomSettingData;
-}
-```
-
----
-
-#### dataReceived
-
-接收到原始数据时触发。
-
-**Payload:**
-```typescript
-{
-  deviceId: string;
-  data: unknown;
-}
-```
-
----
 
 #### connectionStatusChanged
 
@@ -2932,7 +2904,7 @@ useEffect(() => {
 
 **iOS**: 不支持。由于包含原生 frameworks，必须使用开发构建。
 
-**Android**: 支持。但推荐使用开发构建以获得最佳体验。
+**Android**: 也不支持 Expo Go。由于模块依赖原生代码，必须使用开发构建。
 
 ---
 

@@ -18,6 +18,7 @@ fun ModuleDefinitionBuilder.defineInitialization(module: VeepooSDKModule) {
       manager.init(module.context)
       module.isInitialized = true
       Log.d(TAG, "Veepoo SDK initialized successfully")
+      module.emitBluetoothStatus()
       promise.resolve(null)
     } catch (e: Exception) {
       Log.e(TAG, "Error initializing Veepoo SDK", e)

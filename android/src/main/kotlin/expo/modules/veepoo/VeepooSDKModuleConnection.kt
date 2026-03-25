@@ -41,10 +41,7 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
     val password = options?.get("password") as? String ?: "0000"
     val is24Hour = options?.get("is24Hour") as? Boolean ?: false
     
-    module.sendEvent(DEVICE_CONNECT_STATUS, mapOf(
-      "deviceId" to deviceId,
-      "status" to "connecting"
-    ))
+    module.emitConnectionStatus(deviceId, "connecting")
     
     manager.connectDevice(
       deviceId,
@@ -55,11 +52,7 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
           if (code == Code.REQUEST_SUCCESS) {
             module.connectedDeviceId = deviceId
             module.sendEvent(DEVICE_CONNECTED, mapOf("deviceId" to deviceId, "isOadModel" to isOadModel))
-            module.sendEvent(DEVICE_CONNECT_STATUS, mapOf(
-              "deviceId" to deviceId,
-              "status" to "connected",
-              "code" to code
-            ))
+            module.emitConnectionStatus(deviceId, "connected", code)
             
             Handler(Looper.getMainLooper()).postDelayed({
               module.verifyPasswordInternal(deviceId, password, is24Hour)
@@ -67,11 +60,7 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
             
             promise.resolve(null)
           } else {
-            module.sendEvent(DEVICE_CONNECT_STATUS, mapOf(
-              "deviceId" to deviceId,
-              "status" to "disconnected",
-              "code" to code
-            ))
+            module.emitConnectionStatus(deviceId, "error", code)
             promise.reject("CONNECTION_FAILED", "Connection failed with code: $code", null)
           }
         }
@@ -79,10 +68,7 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
       object : INotifyResponse {
         override fun notifyState(state: Int) {
           if (state == Code.REQUEST_SUCCESS) {
-            module.sendEvent(DEVICE_CONNECT_STATUS, mapOf(
-              "deviceId" to deviceId,
-              "status" to "ready"
-            ))
+            module.emitConnectionStatus(deviceId, "ready")
           }
         }
       }
@@ -103,10 +89,7 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
             if (code == Code.REQUEST_SUCCESS) {
               module.connectedDeviceId = null
               module.sendEvent(DEVICE_DISCONNECTED, mapOf("deviceId" to deviceId))
-              module.sendEvent(DEVICE_CONNECT_STATUS, mapOf(
-                "deviceId" to deviceId,
-                "status" to "disconnected"
-              ))
+              module.emitConnectionStatus(deviceId, "disconnected")
               promise.resolve(null)
             } else {
               promise.reject("DISCONNECT_FAILED", "Disconnect failed with code: $code", null)

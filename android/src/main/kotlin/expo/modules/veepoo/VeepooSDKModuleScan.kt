@@ -40,6 +40,7 @@ fun ModuleDefinitionBuilder.defineScan(module: VeepooSDKModule) {
         override fun onSearchStarted() {
           Log.d(TAG, "Scan started")
           module.isScanning = true
+          module.emitBluetoothStatus()
         }
 
         override fun onDeviceFounded(result: SearchResult?) {
@@ -63,11 +64,13 @@ fun ModuleDefinitionBuilder.defineScan(module: VeepooSDKModule) {
         override fun onSearchStopped() {
           Log.d(TAG, "Scan stopped")
           module.isScanning = false
+          module.emitBluetoothStatus()
         }
 
         override fun onSearchCanceled() {
           Log.d(TAG, "Scan canceled")
           module.isScanning = false
+          module.emitBluetoothStatus()
         }
       })
       
@@ -88,6 +91,7 @@ fun ModuleDefinitionBuilder.defineScan(module: VeepooSDKModule) {
       val manager = VPOperateManager.getInstance()
       manager?.stopScanDevice()
       module.isScanning = false
+      module.emitBluetoothStatus()
       promise.resolve(null)
     } catch (e: Exception) {
       Log.e(TAG, "Error stopping scan", e)

@@ -76,7 +76,7 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
         override fun onDataChange(batteryData: BatteryData?) {
           if (batteryData != null) {
             val actualLevel = if (batteryData.isPercent) batteryData.batteryPercent else batteryData.batteryLevel
-            promise.resolve(mapOf(
+            val payload = mapOf(
               "level" to actualLevel,
               "percent" to batteryData.batteryPercent,
               "powerModel" to batteryData.powerModel,
@@ -84,7 +84,12 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
               "bat" to batteryData.bat.toInt(),
               "isPercent" to batteryData.isPercent,
               "isLowBattery" to batteryData.isLowBattery
+            )
+            module.sendEvent(BATTERY_DATA, mapOf(
+              "deviceId" to (module.connectedDeviceId ?: ""),
+              "data" to payload
             ))
+            promise.resolve(payload)
           } else {
             promise.reject("READ_FAILED", "Battery data is null", null)
           }

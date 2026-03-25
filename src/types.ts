@@ -53,7 +53,13 @@ export interface DeviceTimeSetting {
 export type BluetoothState = 'unknown' | 'resetting' | 'unsupported' | 'unauthorized' | 'poweredOff' | 'poweredOn';
 export type BluetoothAuthorization = 'notDetermined' | 'restricted' | 'denied' | 'allowedAlways';
 
-export type PermissionStatus = 'granted' | 'denied' | 'never_ask_again';
+export type PermissionStatus =
+  | 'granted'
+  | 'denied'
+  | 'restricted'
+  | 'unknown'
+  | 'never_ask_again'
+  | 'powered_off';
 
 export interface PermissionsResult {
   granted: boolean;
@@ -509,7 +515,6 @@ export type VeepooEvent =
   | 'readOriginComplete'
   | 'originFiveMinuteData'
   | 'originHalfHourData'
-  | 'originSpo2Data'
   | 'sleepData'
   | 'sportStepData'
   | 'heartRateTestResult'
@@ -518,10 +523,7 @@ export type VeepooEvent =
   | 'temperatureTestResult'
   | 'stressData'
   | 'bloodGlucoseData'
-  | 'bloodGlucoseTestResult'
   | 'batteryData'
-  | 'customSettingData'
-  | 'dataReceived'
   | 'connectionStatusChanged'
   | 'error';
 
@@ -540,7 +542,6 @@ export interface VeepooEventPayload {
   readOriginComplete: { deviceId: string; success: boolean };
   originFiveMinuteData: { deviceId: string; data: OriginData };
   originHalfHourData: { deviceId: string; data: HalfHourData };
-  originSpo2Data: { deviceId: string; data: Spo2OriginData[] };
   sleepData: { deviceId: string; date: string; data: SleepData };
   sportStepData: { deviceId: string; date: string; data: SportStepData };
   heartRateTestResult: { deviceId: string; result: HeartRateTestResult };
@@ -549,10 +550,7 @@ export interface VeepooEventPayload {
   temperatureTestResult: { deviceId: string; result: TemperatureTestResult };
   stressData: { deviceId: string; data: StressData };
   bloodGlucoseData: { deviceId: string; data: BloodGlucoseData };
-  bloodGlucoseTestResult: { deviceId: string; result: BloodGlucoseTestResult };
   batteryData: { deviceId: string; data: BatteryInfo };
-  customSettingData: { deviceId: string; data: CustomSettingData };
-  dataReceived: { deviceId: string; data: unknown };
   connectionStatusChanged: { deviceId: string; status: ConnectionStatus };
   error: VeepooError;
 }

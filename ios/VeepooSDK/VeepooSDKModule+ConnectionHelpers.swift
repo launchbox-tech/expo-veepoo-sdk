@@ -4,6 +4,21 @@ import VeepooBleSDK
 
 /// 连接与蓝牙状态辅助方法
 extension VeepooSDKModule {
+  func emitConnectionStatus(deviceId: String, status: String, code: Int? = nil) {
+    var payload: [String: Any] = [
+      "deviceId": deviceId,
+      "status": status
+    ]
+    if let code = code {
+      payload["code"] = code
+    }
+    self.sendEvent(DEVICE_CONNECT_STATUS, payload)
+    self.sendEvent(CONNECTION_STATUS_CHANGED, [
+      "deviceId": deviceId,
+      "status": status
+    ])
+  }
+
   func ensureCentralManager() {
     #if !targetEnvironment(simulator)
     if centralManager != nil { return }
@@ -22,45 +37,47 @@ extension VeepooSDKModule {
   ) {
     #if !targetEnvironment(simulator)
     print("[VeepooSDK] performConnect - 开始, deviceId: \(deviceId)")
-    
+
     connectionState = .connecting
-    
+
     guard let manager = self.bleManager else {
       print("[VeepooSDK] performConnect - 错误: bleManager 为 nil")
       connectionState = .error("BLE manager is nil")
       promise.reject("SDK_NOT_INITIALIZED", "BLE manager is nil")
       return
     }
-    
+
     print("[VeepooSDK] performConnect - 调用 veepooSDKConnectDevice")
-    
+
+    var isSettled = false
+
     connectionTimer = Timer.scheduledTimer(withTimeInterval: 15.0, repeats: false) { [weak self] _ in
       guard let self = self else { return }
+      guard !isSettled else { return }
+      isSettled = true
       print("[VeepooSDK] performConnect - 连接超时")
       self.connectionState = .error("Connection timeout")
-      self.sendEvent(DEVICE_CONNECT_STATUS, [
-        "deviceId": deviceId,
-        "status": "timeout"
-      ])
+      self.emitConnectionStatus(deviceId: deviceId, status: "error")
       promise.reject("CONNECTION_TIMEOUT", "Connection timeout after 15 seconds")
     }
-    
+
     manager.veepooSDKConnectDevice(model) { [weak self] connectState in
       guard let self = self else { return }
-      
+
       self.connectionTimer?.invalidate()
       self.connectionTimer = nil
-      
+
       print("[VeepooSDK] performConnect - 连接状态: \(connectState.rawValue)")
-      
+
       switch connectState.rawValue {
       case 2:
+        guard !isSettled else { return }
+        isSettled = true
         print("[VeepooSDK] performConnect - 连接成功")
         self.connectionState = .connected
         self.connectedDeviceId = deviceId
         self.sendEvent(DEVICE_CONNECTED, ["deviceId": deviceId, "isOadModel": false])
-        self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "connected"])
-        
+
         self.connectionState = .authenticating
         print("[VeepooSDK] performConnect - 准备认证，等待 0.3 秒")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -70,25 +87,34 @@ extension VeepooSDKModule {
         promise.resolve(nil)
 
       case 0:
-        self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "bluetoothOff"])
+        guard !isSettled else { return }
+        isSettled = true
+        self.connectionState = .error("Bluetooth is powered off")
+        self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
         promise.reject("BLUETOOTH_NOT_ENABLED", "Bluetooth is powered off")
 
       case 1:
-        self.sendEvent(DEVICE_CONNECT_STATUS, [
-          "deviceId": deviceId,
-          "status": "connecting"
-        ])
+        self.emitConnectionStatus(deviceId: deviceId, status: "connecting", code: connectState.rawValue)
 
       case 3:
-        self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "failed"])
+        guard !isSettled else { return }
+        isSettled = true
+        self.connectionState = .error("Connection failed")
+        self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
         promise.reject("CONNECTION_FAILED", "Connection failed")
 
       case 6:
-        self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "timeout"])
+        guard !isSettled else { return }
+        isSettled = true
+        self.connectionState = .error("Connection timeout")
+        self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
         promise.reject("TIMEOUT", "Connection timeout")
 
       default:
-        self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "unknown", "code": connectState.rawValue])
+        guard !isSettled else { return }
+        isSettled = true
+        self.connectionState = .error("Unknown connection error: \(connectState.rawValue)")
+        self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
         promise.reject("UNKNOWN", "Unknown connection error: \(connectState.rawValue)")
       }
     }
@@ -109,15 +135,27 @@ extension VeepooSDKModule {
       guard let self = self else { return }
 
       let mac = self.connectedDeviceId ?? ""
+      let status: String
+      switch state.rawValue {
+      case 0:
+        status = "disconnected"
+      case 1:
+        status = "connecting"
+      case 2:
+        status = "connected"
+      default:
+        status = "error"
+      }
 
-      self.sendEvent(DEVICE_CONNECT_STATUS, [
-        "deviceId": mac,
-        "code": state.rawValue
-      ])
+      if !mac.isEmpty {
+        self.emitConnectionStatus(deviceId: mac, status: status, code: state.rawValue)
+      }
 
       if state.rawValue == 0 {
         self.connectedDeviceId = nil
-        self.sendEvent(DEVICE_DISCONNECTED, ["deviceId": mac])
+        if !mac.isEmpty {
+          self.sendEvent(DEVICE_DISCONNECTED, ["deviceId": mac])
+        }
       }
     }
     #endif
@@ -133,6 +171,7 @@ extension VeepooSDKModule {
     let exportId = rawAddr ?? uuid
 
     self.discoveredDevices[exportId] = peripheralModel
+    self.discoveredDevices[uuid] = peripheralModel
 
     self.sendEvent(DEVICE_FOUND, [
       "device": [
@@ -154,12 +193,14 @@ extension VeepooSDKModule {
       self.pendingConnectPromise = nil
       self.pendingConnectPassword = nil
       self.pendingConnectIs24Hour = false
-      
-      if let central = self.centralManager, self.isScanning {
-        central.stopScan()
+
+      if self.isScanning {
+        self.bleManager?.veepooSDKStopScanDevice()
         self.isScanning = false
+        self.pendingScanStart = false
+        self.emitBluetoothStatus()
       }
-      
+
       self.performConnect(
         model: peripheralModel,
         deviceId: exportId,
@@ -292,41 +333,38 @@ extension VeepooSDKModule {
 
   func emitBluetoothStatus() {
     #if !targetEnvironment(simulator)
-    var stateCode = 0
     var stateName = "unknown"
 
     if let central = centralManager {
       switch central.state {
-      case .unknown: stateCode = 0; stateName = "unknown"
-      case .resetting: stateCode = 1; stateName = "resetting"
-      case .unsupported: stateCode = 2; stateName = "unsupported"
-      case .unauthorized: stateCode = 3; stateName = "unauthorized"
-      case .poweredOff: stateCode = 4; stateName = "poweredOff"
-      case .poweredOn: stateCode = 5; stateName = "poweredOn"
-      @unknown default: stateCode = 0; stateName = "unknown"
+      case .unknown: stateName = "unknown"
+      case .resetting: stateName = "resetting"
+      case .unsupported: stateName = "unsupported"
+      case .unauthorized: stateName = "unauthorized"
+      case .poweredOff: stateName = "poweredOff"
+      case .poweredOn: stateName = "poweredOn"
+      @unknown default: stateName = "unknown"
       }
     }
 
-    let authorization: Int
     let authorizationName: String
 
     if #available(iOS 13.0, *) {
       switch CBManager.authorization {
-      case .notDetermined: authorization = 0; authorizationName = "notDetermined"
-      case .restricted: authorization = 1; authorizationName = "restricted"
-      case .denied: authorization = 2; authorizationName = "denied"
-      case .allowedAlways: authorization = 3; authorizationName = "allowedAlways"
-      @unknown default: authorization = 0; authorizationName = "unknown"
+      case .notDetermined: authorizationName = "notDetermined"
+      case .restricted: authorizationName = "restricted"
+      case .denied: authorizationName = "denied"
+      case .allowedAlways: authorizationName = "allowedAlways"
+      @unknown default: authorizationName = "notDetermined"
       }
     } else {
-      authorization = 0
-      authorizationName = "unknown"
+      authorizationName = "notDetermined"
     }
 
     self.sendEvent(BLUETOOTH_STATE_CHANGED, [
-      "state": stateCode,
+      "state": stateName,
       "stateName": stateName,
-      "authorization": authorization,
+      "authorization": authorizationName,
       "authorizationName": authorizationName,
       "isScanning": isScanning,
       "pendingScanStart": pendingScanStart
@@ -348,9 +386,15 @@ extension VeepooSDKModule {
     authenticationRetryCount = 0
     #endif
     isScanning = false
+    pendingScanStart = false
     connectedDeviceId = nil
     isInitialized = false
+    pendingConnectDeviceId = nil
+    pendingConnectPassword = nil
+    pendingConnectIs24Hour = false
+    pendingConnectPromise = nil
     discoveredDevices.removeAll()
     connectionState = .idle
+    emitBluetoothStatus()
   }
 }

@@ -8,6 +8,7 @@ enum VeepooEvent {
   static let deviceConnected = "deviceConnected"
   static let deviceDisconnected = "deviceDisconnected"
   static let deviceConnectStatus = "deviceConnectStatus"
+  static let connectionStatusChanged = "connectionStatusChanged"
   static let deviceReady = "deviceReady"
   static let bluetoothStateChanged = "bluetoothStateChanged"
   static let deviceFunction = "deviceFunction"
@@ -35,6 +36,7 @@ let DEVICE_FOUND = VeepooEvent.deviceFound
 let DEVICE_CONNECTED = VeepooEvent.deviceConnected
 let DEVICE_DISCONNECTED = VeepooEvent.deviceDisconnected
 let DEVICE_CONNECT_STATUS = VeepooEvent.deviceConnectStatus
+let CONNECTION_STATUS_CHANGED = VeepooEvent.connectionStatusChanged
 let DEVICE_READY = VeepooEvent.deviceReady
 let BLUETOOTH_STATE_CHANGED = VeepooEvent.bluetoothStateChanged
 let DEVICE_FUNCTION = VeepooEvent.deviceFunction
@@ -110,11 +112,10 @@ public class VeepooSDKModule: Module {
   var connectionState: ConnectionState = .idle {
     didSet {
       print("[VeepooSDK] 状态变化: \(oldValue.rawValue) -> \(connectionState.rawValue)")
-      if let deviceId = connectedDeviceId {
-        sendEvent(DEVICE_CONNECT_STATUS, [
-          "deviceId": deviceId,
-          "status": connectionState.rawValue
-        ])
+      let previousStatus = publicConnectionStatus(for: oldValue)
+      let currentStatus = publicConnectionStatus(for: connectionState)
+      if previousStatus != currentStatus, let deviceId = connectedDeviceId {
+        emitConnectionStatus(deviceId: deviceId, status: currentStatus)
       }
     }
   }
@@ -124,20 +125,60 @@ public class VeepooSDKModule: Module {
   var authenticationRetryCount = 0
   let maxAuthenticationRetries = 3
 
+  func publicConnectionStatus(for state: ConnectionState) -> String {
+    switch state {
+    case .idle, .disconnected:
+      return "disconnected"
+    case .scanning, .connecting, .discoveringServices:
+      return "connecting"
+    case .connected, .authenticating:
+      return "connected"
+    case .ready:
+      return "ready"
+    case .disconnecting:
+      return "disconnecting"
+    case .error:
+      return "error"
+    }
+  }
+
+  func makePermissionsResult(status: String, granted: Bool, canAskAgain: Bool) -> [String: Any] {
+    return [
+      "granted": granted,
+      "status": status,
+      "canAskAgain": canAskAgain
+    ]
+  }
+
   public   func handlePermissionStateUpdate(_ central: CBCentralManager) {
+    let authorization = CBManager.authorization
+    if authorization == .notDetermined && (central.state == .unknown || central.state == .resetting) {
+      return
+    }
+
     guard let promise = self.permissionPromise else { return }
     self.permissionPromise = nil
-    
-    switch central.state {
-    case .poweredOn:
-      promise.resolve("granted")
-    case .poweredOff:
-      promise.resolve("poweredOff")
-    case .unauthorized:
-      promise.resolve("denied")
-    default:
-      promise.resolve("unknown")
+
+    let result: [String: Any]
+    switch authorization {
+    case .allowedAlways:
+      if central.state == .poweredOff {
+        result = makePermissionsResult(status: "powered_off", granted: false, canAskAgain: false)
+      } else {
+        result = makePermissionsResult(status: "granted", granted: true, canAskAgain: false)
+      }
+    case .restricted:
+      result = makePermissionsResult(status: "restricted", granted: false, canAskAgain: false)
+    case .denied:
+      result = makePermissionsResult(status: "denied", granted: false, canAskAgain: false)
+    case .notDetermined:
+      result = makePermissionsResult(status: "unknown", granted: false, canAskAgain: true)
+    @unknown default:
+      result = makePermissionsResult(status: "unknown", granted: false, canAskAgain: true)
     }
+
+    promise.resolve(result)
+    self.emitBluetoothStatus()
   }
 
   public func definition() -> ModuleDefinition {
@@ -146,7 +187,7 @@ public class VeepooSDKModule: Module {
     // MARK: Events
     Events(
       DEVICE_FOUND, DEVICE_CONNECTED, DEVICE_DISCONNECTED,
-      DEVICE_CONNECT_STATUS, DEVICE_READY, BLUETOOTH_STATE_CHANGED,
+      DEVICE_CONNECT_STATUS, CONNECTION_STATUS_CHANGED, DEVICE_READY, BLUETOOTH_STATE_CHANGED,
       DEVICE_FUNCTION, DEVICE_VERSION, PASSWORD_DATA,
       HEART_RATE_TEST_RESULT, BLOOD_PRESSURE_TEST_RESULT,
       BLOOD_OXYGEN_TEST_RESULT, TEMPERATURE_TEST_RESULT,
@@ -197,14 +238,20 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("requestPermissions") { (promise: Promise) in
       #if targetEnvironment(simulator)
-      promise.resolve("granted")
+      promise.resolve(self.makePermissionsResult(status: "granted", granted: true, canAskAgain: false))
       #else
       let authorization = CBManager.authorization
       switch authorization {
       case .allowedAlways:
-        promise.resolve("granted")
+        self.ensureCentralManager()
+        let granted = self.centralManager?.state != .poweredOff
+        promise.resolve(self.makePermissionsResult(
+          status: granted ? "granted" : "powered_off",
+          granted: granted,
+          canAskAgain: false
+        ))
       case .restricted:
-        promise.resolve("restricted")
+        promise.resolve(self.makePermissionsResult(status: "restricted", granted: false, canAskAgain: false))
       case .notDetermined:
         if self.permissionDelegate == nil {
           self.permissionDelegate = PermissionDelegate(module: self)
@@ -213,9 +260,9 @@ public class VeepooSDKModule: Module {
         self.permissionCentralManager = CBCentralManager(delegate: self.permissionDelegate, queue: nil, options: [:])
         self.centralManager = self.permissionCentralManager
       case .denied:
-        promise.resolve("denied")
+        promise.resolve(self.makePermissionsResult(status: "denied", granted: false, canAskAgain: false))
       @unknown default:
-        promise.resolve("unknown")
+        promise.resolve(self.makePermissionsResult(status: "unknown", granted: false, canAskAgain: true))
       }
       #endif
     }
@@ -239,6 +286,7 @@ public class VeepooSDKModule: Module {
         return
       }
       self.isScanning = true
+      self.emitBluetoothStatus()
       manager.veepooSDKStartScanDeviceAndReceiveScanningDevice { [weak self] peripheralModel in
         guard let self = self, let model = peripheralModel else { return }
         self.handleDiscoveredDevice(model)
@@ -249,6 +297,7 @@ public class VeepooSDKModule: Module {
         self.bleManager?.veepooSDKStopScanDevice()
         self.isScanning = false
         self.pendingScanStart = false
+        self.emitBluetoothStatus()
       }
       promise.resolve(nil)
       #endif
@@ -261,6 +310,7 @@ public class VeepooSDKModule: Module {
       self.pendingScanStart = false
       self.isScanning = false
       self.bleManager?.veepooSDKStopScanDevice()
+      self.emitBluetoothStatus()
       promise.resolve(nil)
       #endif
     }
@@ -283,7 +333,7 @@ public class VeepooSDKModule: Module {
       let password = options?["password"] as? String ?? "0000"
       let is24Hour = options?["is24Hour"] as? Bool ?? false
       let uuidString = options?["uuid"] as? String
-      self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "connecting"])
+      self.emitConnectionStatus(deviceId: deviceId, status: "connecting")
       var peripheralModel: VPPeripheralModel? = self.discoveredDevices[deviceId]
       if peripheralModel == nil, let uuidStr = uuidString, let uuid = UUID(uuidString: uuidStr), let central = self.centralManager {
         let peripherals = central.retrievePeripherals(withIdentifiers: [uuid])
@@ -298,24 +348,36 @@ public class VeepooSDKModule: Module {
         self.pendingConnectPassword = password
         self.pendingConnectIs24Hour = is24Hour
         self.pendingConnectPromise = promise
-        self.ensureCentralManager()
-        if let central = self.centralManager {
-          central.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+        self.pendingScanStart = true
+
+        if !self.isScanning {
+          guard let manager = self.bleManager else {
+            promise.reject("BLUETOOTH_UNAVAILABLE", "Bluetooth manager not available")
+            return
+          }
           self.isScanning = true
-          DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
-            guard let self = self else { return }
-            if self.pendingConnectDeviceId == deviceId {
-              central.stopScan()
-              self.isScanning = false
-              if let pendingPromise = self.pendingConnectPromise {
-                self.pendingConnectPromise = nil
-                self.pendingConnectDeviceId = nil
-                pendingPromise.reject("DEVICE_NOT_FOUND", "Device not found after scanning.")
-              }
+          self.emitBluetoothStatus()
+          manager.veepooSDKStartScanDeviceAndReceiveScanningDevice { [weak self] peripheralModel in
+            guard let self = self, let model = peripheralModel else { return }
+            self.handleDiscoveredDevice(model)
+          }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+          guard let self = self else { return }
+          if self.pendingConnectDeviceId == deviceId {
+            self.bleManager?.veepooSDKStopScanDevice()
+            self.isScanning = false
+            self.pendingScanStart = false
+            self.emitBluetoothStatus()
+            if let pendingPromise = self.pendingConnectPromise {
+              self.pendingConnectPromise = nil
+              self.pendingConnectDeviceId = nil
+              self.pendingConnectPassword = nil
+              self.pendingConnectIs24Hour = false
+              pendingPromise.reject("DEVICE_NOT_FOUND", "Device not found after scanning.")
             }
           }
-        } else {
-          promise.reject("BLUETOOTH_UNAVAILABLE", "Bluetooth manager not available")
         }
       }
       #endif
@@ -328,10 +390,12 @@ public class VeepooSDKModule: Module {
       self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "disconnected"])
       promise.resolve(nil)
       #else
+      self.connectionState = .disconnecting
       self.bleManager?.veepooSDKDisconnectDevice()
       self.connectedDeviceId = nil
       self.sendEvent(DEVICE_DISCONNECTED, ["deviceId": deviceId])
-      self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "disconnected"])
+      self.emitConnectionStatus(deviceId: deviceId, status: "disconnected")
+      self.connectionState = .disconnected
       promise.resolve(nil)
       #endif
     }
@@ -392,7 +456,7 @@ public class VeepooSDKModule: Module {
       peripheralManage.veepooSDKReadDeviceBatteryAndChargeInfo { isPercent, chargeState, percenTypeIsLowBat, battery in
         if hasResolved { return }
         hasResolved = true
-        promise.resolve([
+        let payload: [String: Any] = [
           "level": battery,
           "percent": isPercent ? battery : 0,
           "powerModel": 0,
@@ -400,7 +464,9 @@ public class VeepooSDKModule: Module {
           "bat": 0,
           "isPercent": isPercent,
           "isLowBattery": percenTypeIsLowBat
-        ])
+        ]
+        self.sendEvent(BATTERY_DATA, ["deviceId": self.connectedDeviceId ?? "", "data": payload])
+        promise.resolve(payload)
       }
       #endif
     }

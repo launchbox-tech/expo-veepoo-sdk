@@ -64,6 +64,7 @@ class VeepooSDKModule : Module() {
     val allGranted = grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
     
     if (allGranted) {
+      emitBluetoothStatus()
       promise.resolve(mapOf(
         "granted" to true,
         "status" to "granted"
@@ -74,6 +75,7 @@ class VeepooSDKModule : Module() {
         activity?.shouldShowRequestPermissionRationale(perm) == true
       }
 
+      emitBluetoothStatus()
       promise.resolve(mapOf(
         "granted" to false,
         "status" to if (canAskAgain) "denied" else "never_ask_again",
