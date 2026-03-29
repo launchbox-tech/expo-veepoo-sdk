@@ -130,9 +130,23 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
       },
       object : IPwdDataListener {
         override fun onPwdDataChange(pwdData: PwdData?) {
-          val status = normalizePasswordStatus(pwdData?.getmStatus()?.toString() ?: "UNKNOWN")
+          val rawStatus = pwdData?.getmStatus()?.toString() ?: "UNKNOWN"
+          val status = normalizePasswordStatus(rawStatus)
           val deviceNumber = pwdData?.deviceNumber?.toString() ?: ""
           val deviceVersion = pwdData?.deviceVersion ?: ""
+          val resultData = mapOf(
+            "status" to status,
+            "rawStatus" to rawStatus,
+            "password" to password,
+            "pwd" to password,
+            "deviceNumber" to deviceNumber,
+            "deviceVersion" to deviceVersion,
+            "deviceTestVersion" to (pwdData?.deviceTestVersion ?: ""),
+            "isHaveDrinkData" to (pwdData?.isHaveDrinkData ?: false),
+            "isOpenNightTurnWriste" to (pwdData?.isOpenNightTurnWriste?.toString() ?: ""),
+            "findPhoneFunction" to (pwdData?.findPhoneFunction?.toString() ?: ""),
+            "wearDetectFunction" to (pwdData?.wearDetectFunction?.toString() ?: "")
+          )
           
           if (status == "SUCCESS") {
             module.cachedDeviceVersion = deviceVersion
@@ -145,20 +159,10 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
           
           module.sendEvent(PASSWORD_DATA, mapOf(
             "deviceId" to (module.connectedDeviceId ?: ""),
-            "data" to mapOf(
-              "status" to status,
-              "password" to password,
-              "deviceNumber" to deviceNumber,
-              "deviceVersion" to deviceVersion
-            )
+            "data" to resultData
           ))
           
-          promise.resolve(mapOf(
-            "status" to status,
-            "password" to password,
-            "deviceNumber" to deviceNumber,
-            "deviceVersion" to deviceVersion
-          ))
+          promise.resolve(resultData)
         }
       },
       object : IDeviceFuctionDataListener {

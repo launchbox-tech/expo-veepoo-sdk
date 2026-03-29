@@ -2,21 +2,12 @@ import { requireNativeModule, EventSubscription } from 'expo-modules-core';
 
 import type {
   ConnectionStatus,
-  BatteryInfo,
   PersonalInfo,
   VeepooEvent,
   ScanOptions,
   ConnectOptions,
-  DeviceFunctions,
-  DeviceVersion,
-  PasswordData,
-  SocialMsgData,
   Language,
   AutoMeasureSetting,
-  SleepData,
-  SportStepData,
-  OriginData,
-  DaySummaryData,
   PermissionsResult,
 } from './types.js';
 
@@ -27,42 +18,42 @@ const LINKING_ERROR =
 
 export interface NativeVeepooSDKInterface {
   init(): Promise<void>;
-    isBluetoothEnabled(): Promise<boolean>;
-    requestPermissions(): Promise<PermissionsResult>;
-    startScan(options?: ScanOptions): Promise<void>;
-    stopScan(): Promise<void>;
-    connect(deviceId: string, options?: ConnectOptions): Promise<void>;
-    disconnect(deviceId: string): Promise<void>;
-    getConnectionStatus(deviceId: string): Promise<ConnectionStatus>;
-    verifyPassword(password: string, is24Hour: boolean): Promise<PasswordData>;
-    readBattery(): Promise<BatteryInfo>;
-    syncPersonalInfo(info: PersonalInfo): Promise<boolean>;
-    readDeviceFunctions(): Promise<DeviceFunctions>;
-    readSocialMsgData(): Promise<SocialMsgData>;
-    readDeviceVersion(): Promise<DeviceVersion>;
-    startReadOriginData(): Promise<void>;
-    readDeviceAllData(): Promise<boolean>;
-    readSleepData(date?: string): Promise<SleepData[]>;
-    readSportStepData(date?: string): Promise<SportStepData>;
-    readOriginData(dayOffset?: number): Promise<OriginData[]>;
-  readDaySummaryData(dayOffset?: number): Promise<DaySummaryData>;
-  readAutoMeasureSetting(): Promise<AutoMeasureSetting[]>;
-  modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<AutoMeasureSetting[]>;
+  isBluetoothEnabled(): Promise<boolean>;
+  requestPermissions(): Promise<PermissionsResult>;
+  startScan(options?: ScanOptions): Promise<void>;
+  stopScan(): Promise<void>;
+  connect(deviceId: string, options?: ConnectOptions): Promise<void>;
+  disconnect(deviceId: string): Promise<void>;
+  getConnectionStatus(deviceId: string): Promise<ConnectionStatus>;
+  verifyPassword(password: string, is24Hour: boolean): Promise<unknown>;
+  readBattery(): Promise<unknown>;
+  syncPersonalInfo(info: PersonalInfo): Promise<boolean>;
+  readDeviceFunctions(): Promise<unknown>;
+  readSocialMsgData(): Promise<unknown>;
+  readDeviceVersion(): Promise<unknown>;
+  startReadOriginData(): Promise<void>;
+  readDeviceAllData(): Promise<boolean>;
+  readSleepData(date?: string): Promise<unknown>;
+  readSportStepData(date?: string): Promise<unknown>;
+  readOriginData(dayOffset?: number): Promise<unknown>;
+  readDaySummaryData(dayOffset?: number): Promise<unknown>;
+  readAutoMeasureSetting(): Promise<unknown>;
+  modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<unknown>;
   setLanguage(language: Language): Promise<boolean>;
-    startHeartRateTest(): Promise<void>;
-    stopHeartRateTest(): Promise<void>;
-    startBloodPressureTest(): Promise<void>;
-    stopBloodPressureTest(): Promise<void>;
-    startBloodOxygenTest(): Promise<void>;
-    stopBloodOxygenTest(): Promise<void>;
-    startTemperatureTest(): Promise<void>;
-    stopTemperatureTest(): Promise<void>;
-    startStressTest(): Promise<void>;
-    stopStressTest(): Promise<void>;
-    startBloodGlucoseTest(): Promise<void>;
-    stopBloodGlucoseTest(): Promise<void>;
-    addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
-    removeListeners(count: number): void;
+  startHeartRateTest(): Promise<void>;
+  stopHeartRateTest(): Promise<void>;
+  startBloodPressureTest(): Promise<void>;
+  stopBloodPressureTest(): Promise<void>;
+  startBloodOxygenTest(): Promise<void>;
+  stopBloodOxygenTest(): Promise<void>;
+  startTemperatureTest(): Promise<void>;
+  stopTemperatureTest(): Promise<void>;
+  startStressTest(): Promise<void>;
+  stopStressTest(): Promise<void>;
+  startBloodGlucoseTest(): Promise<void>;
+  stopBloodGlucoseTest(): Promise<void>;
+  addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
+  removeListeners(count: number): void;
 }
 
 let NativeModule: NativeVeepooSDKInterface;
@@ -118,11 +109,11 @@ class VeepooSDKNativeWrapper implements NativeVeepooSDKInterface {
     return this.native.getConnectionStatus(deviceId);
   }
 
-  async verifyPassword(password: string, is24Hour: boolean = false): Promise<PasswordData> {
+  async verifyPassword(password: string, is24Hour: boolean = false): Promise<unknown> {
     return this.native.verifyPassword(password, is24Hour);
   }
 
-  async readBattery(): Promise<BatteryInfo> {
+  async readBattery(): Promise<unknown> {
     return this.native.readBattery();
   }
 
@@ -130,15 +121,15 @@ class VeepooSDKNativeWrapper implements NativeVeepooSDKInterface {
     return this.native.syncPersonalInfo(info);
   }
 
-  async readDeviceFunctions(): Promise<DeviceFunctions> {
+  async readDeviceFunctions(): Promise<unknown> {
     return this.native.readDeviceFunctions();
   }
 
-  async readSocialMsgData(): Promise<SocialMsgData> {
+  async readSocialMsgData(): Promise<unknown> {
     return this.native.readSocialMsgData();
   }
 
-  async readDeviceVersion(): Promise<DeviceVersion> {
+  async readDeviceVersion(): Promise<unknown> {
     return this.native.readDeviceVersion();
   }
 
@@ -150,27 +141,27 @@ class VeepooSDKNativeWrapper implements NativeVeepooSDKInterface {
     return this.native.readDeviceAllData();
   }
 
-  async readSleepData(date?: string): Promise<SleepData[]> {
+  async readSleepData(date?: string): Promise<unknown> {
     return this.native.readSleepData(date);
   }
 
-  async readSportStepData(date?: string): Promise<SportStepData> {
+  async readSportStepData(date?: string): Promise<unknown> {
     return this.native.readSportStepData(date);
   }
 
-  async readOriginData(dayOffset: number = 0): Promise<OriginData[]> {
+  async readOriginData(dayOffset: number = 0): Promise<unknown> {
     return this.native.readOriginData(dayOffset);
   }
 
-  async readDaySummaryData(dayOffset: number = 0): Promise<DaySummaryData> {
+  async readDaySummaryData(dayOffset: number = 0): Promise<unknown> {
     return this.native.readDaySummaryData(dayOffset);
   }
 
-  async readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
+  async readAutoMeasureSetting(): Promise<unknown> {
     return this.native.readAutoMeasureSetting();
   }
 
-  async modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<AutoMeasureSetting[]> {
+  async modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<unknown> {
     return this.native.modifyAutoMeasureSetting(setting);
   }
 

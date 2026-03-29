@@ -31,6 +31,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
           "deviceId" to (module.connectedDeviceId ?: ""),
           "result" to mapOf(
             "state" to "testing",
+            "rawState" to "testing",
             "value" to lastHeartValue,
             "progress" to progress
           )
@@ -44,6 +45,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
           "deviceId" to (module.connectedDeviceId ?: ""),
           "result" to mapOf(
             "state" to "over",
+            "rawState" to "over",
             "value" to lastHeartValue,
             "progress" to 100
           )
@@ -78,6 +80,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
                 "deviceId" to (module.connectedDeviceId ?: ""),
                 "result" to mapOf(
                   "state" to testState,
+                  "rawState" to rawStatus,
                   "value" to heartData.data,
                   "progress" to module.heartRateTestProgress
                 )
@@ -155,6 +158,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
                 "deviceId" to (module.connectedDeviceId ?: ""),
                 "result" to mapOf(
                   "state" to "testing",
+                  "rawState" to rawStatus,
                   "systolic" to lastSystolic,
                   "diastolic" to lastDiastolic,
                   "progress" to progress,
@@ -178,6 +182,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
                 "deviceId" to (module.connectedDeviceId ?: ""),
                 "result" to mapOf(
                   "state" to if (testState == "error" || testState == "notWear" || testState == "deviceBusy") testState else "over",
+                  "rawState" to rawStatus,
                   "systolic" to lastSystolic,
                   "diastolic" to lastDiastolic,
                   "progress" to 100,
@@ -231,11 +236,12 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
       onProgress = { progress ->
         module.sendEvent(BLOOD_OXYGEN_TEST_RESULT, mapOf(
           "deviceId" to (module.connectedDeviceId ?: ""),
-          "result" to mapOf(
-            "state" to "testing",
-            "value" to lastSPO2Value,
-            "rate" to lastRateValue,
-            "progress" to progress
+            "result" to mapOf(
+              "state" to "testing",
+              "rawState" to "testing",
+              "value" to lastSPO2Value,
+              "rate" to lastRateValue,
+              "progress" to progress
           )
         ))
       },
@@ -250,11 +256,12 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
         )
         module.sendEvent(BLOOD_OXYGEN_TEST_RESULT, mapOf(
           "deviceId" to (module.connectedDeviceId ?: ""),
-          "result" to mapOf(
-            "state" to "over",
-            "value" to lastSPO2Value,
-            "rate" to lastRateValue,
-            "progress" to 100
+            "result" to mapOf(
+              "state" to "over",
+              "rawState" to "over",
+              "value" to lastSPO2Value,
+              "rate" to lastRateValue,
+              "progress" to 100
           )
         ))
       }
@@ -293,6 +300,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
                 "deviceId" to (module.connectedDeviceId ?: ""),
                 "result" to mapOf(
                   "state" to testState,
+                  "rawState" to (spo2hData.deviceState?.toString() ?: ""),
                   "value" to spo2hData.value,
                   "rate" to spo2hData.rateValue,
                   "progress" to module.bloodOxygenTestProgress
@@ -368,6 +376,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
               "deviceId" to (module.connectedDeviceId ?: ""),
               "result" to mapOf(
                 "state" to testState,
+                "rawState" to (data.deviceState?.toString() ?: data.oprate.toString()),
                 "value" to data.tempture.toDouble(),
                 "deviceState" to data.deviceState,
                 "progress" to data.progress,
@@ -465,6 +474,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
               "progress" to progress,
               "level" to (level?.toString() ?: "UNKNOWN"),
               "state" to state,
+              "rawState" to "progress:$progress",
               "isEnd" to (progress >= 100),
               "timestamp" to System.currentTimeMillis()
             )
@@ -501,6 +511,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
               "progress" to 100,
               "level" to (lastLevel?.toString() ?: "UNKNOWN"),
               "state" to "over",
+              "rawState" to "stop",
               "status" to "STOPPED",
               "isEnd" to true,
               "timestamp" to System.currentTimeMillis()
@@ -517,6 +528,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
               "level" to (lastLevel?.toString() ?: "UNKNOWN"),
               "error" to "Detect error: $status",
               "state" to "error",
+              "rawState" to (status?.toString() ?: "UNKNOWN"),
               "status" to (status?.toString() ?: "UNKNOWN"),
               "isEnd" to true,
               "timestamp" to System.currentTimeMillis()

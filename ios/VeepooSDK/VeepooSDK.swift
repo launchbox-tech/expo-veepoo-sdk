@@ -429,9 +429,12 @@ public class VeepooSDKModule: Module {
         let status = self.normalizePasswordStatus(success ? "SUCCESS" : "FAILED")
         let resultData: [String: Any] = [
           "status": status,
+          "rawStatus": result.rawValue,
           "password": password,
+          "pwd": password,
           "deviceNumber": String(manager.peripheralModel?.deviceNumber ?? 0),
-          "deviceVersion": manager.peripheralModel?.deviceVersion ?? ""
+          "deviceVersion": manager.peripheralModel?.deviceVersion ?? "",
+          "deviceTestVersion": manager.peripheralModel?.deviceTestVersion ?? ""
         ]
         self.sendEvent(PASSWORD_DATA, ["deviceId": self.connectedDeviceId ?? "", "data": resultData])
         if success {

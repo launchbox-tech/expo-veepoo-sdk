@@ -734,6 +734,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "over",
+            "rawState": "timer_over",
             "value": currentHeartRate,
             "progress": 100
           ]
@@ -741,13 +742,14 @@ extension VeepooSDKModule {
         return
       }
       
-      self.sendEvent(HEART_RATE_TEST_RESULT, [
-        "deviceId": self.connectedDeviceId ?? "",
-        "result": [
-          "state": "testing",
-          "value": currentHeartRate,
-          "progress": currentProgress
-        ]
+        self.sendEvent(HEART_RATE_TEST_RESULT, [
+          "deviceId": self.connectedDeviceId ?? "",
+          "result": [
+            "state": "testing",
+            "rawState": "timer_testing",
+            "value": currentHeartRate,
+            "progress": currentProgress
+          ]
       ])
     }
     }
@@ -768,6 +770,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "testing",
+            "rawState": state.rawValue,
             "value": heartValue,
             "progress": progressWrapper.value
           ]
@@ -781,6 +784,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "notWear",
+            "rawState": state.rawValue,
             "value": heartValue,
             "progress": progressWrapper.value
           ]
@@ -794,6 +798,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "deviceBusy",
+            "rawState": state.rawValue,
             "value": heartValue,
             "progress": progressWrapper.value
           ]
@@ -807,6 +812,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "over",
+            "rawState": state.rawValue,
             "value": heartValue,
             "progress": 100
           ]
@@ -860,6 +866,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": statusStr,
+            "rawState": state.rawValue,
             "systolic": high,
             "diastolic": low,
             "progress": 100,
@@ -879,11 +886,12 @@ extension VeepooSDKModule {
       
       self.sendEvent(BLOOD_PRESSURE_TEST_RESULT, [
         "deviceId": self.connectedDeviceId ?? "",
-        "result": [
-          "state": statusStr,
-          "systolic": high,
-          "diastolic": low,
-          "progress": progress,
+          "result": [
+            "state": statusStr,
+            "rawState": state.rawValue,
+            "systolic": high,
+            "diastolic": low,
+            "progress": progress,
           "isEnd": false
         ]
       ])
@@ -954,6 +962,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "calibration",
+            "rawState": state.rawValue,
             "value": 0,
             "rate": 0,
             "progress": Int(value),
@@ -976,6 +985,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "notWear",
+            "rawState": state.rawValue,
             "value": Int(value),
             "rate": rateValueWrapper.value,
             "progress": progressWrapper.value,
@@ -989,6 +999,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "deviceBusy",
+            "rawState": state.rawValue,
             "value": Int(value),
             "rate": rateValueWrapper.value,
             "progress": progressWrapper.value,
@@ -1002,6 +1013,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "over",
+            "rawState": state.rawValue,
             "value": Int(value),
             "rate": rateValueWrapper.value,
             "progress": 100,
@@ -1015,6 +1027,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "noFunction",
+            "rawState": state.rawValue,
             "value": Int(value),
             "rate": rateValueWrapper.value,
             "progress": progressWrapper.value,
@@ -1028,6 +1041,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
             "state": "invalid",
+            "rawState": state.rawValue,
             "value": Int(value),
             "rate": rateValueWrapper.value,
             "progress": progressWrapper.value,
@@ -1073,6 +1087,7 @@ extension VeepooSDKModule {
       
       var result: [String: Any] = [
         "state": statusStr,
+        "rawState": state.rawValue,
         "value": tempValue > 0 ? Double(tempValue) / 10.0 : nil,
         "progress": progress,
         "isEnd": isEnd
@@ -1127,6 +1142,7 @@ extension VeepooSDKModule {
         "data": [
           "stress": stress,
           "progress": progress,
+          "rawState": state.rawValue,
           "status": statusStr,
           "isEnd": isEnd
         ]
@@ -1186,6 +1202,7 @@ extension VeepooSDKModule {
             "progress": 100,
             "level": level,
             "state": statusStr,
+            "rawState": state.rawValue,
             "status": statusStr,
             "isEnd": true
           ]
@@ -1210,6 +1227,7 @@ extension VeepooSDKModule {
           "progress": progress,
           "level": level,
           "state": statusStr,
+          "rawState": state.rawValue,
           "status": statusStr,
           "isEnd": false
         ]

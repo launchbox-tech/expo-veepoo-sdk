@@ -24,9 +24,26 @@ import type {
 } from './types.js';
 import type { NativeVeepooSDKInterface } from './NativeVeepooSDK.js';
 import {
+  normalizeAutoMeasureSettings,
+  normalizeBatteryInfo,
   normalizeBluetoothStatus,
+  normalizeBloodGlucoseData,
+  normalizeBloodOxygenTestResult,
+  normalizeBloodPressureTestResult,
+  normalizeDaySummaryData,
+  normalizeDeviceFunctions,
+  normalizeDeviceVersion,
+  normalizeHalfHourData,
+  normalizeHeartRateTestResult,
+  normalizeOriginDataList,
+  normalizePasswordData,
   normalizePermissionsResult,
   normalizeReadOriginProgressPayload,
+  normalizeSleepDataList,
+  normalizeSocialMsgData,
+  normalizeSportStepData,
+  normalizeStressData,
+  normalizeTemperatureTestResult,
 } from './normalizers.js';
 
 type EventListener = (payload: unknown) => void;
@@ -104,6 +121,58 @@ export class VeepooSDK {
         ? normalizeBluetoothStatus(payload)
         : event === 'readOriginProgress'
           ? normalizeReadOriginProgressPayload(payload)
+          : event === 'deviceFunction' && this.isEventRecord(payload)
+            ? {
+                ...payload,
+                data: normalizeDeviceFunctions(payload.data ?? payload.functions),
+                functions: normalizeDeviceFunctions(payload.functions ?? payload.data),
+              }
+            : event === 'deviceVersion' && this.isEventRecord(payload)
+              ? { ...payload, version: normalizeDeviceVersion(payload.version) }
+              : event === 'passwordData' && this.isEventRecord(payload)
+                ? { ...payload, data: normalizePasswordData(payload.data) }
+                : event === 'socialMsgData' && this.isEventRecord(payload)
+                  ? { ...payload, data: normalizeSocialMsgData(payload.data) }
+                  : event === 'originFiveMinuteData' && this.isEventRecord(payload)
+                    ? {
+                        ...payload,
+                        data: normalizeOriginDataList([payload.data])[0],
+                      }
+                    : event === 'originHalfHourData' && this.isEventRecord(payload)
+                      ? { ...payload, data: normalizeHalfHourData(payload.data) }
+                      : event === 'sleepData' && this.isEventRecord(payload)
+                        ? {
+                            ...payload,
+                            data: normalizeSleepDataList(payload.data)[0],
+                          }
+                        : event === 'sportStepData' && this.isEventRecord(payload)
+                          ? { ...payload, data: normalizeSportStepData(payload.data) }
+                          : event === 'heartRateTestResult' && this.isEventRecord(payload)
+                            ? { ...payload, result: normalizeHeartRateTestResult(payload.result) }
+                            : event === 'bloodPressureTestResult' && this.isEventRecord(payload)
+                              ? {
+                                  ...payload,
+                                  result: normalizeBloodPressureTestResult(payload.result),
+                                }
+                              : event === 'bloodOxygenTestResult' && this.isEventRecord(payload)
+                                ? {
+                                    ...payload,
+                                    result: normalizeBloodOxygenTestResult(payload.result),
+                                  }
+                                : event === 'temperatureTestResult' && this.isEventRecord(payload)
+                                  ? {
+                                      ...payload,
+                                      result: normalizeTemperatureTestResult(payload.result),
+                                    }
+                                  : event === 'stressData' && this.isEventRecord(payload)
+                                    ? { ...payload, data: normalizeStressData(payload.data) }
+                                    : event === 'bloodGlucoseData' && this.isEventRecord(payload)
+                                      ? {
+                                          ...payload,
+                                          data: normalizeBloodGlucoseData(payload.data),
+                                        }
+                                      : event === 'batteryData' && this.isEventRecord(payload)
+                                        ? { ...payload, data: normalizeBatteryInfo(payload.data) }
           : payload;
 
     if (event === 'bluetoothStateChanged') {
@@ -145,6 +214,10 @@ export class VeepooSDK {
         }
       });
     }
+  }
+
+  private isEventRecord(payload: unknown): payload is Record<string, any> {
+    return typeof payload === 'object' && payload !== null;
   }
 
   private handleError(error: unknown, code: VeepooError['code'], deviceId?: string): VeepooError {
@@ -242,11 +315,11 @@ export class VeepooSDK {
   }
 
   async verifyPassword(password: string = '0000', is24Hour: boolean = false): Promise<PasswordData> {
-    return NativeModule.verifyPassword(password, is24Hour);
+    return normalizePasswordData(await NativeModule.verifyPassword(password, is24Hour));
   }
 
   async readBattery(): Promise<BatteryInfo> {
-    return NativeModule.readBattery();
+    return normalizeBatteryInfo(await NativeModule.readBattery());
   }
 
   async syncPersonalInfo(info: PersonalInfo): Promise<boolean> {
@@ -254,15 +327,15 @@ export class VeepooSDK {
   }
 
   async readDeviceFunctions(): Promise<DeviceFunctions> {
-    return NativeModule.readDeviceFunctions();
+    return normalizeDeviceFunctions(await NativeModule.readDeviceFunctions());
   }
 
   async readSocialMsgData(): Promise<SocialMsgData> {
-    return NativeModule.readSocialMsgData();
+    return normalizeSocialMsgData(await NativeModule.readSocialMsgData());
   }
 
   async readDeviceVersion(): Promise<DeviceVersion> {
-    return NativeModule.readDeviceVersion();
+    return normalizeDeviceVersion(await NativeModule.readDeviceVersion());
   }
 
   async startReadOriginData(): Promise<void> {
@@ -274,27 +347,27 @@ export class VeepooSDK {
   }
 
   async readSleepData(date?: string): Promise<SleepData[]> {
-    return NativeModule.readSleepData(date);
+    return normalizeSleepDataList(await NativeModule.readSleepData(date));
   }
 
   async readSportStepData(date?: string): Promise<SportStepData> {
-    return NativeModule.readSportStepData(date);
+    return normalizeSportStepData(await NativeModule.readSportStepData(date));
   }
 
   async readOriginData(dayOffset: number = 0): Promise<OriginData[]> {
-    return NativeModule.readOriginData(dayOffset);
+    return normalizeOriginDataList(await NativeModule.readOriginData(dayOffset));
   }
 
   async readDaySummaryData(dayOffset: number = 0): Promise<DaySummaryData> {
-    return NativeModule.readDaySummaryData(dayOffset);
+    return normalizeDaySummaryData(await NativeModule.readDaySummaryData(dayOffset));
   }
 
   async readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
-    return NativeModule.readAutoMeasureSetting();
+    return normalizeAutoMeasureSettings(await NativeModule.readAutoMeasureSetting());
   }
 
   async modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<AutoMeasureSetting[]> {
-    return NativeModule.modifyAutoMeasureSetting(setting);
+    return normalizeAutoMeasureSettings(await NativeModule.modifyAutoMeasureSetting(setting));
   }
 
   async setLanguage(language: Language): Promise<boolean> {

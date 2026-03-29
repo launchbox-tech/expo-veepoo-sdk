@@ -229,14 +229,16 @@ extension VeepooSDKModule {
         }
       } else {
         self.connectionState = .error("Authentication timeout")
-        self.sendEvent(PASSWORD_DATA, [
-          "deviceId": deviceId,
-          "data": [
-            "status": "TIMEOUT",
-            "password": password,
-            "deviceNumber": "",
-            "deviceVersion": "",
-            "retryCount": self.authenticationRetryCount
+      self.sendEvent(PASSWORD_DATA, [
+        "deviceId": deviceId,
+        "data": [
+          "status": "TIMEOUT",
+          "rawStatus": "TIMEOUT",
+          "password": password,
+          "pwd": password,
+          "deviceNumber": "",
+          "deviceVersion": "",
+          "retryCount": self.authenticationRetryCount
           ]
         ])
         self.authenticationRetryCount = 0
@@ -252,7 +254,9 @@ extension VeepooSDKModule {
         "deviceId": deviceId,
         "data": [
           "status": "FAILED",
+          "rawStatus": "FAILED",
           "password": password,
+          "pwd": password,
           "deviceNumber": "",
           "deviceVersion": "",
           "error": "BLE manager is nil"
@@ -273,7 +277,9 @@ extension VeepooSDKModule {
         "deviceId": deviceId,
         "data": [
           "status": "FAILED",
+          "rawStatus": "FAILED",
           "password": password,
+          "pwd": password,
           "deviceNumber": "",
           "deviceVersion": "",
           "error": "Invalid password type"
@@ -301,7 +307,9 @@ extension VeepooSDKModule {
         "deviceId": deviceId,
         "data": [
           "status": status,
+          "rawStatus": result.rawValue,
           "password": password,
+          "pwd": password,
           "deviceNumber": String(manager.peripheralModel?.deviceNumber ?? 0),
           "deviceVersion": manager.peripheralModel?.deviceVersion ?? "",
           "retryCount": self.authenticationRetryCount
