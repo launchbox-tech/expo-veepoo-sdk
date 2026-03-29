@@ -77,6 +77,12 @@ ios/*.xcworkspace/
 ios/Podfile.lock
 ios/DerivedData/
 *.xcodeproj/xcuserdata
+ios/**/Pods/
+ios/**/*.xcworkspace/
+ios/**/Podfile.lock
+ios/**/DerivedData/
+ios/**/build/
+ios/**/*.xcodeproj/xcuserdata
 
 # OS
 .DS_Store
@@ -118,6 +124,30 @@ example/*.p12
 example/*.key
 example/*.mobileprovision
 example/*.orig.*
+examples/node_modules/
+examples/.expo/
+examples/.yalc/
+examples/.expo-shared/
+examples/dist/
+examples/web-build/
+examples/android/.gradle/
+examples/android/.cxx/
+examples/android/build/
+examples/android/app/build/
+examples/android/local.properties
+examples/ios/Pods/
+examples/ios/Podfile.lock
+examples/ios/DerivedData/
+examples/ios/build/
+examples/ios/*.xcworkspace/
+examples/ios/*.xcodeproj/xcuserdata
+examples/ios/*.xcarchive/
+examples/*.jks
+examples/*.p8
+examples/*.p12
+examples/*.key
+examples/*.mobileprovision
+examples/*.orig.*
 
 # Xcode build artifacts
 *.xcarchive
@@ -140,3 +170,5 @@ pnpm-lock.yaml
 
 example/package-lock.json
 example/yalc.lock
+examples/package-lock.json
+examples/yalc.lock
