@@ -6,7 +6,7 @@
 
 Expo 模块，用于 Veepoo 设备的蓝牙连接、数据读取和健康测试。
 
-升级说明见 [docs/release-notes/1.1.0.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.1.0.md)、[docs/release-notes/1.2.0.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.0.md)、[docs/release-notes/1.2.1.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.1.md) 和 [docs/release-notes/1.2.2.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.2.md)。
+升级说明见 [docs/release-notes/1.1.0.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.1.0.md)、[docs/release-notes/1.2.0.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.0.md)、[docs/release-notes/1.2.1.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.1.md)、[docs/release-notes/1.2.2.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.2.md) 和 [docs/release-notes/1.2.3.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.3.md)。
 
 这个包的原则是：
 
@@ -70,6 +70,7 @@ iOS 说明：
 - 但由于上游厂商二进制仅提供 device slice，Simulator 下走的是框架内置 stub/no-op 路径，不能用于真实蓝牙联调
 - `1.2.1` 修复了 iOS 设备构建下 `FRAMEWORK_SEARCH_PATHS` 对 `$(inherited)` 的错误引用问题
 - `1.2.2` 修复了 iOS 真机构建下动态 frameworks 未自动 embed 导致的启动崩溃问题
+- `1.2.3` 修复了 iOS embed 脚本在部分构建环境下 `FRAMEWORKS_FOLDER_PATH` 未定义导致的构建失败
 
 ### Android
 

@@ -16,5 +16,6 @@
 - `release-notes/1.2.0.md`
 - `release-notes/1.2.1.md`
 - `release-notes/1.2.2.md`
+- `release-notes/1.2.3.md`
 
 对外使用说明请优先查看仓库根目录的 `README.md`。

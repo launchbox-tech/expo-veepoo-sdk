@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'VeepooSDK'
-  s.version        = '1.2.2'
+  s.version        = '1.2.3'
   s.summary        = 'Expo module for Veepoo SDK Bluetooth connectivity'
   s.description    = 'Expo module that provides Bluetooth LE functionality for Veepoo devices'
   s.author         = 'Expo'
@@ -37,6 +37,10 @@ case "${PLATFORM_NAME:-}" in
     exit 0
     ;;
 esac
+
+if [ -z "${TARGET_BUILD_DIR:-}" ] || [ -z "${FRAMEWORKS_FOLDER_PATH:-}" ] || [ -z "${PODS_TARGET_SRCROOT:-}" ]; then
+  exit 0
+fi
 
 FRAMEWORKS_DIR="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"
 SOURCE_DIR="${PODS_TARGET_SRCROOT}/VeepooSDK/Frameworks"
