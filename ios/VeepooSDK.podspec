@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'VeepooSDK'
-  s.version        = '1.0.1'
+  s.version        = '1.2.0'
   s.summary        = 'Expo module for Veepoo SDK Bluetooth connectivity'
   s.description    = 'Expo module that provides Bluetooth LE functionality for Veepoo devices'
   s.author         = 'Expo'
@@ -13,14 +13,29 @@ Pod::Spec.new do |s|
   s.dependency 'MJExtension'
   s.swift_versions = '5.4'
 
-  s.vendored_frameworks = [
-    'VeepooSDK/Frameworks/VeepooBleSDK.framework',
-    'VeepooSDK/Frameworks/JL_BLEKit.framework',
-    'VeepooSDK/Frameworks/JLDialUnit.framework',
-    'VeepooSDK/Frameworks/GRDFUSDK.framework',
-    'VeepooSDK/Frameworks/ABParTool.framework',
-    'VeepooSDK/Frameworks/ZipZap.framework'
-  ]
+  frameworks_dir = File.expand_path('VeepooSDK/Frameworks', __dir__)
+  linker_flags = %w[
+    VeepooBleSDK
+    JL_BLEKit
+    JLDialUnit
+    GRDFUSDK
+    ABParTool
+    ZipZap
+  ].map { |name| %(-framework "#{name}") }.join(' ')
+
+  s.preserve_paths = 'VeepooSDK/Frameworks/**/*'
+  s.pod_target_xcconfig = {
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => %("$(inherited)" "#{frameworks_dir}"),
+    'OTHER_LDFLAGS[sdk=iphoneos*]' => %($(inherited) #{linker_flags}),
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => '$(inherited)',
+    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)'
+  }
+  s.user_target_xcconfig = {
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => %("$(inherited)" "#{frameworks_dir}"),
+    'OTHER_LDFLAGS[sdk=iphoneos*]' => %($(inherited) #{linker_flags}),
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => '$(inherited)',
+    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)'
+  }
 
   s.frameworks = 'CoreBluetooth', 'CoreLocation', 'CoreMotion', 'CoreAudio', 'AVFoundation'
 

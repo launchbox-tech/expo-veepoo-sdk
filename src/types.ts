@@ -500,6 +500,31 @@ export interface VeepooError {
   deviceId?: string;
 }
 
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+export type LogScope =
+  | 'sdk'
+  | 'scan'
+  | 'connection'
+  | 'bluetooth'
+  | 'permissions'
+  | 'device'
+  | 'read'
+  | 'test'
+  | 'listener';
+
+export interface LogEntry {
+  timestamp: number;
+  level: LogLevel;
+  scope: LogScope;
+  action: string;
+  platform: 'ios' | 'android' | 'web' | 'unknown';
+  message: string;
+  deviceId?: string;
+  data?: unknown;
+  error?: string;
+}
+
 export type VeepooEvent =
   | 'deviceFound'
   | 'deviceConnected'
