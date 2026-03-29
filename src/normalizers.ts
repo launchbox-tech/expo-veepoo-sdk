@@ -3,6 +3,7 @@ import type {
   BluetoothState,
   BluetoothStatus,
   PermissionStatus,
+  ReadOriginProgress,
   PermissionsResult,
 } from './types.js';
 
@@ -33,6 +34,10 @@ const validPermissionStatuses = new Set<PermissionStatus>([
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
 }
 
 export function normalizePermissionsResult(value: unknown): PermissionsResult {
@@ -119,4 +124,35 @@ export function normalizeBluetoothStatus(value: unknown): unknown {
   };
 
   return payload;
+}
+
+export function normalizeReadOriginProgressPayload(value: unknown): unknown {
+  if (!isRecord(value) || !isRecord(value.progress)) {
+    return value;
+  }
+
+  const progress = value.progress;
+  const normalized: ReadOriginProgress = {
+    readState:
+      typeof progress.readState === 'string'
+        ? (progress.readState as ReadOriginProgress['readState'])
+        : 'idle',
+    totalDays:
+      typeof progress.totalDays === 'number' && Number.isFinite(progress.totalDays)
+        ? Math.max(1, Math.trunc(progress.totalDays))
+        : 1,
+    currentDay:
+      typeof progress.currentDay === 'number' && Number.isFinite(progress.currentDay)
+        ? Math.max(1, Math.trunc(progress.currentDay))
+        : 1,
+    progress:
+      typeof progress.progress === 'number' && Number.isFinite(progress.progress)
+        ? clamp(progress.progress, 0, 1)
+        : 0,
+  };
+
+  return {
+    ...value,
+    progress: normalized,
+  };
 }

@@ -250,6 +250,18 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
       return@AsyncFunction
     }
     
+    val availableDays = maxOf(module.watchday, 1)
+
+    module.sendEvent(READ_ORIGIN_PROGRESS, mapOf(
+      "deviceId" to (module.connectedDeviceId ?: ""),
+      "progress" to mapOf(
+        "readState" to "start",
+        "totalDays" to availableDays,
+        "currentDay" to 1,
+        "progress" to 0.0
+      )
+    ))
+
     manager.readOriginData(
       object : IBleWriteResponse {
         override fun onResponse(code: Int) {
@@ -386,16 +398,19 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
         
         override fun onReadOriginProgressDetail(day: Int, date: String?, allPack: Int, currentPack: Int) {
           try {
-            val progress = if (allPack > 0) currentPack.toDouble() / allPack.toDouble() else 0.0
-            Log.d(TAG, "onReadOriginProgressDetail: day=$day, progress=$progress")
+            val dayProgress = (if (allPack > 0) currentPack.toDouble() / allPack.toDouble() else 0.0)
+              .coerceIn(0.0, 1.0)
+            val currentDay = (day + 1).coerceIn(1, availableDays)
+            val overallProgress = ((currentDay - 1) + dayProgress) / availableDays.toDouble()
+            Log.d(TAG, "onReadOriginProgressDetail: day=$day, dayProgress=$dayProgress, overallProgress=$overallProgress")
             
             module.sendEvent(READ_ORIGIN_PROGRESS, mapOf(
               "deviceId" to (module.connectedDeviceId ?: ""),
               "progress" to mapOf(
                 "readState" to "reading",
-                "totalDays" to 1,
-                "currentDay" to 1,
-                "progress" to progress
+                "totalDays" to availableDays,
+                "currentDay" to currentDay,
+                "progress" to overallProgress.coerceIn(0.0, 1.0)
               )
             ))
           } catch (e: Exception) {
@@ -407,6 +422,8 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
           try {
             var p = progress.toDouble()
             if (p > 1.0) p /= 100.0
+            p = p.coerceIn(0.0, 1.0)
+            val currentDay = kotlin.math.floor(p * availableDays).toInt().plus(1).coerceIn(1, availableDays)
             
             Log.d(TAG, "onReadOriginProgress: $p")
             
@@ -414,8 +431,8 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
               "deviceId" to (module.connectedDeviceId ?: ""),
               "progress" to mapOf(
                 "readState" to "reading",
-                "totalDays" to 1,
-                "currentDay" to 1,
+                "totalDays" to availableDays,
+                "currentDay" to currentDay,
                 "progress" to p
               )
             ))
@@ -427,6 +444,16 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
         override fun onReadOriginComplete() {
           try {
             Log.d(TAG, "onReadOriginComplete")
+
+            module.sendEvent(READ_ORIGIN_PROGRESS, mapOf(
+              "deviceId" to (module.connectedDeviceId ?: ""),
+              "progress" to mapOf(
+                "readState" to "complete",
+                "totalDays" to availableDays,
+                "currentDay" to availableDays,
+                "progress" to 1.0
+              )
+            ))
             
             module.sendEvent(READ_ORIGIN_COMPLETE, mapOf(
               "deviceId" to (module.connectedDeviceId ?: ""),
@@ -444,7 +471,7 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
           }
         }
       },
-      0
+      availableDays
     )
   }
 
@@ -461,11 +488,13 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
     
     Log.d(TAG, "readDeviceAllData: starting to read all device data")
     
+    val availableDays = maxOf(module.watchday, 1)
+
     module.sendEvent(READ_ORIGIN_PROGRESS, mapOf(
       "deviceId" to (module.connectedDeviceId ?: ""),
       "progress" to mapOf(
         "readState" to "start",
-        "totalDays" to 1,
+        "totalDays" to availableDays,
         "currentDay" to 1,
         "progress" to 0.0
       )
@@ -591,16 +620,19 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
         }
         
         override fun onReadOriginProgressDetail(day: Int, date: String?, allPack: Int, currentPack: Int) {
-          val progress = if (allPack > 0) currentPack.toDouble() / allPack.toDouble() else 0.0
-          Log.d(TAG, "readDeviceAllData: onReadOriginProgressDetail: day=$day, progress=$progress")
+          val dayProgress = (if (allPack > 0) currentPack.toDouble() / allPack.toDouble() else 0.0)
+            .coerceIn(0.0, 1.0)
+          val currentDay = (day + 1).coerceIn(1, availableDays)
+          val overallProgress = ((currentDay - 1) + dayProgress) / availableDays.toDouble()
+          Log.d(TAG, "readDeviceAllData: onReadOriginProgressDetail: day=$day, dayProgress=$dayProgress, overallProgress=$overallProgress")
           
           module.sendEvent(READ_ORIGIN_PROGRESS, mapOf(
             "deviceId" to (module.connectedDeviceId ?: ""),
             "progress" to mapOf(
               "readState" to "reading",
-              "totalDays" to 1,
-              "currentDay" to day,
-              "progress" to progress
+              "totalDays" to availableDays,
+              "currentDay" to currentDay,
+              "progress" to overallProgress.coerceIn(0.0, 1.0)
             )
           ))
         }
@@ -608,6 +640,8 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
         override fun onReadOriginProgress(progress: Float) {
           var p = progress.toDouble()
           if (p > 1.0) p /= 100.0
+          p = p.coerceIn(0.0, 1.0)
+          val currentDay = kotlin.math.floor(p * availableDays).toInt().plus(1).coerceIn(1, availableDays)
           
           Log.d(TAG, "readDeviceAllData: onReadOriginProgress: $p")
           
@@ -615,8 +649,8 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
             "deviceId" to (module.connectedDeviceId ?: ""),
             "progress" to mapOf(
               "readState" to "reading",
-              "totalDays" to 1,
-              "currentDay" to 1,
+              "totalDays" to availableDays,
+              "currentDay" to currentDay,
               "progress" to p
             )
           ))
@@ -629,8 +663,8 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
             "deviceId" to (module.connectedDeviceId ?: ""),
             "progress" to mapOf(
               "readState" to "complete",
-              "totalDays" to 1,
-              "currentDay" to 1,
+              "totalDays" to availableDays,
+              "currentDay" to availableDays,
               "progress" to 1.0
             )
           ))
@@ -643,7 +677,7 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
           promise.resolve(true)
         }
       },
-      0
+      availableDays
     )
   }
 
@@ -661,6 +695,7 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
     Log.d(TAG, "readSleepData: reading sleep data")
     
     val isPromiseResolved = java.util.concurrent.atomic.AtomicBoolean(false)
+    var timeoutRunnable: Runnable? = null
     
     fun createEmptySleepResult(): List<Map<String, Any>> = listOf(mapOf(
       "date" to (date ?: ""),
@@ -676,16 +711,16 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
     
     fun resolveSleepOnce(result: List<Map<String, Any>>) {
       if (isPromiseResolved.compareAndSet(false, true)) {
-        module.mainHandler.removeCallbacksAndMessages(null)
+        timeoutRunnable?.let { module.mainHandler.removeCallbacks(it) }
         promise.resolve(result)
       }
     }
     
-    val timeoutRunnable = Runnable {
+    timeoutRunnable = Runnable {
       Log.w(TAG, "readSleepData: timeout, returning empty result")
       resolveSleepOnce(createEmptySleepResult())
     }
-    module.mainHandler.postDelayed(timeoutRunnable, 15000)
+    module.mainHandler.postDelayed(timeoutRunnable!!, 15000)
     
     manager.readSleepData(
       object : IBleWriteResponse {
@@ -804,6 +839,7 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
     Log.d(TAG, "readSportStepData: reading sport step data")
     
     val isPromiseResolved = java.util.concurrent.atomic.AtomicBoolean(false)
+    var timeoutRunnable: Runnable? = null
     
     fun createEmptySportResult(): Map<String, Any> = mapOf(
       "date" to (date ?: ""),
@@ -814,16 +850,16 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
     
     fun resolveSportOnce(result: Map<String, Any>) {
       if (isPromiseResolved.compareAndSet(false, true)) {
-        module.mainHandler.removeCallbacksAndMessages(null)
+        timeoutRunnable?.let { module.mainHandler.removeCallbacks(it) }
         promise.resolve(result)
       }
     }
     
-    val timeoutRunnable = Runnable {
+    timeoutRunnable = Runnable {
       Log.w(TAG, "readSportStepData: timeout, returning empty result")
       resolveSportOnce(createEmptySportResult())
     }
-    module.mainHandler.postDelayed(timeoutRunnable, 15000)
+    module.mainHandler.postDelayed(timeoutRunnable!!, 15000)
     
     manager.readSportStep(
       object : IBleWriteResponse {
@@ -873,9 +909,11 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
       return@AsyncFunction
     }
     
-    Log.d(TAG, "readOriginData: dayOffset=$dayOffset")
+    val availableDays = maxOf(module.watchday, 1)
+    val safeDayOffset = dayOffset.coerceAtLeast(0)
+    Log.d(TAG, "readOriginData: requested dayOffset=$dayOffset, safeDayOffset=$safeDayOffset, watchday=$availableDays")
     
-    manager.readOriginData(
+    manager.readOriginDataSingleDay(
       object : IBleWriteResponse {
         override fun onResponse(code: Int) {
           if (code != Code.REQUEST_SUCCESS) {
@@ -989,7 +1027,9 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
           promise.resolve(sortedList)
         }
       },
-      dayOffset
+      safeDayOffset,
+      1,
+      availableDays
     )
   }
 
@@ -1017,15 +1057,16 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
     var allStep = 0
     
     val isPromiseResolved = java.util.concurrent.atomic.AtomicBoolean(false)
+    var timeoutRunnable: Runnable? = null
     
     fun resolveOnce(result: Map<String, Any>) {
       if (isPromiseResolved.compareAndSet(false, true)) {
-        module.mainHandler.removeCallbacksAndMessages(null)
+        timeoutRunnable?.let { module.mainHandler.removeCallbacks(it) }
         promise.resolve(result)
       }
     }
     
-    val timeoutRunnable = Runnable {
+    timeoutRunnable = Runnable {
       Log.w(TAG, "readDaySummaryData: timeout, returning collected data")
       val result = mapOf(
         "date" to dateStr,
@@ -1036,9 +1077,12 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
       )
       resolveOnce(result)
     }
-    module.mainHandler.postDelayed(timeoutRunnable, 20000)
+    module.mainHandler.postDelayed(timeoutRunnable!!, 20000)
     
-    manager.readOriginData(
+    val availableDays = maxOf(module.watchday, 1)
+    val safeDayOffset = dayOffset.coerceAtLeast(0)
+
+    manager.readOriginDataSingleDay(
       object : IBleWriteResponse {
         override fun onResponse(code: Int) {
           if (code != Code.REQUEST_SUCCESS) {
@@ -1113,7 +1157,9 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
           resolveOnce(result)
         }
       },
-      dayOffset
+      safeDayOffset,
+      1,
+      availableDays
     )
   }
 }

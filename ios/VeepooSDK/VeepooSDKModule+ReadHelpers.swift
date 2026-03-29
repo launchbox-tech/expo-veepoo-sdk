@@ -258,7 +258,7 @@ extension VeepooSDKModule {
       
       switch readState {
       case .reading:
-        let progressInDay = Double(readCurrentDayProgress) / 100.0
+        let progressInDay = min(max(Double(readCurrentDayProgress) / 100.0, 0.0), 1.0)
         let completedDays = max(Double(currentReadDayNumber) - 1.0, 0.0)
         let overallProgress = totalDay > 0
           ? min(max((completedDays + progressInDay) / Double(totalDay), 0.0), 1.0)

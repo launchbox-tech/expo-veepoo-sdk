@@ -23,7 +23,11 @@ import type {
   PermissionsResult,
 } from './types.js';
 import type { NativeVeepooSDKInterface } from './NativeVeepooSDK.js';
-import { normalizeBluetoothStatus, normalizePermissionsResult } from './normalizers.js';
+import {
+  normalizeBluetoothStatus,
+  normalizePermissionsResult,
+  normalizeReadOriginProgressPayload,
+} from './normalizers.js';
 
 type EventListener = (payload: unknown) => void;
 
@@ -96,7 +100,11 @@ export class VeepooSDK {
 
   private emitLocal(event: VeepooEvent, payload: unknown): void {
     const normalizedPayload =
-      event === 'bluetoothStateChanged' ? normalizeBluetoothStatus(payload) : payload;
+      event === 'bluetoothStateChanged'
+        ? normalizeBluetoothStatus(payload)
+        : event === 'readOriginProgress'
+          ? normalizeReadOriginProgressPayload(payload)
+          : payload;
 
     if (event === 'bluetoothStateChanged') {
       const bluetoothStatus = normalizedPayload as { isScanning?: boolean };
