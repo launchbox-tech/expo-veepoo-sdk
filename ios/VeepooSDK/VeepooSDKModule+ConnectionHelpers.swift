@@ -4,6 +4,20 @@ import VeepooBleSDK
 
 /// 连接与蓝牙状态辅助方法
 extension VeepooSDKModule {
+  func emitNativeError(code: String, message: String, deviceId: String? = nil, rawCode: Int? = nil) {
+    var payload: [String: Any] = [
+      "code": code,
+      "message": message
+    ]
+    if let deviceId = deviceId, !deviceId.isEmpty {
+      payload["deviceId"] = deviceId
+    }
+    if let rawCode = rawCode {
+      payload["rawCode"] = rawCode
+    }
+    self.sendEvent(ERROR, payload)
+  }
+
   func emitConnectionStatus(deviceId: String, status: String, code: Int? = nil) {
     var payload: [String: Any] = [
       "deviceId": deviceId,
@@ -33,16 +47,20 @@ extension VeepooSDKModule {
     deviceId: String,
     password: String,
     is24Hour: Bool,
-    promise: Promise
+    promise: Promise,
+    fallbackToScan: (() -> Void)? = nil
   ) {
     #if !targetEnvironment(simulator)
     print("[VeepooSDK] performConnect - 开始, deviceId: \(deviceId)")
 
+    activeConnectDeviceId = deviceId
     connectionState = .connecting
 
     guard let manager = self.bleManager else {
       print("[VeepooSDK] performConnect - 错误: bleManager 为 nil")
+      activeConnectDeviceId = nil
       connectionState = .error("BLE manager is nil")
+      emitNativeError(code: "SDK_NOT_INITIALIZED", message: "BLE manager is nil", deviceId: deviceId)
       promise.reject("SDK_NOT_INITIALIZED", "BLE manager is nil")
       return
     }
@@ -58,7 +76,12 @@ extension VeepooSDKModule {
       print("[VeepooSDK] performConnect - 连接超时")
       self.connectionState = .error("Connection timeout")
       self.emitConnectionStatus(deviceId: deviceId, status: "error")
-      promise.reject("CONNECTION_TIMEOUT", "Connection timeout after 15 seconds")
+      self.emitNativeError(code: "CONNECTION_TIMEOUT", message: "Connection timeout after 15 seconds", deviceId: deviceId)
+      if let fallbackToScan = fallbackToScan {
+        fallbackToScan()
+      } else {
+        promise.reject("CONNECTION_TIMEOUT", "Connection timeout after 15 seconds")
+      }
     }
 
     manager.veepooSDKConnectDevice(model) { [weak self] connectState in
@@ -89,9 +112,15 @@ extension VeepooSDKModule {
       case 0:
         guard !isSettled else { return }
         isSettled = true
-        self.connectionState = .error("Bluetooth is powered off")
+        self.connectionState = .error("Device disconnected before connection completed")
         self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
-        promise.reject("BLUETOOTH_NOT_ENABLED", "Bluetooth is powered off")
+        self.emitNativeError(
+          code: "DEVICE_DISCONNECTED",
+          message: "Device disconnected before connection completed",
+          deviceId: deviceId,
+          rawCode: connectState.rawValue
+        )
+        promise.reject("DEVICE_DISCONNECTED", "Device disconnected before connection completed")
 
       case 1:
         self.emitConnectionStatus(deviceId: deviceId, status: "connecting", code: connectState.rawValue)
@@ -101,21 +130,97 @@ extension VeepooSDKModule {
         isSettled = true
         self.connectionState = .error("Connection failed")
         self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
-        promise.reject("CONNECTION_FAILED", "Connection failed")
+        self.emitNativeError(
+          code: "CONNECTION_FAILED",
+          message: "Connection failed",
+          deviceId: deviceId,
+          rawCode: connectState.rawValue
+        )
+        if let fallbackToScan = fallbackToScan {
+          fallbackToScan()
+        } else {
+          promise.reject("CONNECTION_FAILED", "Connection failed")
+        }
 
       case 6:
         guard !isSettled else { return }
         isSettled = true
         self.connectionState = .error("Connection timeout")
         self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
-        promise.reject("TIMEOUT", "Connection timeout")
+        self.emitNativeError(
+          code: "TIMEOUT",
+          message: "Connection timeout",
+          deviceId: deviceId,
+          rawCode: connectState.rawValue
+        )
+        if let fallbackToScan = fallbackToScan {
+          fallbackToScan()
+        } else {
+          promise.reject("TIMEOUT", "Connection timeout")
+        }
 
       default:
         guard !isSettled else { return }
         isSettled = true
         self.connectionState = .error("Unknown connection error: \(connectState.rawValue)")
         self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
-        promise.reject("UNKNOWN", "Unknown connection error: \(connectState.rawValue)")
+        self.emitNativeError(
+          code: "UNKNOWN",
+          message: "Unknown connection error: \(connectState.rawValue)",
+          deviceId: deviceId,
+          rawCode: connectState.rawValue
+        )
+        if let fallbackToScan = fallbackToScan {
+          fallbackToScan()
+        } else {
+          promise.reject("UNKNOWN", "Unknown connection error: \(connectState.rawValue)")
+        }
+      }
+    }
+    #endif
+  }
+
+  func startScanConnectFallback(
+    deviceId: String,
+    password: String,
+    is24Hour: Bool,
+    promise: Promise,
+    timeout: TimeInterval = 5.0
+  ) {
+    #if !targetEnvironment(simulator)
+    self.pendingConnectDeviceId = deviceId
+    self.pendingConnectPassword = password
+    self.pendingConnectIs24Hour = is24Hour
+    self.pendingConnectPromise = promise
+    self.pendingScanStart = true
+
+    if !self.isScanning {
+      guard let manager = self.bleManager else {
+        promise.reject("BLUETOOTH_UNAVAILABLE", "Bluetooth manager not available")
+        return
+      }
+      self.isScanning = true
+      self.emitBluetoothStatus()
+      manager.veepooSDKStartScanDeviceAndReceiveScanningDevice { [weak self] peripheralModel in
+        guard let self = self, let model = peripheralModel else { return }
+        self.handleDiscoveredDevice(model)
+      }
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + timeout) { [weak self] in
+      guard let self = self else { return }
+      if self.pendingConnectDeviceId == deviceId {
+        self.bleManager?.veepooSDKStopScanDevice()
+        self.isScanning = false
+        self.pendingScanStart = false
+        self.emitBluetoothStatus()
+        if let pendingPromise = self.pendingConnectPromise {
+          self.pendingConnectPromise = nil
+          self.pendingConnectDeviceId = nil
+          self.pendingConnectPassword = nil
+          self.pendingConnectIs24Hour = false
+          pendingPromise.reject("DEVICE_NOT_FOUND", "Device not found after scanning.")
+        }
       }
     }
     #endif
@@ -134,7 +239,7 @@ extension VeepooSDKModule {
     manager.vpBleConnectStateChangeBlock = { [weak self] state in
       guard let self = self else { return }
 
-      let mac = self.connectedDeviceId ?? ""
+      let deviceId = self.connectedDeviceId ?? self.activeConnectDeviceId ?? ""
       let status: String
       switch state.rawValue {
       case 0:
@@ -147,14 +252,34 @@ extension VeepooSDKModule {
         status = "error"
       }
 
-      if !mac.isEmpty {
-        self.emitConnectionStatus(deviceId: mac, status: status, code: state.rawValue)
+      if !deviceId.isEmpty {
+        self.emitConnectionStatus(deviceId: deviceId, status: status, code: state.rawValue)
       }
 
       if state.rawValue == 0 {
+        let failedDuringConnect: Bool
+        switch self.connectionState {
+        case .connecting, .connected, .discoveringServices, .authenticating:
+          failedDuringConnect = true
+        default:
+          failedDuringConnect = false
+        }
+
         self.connectedDeviceId = nil
-        if !mac.isEmpty {
-          self.sendEvent(DEVICE_DISCONNECTED, ["deviceId": mac])
+        self.activeConnectDeviceId = nil
+        if !deviceId.isEmpty {
+          self.sendEvent(DEVICE_DISCONNECTED, ["deviceId": deviceId])
+        }
+        if failedDuringConnect {
+          self.connectionState = .error("Device disconnected during connection")
+          self.emitNativeError(
+            code: "DEVICE_DISCONNECTED",
+            message: "Device disconnected during connection",
+            deviceId: deviceId,
+            rawCode: state.rawValue
+          )
+        } else {
+          self.connectionState = .disconnected
         }
       }
     }
@@ -189,6 +314,7 @@ extension VeepooSDKModule {
        let pendingPassword = self.pendingConnectPassword,
        (pendingId == exportId || pendingId == uuid) {
       let savedIs24Hour = self.pendingConnectIs24Hour
+      let requestedDeviceId = pendingId
       self.pendingConnectDeviceId = nil
       self.pendingConnectPromise = nil
       self.pendingConnectPassword = nil
@@ -203,7 +329,7 @@ extension VeepooSDKModule {
 
       self.performConnect(
         model: peripheralModel,
-        deviceId: exportId,
+        deviceId: requestedDeviceId,
         password: pendingPassword,
         is24Hour: savedIs24Hour,
         promise: pendingPromise
@@ -229,6 +355,11 @@ extension VeepooSDKModule {
         }
       } else {
         self.connectionState = .error("Authentication timeout")
+      self.emitNativeError(
+        code: "AUTH_TIMEOUT",
+        message: "Authentication timeout",
+        deviceId: deviceId
+      )
       self.sendEvent(PASSWORD_DATA, [
         "deviceId": deviceId,
         "data": [
@@ -250,6 +381,7 @@ extension VeepooSDKModule {
       authenticationTimer?.invalidate()
       authenticationTimer = nil
       connectionState = .error("BLE manager is nil")
+      self.emitNativeError(code: "SDK_NOT_INITIALIZED", message: "BLE manager is nil", deviceId: deviceId)
       self.sendEvent(PASSWORD_DATA, [
         "deviceId": deviceId,
         "data": [
@@ -273,6 +405,7 @@ extension VeepooSDKModule {
       authenticationTimer?.invalidate()
       authenticationTimer = nil
       connectionState = .error("Invalid password type")
+      self.emitNativeError(code: "INVALID_PASSWORD_TYPE", message: "Invalid password type", deviceId: deviceId)
       self.sendEvent(PASSWORD_DATA, [
         "deviceId": deviceId,
         "data": [
@@ -319,6 +452,7 @@ extension VeepooSDKModule {
       if success {
         print("[VeepooSDK] verifyPasswordInternal - 密码验证成功, 发送 DEVICE_READY 事件")
         self.connectionState = .ready
+        self.activeConnectDeviceId = nil
         self.authenticationRetryCount = 0
         self.sendEvent(DEVICE_READY, ["deviceId": deviceId, "isOadModel": false])
       } else {
@@ -332,6 +466,12 @@ extension VeepooSDKModule {
           }
         } else {
           self.connectionState = .error("Authentication failed after \(self.authenticationRetryCount) retries")
+          self.emitNativeError(
+            code: "AUTH_FAILED",
+            message: "Authentication failed after \(self.authenticationRetryCount) retries",
+            deviceId: deviceId,
+            rawCode: result.rawValue
+          )
           self.authenticationRetryCount = 0
         }
       }

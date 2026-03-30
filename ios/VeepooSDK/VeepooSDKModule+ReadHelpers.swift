@@ -3,6 +3,28 @@ import VeepooBleSDK
 
 /// 读取数据辅助方法
 extension VeepooSDKModule {
+  func mergeBloodGlucoseData(into item: inout [String: Any], from bgData: [String: Any]) {
+    if let bgValue = bgData["bloodGlucoses"] as? [String],
+       let firstStr = bgValue.first,
+       let first = Double(firstStr), first > 0 {
+      item["bloodGlucose"] = first
+      item["glucose"] = first
+    } else if let bgValue = bgData["bloodGlucose"] as? NSNumber {
+      let first = bgValue.doubleValue
+      if first > 0 {
+        item["bloodGlucose"] = first
+        item["glucose"] = first
+      }
+    } else if let bgValue = bgData["bloodGlucose"] as? String,
+              let first = Double(bgValue), first > 0 {
+      item["bloodGlucose"] = first
+      item["glucose"] = first
+    }
+
+    item["bloodGlucoseLevel"] = bgData["bloodGlucoseLevels"]
+    item["bloodGlucoses"] = bgData["bloodGlucoses"]
+  }
+
   func emitHalfHourData(dayOffset: Int) {
     #if !targetEnvironment(simulator)
     guard let manager = self.bleManager,
@@ -23,8 +45,13 @@ extension VeepooSDKModule {
     // 加载血糖数据映射（用于补充 bloodGlucose）
     var bloodGlucoseMap: [String: [String: Any]] = [:]
     if let bloodGlucoseArray = VPDataBaseOperation.veepooSDKGetDeviceBloodGlucoseData(withDate: dateStr, andTableID: deviceAddress) as? [[String: Any]] {
+      if let sample = bloodGlucoseArray.first {
+        print("[BloodGlucose] emitHalfHourData db rows: \(bloodGlucoseArray.count), sample: \(sample)")
+      } else {
+        print("[BloodGlucose] emitHalfHourData db rows: 0")
+      }
       for item in bloodGlucoseArray {
-        if let time = item["time"] as? String {
+        if let time = (item["time"] as? String) ?? (item["Time"] as? String) {
           bloodGlucoseMap[time] = item
         }
       }
@@ -84,18 +111,7 @@ extension VeepooSDKModule {
           dataItem["bloodGlucose"] = bg
           dataItem["glucose"] = Double(bg)
         } else if let bgData = bloodGlucoseMap[time] {
-          // SDK 返回的 bloodGlucoses 是 [String] 类型，需要正确转换
-          if let bgValue = bgData["bloodGlucoses"] as? [String],
-             let firstStr = bgValue.first,
-             let first = Int(firstStr), first > 0 {
-            dataItem["bloodGlucose"] = first
-            dataItem["glucose"] = Double(first)
-          } else if let bgValue = bgData["bloodGlucose"] as? Int, bgValue > 0 {
-            dataItem["bloodGlucose"] = bgValue
-            dataItem["glucose"] = Double(bgValue)
-          }
-          dataItem["bloodGlucoseLevel"] = bgData["bloodGlucoseLevels"]
-          dataItem["bloodGlucoses"] = bgData["bloodGlucoses"]
+          self.mergeBloodGlucoseData(into: &dataItem, from: bgData)
         }
 
         // 压力字段（兼容两种 key 名）
@@ -139,8 +155,13 @@ extension VeepooSDKModule {
     // 加载血糖数据映射
     var bloodGlucoseMap: [String: [String: Any]] = [:]
     if let bloodGlucoseArray = VPDataBaseOperation.veepooSDKGetDeviceBloodGlucoseData(withDate: dateStr, andTableID: deviceAddress) as? [[String: Any]] {
+      if let sample = bloodGlucoseArray.first {
+        print("[BloodGlucose] emitFiveMinuteData db rows: \(bloodGlucoseArray.count), sample: \(sample)")
+      } else {
+        print("[BloodGlucose] emitFiveMinuteData db rows: 0")
+      }
       for item in bloodGlucoseArray {
-        if let time = item["time"] as? String {
+        if let time = (item["time"] as? String) ?? (item["Time"] as? String) {
           bloodGlucoseMap[time] = item
         }
       }
@@ -178,18 +199,7 @@ extension VeepooSDKModule {
         
         // 合并血糖数据
         if let bgData = bloodGlucoseMap[time] {
-          // SDK 返回的 bloodGlucoses 是 [String] 类型，需要正确转换
-          if let bgValue = bgData["bloodGlucoses"] as? [String],
-             let firstStr = bgValue.first,
-             let first = Int(firstStr), first > 0 {
-            item["bloodGlucose"] = first
-            item["glucose"] = Double(first)
-          } else if let bgValue = bgData["bloodGlucose"] as? Int, bgValue > 0 {
-            item["bloodGlucose"] = bgValue
-            item["glucose"] = Double(bgValue)
-          }
-          item["bloodGlucoseLevel"] = bgData["bloodGlucoseLevels"]
-          item["bloodGlucoses"] = bgData["bloodGlucoses"]
+          self.mergeBloodGlucoseData(into: &item, from: bgData)
         }
         
         // 处理原始数据中的血糖字段（如果上面的合并没有成功）

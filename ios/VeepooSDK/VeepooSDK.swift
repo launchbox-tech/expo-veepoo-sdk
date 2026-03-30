@@ -107,6 +107,7 @@ public class VeepooSDKModule: Module {
   var pendingConnectPassword: String?
   var pendingConnectIs24Hour: Bool = false
   var pendingConnectPromise: Promise?
+  var activeConnectDeviceId: String?
   var cachedDeviceFunctions: [String: Any] = [:]
   
   var connectionState: ConnectionState = .idle {
@@ -114,7 +115,7 @@ public class VeepooSDKModule: Module {
       print("[VeepooSDK] 状态变化: \(oldValue.rawValue) -> \(connectionState.rawValue)")
       let previousStatus = publicConnectionStatus(for: oldValue)
       let currentStatus = publicConnectionStatus(for: connectionState)
-      if previousStatus != currentStatus, let deviceId = connectedDeviceId {
+      if previousStatus != currentStatus, let deviceId = connectedDeviceId ?? activeConnectDeviceId {
         emitConnectionStatus(deviceId: deviceId, status: currentStatus)
       }
     }
@@ -334,51 +335,50 @@ public class VeepooSDKModule: Module {
       let is24Hour = options?["is24Hour"] as? Bool ?? false
       let uuidString = options?["uuid"] as? String
       self.emitConnectionStatus(deviceId: deviceId, status: "connecting")
-      var peripheralModel: VPPeripheralModel? = self.discoveredDevices[deviceId]
+
+      // 优先使用当前扫描/缓存到的设备模型。
+      // 对于扫描页点击连接，直接使用扫描结果里的 peripheralModel 更稳定；
+      // 只有在本地没有缓存模型时，才回退到 UUID 恢复外围设备。
+      var peripheralModel: VPPeripheralModel? = nil
+      peripheralModel = self.discoveredDevices[deviceId]
+      if peripheralModel == nil, let uuidStr = uuidString {
+        peripheralModel = self.discoveredDevices[uuidStr]
+      }
       if peripheralModel == nil, let uuidStr = uuidString, let uuid = UUID(uuidString: uuidStr), let central = self.centralManager {
         let peripherals = central.retrievePeripherals(withIdentifiers: [uuid])
         if let peripheral = peripherals.first {
           peripheralModel = VPPeripheralModel(peripher: peripheral)
+          if let recoveredModel = peripheralModel {
+            self.discoveredDevices[uuidStr] = recoveredModel
+            self.discoveredDevices[deviceId] = recoveredModel
+          }
         }
       }
+
       if let model = peripheralModel {
-        self.performConnect(model: model, deviceId: deviceId, password: password, is24Hour: is24Hour, promise: promise)
+        self.performConnect(
+          model: model,
+          deviceId: deviceId,
+          password: password,
+          is24Hour: is24Hour,
+          promise: promise,
+          fallbackToScan: { [weak self] in
+            guard let self = self else { return }
+            self.startScanConnectFallback(
+              deviceId: deviceId,
+              password: password,
+              is24Hour: is24Hour,
+              promise: promise
+            )
+          }
+        )
       } else {
-        self.pendingConnectDeviceId = deviceId
-        self.pendingConnectPassword = password
-        self.pendingConnectIs24Hour = is24Hour
-        self.pendingConnectPromise = promise
-        self.pendingScanStart = true
-
-        if !self.isScanning {
-          guard let manager = self.bleManager else {
-            promise.reject("BLUETOOTH_UNAVAILABLE", "Bluetooth manager not available")
-            return
-          }
-          self.isScanning = true
-          self.emitBluetoothStatus()
-          manager.veepooSDKStartScanDeviceAndReceiveScanningDevice { [weak self] peripheralModel in
-            guard let self = self, let model = peripheralModel else { return }
-            self.handleDiscoveredDevice(model)
-          }
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
-          guard let self = self else { return }
-          if self.pendingConnectDeviceId == deviceId {
-            self.bleManager?.veepooSDKStopScanDevice()
-            self.isScanning = false
-            self.pendingScanStart = false
-            self.emitBluetoothStatus()
-            if let pendingPromise = self.pendingConnectPromise {
-              self.pendingConnectPromise = nil
-              self.pendingConnectDeviceId = nil
-              self.pendingConnectPassword = nil
-              self.pendingConnectIs24Hour = false
-              pendingPromise.reject("DEVICE_NOT_FOUND", "Device not found after scanning.")
-            }
-          }
-        }
+        self.startScanConnectFallback(
+          deviceId: deviceId,
+          password: password,
+          is24Hour: is24Hour,
+          promise: promise
+        )
       }
       #endif
     }
@@ -393,6 +393,7 @@ public class VeepooSDKModule: Module {
       self.connectionState = .disconnecting
       self.bleManager?.veepooSDKDisconnectDevice()
       self.connectedDeviceId = nil
+      self.activeConnectDeviceId = nil
       self.sendEvent(DEVICE_DISCONNECTED, ["deviceId": deviceId])
       self.emitConnectionStatus(deviceId: deviceId, status: "disconnected")
       self.connectionState = .disconnected
