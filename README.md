@@ -6,10 +6,10 @@
 
 Expo 模块，用于 Veepoo 设备的蓝牙连接、数据读取和健康测试。
 
-当前最新版本：`1.2.5`
+当前最新版本：`1.2.6`
 
 - 使用文档：当前 `README.md`
-- 升级说明：[1.2.5.md](file:///Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.5.md)
+- 升级说明：[1.2.6.md](file:///Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.6.md)
 - 历史版本：[docs/README.md](file:///Users/gzh/Projects/framework/expo-veepoo-sdk/docs/README.md)
 
 这个包的原则是：
