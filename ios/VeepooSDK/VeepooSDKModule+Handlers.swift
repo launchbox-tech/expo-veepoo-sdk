@@ -15,6 +15,59 @@ private class ValueWrapper<T> {
 
 // MARK: - 数据读取和测试方法的实现
 extension VeepooSDKModule {
+  func ensureMeasurementCanStart(type: String, promise: Promise) -> Bool {
+    #if !targetEnvironment(simulator)
+    let connectedId = self.connectedDeviceId ?? self.activeConnectDeviceId ?? ""
+    print("[Measurement] 准备启动\(type)测量 - connectionState: \(self.connectionState.rawValue), connectedDeviceId: \(self.connectedDeviceId ?? "nil"), activeConnectDeviceId: \(self.activeConnectDeviceId ?? "nil"), activeMeasurementType: \(self.activeMeasurementType ?? "nil")")
+
+    guard self.isInitialized else {
+      print("[Measurement] 拒绝启动\(type)测量 - SDK 未初始化")
+      promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")
+      return false
+    }
+
+    guard self.peripheralManage != nil else {
+      print("[Measurement] 拒绝启动\(type)测量 - peripheralManage 为 nil")
+      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+      return false
+    }
+
+    guard !connectedId.isEmpty else {
+      print("[Measurement] 拒绝启动\(type)测量 - 当前没有连接设备")
+      promise.reject("DEVICE_NOT_CONNECTED", "No device connected")
+      return false
+    }
+
+    guard self.connectionState.rawValue == ConnectionState.ready.rawValue else {
+      print("[Measurement] 拒绝启动\(type)测量 - 设备尚未 ready, 当前状态: \(self.connectionState.rawValue)")
+      promise.reject("DEVICE_NOT_READY", "Device is not ready for measurement")
+      return false
+    }
+
+    if let activeMeasurementType = self.activeMeasurementType, activeMeasurementType != type {
+      print("[Measurement] 拒绝启动\(type)测量 - 已有其他测量进行中: \(activeMeasurementType)")
+      promise.reject("MEASUREMENT_IN_PROGRESS", "Another measurement is already in progress")
+      return false
+    }
+
+    self.activeMeasurementType = type
+    print("[Measurement] 已允许启动\(type)测量")
+    return true
+    #else
+    return true
+    #endif
+  }
+
+  func finishMeasurement(type: String, reason: String) {
+    #if !targetEnvironment(simulator)
+    if self.activeMeasurementType == type {
+      print("[Measurement] 结束\(type)测量 - reason: \(reason)")
+      self.activeMeasurementType = nil
+    } else {
+      print("[Measurement] 收到\(type)测量结束，但当前 activeMeasurementType=\(self.activeMeasurementType ?? "nil"), reason: \(reason)")
+    }
+    #endif
+  }
   
   // MARK: 读取原始数据
   func handleStartReadOriginData(promise: Promise) {
@@ -689,10 +742,10 @@ extension VeepooSDKModule {
   // MARK: 开始心率测试
   func handleStartHeartRateTest(promise: Promise) {
     #if !targetEnvironment(simulator)
-    guard let peripheralManage = self.peripheralManage else {
-      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+    guard self.ensureMeasurementCanStart(type: "heartRate", promise: promise) else {
       return
     }
+    guard let peripheralManage = self.peripheralManage else { return }
     
     // 检查设备是否支持心率功能
     if let manager = self.bleManager {
@@ -719,6 +772,7 @@ extension VeepooSDKModule {
         // 如果 Timer 到达 100 但 SDK 还没有返回 over，自动停止测试
         print("[HeartRate] Timer reached 100, auto-stopping test, final heartRate: \(currentHeartRate)")
         peripheralManage.veepooSDKTestHeartStart(false) { _, _ in }
+        self.finishMeasurement(type: "heartRate", reason: "timer_reached_100")
         self.sendEvent(HEART_RATE_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -769,6 +823,8 @@ extension VeepooSDKModule {
         print("[HeartRate] Device not worn")
         progressTimer?.invalidate()
         heartRateValueWrapper.value = Int(heartValue)
+        peripheralManage.veepooSDKTestHeartStart(false) { _, _ in }
+        self.finishMeasurement(type: "heartRate", reason: "not_wear")
         self.sendEvent(HEART_RATE_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -783,6 +839,8 @@ extension VeepooSDKModule {
         print("[HeartRate] Device is busy")
         progressTimer?.invalidate()
         heartRateValueWrapper.value = Int(heartValue)
+        peripheralManage.veepooSDKTestHeartStart(false) { _, _ in }
+        self.finishMeasurement(type: "heartRate", reason: "device_busy")
         self.sendEvent(HEART_RATE_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -797,6 +855,8 @@ extension VeepooSDKModule {
         print("[HeartRate] Test completed - BPM: \(heartValue)")
         heartRateValueWrapper.value = Int(heartValue)
         progressTimer?.invalidate()
+        peripheralManage.veepooSDKTestHeartStart(false) { _, _ in }
+        self.finishMeasurement(type: "heartRate", reason: "sdk_over")
         self.sendEvent(HEART_RATE_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -820,10 +880,10 @@ extension VeepooSDKModule {
   // MARK: 开始血压测试
   func handleStartBloodPressureTest(promise: Promise) {
     #if !targetEnvironment(simulator)
-    guard let peripheralManage = self.peripheralManage else {
-      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+    guard self.ensureMeasurementCanStart(type: "bloodPressure", promise: promise) else {
       return
     }
+    guard let peripheralManage = self.peripheralManage else { return }
     
     // 检查设备是否支持血压功能
     if let manager = self.bleManager {
@@ -840,6 +900,7 @@ extension VeepooSDKModule {
       if progress >= 100 || state == .deviceBusy || state == .testFail || state == .testInterrupt || state == .noFunction {
         // 停止血压测量
         peripheralManage.veepooSDKTestBloodStart(false, testMode: 0) { _, _, _, _ in }
+        self.finishMeasurement(type: "bloodPressure", reason: "terminal_state_\(state.rawValue)")
         
         let statusStr: String
         switch state {
@@ -893,10 +954,10 @@ extension VeepooSDKModule {
   // MARK: 开始血氧测试
   func handleStartBloodOxygenTest(promise: Promise) {
     #if !targetEnvironment(simulator)
-    guard let peripheralManage = self.peripheralManage else {
-      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+    guard self.ensureMeasurementCanStart(type: "bloodOxygen", promise: promise) else {
       return
     }
+    guard let peripheralManage = self.peripheralManage else { return }
     
     // 检查设备是否支持血氧功能
     if let manager = self.bleManager {
@@ -970,6 +1031,8 @@ extension VeepooSDKModule {
       case .notWear:
         print("[BloodOxygen] Device not worn")
         progressTimer?.invalidate()
+        peripheralManage.veepooSDKTestOxygenStart(false) { _, _ in }
+        self.finishMeasurement(type: "bloodOxygen", reason: "not_wear")
         self.sendEvent(BLOOD_OXYGEN_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -984,6 +1047,8 @@ extension VeepooSDKModule {
       case .deviceBusy:
         print("[BloodOxygen] Device is busy")
         progressTimer?.invalidate()
+        peripheralManage.veepooSDKTestOxygenStart(false) { _, _ in }
+        self.finishMeasurement(type: "bloodOxygen", reason: "device_busy")
         self.sendEvent(BLOOD_OXYGEN_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -998,6 +1063,8 @@ extension VeepooSDKModule {
       case .over:
         print("[BloodOxygen] Test completed - SpO2: \(value)")
         progressTimer?.invalidate()
+        peripheralManage.veepooSDKTestOxygenStart(false) { _, _ in }
+        self.finishMeasurement(type: "bloodOxygen", reason: "sdk_over")
         self.sendEvent(BLOOD_OXYGEN_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -1012,6 +1079,8 @@ extension VeepooSDKModule {
       case .noFunction:
         print("[BloodOxygen] Device does not support blood oxygen function")
         progressTimer?.invalidate()
+        peripheralManage.veepooSDKTestOxygenStart(false) { _, _ in }
+        self.finishMeasurement(type: "bloodOxygen", reason: "no_function")
         self.sendEvent(BLOOD_OXYGEN_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -1026,6 +1095,8 @@ extension VeepooSDKModule {
       case .invalid:
         print("[BloodOxygen] Invalid state received")
         progressTimer?.invalidate()
+        peripheralManage.veepooSDKTestOxygenStart(false) { _, _ in }
+        self.finishMeasurement(type: "bloodOxygen", reason: "invalid_state")
         self.sendEvent(BLOOD_OXYGEN_TEST_RESULT, [
           "deviceId": self.connectedDeviceId ?? "",
           "result": [
@@ -1051,10 +1122,10 @@ extension VeepooSDKModule {
   // MARK: 开始体温测试
   func handleStartTemperatureTest(promise: Promise) {
     #if !targetEnvironment(simulator)
-    guard let peripheralManage = self.peripheralManage else {
-      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+    guard self.ensureMeasurementCanStart(type: "temperature", promise: promise) else {
       return
     }
+    guard let peripheralManage = self.peripheralManage else { return }
     
     // 检查设备是否支持体温功能
     if let manager = self.bleManager {
@@ -1072,6 +1143,10 @@ extension VeepooSDKModule {
       case .open: statusStr = "testing"
       case .close: statusStr = "over"; isEnd = true
       @unknown default: statusStr = "testing"
+      }
+      if isEnd {
+        peripheralManage.veepooSDK_temperatureTestStart(false) { _, _, _, _, _ in }
+        self.finishMeasurement(type: "temperature", reason: "terminal_state_\(state.rawValue)")
       }
       
       var result: [String: Any] = [
@@ -1100,10 +1175,10 @@ extension VeepooSDKModule {
   // MARK: 开始压力测试
   func handleStartStressTest(promise: Promise) {
     #if !targetEnvironment(simulator)
-    guard let peripheralManage = self.peripheralManage else {
-      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+    guard self.ensureMeasurementCanStart(type: "stress", promise: promise) else {
       return
     }
+    guard let peripheralManage = self.peripheralManage else { return }
     
     // 检查设备是否支持压力功能
     if let manager = self.bleManager {
@@ -1125,6 +1200,10 @@ extension VeepooSDKModule {
       case .complete: statusStr = "complete"; isEnd = true
       @unknown default: statusStr = "testing"
       }
+      if isEnd {
+        peripheralManage.veepooSDK_stressTestStart(false) { _, _, _ in }
+        self.finishMeasurement(type: "stress", reason: "terminal_state_\(state.rawValue)")
+      }
       
       self.sendEvent(STRESS_DATA, [
         "deviceId": self.connectedDeviceId ?? "",
@@ -1145,10 +1224,10 @@ extension VeepooSDKModule {
   // MARK: 开始血糖测试
   func handleStartBloodGlucoseTest(promise: Promise) {
     #if !targetEnvironment(simulator)
-    guard let peripheralManage = self.peripheralManage else {
-      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+    guard self.ensureMeasurementCanStart(type: "bloodGlucose", promise: promise) else {
       return
     }
+    guard let peripheralManage = self.peripheralManage else { return }
     
     // 检查设备是否支持血糖功能
     if let manager = self.bleManager {
@@ -1165,6 +1244,7 @@ extension VeepooSDKModule {
       if progress >= 100 || state == .deviceBusy || state == .lowPower || state == .notWear || state == .unsupported {
         // 停止血糖测量
         peripheralManage.veepooSDKTestBloodGlucoseStart(false, isPersonalModel: false) { _, _, _, _ in }
+        self.finishMeasurement(type: "bloodGlucose", reason: "terminal_state_\(state.rawValue)")
         
         let statusStr: String
         var finalValue = Double(value) / 100.0

@@ -109,6 +109,7 @@ public class VeepooSDKModule: Module {
   var pendingConnectPromise: Promise?
   var activeConnectDeviceId: String?
   var cachedDeviceFunctions: [String: Any] = [:]
+  var activeMeasurementType: String?
   
   var connectionState: ConnectionState = .idle {
     didSet {
@@ -394,6 +395,7 @@ public class VeepooSDKModule: Module {
       self.bleManager?.veepooSDKDisconnectDevice()
       self.connectedDeviceId = nil
       self.activeConnectDeviceId = nil
+      self.activeMeasurementType = nil
       self.sendEvent(DEVICE_DISCONNECTED, ["deviceId": deviceId])
       self.emitConnectionStatus(deviceId: deviceId, status: "disconnected")
       self.connectionState = .disconnected
@@ -698,6 +700,7 @@ public class VeepooSDKModule: Module {
       print("[HeartRate] Stopping test manually")
       self.peripheralManage?.veepooSDKTestHeartStart(false) { [weak self] _, heartValue in
         print("[HeartRate] Stop callback - final heartValue: \(heartValue)")
+        self?.finishMeasurement(type: "heartRate", reason: "manual_stop")
         // 发送停止事件，使用实际的心率值（如果有效）
         let finalValue = heartValue > 0 ? Int(heartValue) : 0
         self?.sendEvent("heartRateTestResult", [
@@ -726,6 +729,7 @@ public class VeepooSDKModule: Module {
       promise.resolve(nil)
       #else
       self.peripheralManage?.veepooSDKTestBloodStart(false, testMode: 0) { _, _, _, _ in }
+      self.finishMeasurement(type: "bloodPressure", reason: "manual_stop")
       promise.resolve(nil)
       #endif
     }
@@ -743,6 +747,7 @@ public class VeepooSDKModule: Module {
       promise.resolve(nil)
       #else
       self.peripheralManage?.veepooSDKTestOxygenStart(false) { _, _ in }
+      self.finishMeasurement(type: "bloodOxygen", reason: "manual_stop")
       promise.resolve(nil)
       #endif
     }
@@ -760,6 +765,7 @@ public class VeepooSDKModule: Module {
       promise.resolve(nil)
       #else
       self.peripheralManage?.veepooSDK_temperatureTestStart(false) { _, _, _, _, _ in }
+      self.finishMeasurement(type: "temperature", reason: "manual_stop")
       promise.resolve(nil)
       #endif
     }
@@ -777,6 +783,7 @@ public class VeepooSDKModule: Module {
       promise.resolve(nil)
       #else
       self.peripheralManage?.veepooSDK_stressTestStart(false) { _, _, _ in }
+      self.finishMeasurement(type: "stress", reason: "manual_stop")
       promise.resolve(nil)
       #endif
     }
@@ -794,6 +801,7 @@ public class VeepooSDKModule: Module {
       promise.resolve(nil)
       #else
       self.peripheralManage?.veepooSDKTestBloodGlucoseStart(false, isPersonalModel: false) { _, _, _, _ in }
+      self.finishMeasurement(type: "bloodGlucose", reason: "manual_stop")
       promise.resolve(nil)
       #endif
     }

@@ -120,7 +120,12 @@ extension VeepooSDKModule {
           deviceId: deviceId,
           rawCode: connectState.rawValue
         )
-        promise.reject("DEVICE_DISCONNECTED", "Device disconnected before connection completed")
+        if let fallbackToScan = fallbackToScan {
+          print("[VeepooSDK] performConnect - 连接前断开，改走隐藏扫描兜底")
+          fallbackToScan()
+        } else {
+          promise.reject("DEVICE_DISCONNECTED", "Device disconnected before connection completed")
+        }
 
       case 1:
         self.emitConnectionStatus(deviceId: deviceId, status: "connecting", code: connectState.rawValue)
