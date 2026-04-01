@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'VeepooSDK'
-  s.version        = '1.2.4'
+  s.version        = '1.2.5'
   s.summary        = 'Expo module for Veepoo SDK Bluetooth connectivity'
   s.description    = 'Expo module that provides Bluetooth LE functionality for Veepoo devices'
   s.author         = 'Expo'
