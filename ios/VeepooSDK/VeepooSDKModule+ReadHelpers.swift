@@ -259,7 +259,7 @@ extension VeepooSDKModule {
         "readState": "start" as NSString,
         "totalDays": 1,
         "currentDay": 1,
-        "progress": 0.0
+        "progress": 0
       ]
     ])
     
@@ -268,10 +268,10 @@ extension VeepooSDKModule {
       
       switch readState {
       case .reading:
-        let progressInDay = min(max(Double(readCurrentDayProgress) / 100.0, 0.0), 1.0)
+        let progressInDay = min(max(Double(readCurrentDayProgress), 0.0), 100.0)
         let completedDays = max(Double(currentReadDayNumber) - 1.0, 0.0)
         let overallProgress = totalDay > 0
-          ? min(max((completedDays + progressInDay) / Double(totalDay), 0.0), 1.0)
+          ? min(max(((completedDays * 100.0) + progressInDay) / Double(totalDay), 0.0), 100.0)
           : 0.0
         
         self.sendEvent(READ_ORIGIN_PROGRESS, [
@@ -291,7 +291,7 @@ extension VeepooSDKModule {
             "readState": "complete" as NSString,
             "totalDays": totalDay,
             "currentDay": totalDay,
-            "progress": 1.0
+            "progress": 100
           ]
         ])
         

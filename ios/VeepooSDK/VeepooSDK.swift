@@ -324,6 +324,7 @@ public class VeepooSDKModule: Module {
       self.sendEvent(DEVICE_READY, ["deviceId": deviceId, "isOadModel": false])
       promise.resolve(nil)
       #else
+      print("[VeepooSDK] connect - 请求连接, deviceId: \(deviceId), options: \(String(describing: options)), currentState: \(self.connectionState.rawValue), connectedDeviceId: \(self.connectedDeviceId ?? "nil"), activeConnectDeviceId: \(self.activeConnectDeviceId ?? "nil"), discoveredCount: \(self.discoveredDevices.count)")
       guard self.isInitialized else {
         promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")
         return
@@ -341,22 +342,43 @@ public class VeepooSDKModule: Module {
       // 对于扫描页点击连接，直接使用扫描结果里的 peripheralModel 更稳定；
       // 只有在本地没有缓存模型时，才回退到 UUID 恢复外围设备。
       var peripheralModel: VPPeripheralModel? = nil
+      var modelSource = "none"
       peripheralModel = self.discoveredDevices[deviceId]
+      if peripheralModel != nil {
+        modelSource = "cache:deviceId"
+      }
       if peripheralModel == nil, let uuidStr = uuidString {
         peripheralModel = self.discoveredDevices[uuidStr]
+        if peripheralModel != nil {
+          modelSource = "cache:uuid"
+        }
       }
       if peripheralModel == nil, let uuidStr = uuidString, let uuid = UUID(uuidString: uuidStr), let central = self.centralManager {
         let peripherals = central.retrievePeripherals(withIdentifiers: [uuid])
+        print("[VeepooSDK] connect - retrievePeripherals, uuid: \(uuidStr), count: \(peripherals.count)")
         if let peripheral = peripherals.first {
           peripheralModel = VPPeripheralModel(peripher: peripheral)
           if let recoveredModel = peripheralModel {
             self.discoveredDevices[uuidStr] = recoveredModel
             self.discoveredDevices[deviceId] = recoveredModel
+            modelSource = "retrieved:uuid"
           }
         }
       }
 
-      if let model = peripheralModel {
+      print("[VeepooSDK] connect - 模型解析结果, deviceId: \(deviceId), modelSource: \(modelSource), uuid: \(uuidString ?? "nil"), foundModel: \(peripheralModel != nil)")
+
+      let shouldUseScanFallbackDirectly = modelSource == "retrieved:uuid" || modelSource == "none"
+
+      if shouldUseScanFallbackDirectly {
+        print("[VeepooSDK] connect - 当前仅有 UUID 恢复模型或无模型，直接进入隐藏扫描兜底, deviceId: \(deviceId), modelSource: \(modelSource)")
+        self.startScanConnectFallback(
+          deviceId: deviceId,
+          password: password,
+          is24Hour: is24Hour,
+          promise: promise
+        )
+      } else if let model = peripheralModel {
         self.performConnect(
           model: model,
           deviceId: deviceId,
@@ -365,6 +387,7 @@ public class VeepooSDKModule: Module {
           promise: promise,
           fallbackToScan: { [weak self] in
             guard let self = self else { return }
+            print("[VeepooSDK] connect - performConnect 失败，进入扫描兜底, deviceId: \(deviceId)")
             self.startScanConnectFallback(
               deviceId: deviceId,
               password: password,
@@ -374,6 +397,7 @@ public class VeepooSDKModule: Module {
           }
         )
       } else {
+        print("[VeepooSDK] connect - 无可用模型，直接进入扫描兜底, deviceId: \(deviceId), uuid: \(uuidString ?? "nil")")
         self.startScanConnectFallback(
           deviceId: deviceId,
           password: password,
@@ -404,7 +428,13 @@ public class VeepooSDKModule: Module {
     }
 
     AsyncFunction("getConnectionStatus") { (deviceId: String, promise: Promise) in
-      let status = self.connectedDeviceId == deviceId ? "connected" : "disconnected"
+      let matchesCurrentDevice =
+        self.connectedDeviceId == deviceId ||
+        self.activeConnectDeviceId == deviceId
+
+      let status = matchesCurrentDevice
+        ? self.publicConnectionStatus(for: self.connectionState)
+        : "disconnected"
       promise.resolve(status)
     }
 
@@ -414,6 +444,8 @@ public class VeepooSDKModule: Module {
         "deviceId": self.connectedDeviceId ?? "",
         "data": ["status": "SUCCESS", "password": password, "deviceNumber": "", "deviceVersion": ""]
       ])
+      self.connectionState = .ready
+      self.activeConnectDeviceId = nil
       self.sendEvent(DEVICE_READY, ["deviceId": self.connectedDeviceId ?? "", "isOadModel": false])
       promise.resolve(["status": "SUCCESS", "password": password, "deviceNumber": "", "deviceVersion": ""])
       #else
@@ -442,6 +474,8 @@ public class VeepooSDKModule: Module {
         self.sendEvent(PASSWORD_DATA, ["deviceId": self.connectedDeviceId ?? "", "data": resultData])
         if success {
           self.cacheDeviceFunctions()
+          self.connectionState = .ready
+          self.activeConnectDeviceId = nil
           self.sendEvent(DEVICE_READY, ["deviceId": self.connectedDeviceId ?? "", "isOadModel": false])
         }
         promise.resolve(resultData)
@@ -603,12 +637,12 @@ public class VeepooSDKModule: Module {
       #if targetEnvironment(simulator)
       self.sendEvent(READ_ORIGIN_PROGRESS, [
         "deviceId": self.connectedDeviceId ?? "",
-        "progress": ["readState": "start", "totalDays": 1, "currentDay": 1, "progress": 0.0]
+        "progress": ["readState": "start", "totalDays": 1, "currentDay": 1, "progress": 0]
       ])
       DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
         self.sendEvent(READ_ORIGIN_PROGRESS, [
           "deviceId": self.connectedDeviceId ?? "",
-          "progress": ["readState": "complete", "totalDays": 1, "currentDay": 1, "progress": 1.0]
+          "progress": ["readState": "complete", "totalDays": 1, "currentDay": 1, "progress": 100]
         ])
         self.sendEvent(READ_ORIGIN_COMPLETE, ["deviceId": self.connectedDeviceId ?? "", "success": true])
         promise.resolve(true)

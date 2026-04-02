@@ -74,6 +74,7 @@ export class VeepooSDK {
   private isInitialized = false;
   private connectedDeviceId: string | null = null;
   private eventListenersSetup = false;
+  private lastReadOriginProgressByDevice: Map<string, number> = new Map();
   private logEnabled = false;
   private logger: LogListener | null = null;
   private listeners: Map<VeepooEvent, Set<EventListener>> = new Map();
@@ -241,6 +242,23 @@ export class VeepooSDK {
                                         ? { ...payload, data: normalizeBatteryInfo(payload.data) }
           : payload;
 
+    if (event === 'readOriginProgress' && this.isEventRecord(normalizedPayload) && this.isEventRecord(normalizedPayload.progress)) {
+      const deviceId = this.getPayloadDeviceId(normalizedPayload) ?? '__default__';
+      const progressValue = normalizedPayload.progress.progress;
+      const readState = normalizedPayload.progress.readState;
+      const lastProgress = this.lastReadOriginProgressByDevice.get(deviceId);
+
+      if (typeof progressValue === 'number' && Number.isFinite(progressValue)) {
+        if (readState === 'start' || lastProgress === undefined || progressValue < lastProgress) {
+          this.lastReadOriginProgressByDevice.set(deviceId, progressValue);
+        } else if (progressValue === lastProgress) {
+          return;
+        } else {
+          this.lastReadOriginProgressByDevice.set(deviceId, progressValue);
+        }
+      }
+    }
+
     this.log('debug', this.getEventScope(event), `event.${event}`, `Received ${event} event`, {
       deviceId: this.getPayloadDeviceId(normalizedPayload),
       data: normalizedPayload,
@@ -264,6 +282,9 @@ export class VeepooSDK {
       const device = normalizedPayload as { deviceId?: string };
       if (!device.deviceId || this.connectedDeviceId === device.deviceId) {
         this.connectedDeviceId = null;
+      }
+      if (device.deviceId) {
+        this.lastReadOriginProgressByDevice.delete(device.deviceId);
       }
       this.isScanning = false;
     }
@@ -742,6 +763,7 @@ export class VeepooSDK {
     });
     this.nativeSubscriptions = [];
     this.listeners.clear();
+    this.lastReadOriginProgressByDevice.clear();
     this.eventListenersSetup = false;
     this.isScanning = false;
     this.connectedDeviceId = null;

@@ -632,16 +632,17 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
               "readState" to "reading",
               "totalDays" to availableDays,
               "currentDay" to currentDay,
-              "progress" to overallProgress.coerceIn(0.0, 1.0)
+              "progress" to (overallProgress.coerceIn(0.0, 1.0) * 100).toInt()
             )
           ))
         }
         
         override fun onReadOriginProgress(progress: Float) {
           var p = progress.toDouble()
-          if (p > 1.0) p /= 100.0
-          p = p.coerceIn(0.0, 1.0)
-          val currentDay = kotlin.math.floor(p * availableDays).toInt().plus(1).coerceIn(1, availableDays)
+          if (p <= 1.0) p *= 100.0
+          p = p.coerceIn(0.0, 100.0)
+          val dayProgress = p / 100.0
+          val currentDay = kotlin.math.floor(dayProgress * availableDays).toInt().plus(1).coerceIn(1, availableDays)
           
           Log.d(TAG, "readDeviceAllData: onReadOriginProgress: $p")
           
@@ -651,7 +652,7 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
               "readState" to "reading",
               "totalDays" to availableDays,
               "currentDay" to currentDay,
-              "progress" to p
+              "progress" to p.toInt()
             )
           ))
         }
@@ -665,7 +666,7 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
               "readState" to "complete",
               "totalDays" to availableDays,
               "currentDay" to availableDays,
-              "progress" to 1.0
+              "progress" to 100
             )
           ))
           

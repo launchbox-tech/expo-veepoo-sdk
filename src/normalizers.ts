@@ -420,7 +420,7 @@ export function normalizeReadOriginProgressPayload(value: unknown): unknown {
         : 1,
     progress:
       typeof progress.progress === 'number' && Number.isFinite(progress.progress)
-        ? clamp(progress.progress, 0, 1)
+        ? Math.trunc(clamp(progress.progress <= 1 ? progress.progress * 100 : progress.progress, 0, 100))
         : 0,
   };
 

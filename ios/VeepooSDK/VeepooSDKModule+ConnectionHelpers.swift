@@ -52,6 +52,7 @@ extension VeepooSDKModule {
   ) {
     #if !targetEnvironment(simulator)
     print("[VeepooSDK] performConnect - 开始, deviceId: \(deviceId)")
+    print("[VeepooSDK] performConnect - 当前上下文, connectedDeviceId: \(self.connectedDeviceId ?? "nil"), activeConnectDeviceId: \(self.activeConnectDeviceId ?? "nil"), state: \(self.connectionState.rawValue), pendingScanStart: \(self.pendingScanStart), isScanning: \(self.isScanning)")
 
     activeConnectDeviceId = deviceId
     connectionState = .connecting
@@ -73,7 +74,7 @@ extension VeepooSDKModule {
       guard let self = self else { return }
       guard !isSettled else { return }
       isSettled = true
-      print("[VeepooSDK] performConnect - 连接超时")
+      print("[VeepooSDK] performConnect - 连接超时, deviceId: \(deviceId), state: \(self.connectionState.rawValue), connectedDeviceId: \(self.connectedDeviceId ?? "nil"), activeConnectDeviceId: \(self.activeConnectDeviceId ?? "nil")")
       self.connectionState = .error("Connection timeout")
       self.emitConnectionStatus(deviceId: deviceId, status: "error")
       self.emitNativeError(code: "CONNECTION_TIMEOUT", message: "Connection timeout after 15 seconds", deviceId: deviceId)
@@ -87,15 +88,15 @@ extension VeepooSDKModule {
     manager.veepooSDKConnectDevice(model) { [weak self] connectState in
       guard let self = self else { return }
 
-      self.connectionTimer?.invalidate()
-      self.connectionTimer = nil
-
       print("[VeepooSDK] performConnect - 连接状态: \(connectState.rawValue)")
+      print("[VeepooSDK] performConnect - 回调现场, deviceId: \(deviceId), state: \(self.connectionState.rawValue), connectedDeviceId: \(self.connectedDeviceId ?? "nil"), activeConnectDeviceId: \(self.activeConnectDeviceId ?? "nil"), isSettled: \(isSettled)")
 
       switch connectState.rawValue {
       case 2:
         guard !isSettled else { return }
         isSettled = true
+        self.connectionTimer?.invalidate()
+        self.connectionTimer = nil
         print("[VeepooSDK] performConnect - 连接成功")
         self.connectionState = .connected
         self.connectedDeviceId = deviceId
@@ -112,6 +113,8 @@ extension VeepooSDKModule {
       case 0:
         guard !isSettled else { return }
         isSettled = true
+        self.connectionTimer?.invalidate()
+        self.connectionTimer = nil
         self.connectionState = .error("Device disconnected before connection completed")
         self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
         self.emitNativeError(
@@ -128,11 +131,15 @@ extension VeepooSDKModule {
         }
 
       case 1:
+        self.connectionState = .connecting
+        print("[VeepooSDK] performConnect - 仍在连接中, deviceId: \(deviceId), 将继续等待成功/失败终态")
         self.emitConnectionStatus(deviceId: deviceId, status: "connecting", code: connectState.rawValue)
 
       case 3:
         guard !isSettled else { return }
         isSettled = true
+        self.connectionTimer?.invalidate()
+        self.connectionTimer = nil
         self.connectionState = .error("Connection failed")
         self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
         self.emitNativeError(
@@ -150,6 +157,8 @@ extension VeepooSDKModule {
       case 6:
         guard !isSettled else { return }
         isSettled = true
+        self.connectionTimer?.invalidate()
+        self.connectionTimer = nil
         self.connectionState = .error("Connection timeout")
         self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
         self.emitNativeError(
@@ -167,6 +176,8 @@ extension VeepooSDKModule {
       default:
         guard !isSettled else { return }
         isSettled = true
+        self.connectionTimer?.invalidate()
+        self.connectionTimer = nil
         self.connectionState = .error("Unknown connection error: \(connectState.rawValue)")
         self.emitConnectionStatus(deviceId: deviceId, status: "error", code: connectState.rawValue)
         self.emitNativeError(
@@ -193,6 +204,7 @@ extension VeepooSDKModule {
     timeout: TimeInterval = 5.0
   ) {
     #if !targetEnvironment(simulator)
+    print("[VeepooSDK] startScanConnectFallback - 开始, deviceId: \(deviceId), timeout: \(timeout), isScanning: \(self.isScanning), discoveredCount: \(self.discoveredDevices.count)")
     self.pendingConnectDeviceId = deviceId
     self.pendingConnectPassword = password
     self.pendingConnectIs24Hour = is24Hour
@@ -206,6 +218,7 @@ extension VeepooSDKModule {
       }
       self.isScanning = true
       self.emitBluetoothStatus()
+      print("[VeepooSDK] startScanConnectFallback - 启动扫描兜底, deviceId: \(deviceId)")
       manager.veepooSDKStartScanDeviceAndReceiveScanningDevice { [weak self] peripheralModel in
         guard let self = self, let model = peripheralModel else { return }
         self.handleDiscoveredDevice(model)
@@ -215,6 +228,7 @@ extension VeepooSDKModule {
     DispatchQueue.main.asyncAfter(deadline: .now() + timeout) { [weak self] in
       guard let self = self else { return }
       if self.pendingConnectDeviceId == deviceId {
+        print("[VeepooSDK] startScanConnectFallback - 扫描兜底超时, deviceId: \(deviceId), discoveredCount: \(self.discoveredDevices.count)")
         self.bleManager?.veepooSDKStopScanDevice()
         self.isScanning = false
         self.pendingScanStart = false
@@ -300,6 +314,8 @@ extension VeepooSDKModule {
 
     let exportId = rawAddr ?? uuid
 
+    print("[VeepooSDK] handleDiscoveredDevice - 发现设备, exportId: \(exportId), uuid: \(uuid), name: \(name), pendingConnectDeviceId: \(self.pendingConnectDeviceId ?? "nil")")
+
     self.discoveredDevices[exportId] = peripheralModel
     self.discoveredDevices[uuid] = peripheralModel
 
@@ -345,7 +361,7 @@ extension VeepooSDKModule {
 
   func verifyPasswordInternal(deviceId: String, password: String, is24Hour: Bool) {
     #if !targetEnvironment(simulator)
-    print("[VeepooSDK] verifyPasswordInternal - 开始, deviceId: \(deviceId), password: \(password), 重试次数: \(authenticationRetryCount)")
+    print("[VeepooSDK] verifyPasswordInternal - 开始, deviceId: \(deviceId), password: \(password), 重试次数: \(authenticationRetryCount), state: \(self.connectionState.rawValue), connectedDeviceId: \(self.connectedDeviceId ?? "nil"), activeConnectDeviceId: \(self.activeConnectDeviceId ?? "nil")")
     
     authenticationTimer?.invalidate()
     authenticationTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: false) { [weak self] _ in

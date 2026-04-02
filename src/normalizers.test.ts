@@ -1,4 +1,8 @@
-import { normalizeBluetoothStatus, normalizePermissionsResult } from './normalizers';
+import {
+  normalizeBluetoothStatus,
+  normalizePermissionsResult,
+  normalizeReadOriginProgressPayload,
+} from './normalizers';
 
 describe('normalizePermissionsResult', () => {
   it('normalizes legacy string payloads', () => {
@@ -46,6 +50,52 @@ describe('normalizeBluetoothStatus', () => {
       authorizationName: 'allowedAlways',
       isScanning: true,
       pendingScanStart: false,
+    });
+  });
+});
+
+describe('normalizeReadOriginProgressPayload', () => {
+  it('converts progress to an integer percentage', () => {
+    expect(
+      normalizeReadOriginProgressPayload({
+        deviceId: 'd1',
+        progress: {
+          readState: 'reading',
+          totalDays: 3,
+          currentDay: 2,
+          progress: 0.6789,
+        },
+      })
+    ).toEqual({
+      deviceId: 'd1',
+      progress: {
+        readState: 'reading',
+        totalDays: 3,
+        currentDay: 2,
+        progress: 67,
+      },
+    });
+  });
+
+  it('clamps final progress to 100', () => {
+    expect(
+      normalizeReadOriginProgressPayload({
+        deviceId: 'd1',
+        progress: {
+          readState: 'complete',
+          totalDays: 1,
+          currentDay: 1,
+          progress: 1.2,
+        },
+      })
+    ).toEqual({
+      deviceId: 'd1',
+      progress: {
+        readState: 'complete',
+        totalDays: 1,
+        currentDay: 1,
+        progress: 100,
+      },
     });
   });
 });
