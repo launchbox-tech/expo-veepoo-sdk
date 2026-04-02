@@ -77,7 +77,7 @@ describe('normalizeReadOriginProgressPayload', () => {
     });
   });
 
-  it('clamps final progress to 100', () => {
+  it('converts a completed fractional progress to 100', () => {
     expect(
       normalizeReadOriginProgressPayload({
         deviceId: 'd1',
@@ -85,7 +85,29 @@ describe('normalizeReadOriginProgressPayload', () => {
           readState: 'complete',
           totalDays: 1,
           currentDay: 1,
-          progress: 1.2,
+          progress: 1.0,
+        },
+      })
+    ).toEqual({
+      deviceId: 'd1',
+      progress: {
+        readState: 'complete',
+        totalDays: 1,
+        currentDay: 1,
+        progress: 100,
+      },
+    });
+  });
+
+  it('clamps percent-style values to 100', () => {
+    expect(
+      normalizeReadOriginProgressPayload({
+        deviceId: 'd1',
+        progress: {
+          readState: 'complete',
+          totalDays: 1,
+          currentDay: 1,
+          progress: 120,
         },
       })
     ).toEqual({
