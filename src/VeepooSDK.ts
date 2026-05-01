@@ -25,7 +25,7 @@ import type {
   VeepooEvent,
   VeepooEventPayload,
   PermissionsResult,
-} from "./types.js";
+} from "./types/index.js";
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import {
   normalizeAutoMeasureSettings,

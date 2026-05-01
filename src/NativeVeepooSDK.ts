@@ -9,7 +9,7 @@ import type {
   Language,
   AutoMeasureSetting,
   PermissionsResult,
-} from './types.js';
+} from './types/index.js';
 
 const LINKING_ERROR =
   "The package 'expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +

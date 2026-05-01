@@ -24,7 +24,7 @@ import type {
   TestState,
   OriginData,
   BloodPressureTestResult,
-} from './types.js';
+} from './types/index.js';
 
 const bluetoothStatesByCode: BluetoothState[] = [
   'unknown',
