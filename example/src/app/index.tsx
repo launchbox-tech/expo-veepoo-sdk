@@ -301,6 +301,21 @@ export default function Index() {
     await sdk.startBloodOxygenTest();
   }, []);
 
+  const handleStopHR = useCallback(async () => {
+    await sdk.stopHeartRateTest();
+    setActiveTest(null);
+  }, []);
+
+  const handleStopBP = useCallback(async () => {
+    await sdk.stopBloodPressureTest();
+    setActiveTest(null);
+  }, []);
+
+  const handleStopSpo2 = useCallback(async () => {
+    await sdk.stopBloodOxygenTest();
+    setActiveTest(null);
+  }, []);
+
   const handleSyncData = useCallback(async () => {
     setDataSyncing(true);
     setDataSyncProgress(null);
@@ -423,6 +438,7 @@ export default function Index() {
             state={hrResult?.state}
             resultLine={hrResult?.value != null ? `${hrResult.value} bpm` : null}
             onStart={handleStartHR}
+            onStop={handleStopHR}
           />
           <HealthTestCard
             label="Blood Pressure"
@@ -437,6 +453,7 @@ export default function Index() {
                 : null
             }
             onStart={handleStartBP}
+            onStop={handleStopBP}
           />
           <HealthTestCard
             label="Blood Oxygen (SpO₂)"
@@ -447,6 +464,7 @@ export default function Index() {
             state={spo2Result?.state}
             resultLine={spo2Result?.value != null ? `${spo2Result.value}% SpO₂` : null}
             onStart={handleStartSpo2}
+            onStop={handleStopSpo2}
           />
 
           {/* ── Historical Data Sync (#9) ── */}
@@ -460,7 +478,7 @@ export default function Index() {
               <Pressable
                 style={({ pressed }) => [
                   styles.testBtn,
-                  dataSyncing ? styles.testBtnActive : styles.testBtnIdle,
+                  dataSyncing ? styles.testBtnDisabled : styles.testBtnIdle,
                   pressed && !dataSyncing && styles.buttonPressed,
                 ]}
                 disabled={dataSyncing}
@@ -621,7 +639,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 function HealthTestCard({
-  label, isActive, disabled, progress, state, resultLine, onStart,
+  label, isActive, disabled, progress, state, resultLine, onStart, onStop,
 }: {
   label: string;
   unit: string;
@@ -631,6 +649,7 @@ function HealthTestCard({
   state?: string;
   resultLine: string | null;
   onStart: () => void;
+  onStop: () => void;
 }) {
   const stateMsg =
     state === 'notWear' ? 'Please wear the device.' :
@@ -640,26 +659,34 @@ function HealthTestCard({
     <View style={styles.card}>
       <View style={styles.testCardRow}>
         <Text style={styles.testLabel}>{label}</Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.testBtn,
-            isActive ? styles.testBtnActive : disabled ? styles.testBtnDisabled : styles.testBtnIdle,
-            pressed && !disabled && styles.buttonPressed,
-          ]}
-          disabled={disabled || isActive}
-          onPress={onStart}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: disabled || isActive }}
-        >
-          {isActive
-            ? <ActivityIndicator size="small" color="#fff" />
-            : <Text style={[styles.testBtnText, disabled && styles.testBtnTextDisabled]}>Start</Text>
-          }
-        </Pressable>
+        {isActive ? (
+          <Pressable
+            style={({ pressed }) => [styles.testBtn, styles.testBtnStop, pressed && styles.buttonPressed]}
+            onPress={onStop}
+            accessibilityRole="button"
+            accessibilityLabel={`Stop ${label} test`}
+          >
+            <Text style={styles.testBtnText}>Stop</Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={({ pressed }) => [
+              styles.testBtn,
+              disabled ? styles.testBtnDisabled : styles.testBtnIdle,
+              pressed && !disabled && styles.buttonPressed,
+            ]}
+            disabled={disabled}
+            onPress={onStart}
+            accessibilityRole="button"
+            accessibilityState={{ disabled }}
+          >
+            <Text style={[styles.testBtnText, disabled && styles.testBtnTextDisabled]}>Start</Text>
+          </Pressable>
+        )}
       </View>
-      {isActive && progress != null && (
+      {isActive && (
         <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+          <View style={[styles.progressFill, { width: `${progress ?? 0}%` }]} />
         </View>
       )}
       {!isActive && resultLine && <Text style={styles.testResult}>{resultLine}</Text>}
@@ -719,7 +746,7 @@ const styles = StyleSheet.create({
   testLabel: { fontSize: 15, fontWeight: '600', color: '#111' },
   testBtn: { borderRadius: 8, paddingVertical: 7, paddingHorizontal: 16, minWidth: 64, alignItems: 'center' },
   testBtnIdle: { backgroundColor: BLUE },
-  testBtnActive: { backgroundColor: '#999' },
+  testBtnStop: { backgroundColor: RED },
   testBtnDisabled: { backgroundColor: '#E5E5E5' },
   testBtnText: { fontSize: 13, fontWeight: '600', color: '#fff' },
   testBtnTextDisabled: { color: '#bbb' },
