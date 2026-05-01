@@ -54,7 +54,7 @@ Stand up the fork so it builds cleanly on both platforms, ship a minimal `exampl
 **Module 3 — Example app UI (single screen)** (in progress)
 - State machine mirroring `VeepooSDK`'s connection lifecycle: `idle → scanning → pairing → connecting → ready → disconnected`
 - [✅ idle state] `init()` + `requestPermissions()` called on mount; "Start Scan" button disabled until `permissions.granted`
-- Scan section: start/stop scan button, scrollable list of `VeepooDevice` rows with name + RSSI + connect button
+- [✅ scan section] "Start Scan" → `startScan()` + `deviceFound` listener → `FlatList` of device rows (name, RSSI dBm, MAC); "Stop Scan" → `stopScan()` + back to idle; deduplication by device ID
 - Session section (visible only in `ready` state): battery level, device version, personal info sync status
 - Health test section: HR / BP / SpO2 buttons with progress bars and result display
 - Data sync section: sync button, progress indicator, summary of sleep + steps for today

@@ -1,3 +1,25 @@
+## 2026-05-01 — Issue #6: scan + device list
+
+**Done:**
+- "Start Scan" Pressable calls `sdk.startScan()`, clears device list, transitions to 'scanning'
+- `deviceFound` listener registered in a useEffect gated on `appState === 'scanning'`;
+  deduplicates by `device.id`, updates RSSI on repeat sightings of the same device
+- FlatList renders `DeviceRow` per device: name, RSSI dBm, MAC, "Connect" Pressable
+  (Connect stubbed — Issue #7)
+- Empty-list placeholder: "Scanning for nearby HBand devices…"
+- "Stop Scan" Pressable calls `sdk.stopScan()`, transitions back to 'idle'; list persists
+  so user can still connect after stopping
+- `deviceFound` listener cleaned up on effect teardown (state changes or unmount)
+- tsc --noEmit example: 0 errors ✅ | root tests: 6/6 pass ✅
+
+**Note for next agent (Issue #7 — connect + session + disconnect):**
+- DeviceRow's `onConnect` prop is stubbed in index.tsx with a comment
+- Next: call `sdk.connect(device.id)`, set appState to 'connecting', show spinner
+- Listen for `deviceReady` event → transition to 'ready', call `sdk.syncPersonalInfo()`
+- Listen for `deviceDisconnected` event → transition to 'disconnected', show Reconnect btn
+- Session section should only render when appState === 'ready'
+- syncPersonalInfo() signature in VeepooSDK.ts — check what PersonalInfo fields are needed
+
 ## 2026-05-01 — Issue #4: init + permissions + idle-state UI
 
 **Done:**

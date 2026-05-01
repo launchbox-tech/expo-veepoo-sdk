@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  FlatList,
   Pressable,
   StatusBar,
   StyleSheet,
@@ -9,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import sdk from 'expo-veepoo-sdk';
-import type { PermissionsResult } from 'expo-veepoo-sdk';
+import type { PermissionsResult, VeepooDevice } from 'expo-veepoo-sdk';
 
 // State machine: idle → scanning → connecting → ready → disconnected
 export type AppState =
@@ -23,10 +24,11 @@ export type AppState =
 export default function Index() {
   const [appState, setAppState] = useState<AppState>('initializing');
   const [permissions, setPermissions] = useState<PermissionsResult | null>(null);
+  const [devices, setDevices] = useState<VeepooDevice[]>([]);
 
+  // SDK init + permission request on mount
   useEffect(() => {
     let cancelled = false;
-
     async function setup() {
       await sdk.init();
       const result = await sdk.requestPermissions();
@@ -35,11 +37,40 @@ export default function Index() {
         setAppState('idle');
       }
     }
-
     setup();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
+  }, []);
+
+  // deviceFound listener — active only while scanning
+  useEffect(() => {
+    if (appState !== 'scanning') return;
+
+    function onDeviceFound({ device }: { device: VeepooDevice; timestamp: number }) {
+      setDevices(prev => {
+        const idx = prev.findIndex(d => d.id === device.id);
+        if (idx !== -1) {
+          // update RSSI for already-known device
+          const next = [...prev];
+          next[idx] = device;
+          return next;
+        }
+        return [...prev, device];
+      });
+    }
+
+    sdk.on('deviceFound', onDeviceFound);
+    return () => { sdk.off('deviceFound', onDeviceFound); };
+  }, [appState]);
+
+  const handleStartScan = useCallback(async () => {
+    setDevices([]);
+    setAppState('scanning');
+    await sdk.startScan();
+  }, []);
+
+  const handleStopScan = useCallback(async () => {
+    await sdk.stopScan();
+    setAppState('idle');
   }, []);
 
   const permissionsGranted = permissions?.granted ?? false;
@@ -63,41 +94,99 @@ export default function Index() {
         <Text style={styles.version}>expo-veepoo-sdk v1.2.7</Text>
       </View>
 
-      <View style={styles.section}>
+      {/* Scan controls */}
+      <View style={styles.scanControls}>
         {!permissionsGranted && (
           <Text style={styles.permissionHint}>
             Bluetooth permission is required to scan for devices.
           </Text>
         )}
 
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            permissionsGranted ? styles.buttonPrimary : styles.buttonDisabled,
-            pressed && permissionsGranted && styles.buttonPressed,
-          ]}
-          disabled={!permissionsGranted}
-          onPress={() => {
-            // Issue #6: call sdk.startScan() and transition to 'scanning'
-          }}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: !permissionsGranted }}
-          accessibilityLabel="Start Scan"
-          accessibilityHint="Scans for nearby HBand devices via Bluetooth"
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              !permissionsGranted && styles.buttonTextDisabled,
-            ]}
+        {appState === 'scanning' ? (
+          <Pressable
+            style={({ pressed }) => [styles.button, styles.buttonStop, pressed && styles.buttonPressed]}
+            onPress={handleStopScan}
+            accessibilityRole="button"
+            accessibilityLabel="Stop scanning for devices"
           >
-            Start Scan
-          </Text>
-        </Pressable>
+            <ActivityIndicator size="small" color="#fff" style={styles.spinnerInline} />
+            <Text style={styles.buttonText}>Stop Scan</Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={({ pressed }) => [
+              styles.button,
+              permissionsGranted ? styles.buttonPrimary : styles.buttonDisabled,
+              pressed && permissionsGranted && styles.buttonPressed,
+            ]}
+            disabled={!permissionsGranted}
+            onPress={handleStartScan}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !permissionsGranted }}
+            accessibilityLabel="Start scanning for nearby devices"
+          >
+            <Text style={[styles.buttonText, !permissionsGranted && styles.buttonTextDisabled]}>
+              Start Scan
+            </Text>
+          </Pressable>
+        )}
       </View>
+
+      {/* Device list — visible while scanning or after a scan found something */}
+      {(appState === 'scanning' || devices.length > 0) && (
+        <FlatList
+          data={devices}
+          keyExtractor={item => item.id}
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>Scanning for nearby HBand devices…</Text>
+          }
+          renderItem={({ item }) => (
+            <DeviceRow
+              device={item}
+              onConnect={() => {
+                // Issue #7: call sdk.connect(item.id) and transition to 'connecting'
+              }}
+            />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
+
+function DeviceRow({
+  device,
+  onConnect,
+}: {
+  device: VeepooDevice;
+  onConnect: () => void;
+}) {
+  return (
+    <View style={styles.deviceRow}>
+      <View style={styles.deviceInfo}>
+        <Text style={styles.deviceName} numberOfLines={1}>
+          {device.name || 'Unknown Device'}
+        </Text>
+        <Text style={styles.deviceMeta}>
+          {device.rssi} dBm{device.mac ? ` · ${device.mac}` : ''}
+        </Text>
+      </View>
+      <Pressable
+        style={({ pressed }) => [styles.connectBtn, pressed && styles.connectBtnPressed]}
+        onPress={onConnect}
+        accessibilityRole="button"
+        accessibilityLabel={`Connect to ${device.name ?? 'device'}`}
+      >
+        <Text style={styles.connectBtnText}>Connect</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const BLUE = '#208AEF';
+const RED = '#E53935';
 
 const styles = StyleSheet.create({
   centered: {
@@ -110,11 +199,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 24,
   },
   header: {
-    paddingTop: 32,
-    paddingBottom: 24,
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 28,
@@ -127,39 +216,83 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 4,
   },
-  section: {
-    gap: 16,
-  },
-  statusText: {
-    fontSize: 16,
-    color: '#666',
+  scanControls: {
+    paddingHorizontal: 24,
+    gap: 12,
+    marginBottom: 16,
   },
   permissionHint: {
     fontSize: 14,
     color: '#E05C00',
     lineHeight: 20,
   },
+  statusText: {
+    fontSize: 16,
+    color: '#666',
+  },
   button: {
     height: 52,
     borderRadius: 12,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
   },
-  buttonPrimary: {
-    backgroundColor: '#208AEF',
-  },
-  buttonDisabled: {
-    backgroundColor: '#E5E5E5',
-  },
-  buttonPressed: {
-    opacity: 0.85,
-  },
+  buttonPrimary: { backgroundColor: BLUE },
+  buttonStop: { backgroundColor: RED },
+  buttonDisabled: { backgroundColor: '#E5E5E5' },
+  buttonPressed: { opacity: 0.82 },
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
   },
-  buttonTextDisabled: {
+  buttonTextDisabled: { color: '#999' },
+  spinnerInline: { marginRight: 4 },
+  list: { flex: 1 },
+  listContent: {
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+    gap: 10,
+  },
+  emptyText: {
+    fontSize: 14,
     color: '#999',
+    textAlign: 'center',
+    marginTop: 24,
+  },
+  deviceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F9FF',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  deviceInfo: {
+    flex: 1,
+    gap: 3,
+  },
+  deviceName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111',
+  },
+  deviceMeta: {
+    fontSize: 12,
+    color: '#888',
+  },
+  connectBtn: {
+    backgroundColor: BLUE,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  connectBtnPressed: { opacity: 0.8 },
+  connectBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#fff',
   },
 });
