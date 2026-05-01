@@ -37,8 +37,19 @@ export default function Index() {
     reconnect,
   } = useBandSession(appState, dispatch, stopScan);
 
-  const { hrResult, bpResult, spo2Result, activeTest, startHR, stopHR, startBP, stopBP, startSpo2, stopSpo2 } = useHealthTests(appState);
-  const { dataSyncing, dataSyncProgress, sleepSummary, stepData, syncData } = useDataSync(appState);
+  const healthTests = useHealthTests(appState);
+  const dataSync = useDataSync(appState);
+
+  const hrResult         = appState === 'ready' ? healthTests.hrResult : null;
+  const bpResult         = appState === 'ready' ? healthTests.bpResult : null;
+  const spo2Result       = appState === 'ready' ? healthTests.spo2Result : null;
+  const activeTest       = appState === 'ready' ? healthTests.activeTest : null;
+  const dataSyncing      = appState === 'ready' ? dataSync.dataSyncing : false;
+  const dataSyncProgress = appState === 'ready' ? dataSync.dataSyncProgress : null;
+  const sleepSummary     = appState === 'ready' ? dataSync.sleepSummary : null;
+  const stepData         = appState === 'ready' ? dataSync.stepData : null;
+  const { startHR, stopHR, startBP, stopBP, startSpo2, stopSpo2 } = healthTests;
+  const { syncData } = dataSync;
 
   const permissionsGranted = permissions?.granted ?? false;
 
