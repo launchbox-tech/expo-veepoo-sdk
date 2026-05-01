@@ -1,5 +1,7 @@
 # @gaozh1024/expo-veepoo-sdk
 
+An Expo SDK for integrating HBand wearable devices into React Native / Expo applications.
+
 [![npm version](https://badge.fury.io/js/@gaozh1024%2Fexpo-veepoo-sdk.svg)](https://badge.fury.io/js/@gaozh1024%2Fexpo-veepoo-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey.svg)](https://github.com/gaozh1024/expo-veepoo-sdk)

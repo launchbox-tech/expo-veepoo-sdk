@@ -8,6 +8,7 @@ import {
 type VeepooSDKPluginProps = {
   bluetoothAlwaysPermission?: string;
   bluetoothPeripheralPermission?: string;
+  locationWhenInUsePermission?: string;
 };
 
 const DEFAULT_OPTIONS: VeepooSDKPluginProps = {
@@ -15,6 +16,8 @@ const DEFAULT_OPTIONS: VeepooSDKPluginProps = {
     'This app needs Bluetooth permission to connect to Veepoo devices',
   bluetoothPeripheralPermission:
     'This app needs Bluetooth permission to scan and connect to devices',
+  locationWhenInUsePermission:
+    'This app uses your location to scan for nearby Bluetooth devices',
 };
 
 const withVeepooSDK: ConfigPlugin<VeepooSDKPluginProps | void> = (
@@ -26,6 +29,8 @@ const withVeepooSDK: ConfigPlugin<VeepooSDKPluginProps | void> = (
       props?.bluetoothAlwaysPermission ?? DEFAULT_OPTIONS.bluetoothAlwaysPermission!,
     bluetoothPeripheralPermission:
       props?.bluetoothPeripheralPermission ?? DEFAULT_OPTIONS.bluetoothPeripheralPermission!,
+    locationWhenInUsePermission:
+      props?.locationWhenInUsePermission ?? DEFAULT_OPTIONS.locationWhenInUsePermission!,
   };
 
   config = withIOSBluetoothPermissions(config, options);
@@ -46,6 +51,10 @@ const withIOSBluetoothPermissions: ConfigPlugin<VeepooSDKPluginProps> = (
     if (options.bluetoothPeripheralPermission) {
       config.modResults.NSBluetoothPeripheralUsageDescription =
         options.bluetoothPeripheralPermission;
+    }
+    if (options.locationWhenInUsePermission) {
+      config.modResults.NSLocationWhenInUseUsageDescription =
+        options.locationWhenInUsePermission;
     }
     return config;
   });

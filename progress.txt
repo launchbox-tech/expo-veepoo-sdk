@@ -1,0 +1,30 @@
+## 2026-05-01 — Issue #3: Example app scaffold + config plugin
+
+**Done:**
+- Scaffolded `example/` with `npx create-expo-app@latest --template default@sdk-55`
+  (Expo SDK 55, RN 0.83.6, expo-router, Reanimated 4, New Arch)
+- Added `expo-veepoo-sdk: "file:.."` to example/package.json; bun install resolves cleanly
+- Added `bundleIdentifier` (tech.launchbox.veepoo.example) and `package` to app.json
+- Wired `"expo-veepoo-sdk"` into example/app.json plugins
+- Fixed config plugin (src/plugin/index.ts) to inject NSLocationWhenInUseUsageDescription
+  (was missing; required for BLE scanning on iOS)
+- Built module (`./node_modules/.bin/tsc` → build/) — module must be built locally since
+  build/ is gitignored; `prepare` script handles this on `npm install` from GitHub
+- `npx expo prebuild --clean` succeeds; verified:
+  - AndroidManifest: BLUETOOTH, BLUETOOTH_ADMIN, BLUETOOTH_CONNECT, BLUETOOTH_SCAN,
+    ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION ✅
+  - Info.plist: NSBluetoothAlwaysUsageDescription, NSBluetoothPeripheralUsageDescription,
+    NSLocationWhenInUseUsageDescription ✅
+- tsc --noEmit: 0 errors ✅ | npm test: 6/6 pass ✅
+
+**Note for next agent (Issue #4 — init + permissions + idle-state UI):**
+- The example app uses expo-router (file-based routing under example/src/app/)
+- The template has a default home screen at example/src/app/(tabs)/index.tsx
+- Replace that screen with the idle-state UI: call init() + requestPermissions() on mount,
+  render a "Start Scan" button that is disabled until permissions are granted
+- The module exports: init(), requestPermissions(), startScan(), stopScan(), connect(),
+  disconnect(), syncPersonalInfo(), startHeartRateTest(), etc. — see src/VeepooSDK.ts
+- SDK types are in src/types.ts; VeepooDevice, ConnectionState, etc.
+- The example/android/ and example/ios/ directories from prebuild ARE generated;
+  they are gitignored per .gitignore (example/android/, example/ios/) so run prebuild
+  before running on device

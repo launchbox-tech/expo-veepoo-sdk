@@ -1,0 +1,1 @@
+Install skills with npx skills experimental_install if not present
