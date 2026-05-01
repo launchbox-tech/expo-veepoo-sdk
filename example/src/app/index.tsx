@@ -13,8 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { VeepooDevice } from "expo-veepoo-sdk";
 import { BLUE, GREEN, RED } from "../components/theme";
-import { DeviceRow } from "../components/DeviceRow";
-import { InfoRow } from "../components/InfoRow";
+import { DeviceRow, HealthTestCard, InfoRow } from "../components";
 import { appStateReducer } from "../hooks/appStateReducer";
 import { useSDKInit } from "../hooks/useSDKInit";
 import { useBandScan } from "../hooks/useBandScan";
@@ -174,7 +173,6 @@ export default function Index() {
 
           <HealthTestCard
             label="Heart Rate"
-            unit="BPM"
             isActive={activeTest === "hr"}
             disabled={activeTest !== null && activeTest !== "hr"}
             progress={hrResult?.progress}
@@ -187,7 +185,6 @@ export default function Index() {
           />
           <HealthTestCard
             label="Blood Pressure"
-            unit="mmHg"
             isActive={activeTest === "bp"}
             disabled={activeTest !== null && activeTest !== "bp"}
             progress={bpResult?.progress}
@@ -202,7 +199,6 @@ export default function Index() {
           />
           <HealthTestCard
             label="Blood Oxygen (SpO₂)"
-            unit="%"
             isActive={activeTest === "spo2"}
             disabled={activeTest !== null && activeTest !== "spo2"}
             progress={spo2Result?.progress}
@@ -402,88 +398,6 @@ export default function Index() {
   );
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function HealthTestCard({
-  label,
-  isActive,
-  disabled,
-  progress,
-  state,
-  resultLine,
-  onStart,
-  onStop,
-}: {
-  label: string;
-  unit: string;
-  isActive: boolean;
-  disabled: boolean;
-  progress?: number;
-  state?: string;
-  resultLine: string | null;
-  onStart: () => void;
-  onStop: () => void;
-}) {
-  const stateMsg =
-    state === "notWear"
-      ? "Please wear the device."
-      : state === "error"
-      ? "Test error — try again."
-      : null;
-
-  return (
-    <View style={styles.card}>
-      <View style={styles.testCardRow}>
-        <Text style={styles.testLabel}>{label}</Text>
-        {isActive ? (
-          <Pressable
-            style={({ pressed }) => [
-              styles.testBtn,
-              styles.testBtnStop,
-              pressed && styles.buttonPressed,
-            ]}
-            onPress={onStop}
-            accessibilityRole="button"
-            accessibilityLabel={`Stop ${label} test`}
-          >
-            <Text style={styles.testBtnText}>Stop</Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            style={({ pressed }) => [
-              styles.testBtn,
-              disabled ? styles.testBtnDisabled : styles.testBtnIdle,
-              pressed && !disabled && styles.buttonPressed,
-            ]}
-            disabled={disabled}
-            onPress={onStart}
-            accessibilityRole="button"
-            accessibilityState={{ disabled }}
-          >
-            <Text
-              style={[
-                styles.testBtnText,
-                disabled && styles.testBtnTextDisabled,
-              ]}
-            >
-              Start
-            </Text>
-          </Pressable>
-        )}
-      </View>
-      {isActive && (
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress ?? 0}%` }]} />
-        </View>
-      )}
-      {!isActive && resultLine && (
-        <Text style={styles.testResult}>{resultLine}</Text>
-      )}
-      {stateMsg && <Text style={styles.testStateMsg}>{stateMsg}</Text>}
-    </View>
-  );
-}
-
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
@@ -574,10 +488,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   testBtnIdle: { backgroundColor: BLUE },
-  testBtnStop: { backgroundColor: RED },
   testBtnDisabled: { backgroundColor: "#E5E5E5" },
   testBtnText: { fontSize: 13, fontWeight: "600", color: "#fff" },
-  testBtnTextDisabled: { color: "#bbb" },
   progressTrack: {
     height: 6,
     borderRadius: 3,
@@ -585,8 +497,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   progressFill: { height: 6, backgroundColor: BLUE, borderRadius: 3 },
-  testResult: { fontSize: 20, fontWeight: "700", color: "#111" },
-  testStateMsg: { fontSize: 13, color: "#E05C00" },
   syncProgressLabel: { fontSize: 12, color: "#888" },
   dataSummary: {
     borderTopWidth: 1,
