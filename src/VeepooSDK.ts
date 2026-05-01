@@ -30,78 +30,20 @@ import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import {
   normalizeAutoMeasureSettings,
   normalizeBatteryInfo,
-  normalizeBluetoothStatus,
-  normalizeBloodGlucoseData,
-  normalizeBloodOxygenTestResult,
-  normalizeBloodPressureTestResult,
   normalizeDaySummaryData,
   normalizeDeviceFunctions,
   normalizeDeviceVersion,
-  normalizeHalfHourData,
-  normalizeHeartRateTestResult,
   normalizeOriginDataList,
   normalizePasswordData,
   normalizePermissionsResult,
-  normalizeReadOriginProgressPayload,
   normalizeSleepDataList,
   normalizeSocialMsgData,
   normalizeSportStepData,
-  normalizeStressData,
-  normalizeTemperatureTestResult,
+  normalizeEventPayload,
 } from "./normalizers.js";
 
 type EventListener = (payload: unknown) => void;
 type LogListener = (entry: LogEntry) => void;
-
-export function normalizeEventPayload(
-  event: VeepooEvent,
-  payload: unknown,
-): unknown {
-  if (typeof payload !== "object" || payload === null) return payload;
-  const p = payload as Record<string, any>;
-  switch (event) {
-    case "bluetoothStateChanged":
-      return normalizeBluetoothStatus(p);
-    case "readOriginProgress":
-      return normalizeReadOriginProgressPayload(p);
-    case "deviceFunction":
-      return {
-        ...p,
-        data: normalizeDeviceFunctions(p.data ?? p.functions),
-        functions: normalizeDeviceFunctions(p.functions ?? p.data),
-      };
-    case "deviceVersion":
-      return { ...p, version: normalizeDeviceVersion(p.version) };
-    case "passwordData":
-      return { ...p, data: normalizePasswordData(p.data) };
-    case "socialMsgData":
-      return { ...p, data: normalizeSocialMsgData(p.data) };
-    case "originFiveMinuteData":
-      return { ...p, data: normalizeOriginDataList([p.data])[0] };
-    case "originHalfHourData":
-      return { ...p, data: normalizeHalfHourData(p.data) };
-    case "sleepData":
-      return { ...p, data: normalizeSleepDataList(p.data)[0] };
-    case "sportStepData":
-      return { ...p, data: normalizeSportStepData(p.data) };
-    case "heartRateTestResult":
-      return { ...p, result: normalizeHeartRateTestResult(p.result) };
-    case "bloodPressureTestResult":
-      return { ...p, result: normalizeBloodPressureTestResult(p.result) };
-    case "bloodOxygenTestResult":
-      return { ...p, result: normalizeBloodOxygenTestResult(p.result) };
-    case "temperatureTestResult":
-      return { ...p, result: normalizeTemperatureTestResult(p.result) };
-    case "stressData":
-      return { ...p, data: normalizeStressData(p.data) };
-    case "bloodGlucoseData":
-      return { ...p, data: normalizeBloodGlucoseData(p.data) };
-    case "batteryData":
-      return { ...p, data: normalizeBatteryInfo(p.data) };
-    default:
-      return payload;
-  }
-}
 
 const LINKING_ERROR =
   "The package 'expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +
