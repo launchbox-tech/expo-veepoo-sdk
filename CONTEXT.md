@@ -12,6 +12,10 @@ _Avoid_: watch, wearable, peripheral, gadget
 An active BLE connection between the app and the Band. A Session starts after a successful connection and password verification, and ends on disconnect or signal loss.
 _Avoid_: connection, link
 
+**Band Discovery**:
+The phase when the app actively scans for visible Bands. Begins when the user taps "Scan" and ends when scanning is stopped or a Band is selected. Produces a list of `VeepooDevice` candidates.
+_Avoid_: BLE scan, device search
+
 **Pairing**:
 The one-time act of the user selecting their Band from a scan list. The resulting `deviceId` is stored by the app and used for all future reconnections. Not a BLE pairing in the OS sense.
 _Avoid_: bonding, linking
