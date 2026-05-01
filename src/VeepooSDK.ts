@@ -27,6 +27,7 @@ import type {
   PermissionsResult,
 } from "./types/index.js";
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
+import type { VeepooSDKModuleInterface, LogListener } from "./VeepooSDKModule.js";
 import {
   normalizeAutoMeasureSettings,
   normalizeBatteryInfo,
@@ -43,7 +44,6 @@ import {
 } from "./normalizers.js";
 
 type EventListener = (payload: unknown) => void;
-type LogListener = (entry: LogEntry) => void;
 
 const LINKING_ERROR =
   "The package 'expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +
@@ -61,7 +61,7 @@ try {
   });
 }
 
-export class VeepooSDK {
+export class VeepooSDK implements VeepooSDKModuleInterface {
   private readonly native: NativeVeepooSDKInterface;
   private isScanning = false;
   private isInitialized = false;
