@@ -1,5 +1,6 @@
 export type VeepooErrorCode =
   | 'UNKNOWN'
+  | 'INVALID_ARGUMENT'
   | 'PERMISSION_DENIED'
   | 'CONNECTION_FAILED'
   | 'DISCONNECTION_FAILED'

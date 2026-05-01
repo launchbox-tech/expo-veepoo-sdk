@@ -28,6 +28,7 @@ import type {
 } from "./types/index.js";
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import type { VeepooSDKModuleInterface, LogListener } from "./VeepooSDKModule.js";
+import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting } from "./validators/index.js";
 import {
   normalizeAutoMeasureSettings,
   normalizeBatteryInfo,
@@ -442,6 +443,8 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   async connect(deviceId: string, options?: ConnectOptions): Promise<void> {
+    validateDeviceId(deviceId);
+    if (options) validateConnectOptions(options);
     try {
       this.log("info", "connection", "connect.start", "Connecting device", {
         deviceId,
@@ -571,6 +574,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   async syncPersonalInfo(info: PersonalInfo): Promise<boolean> {
+    validatePersonalInfo(info);
     return this.native.syncPersonalInfo(info);
   }
 
@@ -706,6 +710,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   async modifyAutoMeasureSetting(
     setting: Partial<AutoMeasureSetting>,
   ): Promise<AutoMeasureSetting[]> {
+    validateAutoMeasureSetting(setting);
     this.log(
       "info",
       "device",

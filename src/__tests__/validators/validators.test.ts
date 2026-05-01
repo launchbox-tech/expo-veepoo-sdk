@@ -1,0 +1,178 @@
+import {
+  validateDeviceId,
+  validateConnectOptions,
+  validatePersonalInfo,
+  validateAutoMeasureSetting,
+  validateAlarm,
+} from '../../validators/index';
+
+function expectInvalidArgument(fn: () => void, fieldHint?: string): void {
+  let thrown: unknown;
+  try {
+    fn();
+  } catch (e) {
+    thrown = e;
+  }
+  expect(thrown).toBeDefined();
+  expect((thrown as any).code).toBe('INVALID_ARGUMENT');
+  if (fieldHint) {
+    expect((thrown as any).message).toContain(fieldHint);
+  }
+}
+
+describe('validateDeviceId', () => {
+  it('throws INVALID_ARGUMENT for empty string', () => {
+    expectInvalidArgument(() => validateDeviceId(''), 'deviceId');
+  });
+
+  it('throws INVALID_ARGUMENT for whitespace-only string', () => {
+    expectInvalidArgument(() => validateDeviceId('   '), 'deviceId');
+  });
+
+  it('throws INVALID_ARGUMENT for non-string values', () => {
+    expectInvalidArgument(() => validateDeviceId(null as any), 'deviceId');
+    expectInvalidArgument(() => validateDeviceId(undefined as any), 'deviceId');
+    expectInvalidArgument(() => validateDeviceId(42 as any), 'deviceId');
+  });
+
+  it('passes for a valid device id', () => {
+    expect(() => validateDeviceId('AA:BB:CC:DD:EE:FF')).not.toThrow();
+  });
+});
+
+describe('validateConnectOptions', () => {
+  it('passes for an empty options object', () => {
+    expect(() => validateConnectOptions({})).not.toThrow();
+  });
+
+  it('throws when password is an empty string', () => {
+    expectInvalidArgument(() => validateConnectOptions({ password: '' }), 'options.password');
+  });
+
+  it('passes when password is a valid string', () => {
+    expect(() => validateConnectOptions({ password: '1234' })).not.toThrow();
+  });
+
+  it('throws when timeSetting.hour is out of range', () => {
+    expectInvalidArgument(
+      () => validateConnectOptions({ timeSetting: { year: 2024, month: 1, day: 1, hour: 24, minute: 0, second: 0 } }),
+      'timeSetting.hour',
+    );
+  });
+
+  it('throws when timeSetting.minute is out of range', () => {
+    expectInvalidArgument(
+      () => validateConnectOptions({ timeSetting: { year: 2024, month: 1, day: 1, hour: 0, minute: 60, second: 0 } }),
+      'timeSetting.minute',
+    );
+  });
+
+  it('throws when timeSetting.month is out of range', () => {
+    expectInvalidArgument(
+      () => validateConnectOptions({ timeSetting: { year: 2024, month: 13, day: 1, hour: 0, minute: 0, second: 0 } }),
+      'timeSetting.month',
+    );
+  });
+
+  it('passes for valid timeSetting', () => {
+    expect(() =>
+      validateConnectOptions({ timeSetting: { year: 2024, month: 6, day: 15, hour: 10, minute: 30, second: 0 } })
+    ).not.toThrow();
+  });
+});
+
+describe('validatePersonalInfo', () => {
+  const valid = { sex: 1 as 0 | 1, height: 170, weight: 70, age: 30, stepAim: 8000, sleepAim: 480 };
+
+  it('passes for valid info', () => {
+    expect(() => validatePersonalInfo(valid)).not.toThrow();
+  });
+
+  it('throws for invalid sex', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, sex: 2 as any }), 'sex');
+  });
+
+  it('throws for height below range and names the field', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, height: -5 }), 'height');
+  });
+
+  it('throws for height above range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, height: 301 }), 'height');
+  });
+
+  it('throws for weight below range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, weight: 0 }), 'weight');
+  });
+
+  it('throws for weight above range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, weight: 501 }), 'weight');
+  });
+
+  it('throws for age below range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, age: 0 }), 'age');
+  });
+
+  it('throws for age above range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, age: 121 }), 'age');
+  });
+
+  it('throws for stepAim below range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, stepAim: 0 }), 'stepAim');
+  });
+
+  it('throws for stepAim above range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, stepAim: 100_001 }), 'stepAim');
+  });
+
+  it('passes for sleepAim = 0', () => {
+    expect(() => validatePersonalInfo({ ...valid, sleepAim: 0 })).not.toThrow();
+  });
+
+  it('throws for sleepAim above 1440', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, sleepAim: 1_441 }), 'sleepAim');
+  });
+});
+
+describe('validateAutoMeasureSetting', () => {
+  it('passes for empty partial', () => {
+    expect(() => validateAutoMeasureSetting({})).not.toThrow();
+  });
+
+  it('throws for measureInterval below 1', () => {
+    expectInvalidArgument(() => validateAutoMeasureSetting({ measureInterval: 0 }), 'measureInterval');
+  });
+
+  it('throws for measureInterval above 120', () => {
+    expectInvalidArgument(() => validateAutoMeasureSetting({ measureInterval: 121 }), 'measureInterval');
+  });
+
+  it('passes for valid measureInterval', () => {
+    expect(() => validateAutoMeasureSetting({ measureInterval: 30 })).not.toThrow();
+  });
+
+  it('throws for currentStartMinute above 1439', () => {
+    expectInvalidArgument(() => validateAutoMeasureSetting({ currentStartMinute: 1440 }), 'currentStartMinute');
+  });
+
+  it('throws for currentEndMinute above 1439', () => {
+    expectInvalidArgument(() => validateAutoMeasureSetting({ currentEndMinute: 1440 }), 'currentEndMinute');
+  });
+});
+
+describe('validateAlarm', () => {
+  const valid = { id: 1, enabled: true, hour: 7, minute: 30, repeat: [1, 2, 3, 4, 5] };
+
+  it('passes for valid alarm', () => {
+    expect(() => validateAlarm(valid)).not.toThrow();
+  });
+
+  it('throws for hour out of range', () => {
+    expectInvalidArgument(() => validateAlarm({ ...valid, hour: 24 }), 'hour');
+    expectInvalidArgument(() => validateAlarm({ ...valid, hour: -1 }), 'hour');
+  });
+
+  it('throws for minute out of range', () => {
+    expectInvalidArgument(() => validateAlarm({ ...valid, minute: 60 }), 'minute');
+    expectInvalidArgument(() => validateAlarm({ ...valid, minute: -1 }), 'minute');
+  });
+});
