@@ -53,6 +53,31 @@ import {
 type EventListener = (payload: unknown) => void;
 type LogListener = (entry: LogEntry) => void;
 
+export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unknown {
+  if (typeof payload !== 'object' || payload === null) return payload;
+  const p = payload as Record<string, any>;
+  switch (event) {
+    case 'bluetoothStateChanged':   return normalizeBluetoothStatus(p);
+    case 'readOriginProgress':      return normalizeReadOriginProgressPayload(p);
+    case 'deviceFunction':          return { ...p, data: normalizeDeviceFunctions(p.data ?? p.functions), functions: normalizeDeviceFunctions(p.functions ?? p.data) };
+    case 'deviceVersion':           return { ...p, version: normalizeDeviceVersion(p.version) };
+    case 'passwordData':            return { ...p, data: normalizePasswordData(p.data) };
+    case 'socialMsgData':           return { ...p, data: normalizeSocialMsgData(p.data) };
+    case 'originFiveMinuteData':    return { ...p, data: normalizeOriginDataList([p.data])[0] };
+    case 'originHalfHourData':      return { ...p, data: normalizeHalfHourData(p.data) };
+    case 'sleepData':               return { ...p, data: normalizeSleepDataList(p.data)[0] };
+    case 'sportStepData':           return { ...p, data: normalizeSportStepData(p.data) };
+    case 'heartRateTestResult':     return { ...p, result: normalizeHeartRateTestResult(p.result) };
+    case 'bloodPressureTestResult': return { ...p, result: normalizeBloodPressureTestResult(p.result) };
+    case 'bloodOxygenTestResult':   return { ...p, result: normalizeBloodOxygenTestResult(p.result) };
+    case 'temperatureTestResult':   return { ...p, result: normalizeTemperatureTestResult(p.result) };
+    case 'stressData':              return { ...p, data: normalizeStressData(p.data) };
+    case 'bloodGlucoseData':        return { ...p, data: normalizeBloodGlucoseData(p.data) };
+    case 'batteryData':             return { ...p, data: normalizeBatteryInfo(p.data) };
+    default:                        return payload;
+  }
+}
+
 const LINKING_ERROR =
   "The package 'expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +
   '- You rebuilt the app after installing the package\n' +
@@ -70,6 +95,7 @@ try {
 }
 
 export class VeepooSDK {
+  private readonly native: NativeVeepooSDKInterface;
   private isScanning = false;
   private isInitialized = false;
   private connectedDeviceId: string | null = null;
@@ -79,6 +105,10 @@ export class VeepooSDK {
   private logger: LogListener | null = null;
   private listeners: Map<VeepooEvent, Set<EventListener>> = new Map();
   private nativeSubscriptions: EventSubscription[] = [];
+
+  constructor(native: NativeVeepooSDKInterface = NativeModule) {
+    this.native = native;
+  }
 
   private getPlatform(): LogEntry['platform'] {
     if (Platform.OS === 'ios' || Platform.OS === 'android' || Platform.OS === 'web') {
@@ -108,7 +138,7 @@ export class VeepooSDK {
       error: options?.error instanceof Error ? options.error.message : typeof options?.error === 'string' ? options.error : undefined,
     };
 
-    if (this.logEnabled) {
+    if (this.logEnabled && (globalThis as any).__DEV__ !== false) {
       const consoleMethod =
         level === 'error'
           ? console.error
@@ -172,7 +202,7 @@ export class VeepooSDK {
     ];
 
     events.forEach((event) => {
-      const subscription = (NativeModule as unknown as { addListener: (event: string, listener: (payload: unknown) => void) => EventSubscription }).addListener(
+      const subscription = this.native.addListener(
         event,
         (payload: unknown) => {
           this.emitLocal(event, payload);
@@ -359,14 +389,14 @@ export class VeepooSDK {
     if (this.isInitialized) return;
     this.log('info', 'sdk', 'init.start', 'Initializing SDK');
     this.setupEventListeners();
-    await NativeModule.init();
+    await this.native.init();
     this.isInitialized = true;
     this.log('info', 'sdk', 'init.success', 'SDK initialized');
   }
 
   async checkBluetoothStatus(): Promise<boolean> {
     try {
-      const enabled = await NativeModule.isBluetoothEnabled();
+      const enabled = await this.native.isBluetoothEnabled();
       this.log('debug', 'bluetooth', 'bluetooth.check', 'Checked Bluetooth status', {
         data: { enabled },
       });
@@ -379,7 +409,7 @@ export class VeepooSDK {
 
   async requestPermissions(): Promise<PermissionsResult> {
     try {
-      const result = normalizePermissionsResult(await NativeModule.requestPermissions());
+      const result = normalizePermissionsResult(await this.native.requestPermissions());
       this.log('info', 'permissions', 'permissions.request', 'Requested Bluetooth permissions', {
         data: result,
       });
@@ -396,7 +426,7 @@ export class VeepooSDK {
     try {
       this.isScanning = true;
       this.log('info', 'scan', 'scan.start', 'Starting device scan', { data: options });
-      await NativeModule.startScan(options);
+      await this.native.startScan(options);
     } catch (error) {
       this.isScanning = false;
       throw this.handleError(error, 'UNKNOWN');
@@ -407,7 +437,7 @@ export class VeepooSDK {
     if (!this.isScanning) return;
 
     try {
-      await NativeModule.stopScan();
+      await this.native.stopScan();
       this.isScanning = false;
       this.log('info', 'scan', 'scan.stop', 'Stopped device scan');
     } catch (error) {
@@ -422,7 +452,7 @@ export class VeepooSDK {
         deviceId,
         data: options,
       });
-      await NativeModule.connect(deviceId, options);
+      await this.native.connect(deviceId, options);
       this.connectedDeviceId = deviceId;
       this.log('info', 'connection', 'connect.success', 'Device connect request completed', {
         deviceId,
@@ -440,7 +470,7 @@ export class VeepooSDK {
       this.log('info', 'connection', 'disconnect.start', 'Disconnecting device', {
         deviceId: id,
       });
-      await NativeModule.disconnect(id);
+      await this.native.disconnect(id);
       if (this.connectedDeviceId === id) {
         this.connectedDeviceId = null;
       }
@@ -457,7 +487,7 @@ export class VeepooSDK {
     if (!id) return 'disconnected';
 
     try {
-      const status = await NativeModule.getConnectionStatus(id);
+      const status = await this.native.getConnectionStatus(id);
       this.log('debug', 'connection', 'connection.status', 'Fetched connection status', {
         deviceId: id,
         data: { status },
@@ -474,7 +504,7 @@ export class VeepooSDK {
       deviceId: this.connectedDeviceId ?? undefined,
       data: { is24Hour },
     });
-    const result = normalizePasswordData(await NativeModule.verifyPassword(password, is24Hour));
+    const result = normalizePasswordData(await this.native.verifyPassword(password, is24Hour));
     this.log('info', 'connection', 'password.verify.result', 'Device password verified', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: { status: result.status, deviceNumber: result.deviceNumber, deviceVersion: result.deviceVersion },
@@ -486,7 +516,7 @@ export class VeepooSDK {
     this.log('debug', 'device', 'battery.read.start', 'Reading battery info', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    const result = normalizeBatteryInfo(await NativeModule.readBattery());
+    const result = normalizeBatteryInfo(await this.native.readBattery());
     this.log('debug', 'device', 'battery.read.result', 'Battery info received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: result,
@@ -495,11 +525,11 @@ export class VeepooSDK {
   }
 
   async syncPersonalInfo(info: PersonalInfo): Promise<boolean> {
-    return NativeModule.syncPersonalInfo(info);
+    return this.native.syncPersonalInfo(info);
   }
 
   async readDeviceFunctions(): Promise<DeviceFunctions> {
-    const result = normalizeDeviceFunctions(await NativeModule.readDeviceFunctions());
+    const result = normalizeDeviceFunctions(await this.native.readDeviceFunctions());
     this.log('debug', 'device', 'device.functions.read', 'Device functions received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: result,
@@ -508,7 +538,7 @@ export class VeepooSDK {
   }
 
   async readSocialMsgData(): Promise<SocialMsgData> {
-    const result = normalizeSocialMsgData(await NativeModule.readSocialMsgData());
+    const result = normalizeSocialMsgData(await this.native.readSocialMsgData());
     this.log('debug', 'device', 'device.social.read', 'Social message settings received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: result,
@@ -517,7 +547,7 @@ export class VeepooSDK {
   }
 
   async readDeviceVersion(): Promise<DeviceVersion> {
-    const result = normalizeDeviceVersion(await NativeModule.readDeviceVersion());
+    const result = normalizeDeviceVersion(await this.native.readDeviceVersion());
     this.log('debug', 'device', 'device.version.read', 'Device version received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: result,
@@ -529,15 +559,15 @@ export class VeepooSDK {
     this.log('info', 'read', 'read.origin.start', 'Starting origin data read', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.startReadOriginData();
+    return this.native.startReadOriginData();
   }
 
   async readDeviceAllData(): Promise<boolean> {
-    return NativeModule.readDeviceAllData();
+    return this.native.readDeviceAllData();
   }
 
   async readSleepData(date?: string): Promise<SleepData[]> {
-    const result = normalizeSleepDataList(await NativeModule.readSleepData(date));
+    const result = normalizeSleepDataList(await this.native.readSleepData(date));
     this.log('debug', 'read', 'read.sleep.result', 'Sleep data received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: { date, count: result.length },
@@ -546,7 +576,7 @@ export class VeepooSDK {
   }
 
   async readSportStepData(date?: string): Promise<SportStepData> {
-    const result = normalizeSportStepData(await NativeModule.readSportStepData(date));
+    const result = normalizeSportStepData(await this.native.readSportStepData(date));
     this.log('debug', 'read', 'read.sport.result', 'Sport step data received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: result,
@@ -555,7 +585,7 @@ export class VeepooSDK {
   }
 
   async readOriginData(dayOffset: number = 0): Promise<OriginData[]> {
-    const result = normalizeOriginDataList(await NativeModule.readOriginData(dayOffset));
+    const result = normalizeOriginDataList(await this.native.readOriginData(dayOffset));
     this.log('debug', 'read', 'read.origin.result', 'Origin data received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: { dayOffset, count: result.length },
@@ -564,7 +594,7 @@ export class VeepooSDK {
   }
 
   async readDaySummaryData(dayOffset: number = 0): Promise<DaySummaryData> {
-    const result = normalizeDaySummaryData(await NativeModule.readDaySummaryData(dayOffset));
+    const result = normalizeDaySummaryData(await this.native.readDaySummaryData(dayOffset));
     this.log('debug', 'read', 'read.summary.result', 'Day summary data received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: { dayOffset, date: result.date },
@@ -573,7 +603,7 @@ export class VeepooSDK {
   }
 
   async readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
-    const result = normalizeAutoMeasureSettings(await NativeModule.readAutoMeasureSetting());
+    const result = normalizeAutoMeasureSettings(await this.native.readAutoMeasureSetting());
     this.log('debug', 'device', 'autoMeasure.read', 'Auto measure settings received', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: { count: result.length },
@@ -586,7 +616,7 @@ export class VeepooSDK {
       deviceId: this.connectedDeviceId ?? undefined,
       data: setting,
     });
-    const result = normalizeAutoMeasureSettings(await NativeModule.modifyAutoMeasureSetting(setting));
+    const result = normalizeAutoMeasureSettings(await this.native.modifyAutoMeasureSetting(setting));
     this.log('info', 'device', 'autoMeasure.modify.result', 'Auto measure settings updated', {
       deviceId: this.connectedDeviceId ?? undefined,
       data: { count: result.length },
@@ -595,91 +625,91 @@ export class VeepooSDK {
   }
 
   async setLanguage(language: Language): Promise<boolean> {
-    return NativeModule.setLanguage(language);
+    return this.native.setLanguage(language);
   }
 
   async startHeartRateTest(): Promise<void> {
     this.log('info', 'test', 'test.heartRate.start', 'Starting heart rate test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.startHeartRateTest();
+    return this.native.startHeartRateTest();
   }
 
   async stopHeartRateTest(): Promise<void> {
     this.log('info', 'test', 'test.heartRate.stop', 'Stopping heart rate test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.stopHeartRateTest();
+    return this.native.stopHeartRateTest();
   }
 
   async startBloodPressureTest(): Promise<void> {
     this.log('info', 'test', 'test.bloodPressure.start', 'Starting blood pressure test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.startBloodPressureTest();
+    return this.native.startBloodPressureTest();
   }
 
   async stopBloodPressureTest(): Promise<void> {
     this.log('info', 'test', 'test.bloodPressure.stop', 'Stopping blood pressure test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.stopBloodPressureTest();
+    return this.native.stopBloodPressureTest();
   }
 
   async startBloodOxygenTest(): Promise<void> {
     this.log('info', 'test', 'test.bloodOxygen.start', 'Starting blood oxygen test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.startBloodOxygenTest();
+    return this.native.startBloodOxygenTest();
   }
 
   async stopBloodOxygenTest(): Promise<void> {
     this.log('info', 'test', 'test.bloodOxygen.stop', 'Stopping blood oxygen test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.stopBloodOxygenTest();
+    return this.native.stopBloodOxygenTest();
   }
 
   async startTemperatureTest(): Promise<void> {
     this.log('info', 'test', 'test.temperature.start', 'Starting temperature test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.startTemperatureTest();
+    return this.native.startTemperatureTest();
   }
 
   async stopTemperatureTest(): Promise<void> {
     this.log('info', 'test', 'test.temperature.stop', 'Stopping temperature test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.stopTemperatureTest();
+    return this.native.stopTemperatureTest();
   }
 
   async startStressTest(): Promise<void> {
     this.log('info', 'test', 'test.stress.start', 'Starting stress test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.startStressTest();
+    return this.native.startStressTest();
   }
 
   async stopStressTest(): Promise<void> {
     this.log('info', 'test', 'test.stress.stop', 'Stopping stress test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.stopStressTest();
+    return this.native.stopStressTest();
   }
 
   async startBloodGlucoseTest(): Promise<void> {
     this.log('info', 'test', 'test.bloodGlucose.start', 'Starting blood glucose test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.startBloodGlucoseTest();
+    return this.native.startBloodGlucoseTest();
   }
 
   async stopBloodGlucoseTest(): Promise<void> {
     this.log('info', 'test', 'test.bloodGlucose.stop', 'Stopping blood glucose test', {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    return NativeModule.stopBloodGlucoseTest();
+    return this.native.stopBloodGlucoseTest();
   }
 
   setLogEnabled(enabled: boolean): this {
@@ -736,14 +766,13 @@ export class VeepooSDK {
     event: K,
     listener: (payload: VeepooEventPayload[K]) => void
   ): this {
-    const onceWrapper: EventListener = (payload) => {
-      this.off(event, listener);
+    let wrapper!: EventListener;
+    wrapper = (payload) => {
+      this.listeners.get(event)?.delete(wrapper);
       (listener as EventListener)(payload);
     };
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set());
-    }
-    this.listeners.get(event)!.add(onceWrapper);
+    if (!this.listeners.has(event)) this.listeners.set(event, new Set());
+    this.listeners.get(event)!.add(wrapper);
     return this;
   }
 

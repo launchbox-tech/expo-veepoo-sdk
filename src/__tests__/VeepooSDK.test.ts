@@ -1,0 +1,691 @@
+jest.mock('expo-modules-core', () => ({
+  requireNativeModule: jest.fn().mockReturnValue({}),
+}));
+jest.mock('react-native', () => ({
+  Platform: { OS: 'ios' },
+}));
+
+// @ts-ignore — normalizeEventPayload will be exported after the refactoring
+import { VeepooSDK, normalizeEventPayload } from '../VeepooSDK';
+import type { NativeVeepooSDKInterface } from '../NativeVeepooSDK';
+
+type MockNative = jest.Mocked<NativeVeepooSDKInterface> & {
+  _emit(event: string, payload: unknown): void;
+};
+
+function makeMockNative(): MockNative {
+  const listeners = new Map<string, Set<(p: unknown) => void>>();
+  return {
+    init: jest.fn().mockResolvedValue(undefined),
+    isBluetoothEnabled: jest.fn().mockResolvedValue(true),
+    requestPermissions: jest.fn().mockResolvedValue({ granted: true, status: 'granted', canAskAgain: false }),
+    startScan: jest.fn().mockResolvedValue(undefined),
+    stopScan: jest.fn().mockResolvedValue(undefined),
+    connect: jest.fn().mockResolvedValue(undefined),
+    disconnect: jest.fn().mockResolvedValue(undefined),
+    getConnectionStatus: jest.fn().mockResolvedValue('connected' as const),
+    verifyPassword: jest.fn().mockResolvedValue({ status: 'CHECK_SUCCESS' }),
+    readBattery: jest.fn().mockResolvedValue({ level: 80, state: 0 }),
+    syncPersonalInfo: jest.fn().mockResolvedValue(true),
+    readDeviceFunctions: jest.fn().mockResolvedValue({}),
+    readSocialMsgData: jest.fn().mockResolvedValue({}),
+    readDeviceVersion: jest.fn().mockResolvedValue({}),
+    startReadOriginData: jest.fn().mockResolvedValue(undefined),
+    readDeviceAllData: jest.fn().mockResolvedValue(true),
+    readSleepData: jest.fn().mockResolvedValue([]),
+    readSportStepData: jest.fn().mockResolvedValue({}),
+    readOriginData: jest.fn().mockResolvedValue([]),
+    readDaySummaryData: jest.fn().mockResolvedValue({}),
+    readAutoMeasureSetting: jest.fn().mockResolvedValue([]),
+    modifyAutoMeasureSetting: jest.fn().mockResolvedValue([]),
+    setLanguage: jest.fn().mockResolvedValue(true),
+    startHeartRateTest: jest.fn().mockResolvedValue(undefined),
+    stopHeartRateTest: jest.fn().mockResolvedValue(undefined),
+    startBloodPressureTest: jest.fn().mockResolvedValue(undefined),
+    stopBloodPressureTest: jest.fn().mockResolvedValue(undefined),
+    startBloodOxygenTest: jest.fn().mockResolvedValue(undefined),
+    stopBloodOxygenTest: jest.fn().mockResolvedValue(undefined),
+    startTemperatureTest: jest.fn().mockResolvedValue(undefined),
+    stopTemperatureTest: jest.fn().mockResolvedValue(undefined),
+    startStressTest: jest.fn().mockResolvedValue(undefined),
+    stopStressTest: jest.fn().mockResolvedValue(undefined),
+    startBloodGlucoseTest: jest.fn().mockResolvedValue(undefined),
+    stopBloodGlucoseTest: jest.fn().mockResolvedValue(undefined),
+    addListener: jest.fn().mockImplementation((event: string, listener: (p: unknown) => void) => {
+      if (!listeners.has(event)) listeners.set(event, new Set());
+      listeners.get(event)!.add(listener);
+      return {
+        remove: jest.fn().mockImplementation(() => {
+          listeners.get(event)?.delete(listener);
+        }),
+      };
+    }),
+    removeListeners: jest.fn(),
+    _emit(event: string, payload: unknown) {
+      listeners.get(event)?.forEach(l => l(payload));
+    },
+  };
+}
+
+// ── normalizeEventPayload ─────────────────────────────────────────────────────
+
+describe('normalizeEventPayload', () => {
+  it('returns non-object payloads unchanged', () => {
+    expect(normalizeEventPayload('deviceFound', null)).toBeNull();
+    expect(normalizeEventPayload('deviceFound', 42)).toBe(42);
+    expect(normalizeEventPayload('deviceFound', 'str')).toBe('str');
+  });
+
+  it('returns unrecognized events unchanged (reference equality)', () => {
+    const payload = { deviceId: 'x', timestamp: 1 };
+    expect(normalizeEventPayload('deviceFound', payload)).toBe(payload);
+    expect(normalizeEventPayload('deviceConnected', payload)).toBe(payload);
+    expect(normalizeEventPayload('deviceDisconnected', payload)).toBe(payload);
+    expect(normalizeEventPayload('deviceReady', payload)).toBe(payload);
+    expect(normalizeEventPayload('readOriginComplete', payload)).toBe(payload);
+    expect(normalizeEventPayload('error', payload)).toBe(payload);
+  });
+
+  it('bluetoothStateChanged: normalizes numeric state and authorization', () => {
+    const result = normalizeEventPayload('bluetoothStateChanged', {
+      state: 5, authorization: 3, isScanning: false, pendingScanStart: false,
+    }) as any;
+    expect(result.state).toBe('poweredOn');
+    expect(result.authorization).toBe('allowedAlways');
+    expect(result.isScanning).toBe(false);
+  });
+
+  it('readOriginProgress: converts decimal progress to integer percentage', () => {
+    const result = normalizeEventPayload('readOriginProgress', {
+      deviceId: 'd1',
+      progress: { readState: 'reading', totalDays: 3, currentDay: 2, progress: 0.5 },
+    }) as any;
+    expect(result.progress.progress).toBe(50);
+    expect(result.progress.readState).toBe('reading');
+  });
+
+  it('deviceFunction: normalizes data and functions fields', () => {
+    const result = normalizeEventPayload('deviceFunction', {
+      deviceId: 'd1',
+      data: { Bp: 1 },
+      functions: undefined,
+    }) as any;
+    expect(result.data).toBeDefined();
+    expect(result.functions).toBeDefined();
+    expect(result.data.package1.bloodPressure).toBe('support');
+  });
+
+  it('deviceVersion: normalizes version sub-object', () => {
+    const result = normalizeEventPayload('deviceVersion', {
+      deviceId: 'd1',
+      version: { hardwareVersion: 'hw1', firmwareVersion: 'fw2' },
+    }) as any;
+    expect(result.version.hardwareVersion).toBe('hw1');
+    expect(result.version.firmwareVersion).toBe('fw2');
+  });
+
+  it('passwordData: normalizes status to uppercase enum', () => {
+    const result = normalizeEventPayload('passwordData', {
+      deviceId: 'd1',
+      data: { status: 'check_success' },
+    }) as any;
+    expect(result.data.status).toBe('CHECK_SUCCESS');
+  });
+
+  it('socialMsgData: normalizes function status for each key', () => {
+    const result = normalizeEventPayload('socialMsgData', {
+      deviceId: 'd1',
+      data: { phone: 1, sms: 0 },
+    }) as any;
+    expect(result.data.phone).toBe('support');
+    expect(result.data.sms).toBe('unsupported');
+  });
+
+  it('heartRateTestResult: normalizes state from rawState', () => {
+    const result = normalizeEventPayload('heartRateTestResult', {
+      deviceId: 'd1',
+      result: { rawState: 1 },
+    }) as any;
+    expect(result.result.state).toBe('testing');
+  });
+
+  it('bloodPressureTestResult: normalizes state and pressure values', () => {
+    const result = normalizeEventPayload('bloodPressureTestResult', {
+      deviceId: 'd1',
+      result: { rawState: 4, systolic: 120, diastolic: 80 },
+    }) as any;
+    expect(result.result.state).toBe('over');
+    expect(result.result.systolic).toBe(120);
+    expect(result.result.diastolic).toBe(80);
+  });
+
+  it('bloodOxygenTestResult: normalizes oxygenValue alias to value', () => {
+    const result = normalizeEventPayload('bloodOxygenTestResult', {
+      deviceId: 'd1',
+      result: { rawState: 4, oxygenValue: 98 },
+    }) as any;
+    expect(result.result.state).toBe('over');
+    expect(result.result.value).toBe(98);
+  });
+
+  it('temperatureTestResult: normalizes tempValue alias to value', () => {
+    const result = normalizeEventPayload('temperatureTestResult', {
+      deviceId: 'd1',
+      result: { rawState: 4, tempValue: 36.8 },
+    }) as any;
+    expect(result.result.state).toBe('over');
+    expect(result.result.value).toBeCloseTo(36.8);
+  });
+
+  it('stressData: normalizes stress value', () => {
+    const result = normalizeEventPayload('stressData', {
+      deviceId: 'd1',
+      data: { stress: 42, timestamp: 1000 },
+    }) as any;
+    expect(result.data.stress).toBe(42);
+    expect(result.data.timestamp).toBe(1000);
+  });
+
+  it('bloodGlucoseData: normalizes bloodGlucose alias to glucose', () => {
+    const result = normalizeEventPayload('bloodGlucoseData', {
+      deviceId: 'd1',
+      data: { bloodGlucose: 5.5 },
+    }) as any;
+    expect(result.data.glucose).toBeCloseTo(5.5);
+  });
+
+  it('batteryData: normalizes level and chargeState', () => {
+    const result = normalizeEventPayload('batteryData', {
+      deviceId: 'd1',
+      data: { level: 75, state: 0 },
+    }) as any;
+    expect(result.data.level).toBe(75);
+    expect(result.data.chargeState).toBe('normal');
+  });
+
+  it('sleepData: normalizes single sleep record', () => {
+    const result = normalizeEventPayload('sleepData', {
+      deviceId: 'd1',
+      data: { SLEEP_TIME: '22:00', WAKE_TIME: '06:00' },
+    }) as any;
+    expect(result.data).toBeDefined();
+    expect(result.data).not.toBeNull();
+  });
+
+  it('sportStepData: normalizes step alias to stepCount', () => {
+    const result = normalizeEventPayload('sportStepData', {
+      deviceId: 'd1',
+      data: { step: 5000 },
+    }) as any;
+    expect(result.data.stepCount).toBe(5000);
+  });
+
+  it('originHalfHourData: normalizes half-hour item', () => {
+    const result = normalizeEventPayload('originHalfHourData', {
+      deviceId: 'd1',
+      data: { time: '12:00', heartValue: 70 },
+    }) as any;
+    expect(result.data.heartValue).toBe(70);
+    expect(result.data.time).toBe('12:00');
+  });
+
+  it('originFiveMinuteData: normalizes origin data item', () => {
+    const result = normalizeEventPayload('originFiveMinuteData', {
+      deviceId: 'd1',
+      data: { time: '12:00', heartValue: 72 },
+    }) as any;
+    expect(result.data).toBeDefined();
+    expect(result.data.heartValue).toBe(72);
+  });
+});
+
+// ── VeepooSDK class ───────────────────────────────────────────────────────────
+
+describe('VeepooSDK', () => {
+  let native: MockNative;
+  let sdk: VeepooSDK;
+
+  beforeEach(() => {
+    native = makeMockNative();
+    // @ts-ignore — constructor injection will be added in the refactoring
+    sdk = new VeepooSDK(native);
+  });
+
+  // ── State accessors ────────────────────────────────────────────────────────
+  describe('state accessors', () => {
+    it('isSDKInitialized() is false before init', () => {
+      expect(sdk.isSDKInitialized()).toBe(false);
+    });
+    it('isScanningActive() is false initially', () => {
+      expect(sdk.isScanningActive()).toBe(false);
+    });
+    it('getConnectedDeviceId() is null initially', () => {
+      expect(sdk.getConnectedDeviceId()).toBeNull();
+    });
+  });
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+  describe('lifecycle', () => {
+    it('init() calls native.init() once and sets isSDKInitialized', async () => {
+      await sdk.init();
+      expect(native.init).toHaveBeenCalledTimes(1);
+      expect(sdk.isSDKInitialized()).toBe(true);
+    });
+
+    it('init() is idempotent — second call skips native.init()', async () => {
+      await sdk.init();
+      await sdk.init();
+      expect(native.init).toHaveBeenCalledTimes(1);
+    });
+
+    it('destroy() resets all state fields', async () => {
+      await sdk.init();
+      await sdk.connect('device-1');
+      await sdk.startScan();
+      sdk.destroy();
+      expect(sdk.isSDKInitialized()).toBe(false);
+      expect(sdk.isScanningActive()).toBe(false);
+      expect(sdk.getConnectedDeviceId()).toBeNull();
+    });
+
+    it('destroy() calls remove() on registered native subscriptions', async () => {
+      await sdk.init();
+      const firstSub = (native.addListener as jest.Mock).mock.results[0]?.value as { remove: jest.Mock };
+      sdk.destroy();
+      expect(firstSub?.remove).toHaveBeenCalled();
+    });
+
+    it('destroy() clears JS listeners so post-destroy _emit has no effect', async () => {
+      await sdk.init();
+      const listener = jest.fn();
+      sdk.on('deviceFound', listener);
+      sdk.destroy();
+      native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
+      expect(listener).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── Band Discovery (scanning) ──────────────────────────────────────────────
+  describe('Band Discovery (scanning)', () => {
+    beforeEach(async () => { await sdk.init(); });
+
+    it('startScan() calls native.startScan and sets isScanningActive', async () => {
+      await sdk.startScan();
+      expect(native.startScan).toHaveBeenCalledTimes(1);
+      expect(sdk.isScanningActive()).toBe(true);
+    });
+
+    it('startScan() is idempotent when already scanning', async () => {
+      await sdk.startScan();
+      await sdk.startScan();
+      expect(native.startScan).toHaveBeenCalledTimes(1);
+    });
+
+    it('startScan() clears isScanningActive on native error', async () => {
+      native.startScan.mockRejectedValueOnce(new Error('BT error'));
+      await expect(sdk.startScan()).rejects.toBeDefined();
+      expect(sdk.isScanningActive()).toBe(false);
+    });
+
+    it('stopScan() calls native.stopScan and clears isScanningActive', async () => {
+      await sdk.startScan();
+      await sdk.stopScan();
+      expect(native.stopScan).toHaveBeenCalledTimes(1);
+      expect(sdk.isScanningActive()).toBe(false);
+    });
+
+    it('stopScan() is idempotent when not scanning', async () => {
+      await sdk.stopScan();
+      expect(native.stopScan).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── Session (connection) ───────────────────────────────────────────────────
+  describe('Session (connection)', () => {
+    beforeEach(async () => { await sdk.init(); });
+
+    it('connect(id) calls native.connect and stores connectedDeviceId', async () => {
+      await sdk.connect('device-1');
+      expect(native.connect).toHaveBeenCalledWith('device-1', undefined);
+      expect(sdk.getConnectedDeviceId()).toBe('device-1');
+    });
+
+    it('connect() throws and emits error event on failure', async () => {
+      native.connect.mockRejectedValueOnce(new Error('conn failed'));
+      const errorListener = jest.fn();
+      sdk.on('error', errorListener);
+      await expect(sdk.connect('device-1')).rejects.toBeDefined();
+      expect(errorListener).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'CONNECTION_FAILED' })
+      );
+    });
+
+    it('disconnect(id) calls native.disconnect with the given ID', async () => {
+      await sdk.connect('device-1');
+      await sdk.disconnect('device-1');
+      expect(native.disconnect).toHaveBeenCalledWith('device-1');
+    });
+
+    it('disconnect() falls back to stored connectedDeviceId and clears it', async () => {
+      await sdk.connect('device-1');
+      await sdk.disconnect();
+      expect(native.disconnect).toHaveBeenCalledWith('device-1');
+      expect(sdk.getConnectedDeviceId()).toBeNull();
+    });
+
+    it('disconnect() is a no-op when no Band is connected', async () => {
+      await sdk.disconnect();
+      expect(native.disconnect).not.toHaveBeenCalled();
+    });
+
+    it('getConnectionStatus() returns disconnected when no Band ID is available', async () => {
+      const status = await sdk.getConnectionStatus();
+      expect(status).toBe('disconnected');
+      expect(native.getConnectionStatus).not.toHaveBeenCalled();
+    });
+
+    it('getConnectionStatus() delegates to native when Band ID is available', async () => {
+      await sdk.connect('device-1');
+      native.getConnectionStatus.mockResolvedValueOnce('connected');
+      const status = await sdk.getConnectionStatus();
+      expect(native.getConnectionStatus).toHaveBeenCalledWith('device-1');
+      expect(status).toBe('connected');
+    });
+  });
+
+  // ── Event system ───────────────────────────────────────────────────────────
+  describe('event system', () => {
+    beforeEach(async () => { await sdk.init(); });
+
+    it('on() registers a listener and returns this', () => {
+      const listener = jest.fn();
+      const result = sdk.on('deviceFound', listener);
+      expect(result).toBe(sdk);
+      native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it('off() removes a listener and returns this', () => {
+      const listener = jest.fn();
+      sdk.on('deviceFound', listener);
+      const result = sdk.off('deviceFound', listener);
+      expect(result).toBe(sdk);
+      native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('once() fires exactly once — regression test for the wrapper-deletion bug', () => {
+      const listener = jest.fn();
+      sdk.once('deviceFound', listener);
+      const payload = { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 };
+      native._emit('deviceFound', payload);
+      native._emit('deviceFound', payload);
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it('once() returns this', () => {
+      expect(sdk.once('deviceFound', jest.fn())).toBe(sdk);
+    });
+
+    it('removeAllListeners() clears all events', () => {
+      const l1 = jest.fn();
+      const l2 = jest.fn();
+      sdk.on('deviceFound', l1);
+      sdk.on('deviceConnected', l2);
+      sdk.removeAllListeners();
+      native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
+      native._emit('deviceConnected', { deviceId: 'x' });
+      expect(l1).not.toHaveBeenCalled();
+      expect(l2).not.toHaveBeenCalled();
+    });
+
+    it('removeAllListeners(event) clears only that event', () => {
+      const l1 = jest.fn();
+      const l2 = jest.fn();
+      sdk.on('deviceFound', l1);
+      sdk.on('deviceConnected', l2);
+      sdk.removeAllListeners('deviceFound');
+      native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
+      native._emit('deviceConnected', { deviceId: 'x' });
+      expect(l1).not.toHaveBeenCalled();
+      expect(l2).toHaveBeenCalledTimes(1);
+    });
+
+    it('listener receives the normalized payload', () => {
+      const listener = jest.fn();
+      sdk.on('bluetoothStateChanged', listener);
+      native._emit('bluetoothStateChanged', {
+        state: 5, authorization: 3, isScanning: false, pendingScanStart: false,
+      });
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({ state: 'poweredOn', authorization: 'allowedAlways' })
+      );
+    });
+
+    it('error thrown in a listener is caught and does not propagate', () => {
+      const badListener = jest.fn().mockImplementation(() => { throw new Error('boom'); });
+      sdk.on('deviceFound', badListener);
+      expect(() => {
+        native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
+      }).not.toThrow();
+    });
+  });
+
+  // ── State mutations via events ─────────────────────────────────────────────
+  describe('state mutations via events', () => {
+    beforeEach(async () => { await sdk.init(); });
+
+    it('bluetoothStateChanged { isScanning: true } sets isScanningActive', () => {
+      native._emit('bluetoothStateChanged', {
+        state: 5, authorization: 3, isScanning: true, pendingScanStart: false,
+      });
+      expect(sdk.isScanningActive()).toBe(true);
+    });
+
+    it('bluetoothStateChanged { isScanning: false } clears isScanningActive', async () => {
+      await sdk.startScan();
+      native._emit('bluetoothStateChanged', {
+        state: 5, authorization: 3, isScanning: false, pendingScanStart: false,
+      });
+      expect(sdk.isScanningActive()).toBe(false);
+    });
+
+    it('deviceConnected event sets connectedDeviceId', () => {
+      native._emit('deviceConnected', { deviceId: 'device-99' });
+      expect(sdk.getConnectedDeviceId()).toBe('device-99');
+    });
+
+    it('deviceDisconnected clears connectedDeviceId and isScanningActive', async () => {
+      await sdk.startScan();
+      native._emit('deviceConnected', { deviceId: 'device-99' });
+      native._emit('deviceDisconnected', { deviceId: 'device-99' });
+      expect(sdk.getConnectedDeviceId()).toBeNull();
+      expect(sdk.isScanningActive()).toBe(false);
+    });
+
+    it('deviceConnectStatus with disconnected clears connectedDeviceId', () => {
+      native._emit('deviceConnected', { deviceId: 'device-1' });
+      native._emit('deviceConnectStatus', { deviceId: 'device-1', status: 'disconnected' });
+      expect(sdk.getConnectedDeviceId()).toBeNull();
+    });
+
+    it('connectionStatusChanged with disconnected clears connectedDeviceId', () => {
+      native._emit('deviceConnected', { deviceId: 'device-1' });
+      native._emit('connectionStatusChanged', { deviceId: 'device-1', status: 'disconnected' });
+      expect(sdk.getConnectedDeviceId()).toBeNull();
+    });
+
+    describe('readOriginProgress deduplication', () => {
+      const progress = (value: number, readState = 'reading') => ({
+        deviceId: 'd1',
+        progress: { readState, totalDays: 10, currentDay: 1, progress: value },
+      });
+
+      it('first event dispatches', () => {
+        const listener = jest.fn();
+        sdk.on('readOriginProgress', listener);
+        native._emit('readOriginProgress', progress(50));
+        expect(listener).toHaveBeenCalledTimes(1);
+      });
+
+      it('exact duplicate value is suppressed', () => {
+        const listener = jest.fn();
+        sdk.on('readOriginProgress', listener);
+        native._emit('readOriginProgress', progress(50));
+        native._emit('readOriginProgress', progress(50));
+        expect(listener).toHaveBeenCalledTimes(1);
+      });
+
+      it('smaller value (backward reset) dispatches', () => {
+        const listener = jest.fn();
+        sdk.on('readOriginProgress', listener);
+        native._emit('readOriginProgress', progress(80));
+        native._emit('readOriginProgress', progress(10));
+        expect(listener).toHaveBeenCalledTimes(2);
+      });
+
+      it('readState "start" always dispatches regardless of repeated value', () => {
+        const listener = jest.fn();
+        sdk.on('readOriginProgress', listener);
+        native._emit('readOriginProgress', progress(50));
+        native._emit('readOriginProgress', progress(50, 'start'));
+        expect(listener).toHaveBeenCalledTimes(2);
+      });
+    });
+  });
+
+  // ── Error handling ─────────────────────────────────────────────────────────
+  describe('error handling', () => {
+    beforeEach(async () => { await sdk.init(); });
+
+    it('checkBluetoothStatus() returns false and emits error on native failure', async () => {
+      native.isBluetoothEnabled.mockRejectedValueOnce(new Error('BT fail'));
+      const errorListener = jest.fn();
+      sdk.on('error', errorListener);
+      const result = await sdk.checkBluetoothStatus();
+      expect(result).toBe(false);
+      expect(errorListener).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'UNKNOWN' })
+      );
+    });
+
+    it('requestPermissions() returns denied result on native failure', async () => {
+      native.requestPermissions.mockRejectedValueOnce(new Error('perm fail'));
+      const result = await sdk.requestPermissions();
+      expect(result.granted).toBe(false);
+      expect(result.status).toBe('denied');
+    });
+  });
+
+  // ── Logging ────────────────────────────────────────────────────────────────
+  describe('logging', () => {
+    it('setLogEnabled(true) is chainable and mutates isLogEnabled()', () => {
+      expect(sdk.setLogEnabled(true)).toBe(sdk);
+      expect(sdk.isLogEnabled()).toBe(true);
+    });
+
+    it('setLogEnabled(false) is chainable and clears isLogEnabled()', () => {
+      sdk.setLogEnabled(true);
+      expect(sdk.setLogEnabled(false)).toBe(sdk);
+      expect(sdk.isLogEnabled()).toBe(false);
+    });
+
+    it('setLogger(fn) is chainable', () => {
+      expect(sdk.setLogger(jest.fn())).toBe(sdk);
+    });
+
+    it('when logEnabled is true console methods are called', async () => {
+      sdk.setLogEnabled(true);
+      const spy = jest.spyOn(console, 'info').mockImplementation(() => {});
+      await sdk.init();
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
+
+    it('when logger is set callback is invoked', async () => {
+      const logger = jest.fn();
+      sdk.setLogger(logger);
+      await sdk.init();
+      expect(logger).toHaveBeenCalled();
+    });
+
+    it('logger callback that throws is caught silently', async () => {
+      const logger = jest.fn().mockImplementation(() => { throw new Error('logger boom'); });
+      sdk.setLogger(logger);
+      await expect(sdk.init()).resolves.not.toThrow();
+    });
+
+    it('suppresses console output when __DEV__ is false (production mode)', async () => {
+      const origDev = (globalThis as any).__DEV__;
+      (globalThis as any).__DEV__ = false;
+      sdk.setLogEnabled(true);
+      const spy = jest.spyOn(console, 'info').mockImplementation(() => {});
+      await sdk.init();
+      expect(spy).not.toHaveBeenCalled();
+      spy.mockRestore();
+      (globalThis as any).__DEV__ = origDev;
+    });
+  });
+
+  // ── Arrow function pass-throughs ───────────────────────────────────────────
+  describe('arrow function pass-throughs', () => {
+    beforeEach(async () => { await sdk.init(); });
+
+    it('syncPersonalInfo delegates to native.syncPersonalInfo', async () => {
+      const info = { age: 30, height: 175, weight: 70, sex: 1, step: 8000 } as any;
+      await sdk.syncPersonalInfo(info);
+      expect(native.syncPersonalInfo).toHaveBeenCalledWith(info);
+    });
+
+    it('readDeviceAllData delegates to native.readDeviceAllData and returns result', async () => {
+      native.readDeviceAllData.mockResolvedValueOnce(true);
+      const result = await sdk.readDeviceAllData();
+      expect(native.readDeviceAllData).toHaveBeenCalled();
+      expect(result).toBe(true);
+    });
+
+    it('setLanguage delegates to native.setLanguage', async () => {
+      await sdk.setLanguage('english');
+      expect(native.setLanguage).toHaveBeenCalledWith('english');
+    });
+  });
+
+  // ── Data methods ───────────────────────────────────────────────────────────
+  describe('data methods', () => {
+    beforeEach(async () => { await sdk.init(); });
+
+    it('readBattery() calls native and returns normalized BatteryInfo', async () => {
+      native.readBattery.mockResolvedValueOnce({ level: 80, state: 0 });
+      const result = await sdk.readBattery();
+      expect(native.readBattery).toHaveBeenCalled();
+      expect(result.level).toBe(80);
+    });
+
+    it('readSleepData(date) passes date to native', async () => {
+      await sdk.readSleepData('2024-01-01');
+      expect(native.readSleepData).toHaveBeenCalledWith('2024-01-01');
+    });
+
+    it('readSleepData() without date passes undefined', async () => {
+      await sdk.readSleepData();
+      expect(native.readSleepData).toHaveBeenCalledWith(undefined);
+    });
+
+    it('readOriginData(dayOffset) passes offset and returns normalized list', async () => {
+      native.readOriginData.mockResolvedValueOnce([{ time: '12:00', heartValue: 72 }]);
+      const result = await sdk.readOriginData(1);
+      expect(native.readOriginData).toHaveBeenCalledWith(1);
+      expect(result[0].heartValue).toBe(72);
+    });
+
+    it('startHeartRateTest() delegates to native', async () => {
+      await sdk.startHeartRateTest();
+      expect(native.startHeartRateTest).toHaveBeenCalled();
+    });
+
+    it('stopHeartRateTest() delegates to native', async () => {
+      await sdk.stopHeartRateTest();
+      expect(native.stopHeartRateTest).toHaveBeenCalled();
+    });
+  });
+});
