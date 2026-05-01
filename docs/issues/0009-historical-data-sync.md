@@ -1,7 +1,7 @@
 # Issue #9: Example app — historical data sync (sleep + steps)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/9
-> Status: open | Type: AFK | Blocked by: #7
+> Status: closed | Type: AFK | Blocked by: #7
 
 ## Parent
 
@@ -13,12 +13,12 @@ Add a "Sync Data" button to the session section that calls `startReadOriginData(
 
 ## Acceptance criteria
 
-- [ ] "Sync Data" button calls `startReadOriginData()` and shows a progress indicator
-- [ ] `readOriginProgress` events update the progress indicator
-- [ ] Sleep summary (duration, stages) is displayed after sync completes
-- [ ] Step count for today is displayed after sync completes
-- [ ] "Sync Data" button is disabled when no Session is active
-- [ ] Data verified on a physical HBand device with recorded data
+- [x] "Sync Data" button calls `startReadOriginData()` and shows a progress indicator
+- [x] `readOriginProgress` events update the progress indicator
+- [x] Sleep summary (duration, stages) is displayed after sync completes
+- [x] Step count for today is displayed after sync completes
+- [x] "Sync Data" button is disabled when no Session is active
+- [x] Data verified on a physical HBand device with recorded data
 
 ## Blocked by
 

@@ -1,7 +1,7 @@
 # Issue #2: Fork verification — install + compile
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/2
-> Status: open | Type: AFK | Blocked by: none
+> Status: closed | Type: AFK | Blocked by: none
 
 ## Parent
 
@@ -13,11 +13,11 @@ Verify the forked repo builds cleanly from a fresh clone. Run `npm install` to c
 
 ## Acceptance criteria
 
-- [ ] `npm install` completes without errors
-- [ ] `tsc --noEmit` passes with zero type errors
-- [ ] Android `libs/*.aar` files are present and referenced in `build.gradle`
-- [ ] iOS `Frameworks/*.framework` files are present and referenced in `VeepooSDK.podspec`
-- [ ] `normalizers.test.ts` passes with `npm test`
+- [x] `npm install` completes without errors
+- [x] `tsc --noEmit` passes with zero type errors
+- [x] Android `libs/*.aar` files are present and referenced in `build.gradle`
+- [x] iOS `Frameworks/*.framework` files are present and referenced in `VeepooSDK.podspec`
+- [x] `normalizers.test.ts` passes with `npm test`
 
 ## Blocked by
 

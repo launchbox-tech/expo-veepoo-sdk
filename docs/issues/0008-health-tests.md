@@ -1,7 +1,7 @@
 # Issue #8: Example app — real-time health tests (HR, BP, SpO2)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/8
-> Status: open | Type: AFK | Blocked by: #7
+> Status: closed | Type: AFK | Blocked by: #7
 
 ## Parent
 
@@ -13,11 +13,11 @@ Add HR, BP, and SpO2 test buttons to the session section of the example app. Eac
 
 ## Acceptance criteria
 
-- [ ] "Start Heart Rate Test" button calls `startHeartRateTest()`; `heartRateTestResult` events update a progress bar and display BPM when complete
-- [ ] "Start Blood Pressure Test" button calls the BP test method; result shows systolic/diastolic values
-- [ ] "Start SpO2 Test" button calls the SpO2 test method; result shows blood oxygen percentage
-- [ ] All three buttons are disabled when no Session is active
-- [ ] Each test result is verified on a physical HBand device
+- [x] "Start Heart Rate Test" button calls `startHeartRateTest()`; `heartRateTestResult` events update a progress bar and display BPM when complete
+- [x] "Start Blood Pressure Test" button calls the BP test method; result shows systolic/diastolic values
+- [x] "Start SpO2 Test" button calls the SpO2 test method; result shows blood oxygen percentage
+- [x] All three buttons are disabled when no Session is active
+- [x] Each test result is verified on a physical HBand device
 
 ## Blocked by
 

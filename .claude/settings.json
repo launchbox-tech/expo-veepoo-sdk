@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "github@callstack-agent-skills": true
+  }
+}

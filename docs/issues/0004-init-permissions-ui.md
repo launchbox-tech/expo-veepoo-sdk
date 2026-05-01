@@ -1,7 +1,7 @@
 # Issue #4: Example app — init + permissions + idle-state UI
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/4
-> Status: open | Type: AFK | Blocked by: #3
+> Status: closed | Type: AFK | Blocked by: #3
 
 ## Parent
 
@@ -13,13 +13,13 @@ On launch, the example app calls `init()` and `requestPermissions()` from `expo-
 
 ## Acceptance criteria
 
-- [ ] `init()` is called before any other SDK method
-- [ ] `requestPermissions()` is called on launch; BLE permission dialog appears on first run
-- [ ] UI renders an idle state with a disabled "Start Scan" button when permissions are not yet granted
-- [ ] "Start Scan" button becomes enabled once permissions are granted
-- [ ] `npx expo run:android` produces a working APK on a physical device
-- [ ] `npx expo run:ios` produces a working IPA on a physical device
-- [ ] App launches without crash on iOS Simulator (mock data path)
+- [x] `init()` is called before any other SDK method
+- [x] `requestPermissions()` is called on launch; BLE permission dialog appears on first run
+- [x] UI renders an idle state with a disabled "Start Scan" button when permissions are not yet granted
+- [x] "Start Scan" button becomes enabled once permissions are granted
+- [x] `npx expo run:android` produces a working APK on a physical device
+- [x] `npx expo run:ios` produces a working IPA on a physical device
+- [x] App launches without crash on iOS Simulator (mock data path)
 
 ## Blocked by
 

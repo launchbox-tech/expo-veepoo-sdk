@@ -1,7 +1,7 @@
 # Issue #6: Example app — scan + device list
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/6
-> Status: open | Type: AFK | Blocked by: #4
+> Status: closed | Type: AFK | Blocked by: #4
 
 ## Parent
 
@@ -13,11 +13,11 @@ Tapping "Start Scan" calls `startScan()` and transitions the app to a scanning s
 
 ## Acceptance criteria
 
-- [ ] Tapping "Start Scan" calls `startScan()` and shows a scanning indicator
-- [ ] Discovered `VeepooDevice` rows appear in a scrollable list with name, RSSI, and "Connect" button
-- [ ] New devices are appended to the list as they are discovered
-- [ ] "Stop Scan" button stops scanning and hides the indicator
-- [ ] At least one physical HBand device appears in the list during a scan
+- [x] Tapping "Start Scan" calls `startScan()` and shows a scanning indicator
+- [x] Discovered `VeepooDevice` rows appear in a scrollable list with name, RSSI, and "Connect" button
+- [x] New devices are appended to the list as they are discovered
+- [x] "Stop Scan" button stops scanning and hides the indicator
+- [x] At least one physical HBand device appears in the list during a scan
 
 ## Blocked by
 

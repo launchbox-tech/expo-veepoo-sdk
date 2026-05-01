@@ -1,7 +1,7 @@
 # Issue #7: Example app — connect + Session + disconnect/reconnect
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/7
-> Status: open | Type: AFK | Blocked by: #6
+> Status: closed | Type: AFK | Blocked by: #6
 
 ## Parent
 
@@ -13,13 +13,13 @@ Tapping a device row's "Connect" button calls `connect(deviceId)` and transition
 
 ## Acceptance criteria
 
-- [ ] Tapping "Connect" calls `connect(deviceId)` and shows a connecting indicator
-- [ ] `deviceReady` event transitions UI to `ready` state and reveals the session section
-- [ ] `syncPersonalInfo()` is called immediately on every `deviceReady` event
-- [ ] Session section is only visible in `ready` state
-- [ ] `deviceDisconnected` event transitions UI to `disconnected` state
-- [ ] "Reconnect" button is shown in `disconnected` state and calls `startScan()` when tapped
-- [ ] Full flow verified on a physical HBand device: scan → connect → ready → disconnect → reconnect
+- [x] Tapping "Connect" calls `connect(deviceId)` and shows a connecting indicator
+- [x] `deviceReady` event transitions UI to `ready` state and reveals the session section
+- [x] `syncPersonalInfo()` is called immediately on every `deviceReady` event
+- [x] Session section is only visible in `ready` state
+- [x] `deviceDisconnected` event transitions UI to `disconnected` state
+- [x] "Reconnect" button is shown in `disconnected` state and calls `startScan()` when tapped
+- [x] Full flow verified on a physical HBand device: scan → connect → ready → disconnect → reconnect
 
 ## Blocked by
 

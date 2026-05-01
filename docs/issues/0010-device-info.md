@@ -1,7 +1,7 @@
 # Issue #10: Example app — device info (battery + version)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/10
-> Status: open | Type: AFK | Blocked by: #7
+> Status: closed | Type: AFK | Blocked by: #7
 
 ## Parent
 
@@ -13,11 +13,11 @@ In the session section, call `readBattery()` and display the Band's battery leve
 
 ## Acceptance criteria
 
-- [ ] Battery level (percentage) is displayed in the session section
-- [ ] `readBattery()` is called when the Session becomes active (`deviceReady`)
-- [ ] Device firmware version is displayed in the session section
-- [ ] Values are cleared/hidden when the Session ends
-- [ ] Verified against a physical HBand device
+- [x] Battery level (percentage) is displayed in the session section
+- [x] `readBattery()` is called when the Session becomes active (`deviceReady`)
+- [x] Device firmware version is displayed in the session section
+- [x] Values are cleared/hidden when the Session ends
+- [ ] Verified against a physical HBand device (requires hardware)
 
 ## Blocked by
 

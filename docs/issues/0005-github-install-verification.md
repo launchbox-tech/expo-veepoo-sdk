@@ -1,7 +1,7 @@
 # Issue #5: GitHub install verification in external project
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/5
-> Status: open | Type: HITL | Blocked by: #3
+> Status: closed | Type: HITL | Blocked by: none
 
 ## Parent
 
@@ -13,11 +13,11 @@ In a fresh external Expo project (outside this repo), run `npm install github:la
 
 ## Acceptance criteria
 
-- [ ] `npm install github:launchbox-tech/expo-veepoo-sdk` completes without errors in an external Expo project
-- [ ] `npx expo prebuild` succeeds after install
-- [ ] Module is importable: `import * as VeepooSDK from 'expo-veepoo-sdk'` resolves without errors
-- [ ] Android native module links correctly after prebuild
-- [ ] iOS native module links correctly after prebuild (`pod install` succeeds)
+- [x] `npm install github:launchbox-tech/expo-veepoo-sdk` completes without errors in an external Expo project
+- [x] `npx expo prebuild` succeeds after install
+- [x] Module is importable: `import * as VeepooSDK from 'expo-veepoo-sdk'` resolves without errors
+- [x] Android native module links correctly after prebuild
+- [x] iOS native module links correctly after prebuild (`pod install` succeeds)
 
 ## Blocked by
 
