@@ -51,8 +51,9 @@ Stand up the fork so it builds cleanly on both platforms, ship a minimal `exampl
 - Fixed config plugin to also inject `NSLocationWhenInUseUsageDescription` (required by issue #3 acceptance criteria)
 - All 6 permissions verified in AndroidManifest.xml and all 3 iOS keys verified in Info.plist
 
-**Module 3 — Example app UI (single screen)**
+**Module 3 — Example app UI (single screen)** (in progress)
 - State machine mirroring `VeepooSDK`'s connection lifecycle: `idle → scanning → pairing → connecting → ready → disconnected`
+- [✅ idle state] `init()` + `requestPermissions()` called on mount; "Start Scan" button disabled until `permissions.granted`
 - Scan section: start/stop scan button, scrollable list of `VeepooDevice` rows with name + RSSI + connect button
 - Session section (visible only in `ready` state): battery level, device version, personal info sync status
 - Health test section: HR / BP / SpO2 buttons with progress bars and result display

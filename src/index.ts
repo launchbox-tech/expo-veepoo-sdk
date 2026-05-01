@@ -65,4 +65,5 @@ export type {
   BloodGlucoseUnit,
   DeviceAlarm,
   DeviceData,
+  PermissionsResult,
 } from './types';

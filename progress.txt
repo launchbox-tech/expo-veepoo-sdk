@@ -1,3 +1,27 @@
+## 2026-05-01 — Issue #4: init + permissions + idle-state UI
+
+**Done:**
+- Replaced template index.tsx with idle-state UI that:
+  - Calls `sdk.init()` then `sdk.requestPermissions()` on mount
+  - Shows ActivityIndicator + "Initializing SDK…" while `appState === 'initializing'`
+  - Shows "HBand Connect" screen with "Start Scan" button (disabled when !permissions.granted)
+  - Shows permission warning text when permissions not yet granted
+- Updated `_layout.tsx` to wrap app in `SafeAreaProvider`, removed Stack header
+- Exported `PermissionsResult` type from module's `src/index.ts` (was missing)
+- Added `"expo-veepoo-sdk": ["../src/index.ts"]` path alias to example tsconfig.json
+  (bun's file: copy excludes gitignored build/; alias resolves from source directly)
+- AppState type (`initializing | idle | scanning | connecting | ready | disconnected`)
+  defined in index.tsx for future issues to extend
+- tsc --noEmit in example: 0 errors ✅ | root tests: 6/6 pass ✅
+
+**Note for next agent (Issue #6 — scan + device list):**
+- The "Start Scan" `onPress` handler is stubbed with a comment in index.tsx
+- Next step: call `sdk.startScan()`, transition to 'scanning', listen for `deviceFound`
+  events, collect VeepooDevice[] into state, render in a FlatList
+- Use `sdk.on('deviceFound', handler)` or the event subscription API
+- Check VeepooSDK.ts around line ~393 for startScan() signature
+- The state machine type is already set up in index.tsx as `AppState`
+
 ## 2026-05-01 — Issue #3: Example app scaffold + config plugin
 
 **Done:**
