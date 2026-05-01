@@ -1,3 +1,24 @@
+## 2026-05-01 — Issues #9 + #10: historical data sync + device info
+
+**Done:**
+- Issue #10 (device info): `readBattery()` + `readDeviceVersion()` called concurrently
+  in `onDeviceReady` via `Promise.allSettled`; results stored in `batteryInfo` /
+  `deviceVersion` state; Device Info card shows battery % + charging indicator +
+  firmware version string; `batteryData` events keep battery % live during session
+- Issue #9 (data sync): "Sync Data" button → `sdk.startReadOriginData()`;
+  `readOriginProgress` listener updates progress bar + "Day X/Y · N%" label;
+  `readOriginComplete` clears syncing flag; `sleepData` event populates sleep summary
+  card (total / deep / light / wake count); `sportStepData` event populates steps card
+  (count / km / kcal); all listeners gated on appState === 'ready'
+- All states reset on disconnect and on new session start
+- PRD Modules 1-4 all marked ✅ DONE
+- tsc --noEmit example: 0 errors ✅ | root tests: 6/6 pass ✅
+
+**Remaining work (requires physical device — cannot be done by agent):**
+- Issue #5: GitHub install verification (HITL) — run in an external Expo project
+- Issues #4,#6,#7,#8,#9,#10: physical device verification (APK/IPA build + HBand)
+- All code is complete; remaining items are hardware/manual-QA gates
+
 ## 2026-05-01 — Issue #8: real-time health tests (HR, BP, SpO2)
 
 **Done:**

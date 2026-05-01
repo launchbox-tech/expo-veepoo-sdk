@@ -12,11 +12,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import sdk from 'expo-veepoo-sdk';
 import type {
+  BatteryInfo,
   BloodOxygenTestResult,
   BloodPressureTestResult,
+  DeviceVersion,
   HeartRateTestResult,
   PermissionsResult,
   PersonalInfo,
+  ReadOriginProgress,
+  SleepData,
+  SportStepData,
   VeepooDevice,
 } from 'expo-veepoo-sdk';
 
@@ -46,13 +51,24 @@ export default function Index() {
   const [connectedDevice, setConnectedDevice] = useState<VeepooDevice | null>(null);
   const [syncDone, setSyncDone] = useState(false);
 
-  // Health test results
+  // Health tests
   const [hrResult, setHrResult] = useState<HeartRateTestResult | null>(null);
   const [bpResult, setBpResult] = useState<BloodPressureTestResult | null>(null);
   const [spo2Result, setSpo2Result] = useState<BloodOxygenTestResult | null>(null);
   const [activeTest, setActiveTest] = useState<'hr' | 'bp' | 'spo2' | null>(null);
 
-  // SDK init + permission request on mount
+  // Device info (#10)
+  const [batteryInfo, setBatteryInfo] = useState<BatteryInfo | null>(null);
+  const [deviceVersion, setDeviceVersion] = useState<DeviceVersion | null>(null);
+
+  // Historical data sync (#9)
+  const [dataSyncing, setDataSyncing] = useState(false);
+  const [dataSyncProgress, setDataSyncProgress] = useState<ReadOriginProgress | null>(null);
+  const [sleepSummary, setSleepSummary] = useState<SleepData['summary'] | null>(null);
+  const [stepData, setStepData] = useState<SportStepData | null>(null);
+
+  // ─── SDK init ────────────────────────────────────────────────────────────────
+
   useEffect(() => {
     let cancelled = false;
     async function setup() {
@@ -67,7 +83,8 @@ export default function Index() {
     return () => { cancelled = true; };
   }, []);
 
-  // deviceFound listener — active only while scanning
+  // ─── Scan ────────────────────────────────────────────────────────────────────
+
   useEffect(() => {
     if (appState !== 'scanning') return;
 
@@ -87,15 +104,31 @@ export default function Index() {
     return () => { sdk.off('deviceFound', onDeviceFound); };
   }, [appState]);
 
-  // Connection lifecycle listeners
+  // ─── Connection lifecycle ────────────────────────────────────────────────────
+
   useEffect(() => {
     if (appState !== 'connecting' && appState !== 'ready') return;
 
     async function onDeviceReady() {
       setSyncDone(false);
+      setBatteryInfo(null);
+      setDeviceVersion(null);
+      setDataSyncing(false);
+      setDataSyncProgress(null);
+      setSleepSummary(null);
+      setStepData(null);
       setAppState('ready');
-      await sdk.syncPersonalInfo(DEFAULT_PERSONAL_INFO);
+
+      // Run personal info sync and device info reads concurrently
+      const [, battery, version] = await Promise.allSettled([
+        sdk.syncPersonalInfo(DEFAULT_PERSONAL_INFO),
+        sdk.readBattery(),
+        sdk.readDeviceVersion(),
+      ]);
+
       setSyncDone(true);
+      if (battery.status === 'fulfilled') setBatteryInfo(battery.value);
+      if (version.status === 'fulfilled') setDeviceVersion(version.value);
     }
 
     function onDeviceDisconnected() {
@@ -105,6 +138,10 @@ export default function Index() {
       setHrResult(null);
       setBpResult(null);
       setSpo2Result(null);
+      setBatteryInfo(null);
+      setDeviceVersion(null);
+      setDataSyncing(false);
+      setDataSyncProgress(null);
       setAppState('disconnected');
     }
 
@@ -116,7 +153,8 @@ export default function Index() {
     };
   }, [appState]);
 
-  // Health test result listeners — active in 'ready' state
+  // ─── Health test listeners (ready state only) ─────────────────────────────
+
   useEffect(() => {
     if (appState !== 'ready') return;
 
@@ -126,14 +164,12 @@ export default function Index() {
         setActiveTest(prev => (prev === 'hr' ? null : prev));
       }
     }
-
     function onBP({ result }: { deviceId: string; result: BloodPressureTestResult }) {
       setBpResult(result);
       if (result.state === 'over' || result.state === 'error' || result.state === 'notWear') {
         setActiveTest(prev => (prev === 'bp' ? null : prev));
       }
     }
-
     function onSpo2({ result }: { deviceId: string; result: BloodOxygenTestResult }) {
       setSpo2Result(result);
       if (result.state === 'over' || result.state === 'error' || result.state === 'notWear') {
@@ -150,6 +186,43 @@ export default function Index() {
       sdk.off('bloodOxygenTestResult', onSpo2);
     };
   }, [appState]);
+
+  // ─── Data sync listeners (ready state only) ──────────────────────────────
+
+  useEffect(() => {
+    if (appState !== 'ready') return;
+
+    function onSyncProgress({ progress }: { deviceId: string; progress: ReadOriginProgress }) {
+      setDataSyncProgress(progress);
+    }
+    function onSyncComplete() {
+      setDataSyncing(false);
+    }
+    function onSleepData({ data }: { deviceId: string; date: string; data: SleepData }) {
+      setSleepSummary(data.summary);
+    }
+    function onStepData({ data }: { deviceId: string; date: string; data: SportStepData }) {
+      setStepData(data);
+    }
+    function onBatteryData({ data }: { deviceId: string; data: BatteryInfo }) {
+      setBatteryInfo(data);
+    }
+
+    sdk.on('readOriginProgress', onSyncProgress);
+    sdk.on('readOriginComplete', onSyncComplete);
+    sdk.on('sleepData', onSleepData);
+    sdk.on('sportStepData', onStepData);
+    sdk.on('batteryData', onBatteryData);
+    return () => {
+      sdk.off('readOriginProgress', onSyncProgress);
+      sdk.off('readOriginComplete', onSyncComplete);
+      sdk.off('sleepData', onSleepData);
+      sdk.off('sportStepData', onStepData);
+      sdk.off('batteryData', onBatteryData);
+    };
+  }, [appState]);
+
+  // ─── Handlers ─────────────────────────────────────────────────────────────
 
   const handleStartScan = useCallback(async () => {
     setDevices([]);
@@ -178,6 +251,10 @@ export default function Index() {
     setHrResult(null);
     setBpResult(null);
     setSpo2Result(null);
+    setBatteryInfo(null);
+    setDeviceVersion(null);
+    setDataSyncing(false);
+    setDataSyncProgress(null);
     setAppState('idle');
   }, []);
 
@@ -204,7 +281,17 @@ export default function Index() {
     await sdk.startBloodOxygenTest();
   }, []);
 
+  const handleSyncData = useCallback(async () => {
+    setDataSyncing(true);
+    setDataSyncProgress(null);
+    setSleepSummary(null);
+    setStepData(null);
+    await sdk.startReadOriginData();
+  }, []);
+
   const permissionsGranted = permissions?.granted ?? false;
+
+  // ─── Render ───────────────────────────────────────────────────────────────
 
   if (appState === 'initializing') {
     return (
@@ -248,17 +335,39 @@ export default function Index() {
   }
 
   if (appState === 'ready') {
+    const syncPct = dataSyncProgress?.progress ?? 0;
+
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
         <ScrollView contentContainerStyle={styles.scrollContent}>
 
+          {/* ── Header ── */}
           <View style={styles.header}>
             <Text style={styles.title}>Session Active</Text>
             <Text style={styles.version}>{connectedDevice?.name ?? 'HBand Device'}</Text>
           </View>
 
-          {/* Personal info sync status */}
+          {/* ── Device Info (#10) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Device Info</Text>
+            <View style={styles.infoGrid}>
+              <InfoRow
+                label="Battery"
+                value={
+                  batteryInfo
+                    ? `${batteryInfo.percent}%${batteryInfo.chargeState === 'charging' ? ' ⚡' : batteryInfo.isLowBattery ? ' ⚠️' : ''}`
+                    : '—'
+                }
+              />
+              <InfoRow
+                label="Firmware"
+                value={deviceVersion?.firmwareVersion ?? '—'}
+              />
+            </View>
+          </View>
+
+          {/* ── Personal Info Sync ── */}
           <View style={styles.card}>
             <Text style={styles.cardLabel}>Personal Info Sync</Text>
             <View style={styles.syncRow}>
@@ -273,7 +382,7 @@ export default function Index() {
             </View>
           </View>
 
-          {/* Health tests */}
+          {/* ── Health Tests (#8) ── */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Health Tests</Text>
           </View>
@@ -288,7 +397,6 @@ export default function Index() {
             resultLine={hrResult?.value != null ? `${hrResult.value} bpm` : null}
             onStart={handleStartHR}
           />
-
           <HealthTestCard
             label="Blood Pressure"
             unit="mmHg"
@@ -303,7 +411,6 @@ export default function Index() {
             }
             onStart={handleStartBP}
           />
-
           <HealthTestCard
             label="Blood Oxygen (SpO₂)"
             unit="%"
@@ -315,8 +422,69 @@ export default function Index() {
             onStart={handleStartSpo2}
           />
 
-          {/* Issues #9 (data sync) and #10 (battery/device info) sections go here */}
+          {/* ── Historical Data Sync (#9) ── */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Historical Data</Text>
+          </View>
 
+          <View style={styles.card}>
+            <View style={styles.testCardRow}>
+              <Text style={styles.testLabel}>Sync Data</Text>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.testBtn,
+                  dataSyncing ? styles.testBtnActive : styles.testBtnIdle,
+                  pressed && !dataSyncing && styles.buttonPressed,
+                ]}
+                disabled={dataSyncing}
+                onPress={handleSyncData}
+                accessibilityRole="button"
+                accessibilityLabel="Sync historical data from device"
+                accessibilityState={{ disabled: dataSyncing }}
+              >
+                {dataSyncing ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.testBtnText}>Sync</Text>
+                )}
+              </Pressable>
+            </View>
+
+            {dataSyncing && dataSyncProgress && (
+              <>
+                <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, { width: `${syncPct}%` }]} />
+                </View>
+                <Text style={styles.syncProgressLabel}>
+                  Day {dataSyncProgress.currentDay}/{dataSyncProgress.totalDays} · {Math.round(syncPct)}%
+                </Text>
+              </>
+            )}
+
+            {!dataSyncing && stepData && (
+              <View style={styles.dataSummary}>
+                <Text style={styles.dataSummaryTitle}>Today's Steps</Text>
+                <Text style={styles.dataSummaryValue}>{stepData.stepCount.toLocaleString()}</Text>
+                <Text style={styles.dataSummaryMeta}>
+                  {(stepData.distance / 1000).toFixed(2)} km · {Math.round(stepData.calories)} kcal
+                </Text>
+              </View>
+            )}
+
+            {!dataSyncing && sleepSummary && (
+              <View style={styles.dataSummary}>
+                <Text style={styles.dataSummaryTitle}>Last Night's Sleep</Text>
+                <Text style={styles.dataSummaryValue}>
+                  {Math.floor(sleepSummary.totalSleepMinutes / 60)}h {sleepSummary.totalSleepMinutes % 60}m
+                </Text>
+                <Text style={styles.dataSummaryMeta}>
+                  Deep {sleepSummary.totalDeepSleepMinutes}m · Light {sleepSummary.totalLightSleepMinutes}m · Woke {sleepSummary.totalWakeUpCount}×
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* ── Disconnect ── */}
           <Pressable
             style={({ pressed }) => [styles.button, styles.buttonStop, pressed && styles.buttonPressed, styles.disconnectBtn]}
             onPress={handleDisconnect}
@@ -331,7 +499,8 @@ export default function Index() {
     );
   }
 
-  // Idle / scanning
+  // ─── Idle / Scanning ──────────────────────────────────────────────────────
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -396,22 +565,12 @@ export default function Index() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function DeviceRow({
-  device,
-  onConnect,
-}: {
-  device: VeepooDevice;
-  onConnect: () => void;
-}) {
+function DeviceRow({ device, onConnect }: { device: VeepooDevice; onConnect: () => void }) {
   return (
     <View style={styles.deviceRow}>
       <View style={styles.deviceInfo}>
-        <Text style={styles.deviceName} numberOfLines={1}>
-          {device.name || 'Unknown Device'}
-        </Text>
-        <Text style={styles.deviceMeta}>
-          {device.rssi} dBm{device.mac ? ` · ${device.mac}` : ''}
-        </Text>
+        <Text style={styles.deviceName} numberOfLines={1}>{device.name || 'Unknown Device'}</Text>
+        <Text style={styles.deviceMeta}>{device.rssi} dBm{device.mac ? ` · ${device.mac}` : ''}</Text>
       </View>
       <Pressable
         style={({ pressed }) => [styles.connectBtn, pressed && styles.connectBtnPressed]}
@@ -425,14 +584,17 @@ function DeviceRow({
   );
 }
 
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
+    </View>
+  );
+}
+
 function HealthTestCard({
-  label,
-  isActive,
-  disabled,
-  progress,
-  state,
-  resultLine,
-  onStart,
+  label, isActive, disabled, progress, state, resultLine, onStart,
 }: {
   label: string;
   unit: string;
@@ -443,9 +605,9 @@ function HealthTestCard({
   resultLine: string | null;
   onStart: () => void;
 }) {
-  const showProgress = isActive && progress != null;
-  const showResult = !isActive && resultLine != null;
-  const stateMsg = state === 'notWear' ? 'Please wear the device.' : state === 'error' ? 'Test error — try again.' : null;
+  const stateMsg =
+    state === 'notWear' ? 'Please wear the device.' :
+    state === 'error' ? 'Test error — try again.' : null;
 
   return (
     <View style={styles.card}>
@@ -460,26 +622,20 @@ function HealthTestCard({
           disabled={disabled || isActive}
           onPress={onStart}
           accessibilityRole="button"
-          accessibilityLabel={`Start ${label} test`}
           accessibilityState={{ disabled: disabled || isActive }}
         >
-          {isActive ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={[styles.testBtnText, disabled && styles.testBtnTextDisabled]}>
-              Start
-            </Text>
-          )}
+          {isActive
+            ? <ActivityIndicator size="small" color="#fff" />
+            : <Text style={[styles.testBtnText, disabled && styles.testBtnTextDisabled]}>Start</Text>
+          }
         </Pressable>
       </View>
-
-      {showProgress && (
+      {isActive && progress != null && (
         <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress ?? 0}%` }]} />
+          <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
       )}
-
-      {showResult && <Text style={styles.testResult}>{resultLine}</Text>}
+      {!isActive && resultLine && <Text style={styles.testResult}>{resultLine}</Text>}
       {stateMsg && <Text style={styles.testStateMsg}>{stateMsg}</Text>}
     </View>
   );
@@ -492,27 +648,11 @@ const RED = '#E53935';
 const GREEN = '#2E7D32';
 
 const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-    paddingHorizontal: 32,
-  },
+  centered: { flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', gap: 16, paddingHorizontal: 32 },
   container: { flex: 1, backgroundColor: '#fff' },
   scrollContent: { paddingBottom: 40 },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 28,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#111',
-    letterSpacing: -0.5,
-  },
+  header: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 20 },
+  title: { fontSize: 28, fontWeight: '700', color: '#111', letterSpacing: -0.5 },
   version: { fontSize: 13, color: '#999', marginTop: 4 },
   sectionHeader: { paddingHorizontal: 24, paddingBottom: 8, paddingTop: 4 },
   sectionTitle: { fontSize: 13, fontWeight: '700', color: '#888', textTransform: 'uppercase', letterSpacing: 0.6 },
@@ -520,14 +660,7 @@ const styles = StyleSheet.create({
   permissionHint: { fontSize: 14, color: '#E05C00', lineHeight: 20 },
   statusText: { fontSize: 16, color: '#666', textAlign: 'center' },
   disconnectedTitle: { fontSize: 22, fontWeight: '700', color: '#111' },
-  button: {
-    height: 52,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
+  button: { height: 52, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   buttonPrimary: { backgroundColor: BLUE },
   buttonStop: { backgroundColor: RED },
   buttonDisabled: { backgroundColor: '#E5E5E5' },
@@ -539,30 +672,19 @@ const styles = StyleSheet.create({
   list: { flex: 1 },
   listContent: { paddingHorizontal: 24, paddingBottom: 32, gap: 10 },
   emptyText: { fontSize: 14, color: '#999', textAlign: 'center', marginTop: 24 },
-  deviceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F9FF',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    gap: 12,
-  },
+  deviceRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F9FF', borderRadius: 12, paddingVertical: 14, paddingHorizontal: 16, gap: 12 },
   deviceInfo: { flex: 1, gap: 3 },
   deviceName: { fontSize: 15, fontWeight: '600', color: '#111' },
   deviceMeta: { fontSize: 12, color: '#888' },
   connectBtn: { backgroundColor: BLUE, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 14 },
   connectBtnPressed: { opacity: 0.8 },
   connectBtnText: { fontSize: 13, fontWeight: '600', color: '#fff' },
-  card: {
-    marginHorizontal: 24,
-    marginBottom: 12,
-    backgroundColor: '#F5F9FF',
-    borderRadius: 12,
-    padding: 16,
-    gap: 8,
-  },
+  card: { marginHorizontal: 24, marginBottom: 12, backgroundColor: '#F5F9FF', borderRadius: 12, padding: 16, gap: 8 },
   cardLabel: { fontSize: 12, fontWeight: '600', color: '#888', textTransform: 'uppercase', letterSpacing: 0.5 },
+  infoGrid: { gap: 6 },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  infoLabel: { fontSize: 14, color: '#666' },
+  infoValue: { fontSize: 14, fontWeight: '600', color: '#111' },
   syncRow: { flexDirection: 'row', alignItems: 'center' },
   syncDone: { fontSize: 15, color: GREEN, fontWeight: '600' },
   syncPending: { fontSize: 15, color: '#666' },
@@ -578,4 +700,9 @@ const styles = StyleSheet.create({
   progressFill: { height: 6, backgroundColor: BLUE, borderRadius: 3 },
   testResult: { fontSize: 20, fontWeight: '700', color: '#111' },
   testStateMsg: { fontSize: 13, color: '#E05C00' },
+  syncProgressLabel: { fontSize: 12, color: '#888' },
+  dataSummary: { borderTopWidth: 1, borderTopColor: '#E5EDF7', paddingTop: 10, gap: 2 },
+  dataSummaryTitle: { fontSize: 12, fontWeight: '600', color: '#888', textTransform: 'uppercase', letterSpacing: 0.4 },
+  dataSummaryValue: { fontSize: 22, fontWeight: '700', color: '#111' },
+  dataSummaryMeta: { fontSize: 12, color: '#888' },
 });

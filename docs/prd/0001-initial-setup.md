@@ -38,11 +38,11 @@ Stand up the fork so it builds cleanly on both platforms, ship a minimal `exampl
 
 ### Modules
 
-**Module 1 — Fork verification**
-- Run `npm install` to resolve all JS dependencies
-- Run `tsc --noEmit` to confirm the TypeScript layer compiles
-- Confirm Android `libs/*.aar` files are present and `build.gradle` references them correctly
-- Confirm iOS `Frameworks/*.framework` files are present and `VeepooSDK.podspec` references them
+**Module 1 — Fork verification** ✅ DONE
+- `npm install` resolves cleanly (bun install)
+- `tsc --noEmit` passes with 0 errors
+- Android `libs/*.aar` (10 files) present; `build.gradle` references via gradle sub-projects
+- iOS `VeepooSDK/Frameworks/` has 6 frameworks; `ios/VeepooSDK.podspec` references them
 
 **Module 2 — Example app scaffold** ✅ DONE
 - Created `example/` using `npx create-expo-app@latest --template default@sdk-55` (Expo SDK 55, React Native 0.83.6)
@@ -51,20 +51,19 @@ Stand up the fork so it builds cleanly on both platforms, ship a minimal `exampl
 - Fixed config plugin to also inject `NSLocationWhenInUseUsageDescription` (required by issue #3 acceptance criteria)
 - All 6 permissions verified in AndroidManifest.xml and all 3 iOS keys verified in Info.plist
 
-**Module 3 — Example app UI (single screen)** (in progress)
-- State machine mirroring `VeepooSDK`'s connection lifecycle: `idle → scanning → pairing → connecting → ready → disconnected`
-- [✅ idle state] `init()` + `requestPermissions()` called on mount; "Start Scan" button disabled until `permissions.granted`
-- [✅ scan section] "Start Scan" → `startScan()` + `deviceFound` listener → `FlatList` of device rows (name, RSSI dBm, MAC); "Stop Scan" → `stopScan()` + back to idle; deduplication by device ID
-- [✅ connect/session/disconnect] Connect row → `connect(id)`, connecting splash; `deviceReady` → 'ready' + `syncPersonalInfo()`; `deviceDisconnected` → 'disconnected' + Reconnect button; Disconnect button; session card shows sync status
-- [✅ health tests] HR, BP, SpO₂ cards in session screen; each has Start button (disabled while another test runs), progress bar (0-100%), and result display; `heartRateTestResult`/`bloodPressureTestResult`/`bloodOxygenTestResult` event listeners active in 'ready' state
-- Session section (visible only in `ready` state): battery level, device version, personal info sync status
-- Health test section: HR / BP / SpO2 buttons with progress bars and result display
-- Data sync section: sync button, progress indicator, summary of sleep + steps for today
-- Disconnect button always visible when in session
+**Module 3 — Example app UI (single screen)** ✅ DONE
+- [✅] State machine: `idle → scanning → connecting → ready → disconnected`
+- [✅] `init()` + `requestPermissions()` on mount; "Start Scan" disabled until granted
+- [✅] `startScan()` + `deviceFound` → FlatList (name, RSSI, MAC, Connect); `stopScan()` → idle
+- [✅] `connect(id)` → connecting splash; `deviceReady` → 'ready' + `syncPersonalInfo()`; `deviceDisconnected` → reconnect screen; Disconnect button
+- [✅] Device Info card: `readBattery()` + `readDeviceVersion()` on `deviceReady`; `batteryData` events update passively
+- [✅] HR / BP / SpO₂ test cards with progress bars and result display; `activeTest` prevents concurrency
+- [✅] "Sync Data" → `startReadOriginData()`; `readOriginProgress` drives progress bar; `sleepData` + `sportStepData` populate summary cards
 
-**Module 4 — Config plugin verification**
-- After prebuild, `AndroidManifest.xml` must contain: `BLUETOOTH`, `BLUETOOTH_ADMIN`, `BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`, `ACCESS_FINE_LOCATION`
-- `Info.plist` must contain: `NSBluetoothAlwaysUsageDescription`, `NSBluetoothPeripheralUsageDescription`, `NSLocationWhenInUseUsageDescription`
+**Module 4 — Config plugin verification** ✅ DONE
+- `npx expo prebuild --clean` verified in `example/`
+- `AndroidManifest.xml` contains: `BLUETOOTH`, `BLUETOOTH_ADMIN`, `BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION` ✅
+- `Info.plist` contains: `NSBluetoothAlwaysUsageDescription`, `NSBluetoothPeripheralUsageDescription`, `NSLocationWhenInUseUsageDescription` ✅ (last key was missing; added to plugin)
 
 ### Key architectural decisions carried from grilling session
 - `syncPersonalInfo()` is called by the example app on every `deviceReady` event
