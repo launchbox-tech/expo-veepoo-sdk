@@ -1,3 +1,32 @@
+## 2026-05-01 — Issue #7: connect + session + disconnect/reconnect
+
+**Done:**
+- DeviceRow "Connect" → `stopScan()` then `sdk.connect(device.id)`, appState → 'connecting'
+  Shows full-screen spinner with device name while pairing
+- `deviceReady` listener (active in 'connecting' | 'ready') → appState → 'ready',
+  calls `sdk.syncPersonalInfo(DEFAULT_PERSONAL_INFO)`; sync status shown in session card
+- `deviceDisconnected` listener → appState → 'disconnected'; shows device name + Reconnect btn
+- Reconnect button → re-enters scan flow via `handleStartScan()`
+- Session screen ('ready'): device name in header, "Personal Info Sync" card with ✓/spinner,
+  Disconnect button (red); placeholder comment for Issues #8, #9, #10
+- Disconnect button → `sdk.disconnect()` (no-arg — SDK uses internal connectedDeviceId),
+  appState → 'idle'
+- DEFAULT_PERSONAL_INFO defined at module level (sex:1, h:175, w:70, age:30,
+  stepAim:8000, sleepAim:480) — can be overridden by companion app
+- tsc --noEmit example: 0 errors ✅ | root tests: 6/6 pass ✅
+
+**Note for next agent (Issue #8 — HR/BP/SpO2 health tests):**
+- The session screen ('ready' appState) has a placeholder comment in index.tsx for
+  health test section — add below the Personal Info Sync card
+- SDK methods: `sdk.startHeartRateTest()`, listen for `heartRateTestResult` events
+  payload: `{ deviceId, result: HeartRateTestResult }` — check types.ts for TestState
+- Similarly for BP: `startBloodPressureTest()` / `bloodPressureTestResult`
+- And SpO2: `startBloodOxygenTest()` / `bloodOxygenTestResult`
+- Each test has a `state` field (TestState) and a result value; show progress while
+  state is 'testing', show result when state is 'success'
+- Also check Issue #9 (data sync) and #10 (battery/device info) — both are ready to
+  implement after #8
+
 ## 2026-05-01 — Issue #6: scan + device list
 
 **Done:**
