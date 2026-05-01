@@ -2,7 +2,7 @@ import {
   normalizeBluetoothStatus,
   normalizePermissionsResult,
   normalizeReadOriginProgressPayload,
-} from './normalizers';
+} from '../normalizers';
 
 describe('normalizePermissionsResult', () => {
   it('normalizes legacy string payloads', () => {
