@@ -15,6 +15,7 @@ import type {
   BatteryInfo,
   BloodOxygenTestResult,
   BloodPressureTestResult,
+  ConnectionStatus,
   DeviceVersion,
   HeartRateTestResult,
   PermissionsResult,
@@ -49,6 +50,7 @@ export default function Index() {
   const [devices, setDevices] = useState<VeepooDevice[]>([]);
   const [connectingDevice, setConnectingDevice] = useState<VeepooDevice | null>(null);
   const [connectedDevice, setConnectedDevice] = useState<VeepooDevice | null>(null);
+  const [connectError, setConnectError] = useState<string | null>(null);
   const [syncDone, setSyncDone] = useState(false);
 
   // Health tests
@@ -142,14 +144,30 @@ export default function Index() {
       setDeviceVersion(null);
       setDataSyncing(false);
       setDataSyncProgress(null);
+      setConnectError(null);
       setAppState('disconnected');
+    }
+
+    function onConnectStatus({ status, code }: { deviceId: string; status: ConnectionStatus; code?: number }) {
+      if (status === 'error') {
+        setConnectError(
+          code != null
+            ? `Connection failed (code ${code}). Is the device nearby?`
+            : 'Connection failed. Make sure the device is nearby and try again.'
+        );
+        setConnectingDevice(null);
+        setConnectedDevice(null);
+        setAppState('disconnected');
+      }
     }
 
     sdk.on('deviceReady', onDeviceReady);
     sdk.on('deviceDisconnected', onDeviceDisconnected);
+    sdk.on('deviceConnectStatus', onConnectStatus);
     return () => {
       sdk.off('deviceReady', onDeviceReady);
       sdk.off('deviceDisconnected', onDeviceDisconnected);
+      sdk.off('deviceConnectStatus', onConnectStatus);
     };
   }, [appState]);
 
@@ -255,11 +273,13 @@ export default function Index() {
     setDeviceVersion(null);
     setDataSyncing(false);
     setDataSyncProgress(null);
+    setConnectError(null);
     setAppState('idle');
   }, []);
 
   const handleReconnect = useCallback(async () => {
     setConnectingDevice(null);
+    setConnectError(null);
     await handleStartScan();
   }, [handleStartScan]);
 
@@ -316,19 +336,26 @@ export default function Index() {
   }
 
   if (appState === 'disconnected') {
+    const isFailedAttempt = connectError != null;
     return (
       <SafeAreaView style={styles.centered}>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <Text style={styles.disconnectedTitle}>Device Disconnected</Text>
+        <Text style={styles.disconnectedTitle}>
+          {isFailedAttempt ? 'Connection Failed' : 'Device Disconnected'}
+        </Text>
         <Text style={styles.statusText}>
-          {connectedDevice?.name ?? 'The device'} dropped the connection.
+          {isFailedAttempt
+            ? connectError
+            : `${connectedDevice?.name ?? 'The device'} dropped the connection.`}
         </Text>
         <Pressable
           style={({ pressed }) => [styles.button, styles.buttonPrimary, pressed && styles.buttonPressed]}
           onPress={handleReconnect}
           accessibilityRole="button"
         >
-          <Text style={styles.buttonText}>Reconnect</Text>
+          <Text style={styles.buttonText}>
+            {isFailedAttempt ? 'Try Again' : 'Reconnect'}
+          </Text>
         </Pressable>
       </SafeAreaView>
     );
