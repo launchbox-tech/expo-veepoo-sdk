@@ -157,9 +157,7 @@ export class VeepooSDK {
       error?: unknown;
     },
   ): void {
-    if (!this.logEnabled && !this.logger) {
-      return;
-    }
+    if (!this.logEnabled && !this.logger) return;
 
     const entry: LogEntry = {
       timestamp: Date.now(),
@@ -253,66 +251,7 @@ export class VeepooSDK {
   }
 
   private emitLocal(event: VeepooEvent, payload: unknown): void {
-    const normalizedPayload =
-      event === "bluetoothStateChanged"
-        ? normalizeBluetoothStatus(payload)
-        : event === "readOriginProgress"
-        ? normalizeReadOriginProgressPayload(payload)
-        : event === "deviceFunction" && this.isEventRecord(payload)
-        ? {
-            ...payload,
-            data: normalizeDeviceFunctions(payload.data ?? payload.functions),
-            functions: normalizeDeviceFunctions(
-              payload.functions ?? payload.data,
-            ),
-          }
-        : event === "deviceVersion" && this.isEventRecord(payload)
-        ? { ...payload, version: normalizeDeviceVersion(payload.version) }
-        : event === "passwordData" && this.isEventRecord(payload)
-        ? { ...payload, data: normalizePasswordData(payload.data) }
-        : event === "socialMsgData" && this.isEventRecord(payload)
-        ? { ...payload, data: normalizeSocialMsgData(payload.data) }
-        : event === "originFiveMinuteData" && this.isEventRecord(payload)
-        ? {
-            ...payload,
-            data: normalizeOriginDataList([payload.data])[0],
-          }
-        : event === "originHalfHourData" && this.isEventRecord(payload)
-        ? { ...payload, data: normalizeHalfHourData(payload.data) }
-        : event === "sleepData" && this.isEventRecord(payload)
-        ? {
-            ...payload,
-            data: normalizeSleepDataList(payload.data)[0],
-          }
-        : event === "sportStepData" && this.isEventRecord(payload)
-        ? { ...payload, data: normalizeSportStepData(payload.data) }
-        : event === "heartRateTestResult" && this.isEventRecord(payload)
-        ? { ...payload, result: normalizeHeartRateTestResult(payload.result) }
-        : event === "bloodPressureTestResult" && this.isEventRecord(payload)
-        ? {
-            ...payload,
-            result: normalizeBloodPressureTestResult(payload.result),
-          }
-        : event === "bloodOxygenTestResult" && this.isEventRecord(payload)
-        ? {
-            ...payload,
-            result: normalizeBloodOxygenTestResult(payload.result),
-          }
-        : event === "temperatureTestResult" && this.isEventRecord(payload)
-        ? {
-            ...payload,
-            result: normalizeTemperatureTestResult(payload.result),
-          }
-        : event === "stressData" && this.isEventRecord(payload)
-        ? { ...payload, data: normalizeStressData(payload.data) }
-        : event === "bloodGlucoseData" && this.isEventRecord(payload)
-        ? {
-            ...payload,
-            data: normalizeBloodGlucoseData(payload.data),
-          }
-        : event === "batteryData" && this.isEventRecord(payload)
-        ? { ...payload, data: normalizeBatteryInfo(payload.data) }
-        : payload;
+    const normalizedPayload = normalizeEventPayload(event, payload);
 
     if (
       event === "readOriginProgress" &&
