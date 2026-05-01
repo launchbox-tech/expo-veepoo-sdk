@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { VeepooDevice } from "expo-veepoo-sdk";
 import { BLUE, GREEN, RED } from "../components/theme";
 import { DeviceRow } from "../components/DeviceRow";
+import { InfoRow } from "../components/InfoRow";
 import { appStateReducer } from "../hooks/appStateReducer";
 import { useSDKInit } from "../hooks/useSDKInit";
 import { useBandScan } from "../hooks/useBandScan";
@@ -403,15 +404,6 @@ export default function Index() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
-  );
-}
-
 function HealthTestCard({
   label,
   isActive,
@@ -565,9 +557,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   infoGrid: { gap: 6 },
-  infoRow: { flexDirection: "row", justifyContent: "space-between" },
-  infoLabel: { fontSize: 14, color: "#666" },
-  infoValue: { fontSize: 14, fontWeight: "600", color: "#111" },
   syncRow: { flexDirection: "row", alignItems: "center" },
   syncDone: { fontSize: 15, color: GREEN, fontWeight: "600" },
   syncPending: { fontSize: 15, color: "#666" },
