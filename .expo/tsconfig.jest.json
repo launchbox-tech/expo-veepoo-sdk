@@ -1,0 +1,11 @@
+{
+  "extends": "/Users/saileshbro/Projects/expo-veepoo-sdk/tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "typeRoots": [
+      "./node_modules/@types",
+      "../node_modules/@types",
+      "/Users/saileshbro/Projects/expo-veepoo-sdk/node_modules/expo-module-scripts/ts-declarations"
+    ]
+  }
+}

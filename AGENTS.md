@@ -40,6 +40,22 @@ _Avoid_: bonding, linking
 
 - After each GitHub issue is implemented, commit only that issue's diff with `Fixes #N` in the commit message body, then push immediately before starting the next issue.
 
+## Docs structure
+
+Issue tracker is mirrored locally under `docs/` so agents can read full specs offline.
+
+**`docs/prd/`** — Full PRDs (Problem Statement + User Stories + Implementation + Testing sections). Named `NNNN-slug.md` where `NNNN` is the GitHub issue number. A PRD is any issue with the full PRD template body (User Stories section present).
+
+**`docs/issues/`** — Short issue cards (What to build + Acceptance criteria). Named `NNNN-slug.md` where `NNNN` is the GitHub issue number.
+
+**Labels → local status:**
+- `needs-triage` — not yet reviewed by maintainer
+- `ready-for-agent` — fully specified, safe for an autonomous AFK agent
+- `ready-for-human` — requires human judgment or physical device
+- `enhancement` — new feature or refactor
+
+**Sync rule:** When a new GitHub issue or PRD is created, create the matching local file immediately in the same commit. When an issue is closed or its body changes, update the local file. Use `gh issue view N --repo launchbox-tech/expo-veepoo-sdk --json number,title,labels,state,body` to fetch the latest content.
+
 ## Flagged ambiguities
 
 _(none yet)_
