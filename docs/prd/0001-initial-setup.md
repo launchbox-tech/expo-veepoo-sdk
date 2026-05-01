@@ -56,6 +56,7 @@ Stand up the fork so it builds cleanly on both platforms, ship a minimal `exampl
 - [✅ idle state] `init()` + `requestPermissions()` called on mount; "Start Scan" button disabled until `permissions.granted`
 - [✅ scan section] "Start Scan" → `startScan()` + `deviceFound` listener → `FlatList` of device rows (name, RSSI dBm, MAC); "Stop Scan" → `stopScan()` + back to idle; deduplication by device ID
 - [✅ connect/session/disconnect] Connect row → `connect(id)`, connecting splash; `deviceReady` → 'ready' + `syncPersonalInfo()`; `deviceDisconnected` → 'disconnected' + Reconnect button; Disconnect button; session card shows sync status
+- [✅ health tests] HR, BP, SpO₂ cards in session screen; each has Start button (disabled while another test runs), progress bar (0-100%), and result display; `heartRateTestResult`/`bloodPressureTestResult`/`bloodOxygenTestResult` event listeners active in 'ready' state
 - Session section (visible only in `ready` state): battery level, device version, personal info sync status
 - Health test section: HR / BP / SpO2 buttons with progress bars and result display
 - Data sync section: sync button, progress indicator, summary of sleep + steps for today

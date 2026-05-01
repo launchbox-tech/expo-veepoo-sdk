@@ -1,3 +1,25 @@
+## 2026-05-01 — Issue #8: real-time health tests (HR, BP, SpO2)
+
+**Done:**
+- Three HealthTestCard components in session screen: Heart Rate, Blood Pressure, SpO2
+- Each card: Start button (disabled while another test is running), progress bar 0-100%,
+  result display when state === 'over'; "Please wear the device" / "Test error" for edge states
+- `heartRateTestResult`, `bloodPressureTestResult`, `bloodOxygenTestResult` listeners
+  active via useEffect gated on appState === 'ready'
+- `activeTest` state prevents two tests running concurrently
+- Results cleared on new test start and on disconnect
+- HR result: "X bpm" | BP result: "sys/dia mmHg · pulse bpm" | SpO2: "X% SpO₂"
+- tsc --noEmit example: 0 errors ✅ | root tests: 6/6 pass ✅
+
+**Note for next agent (Issue #9 — historical data sync + Issue #10 — device info):**
+- Session screen has a placeholder comment `// Issues #9 and #10 go here`
+- Issue #9: "Sync Data" button → `sdk.startReadOriginData()`, listen for
+  `readOriginProgress` events (payload: { deviceId, progress: ReadOriginProgress }),
+  `readOriginComplete`, `sleepData`, `sportStepData` events; show progress + summary
+- Issue #10: call `sdk.readBattery()` and `sdk.readDeviceVersion()` on deviceReady
+  to populate battery % and firmware version in the session header card
+- Both can be done in a single pass — add them as cards above the Disconnect button
+
 ## 2026-05-01 — Issue #7: connect + session + disconnect/reconnect
 
 **Done:**

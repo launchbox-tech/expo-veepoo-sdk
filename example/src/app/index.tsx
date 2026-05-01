@@ -11,7 +11,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import sdk from 'expo-veepoo-sdk';
-import type { PermissionsResult, PersonalInfo, VeepooDevice } from 'expo-veepoo-sdk';
+import type {
+  BloodOxygenTestResult,
+  BloodPressureTestResult,
+  HeartRateTestResult,
+  PermissionsResult,
+  PersonalInfo,
+  VeepooDevice,
+} from 'expo-veepoo-sdk';
 
 // State machine: idle → scanning → connecting → ready → disconnected
 export type AppState =
@@ -22,7 +29,6 @@ export type AppState =
   | 'ready'
   | 'disconnected';
 
-// Default personal info sent to the Band on every deviceReady
 const DEFAULT_PERSONAL_INFO: PersonalInfo = {
   sex: 1,
   height: 175,
@@ -39,6 +45,12 @@ export default function Index() {
   const [connectingDevice, setConnectingDevice] = useState<VeepooDevice | null>(null);
   const [connectedDevice, setConnectedDevice] = useState<VeepooDevice | null>(null);
   const [syncDone, setSyncDone] = useState(false);
+
+  // Health test results
+  const [hrResult, setHrResult] = useState<HeartRateTestResult | null>(null);
+  const [bpResult, setBpResult] = useState<BloodPressureTestResult | null>(null);
+  const [spo2Result, setSpo2Result] = useState<BloodOxygenTestResult | null>(null);
+  const [activeTest, setActiveTest] = useState<'hr' | 'bp' | 'spo2' | null>(null);
 
   // SDK init + permission request on mount
   useEffect(() => {
@@ -75,7 +87,7 @@ export default function Index() {
     return () => { sdk.off('deviceFound', onDeviceFound); };
   }, [appState]);
 
-  // Connection lifecycle listeners — active while connecting or in session
+  // Connection lifecycle listeners
   useEffect(() => {
     if (appState !== 'connecting' && appState !== 'ready') return;
 
@@ -89,6 +101,10 @@ export default function Index() {
     function onDeviceDisconnected() {
       setConnectedDevice(null);
       setSyncDone(false);
+      setActiveTest(null);
+      setHrResult(null);
+      setBpResult(null);
+      setSpo2Result(null);
       setAppState('disconnected');
     }
 
@@ -97,6 +113,41 @@ export default function Index() {
     return () => {
       sdk.off('deviceReady', onDeviceReady);
       sdk.off('deviceDisconnected', onDeviceDisconnected);
+    };
+  }, [appState]);
+
+  // Health test result listeners — active in 'ready' state
+  useEffect(() => {
+    if (appState !== 'ready') return;
+
+    function onHR({ result }: { deviceId: string; result: HeartRateTestResult }) {
+      setHrResult(result);
+      if (result.state === 'over' || result.state === 'error' || result.state === 'notWear') {
+        setActiveTest(prev => (prev === 'hr' ? null : prev));
+      }
+    }
+
+    function onBP({ result }: { deviceId: string; result: BloodPressureTestResult }) {
+      setBpResult(result);
+      if (result.state === 'over' || result.state === 'error' || result.state === 'notWear') {
+        setActiveTest(prev => (prev === 'bp' ? null : prev));
+      }
+    }
+
+    function onSpo2({ result }: { deviceId: string; result: BloodOxygenTestResult }) {
+      setSpo2Result(result);
+      if (result.state === 'over' || result.state === 'error' || result.state === 'notWear') {
+        setActiveTest(prev => (prev === 'spo2' ? null : prev));
+      }
+    }
+
+    sdk.on('heartRateTestResult', onHR);
+    sdk.on('bloodPressureTestResult', onBP);
+    sdk.on('bloodOxygenTestResult', onSpo2);
+    return () => {
+      sdk.off('heartRateTestResult', onHR);
+      sdk.off('bloodPressureTestResult', onBP);
+      sdk.off('bloodOxygenTestResult', onSpo2);
     };
   }, [appState]);
 
@@ -123,6 +174,10 @@ export default function Index() {
     await sdk.disconnect();
     setConnectedDevice(null);
     setSyncDone(false);
+    setActiveTest(null);
+    setHrResult(null);
+    setBpResult(null);
+    setSpo2Result(null);
     setAppState('idle');
   }, []);
 
@@ -131,9 +186,26 @@ export default function Index() {
     await handleStartScan();
   }, [handleStartScan]);
 
+  const handleStartHR = useCallback(async () => {
+    setHrResult(null);
+    setActiveTest('hr');
+    await sdk.startHeartRateTest();
+  }, []);
+
+  const handleStartBP = useCallback(async () => {
+    setBpResult(null);
+    setActiveTest('bp');
+    await sdk.startBloodPressureTest();
+  }, []);
+
+  const handleStartSpo2 = useCallback(async () => {
+    setSpo2Result(null);
+    setActiveTest('spo2');
+    await sdk.startBloodOxygenTest();
+  }, []);
+
   const permissionsGranted = permissions?.granted ?? false;
 
-  // Initializing splash
   if (appState === 'initializing') {
     return (
       <SafeAreaView style={styles.centered}>
@@ -144,7 +216,6 @@ export default function Index() {
     );
   }
 
-  // Connecting splash
   if (appState === 'connecting') {
     return (
       <SafeAreaView style={styles.centered}>
@@ -157,7 +228,6 @@ export default function Index() {
     );
   }
 
-  // Disconnected state
   if (appState === 'disconnected') {
     return (
       <SafeAreaView style={styles.centered}>
@@ -170,7 +240,6 @@ export default function Index() {
           style={({ pressed }) => [styles.button, styles.buttonPrimary, pressed && styles.buttonPressed]}
           onPress={handleReconnect}
           accessibilityRole="button"
-          accessibilityLabel="Reconnect by scanning for devices"
         >
           <Text style={styles.buttonText}>Reconnect</Text>
         </Pressable>
@@ -178,17 +247,18 @@ export default function Index() {
     );
   }
 
-  // Ready (session active)
   if (appState === 'ready') {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
         <ScrollView contentContainerStyle={styles.scrollContent}>
+
           <View style={styles.header}>
             <Text style={styles.title}>Session Active</Text>
             <Text style={styles.version}>{connectedDevice?.name ?? 'HBand Device'}</Text>
           </View>
 
+          {/* Personal info sync status */}
           <View style={styles.card}>
             <Text style={styles.cardLabel}>Personal Info Sync</Text>
             <View style={styles.syncRow}>
@@ -203,7 +273,49 @@ export default function Index() {
             </View>
           </View>
 
-          {/* Issues #8, #9, #10 will add health test + data sync + device info sections here */}
+          {/* Health tests */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Health Tests</Text>
+          </View>
+
+          <HealthTestCard
+            label="Heart Rate"
+            unit="BPM"
+            isActive={activeTest === 'hr'}
+            disabled={activeTest !== null && activeTest !== 'hr'}
+            progress={hrResult?.progress}
+            state={hrResult?.state}
+            resultLine={hrResult?.value != null ? `${hrResult.value} bpm` : null}
+            onStart={handleStartHR}
+          />
+
+          <HealthTestCard
+            label="Blood Pressure"
+            unit="mmHg"
+            isActive={activeTest === 'bp'}
+            disabled={activeTest !== null && activeTest !== 'bp'}
+            progress={bpResult?.progress}
+            state={bpResult?.state}
+            resultLine={
+              bpResult?.systolic != null
+                ? `${bpResult.systolic}/${bpResult.diastolic} mmHg · ${bpResult.pulse} bpm`
+                : null
+            }
+            onStart={handleStartBP}
+          />
+
+          <HealthTestCard
+            label="Blood Oxygen (SpO₂)"
+            unit="%"
+            isActive={activeTest === 'spo2'}
+            disabled={activeTest !== null && activeTest !== 'spo2'}
+            progress={spo2Result?.progress}
+            state={spo2Result?.state}
+            resultLine={spo2Result?.value != null ? `${spo2Result.value}% SpO₂` : null}
+            onStart={handleStartSpo2}
+          />
+
+          {/* Issues #9 (data sync) and #10 (battery/device info) sections go here */}
 
           <Pressable
             style={({ pressed }) => [styles.button, styles.buttonStop, pressed && styles.buttonPressed, styles.disconnectBtn]}
@@ -213,12 +325,13 @@ export default function Index() {
           >
             <Text style={styles.buttonText}>Disconnect</Text>
           </Pressable>
+
         </ScrollView>
       </SafeAreaView>
     );
   }
 
-  // Idle / scanning — scan + device list
+  // Idle / scanning
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -240,7 +353,6 @@ export default function Index() {
             style={({ pressed }) => [styles.button, styles.buttonStop, pressed && styles.buttonPressed]}
             onPress={handleStopScan}
             accessibilityRole="button"
-            accessibilityLabel="Stop scanning for devices"
           >
             <ActivityIndicator size="small" color="#fff" style={styles.spinnerInline} />
             <Text style={styles.buttonText}>Stop Scan</Text>
@@ -256,7 +368,6 @@ export default function Index() {
             onPress={handleStartScan}
             accessibilityRole="button"
             accessibilityState={{ disabled: !permissionsGranted }}
-            accessibilityLabel="Start scanning for nearby devices"
           >
             <Text style={[styles.buttonText, !permissionsGranted && styles.buttonTextDisabled]}>
               Start Scan
@@ -282,6 +393,8 @@ export default function Index() {
     </SafeAreaView>
   );
 }
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function DeviceRow({
   device,
@@ -312,8 +425,71 @@ function DeviceRow({
   );
 }
 
+function HealthTestCard({
+  label,
+  isActive,
+  disabled,
+  progress,
+  state,
+  resultLine,
+  onStart,
+}: {
+  label: string;
+  unit: string;
+  isActive: boolean;
+  disabled: boolean;
+  progress?: number;
+  state?: string;
+  resultLine: string | null;
+  onStart: () => void;
+}) {
+  const showProgress = isActive && progress != null;
+  const showResult = !isActive && resultLine != null;
+  const stateMsg = state === 'notWear' ? 'Please wear the device.' : state === 'error' ? 'Test error — try again.' : null;
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.testCardRow}>
+        <Text style={styles.testLabel}>{label}</Text>
+        <Pressable
+          style={({ pressed }) => [
+            styles.testBtn,
+            isActive ? styles.testBtnActive : disabled ? styles.testBtnDisabled : styles.testBtnIdle,
+            pressed && !disabled && styles.buttonPressed,
+          ]}
+          disabled={disabled || isActive}
+          onPress={onStart}
+          accessibilityRole="button"
+          accessibilityLabel={`Start ${label} test`}
+          accessibilityState={{ disabled: disabled || isActive }}
+        >
+          {isActive ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={[styles.testBtnText, disabled && styles.testBtnTextDisabled]}>
+              Start
+            </Text>
+          )}
+        </Pressable>
+      </View>
+
+      {showProgress && (
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progress ?? 0}%` }]} />
+        </View>
+      )}
+
+      {showResult && <Text style={styles.testResult}>{resultLine}</Text>}
+      {stateMsg && <Text style={styles.testStateMsg}>{stateMsg}</Text>}
+    </View>
+  );
+}
+
+// ─── Constants & Styles ───────────────────────────────────────────────────────
+
 const BLUE = '#208AEF';
 const RED = '#E53935';
+const GREEN = '#2E7D32';
 
 const styles = StyleSheet.create({
   centered: {
@@ -324,13 +500,8 @@ const styles = StyleSheet.create({
     gap: 16,
     paddingHorizontal: 32,
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  scrollContent: {
-    paddingBottom: 40,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  scrollContent: { paddingBottom: 40 },
   header: {
     paddingHorizontal: 24,
     paddingTop: 28,
@@ -342,31 +513,13 @@ const styles = StyleSheet.create({
     color: '#111',
     letterSpacing: -0.5,
   },
-  version: {
-    fontSize: 13,
-    color: '#999',
-    marginTop: 4,
-  },
-  scanControls: {
-    paddingHorizontal: 24,
-    gap: 12,
-    marginBottom: 16,
-  },
-  permissionHint: {
-    fontSize: 14,
-    color: '#E05C00',
-    lineHeight: 20,
-  },
-  statusText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-  },
-  disconnectedTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#111',
-  },
+  version: { fontSize: 13, color: '#999', marginTop: 4 },
+  sectionHeader: { paddingHorizontal: 24, paddingBottom: 8, paddingTop: 4 },
+  sectionTitle: { fontSize: 13, fontWeight: '700', color: '#888', textTransform: 'uppercase', letterSpacing: 0.6 },
+  scanControls: { paddingHorizontal: 24, gap: 12, marginBottom: 16 },
+  permissionHint: { fontSize: 14, color: '#E05C00', lineHeight: 20 },
+  statusText: { fontSize: 16, color: '#666', textAlign: 'center' },
+  disconnectedTitle: { fontSize: 22, fontWeight: '700', color: '#111' },
   button: {
     height: 52,
     borderRadius: 12,
@@ -379,29 +532,13 @@ const styles = StyleSheet.create({
   buttonStop: { backgroundColor: RED },
   buttonDisabled: { backgroundColor: '#E5E5E5' },
   buttonPressed: { opacity: 0.82 },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
+  buttonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
   buttonTextDisabled: { color: '#999' },
   spinnerInline: { marginRight: 4 },
-  disconnectBtn: {
-    marginHorizontal: 24,
-    marginTop: 8,
-  },
+  disconnectBtn: { marginHorizontal: 24, marginTop: 8 },
   list: { flex: 1 },
-  listContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    gap: 10,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-    marginTop: 24,
-  },
+  listContent: { paddingHorizontal: 24, paddingBottom: 32, gap: 10 },
+  emptyText: { fontSize: 14, color: '#999', textAlign: 'center', marginTop: 24 },
   deviceRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -411,31 +548,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 12,
   },
-  deviceInfo: {
-    flex: 1,
-    gap: 3,
-  },
-  deviceName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111',
-  },
-  deviceMeta: {
-    fontSize: 12,
-    color: '#888',
-  },
-  connectBtn: {
-    backgroundColor: BLUE,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-  },
+  deviceInfo: { flex: 1, gap: 3 },
+  deviceName: { fontSize: 15, fontWeight: '600', color: '#111' },
+  deviceMeta: { fontSize: 12, color: '#888' },
+  connectBtn: { backgroundColor: BLUE, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 14 },
   connectBtnPressed: { opacity: 0.8 },
-  connectBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#fff',
-  },
+  connectBtnText: { fontSize: 13, fontWeight: '600', color: '#fff' },
   card: {
     marginHorizontal: 24,
     marginBottom: 12,
@@ -444,24 +562,20 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 8,
   },
-  cardLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#888',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  syncRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  syncDone: {
-    fontSize: 15,
-    color: '#2E7D32',
-    fontWeight: '600',
-  },
-  syncPending: {
-    fontSize: 15,
-    color: '#666',
-  },
+  cardLabel: { fontSize: 12, fontWeight: '600', color: '#888', textTransform: 'uppercase', letterSpacing: 0.5 },
+  syncRow: { flexDirection: 'row', alignItems: 'center' },
+  syncDone: { fontSize: 15, color: GREEN, fontWeight: '600' },
+  syncPending: { fontSize: 15, color: '#666' },
+  testCardRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  testLabel: { fontSize: 15, fontWeight: '600', color: '#111' },
+  testBtn: { borderRadius: 8, paddingVertical: 7, paddingHorizontal: 16, minWidth: 64, alignItems: 'center' },
+  testBtnIdle: { backgroundColor: BLUE },
+  testBtnActive: { backgroundColor: '#999' },
+  testBtnDisabled: { backgroundColor: '#E5E5E5' },
+  testBtnText: { fontSize: 13, fontWeight: '600', color: '#fff' },
+  testBtnTextDisabled: { color: '#bbb' },
+  progressTrack: { height: 6, borderRadius: 3, backgroundColor: '#DDE8F5', overflow: 'hidden' },
+  progressFill: { height: 6, backgroundColor: BLUE, borderRadius: 3 },
+  testResult: { fontSize: 20, fontWeight: '700', color: '#111' },
+  testStateMsg: { fontSize: 13, color: '#E05C00' },
 });
