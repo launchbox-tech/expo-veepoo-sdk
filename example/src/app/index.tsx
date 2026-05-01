@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Linking,
   Pressable,
   ScrollView,
   StatusBar,
@@ -556,11 +557,25 @@ export default function Index() {
       </View>
 
       <View style={styles.scanControls}>
-        {!permissionsGranted && (
+        {!permissionsGranted && permissions?.canAskAgain === false ? (
+          <>
+            <Text style={styles.permissionHint}>
+              Bluetooth access was permanently denied. Open Settings to grant permission.
+            </Text>
+            <Pressable
+              style={({ pressed }) => [styles.button, styles.buttonPrimary, pressed && styles.buttonPressed]}
+              onPress={() => Linking.openSettings()}
+              accessibilityRole="button"
+              accessibilityLabel="Open app settings to grant Bluetooth permission"
+            >
+              <Text style={styles.buttonText}>Open Settings</Text>
+            </Pressable>
+          </>
+        ) : !permissionsGranted ? (
           <Text style={styles.permissionHint}>
             Bluetooth permission is required to scan for devices.
           </Text>
-        )}
+        ) : null}
 
         {appState === 'scanning' ? (
           <Pressable
