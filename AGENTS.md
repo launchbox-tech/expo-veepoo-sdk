@@ -36,6 +36,10 @@ _Avoid_: bonding, linking
 - A minimal example app lives under `example/` in the repo for testing scan → connect → read data in isolation.
 - Distribution: private, GitHub-only. Installed via `npm install github:launchbox-tech/expo-veepoo-sdk`. Not published to npm.
 
+## Workflow
+
+- After each GitHub issue is implemented, commit only that issue's diff with `Fixes #N` in the commit message body, then push immediately before starting the next issue.
+
 ## Flagged ambiguities
 
 _(none yet)_
