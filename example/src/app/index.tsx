@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useReducer } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,319 +11,34 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import sdk from 'expo-veepoo-sdk';
-import type {
-  BatteryInfo,
-  BloodOxygenTestResult,
-  BloodPressureTestResult,
-  ConnectionStatus,
-  DeviceVersion,
-  HeartRateTestResult,
-  PermissionsResult,
-  PersonalInfo,
-  ReadOriginProgress,
-  SleepData,
-  SportStepData,
-  VeepooDevice,
-} from 'expo-veepoo-sdk';
+import type { VeepooDevice } from 'expo-veepoo-sdk';
+import { appStateReducer } from '../hooks/appStateReducer';
+import { useSDKInit } from '../hooks/useSDKInit';
+import { useBandScan } from '../hooks/useBandScan';
+import { useBandSession } from '../hooks/useBandSession';
+import { useHealthTests } from '../hooks/useHealthTests';
+import { useDataSync } from '../hooks/useDataSync';
+export type { AppState } from '../hooks/appStateReducer';
 
-// State machine: idle → scanning → connecting → ready → disconnected
-export type AppState =
-  | 'initializing'
-  | 'idle'
-  | 'scanning'
-  | 'connecting'
-  | 'ready'
-  | 'disconnected';
-
-const DEFAULT_PERSONAL_INFO: PersonalInfo = {
-  sex: 1,
-  height: 175,
-  weight: 70,
-  age: 30,
-  stepAim: 8000,
-  sleepAim: 480,
-};
 
 export default function Index() {
-  const [appState, setAppState] = useState<AppState>('initializing');
-  const [permissions, setPermissions] = useState<PermissionsResult | null>(null);
-  const [devices, setDevices] = useState<VeepooDevice[]>([]);
-  const [connectingDevice, setConnectingDevice] = useState<VeepooDevice | null>(null);
-  const [connectedDevice, setConnectedDevice] = useState<VeepooDevice | null>(null);
-  const [connectError, setConnectError] = useState<string | null>(null);
-  const [syncDone, setSyncDone] = useState(false);
+  const [appState, dispatch] = useReducer(appStateReducer, 'initializing');
+  const { permissions } = useSDKInit(dispatch);
+  const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
+  const {
+    connectedDevice,
+    connectingDevice,
+    connectError,
+    syncDone,
+    batteryInfo,
+    deviceVersion,
+    connect,
+    disconnect,
+    reconnect,
+  } = useBandSession(appState, dispatch, stopScan);
 
-  // Health tests
-  const [hrResult, setHrResult] = useState<HeartRateTestResult | null>(null);
-  const [bpResult, setBpResult] = useState<BloodPressureTestResult | null>(null);
-  const [spo2Result, setSpo2Result] = useState<BloodOxygenTestResult | null>(null);
-  const [activeTest, setActiveTest] = useState<'hr' | 'bp' | 'spo2' | null>(null);
-
-  // Device info (#10)
-  const [batteryInfo, setBatteryInfo] = useState<BatteryInfo | null>(null);
-  const [deviceVersion, setDeviceVersion] = useState<DeviceVersion | null>(null);
-
-  // Historical data sync (#9)
-  const [dataSyncing, setDataSyncing] = useState(false);
-  const [dataSyncProgress, setDataSyncProgress] = useState<ReadOriginProgress | null>(null);
-  const [sleepSummary, setSleepSummary] = useState<SleepData['summary'] | null>(null);
-  const [stepData, setStepData] = useState<SportStepData | null>(null);
-
-  // ─── SDK init ────────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    let cancelled = false;
-    async function setup() {
-      await sdk.init();
-      const result = await sdk.requestPermissions();
-      if (!cancelled) {
-        setPermissions(result);
-        setAppState('idle');
-      }
-    }
-    setup();
-    return () => { cancelled = true; };
-  }, []);
-
-  // ─── Scan ────────────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    if (appState !== 'scanning') return;
-
-    function onDeviceFound({ device }: { device: VeepooDevice; timestamp: number }) {
-      setDevices(prev => {
-        const idx = prev.findIndex(d => d.id === device.id);
-        if (idx !== -1) {
-          const next = [...prev];
-          next[idx] = device;
-          return next;
-        }
-        return [...prev, device];
-      });
-    }
-
-    sdk.on('deviceFound', onDeviceFound);
-    return () => { sdk.off('deviceFound', onDeviceFound); };
-  }, [appState]);
-
-  // ─── Connection lifecycle ────────────────────────────────────────────────────
-
-  useEffect(() => {
-    if (appState !== 'connecting' && appState !== 'ready') return;
-
-    async function onDeviceReady() {
-      setSyncDone(false);
-      setBatteryInfo(null);
-      setDeviceVersion(null);
-      setDataSyncing(false);
-      setDataSyncProgress(null);
-      setSleepSummary(null);
-      setStepData(null);
-      setAppState('ready');
-
-      // Run personal info sync and device info reads concurrently
-      const [, battery, version] = await Promise.allSettled([
-        sdk.syncPersonalInfo(DEFAULT_PERSONAL_INFO),
-        sdk.readBattery(),
-        sdk.readDeviceVersion(),
-      ]);
-
-      setSyncDone(true);
-      if (battery.status === 'fulfilled') setBatteryInfo(battery.value);
-      if (version.status === 'fulfilled') setDeviceVersion(version.value);
-    }
-
-    function onDeviceDisconnected() {
-      setConnectedDevice(null);
-      setSyncDone(false);
-      setActiveTest(null);
-      setHrResult(null);
-      setBpResult(null);
-      setSpo2Result(null);
-      setBatteryInfo(null);
-      setDeviceVersion(null);
-      setDataSyncing(false);
-      setDataSyncProgress(null);
-      setConnectError(null);
-      setAppState('disconnected');
-    }
-
-    function onConnectStatus({ status, code }: { deviceId: string; status: ConnectionStatus; code?: number }) {
-      if (status === 'error') {
-        setConnectError(
-          code != null
-            ? `Connection failed (code ${code}). Is the device nearby?`
-            : 'Connection failed. Make sure the device is nearby and try again.'
-        );
-        setConnectingDevice(null);
-        setConnectedDevice(null);
-        setAppState('disconnected');
-      }
-    }
-
-    sdk.on('deviceReady', onDeviceReady);
-    sdk.on('deviceDisconnected', onDeviceDisconnected);
-    sdk.on('deviceConnectStatus', onConnectStatus);
-    return () => {
-      sdk.off('deviceReady', onDeviceReady);
-      sdk.off('deviceDisconnected', onDeviceDisconnected);
-      sdk.off('deviceConnectStatus', onConnectStatus);
-    };
-  }, [appState]);
-
-  // ─── Health test listeners (ready state only) ─────────────────────────────
-
-  useEffect(() => {
-    if (appState !== 'ready') return;
-
-    function onHR({ result }: { deviceId: string; result: HeartRateTestResult }) {
-      setHrResult(result);
-      if (result.state === 'over' || result.state === 'error' || result.state === 'notWear') {
-        setActiveTest(prev => (prev === 'hr' ? null : prev));
-      }
-    }
-    function onBP({ result }: { deviceId: string; result: BloodPressureTestResult }) {
-      setBpResult(result);
-      if (result.state === 'over' || result.state === 'error' || result.state === 'notWear') {
-        setActiveTest(prev => (prev === 'bp' ? null : prev));
-      }
-    }
-    function onSpo2({ result }: { deviceId: string; result: BloodOxygenTestResult }) {
-      setSpo2Result(result);
-      if (result.state === 'over' || result.state === 'error' || result.state === 'notWear') {
-        setActiveTest(prev => (prev === 'spo2' ? null : prev));
-      }
-    }
-
-    sdk.on('heartRateTestResult', onHR);
-    sdk.on('bloodPressureTestResult', onBP);
-    sdk.on('bloodOxygenTestResult', onSpo2);
-    return () => {
-      sdk.off('heartRateTestResult', onHR);
-      sdk.off('bloodPressureTestResult', onBP);
-      sdk.off('bloodOxygenTestResult', onSpo2);
-    };
-  }, [appState]);
-
-  // ─── Data sync listeners (ready state only) ──────────────────────────────
-
-  useEffect(() => {
-    if (appState !== 'ready') return;
-
-    function onSyncProgress({ progress }: { deviceId: string; progress: ReadOriginProgress }) {
-      setDataSyncProgress(progress);
-    }
-    function onSyncComplete() {
-      setDataSyncing(false);
-    }
-    function onSleepData({ data }: { deviceId: string; date: string; data: SleepData }) {
-      setSleepSummary(data.summary);
-    }
-    function onStepData({ data }: { deviceId: string; date: string; data: SportStepData }) {
-      setStepData(data);
-    }
-    function onBatteryData({ data }: { deviceId: string; data: BatteryInfo }) {
-      setBatteryInfo(data);
-    }
-
-    sdk.on('readOriginProgress', onSyncProgress);
-    sdk.on('readOriginComplete', onSyncComplete);
-    sdk.on('sleepData', onSleepData);
-    sdk.on('sportStepData', onStepData);
-    sdk.on('batteryData', onBatteryData);
-    return () => {
-      sdk.off('readOriginProgress', onSyncProgress);
-      sdk.off('readOriginComplete', onSyncComplete);
-      sdk.off('sleepData', onSleepData);
-      sdk.off('sportStepData', onStepData);
-      sdk.off('batteryData', onBatteryData);
-    };
-  }, [appState]);
-
-  // ─── Handlers ─────────────────────────────────────────────────────────────
-
-  const handleStartScan = useCallback(async () => {
-    setDevices([]);
-    setAppState('scanning');
-    await sdk.startScan();
-  }, []);
-
-  const handleStopScan = useCallback(async () => {
-    await sdk.stopScan();
-    setAppState('idle');
-  }, []);
-
-  const handleConnect = useCallback(async (device: VeepooDevice) => {
-    await sdk.stopScan();
-    setConnectingDevice(device);
-    setConnectedDevice(device);
-    setAppState('connecting');
-    await sdk.connect(device.id);
-  }, []);
-
-  const handleDisconnect = useCallback(async () => {
-    await sdk.disconnect();
-    setConnectedDevice(null);
-    setSyncDone(false);
-    setActiveTest(null);
-    setHrResult(null);
-    setBpResult(null);
-    setSpo2Result(null);
-    setBatteryInfo(null);
-    setDeviceVersion(null);
-    setDataSyncing(false);
-    setDataSyncProgress(null);
-    setConnectError(null);
-    setAppState('idle');
-  }, []);
-
-  const handleReconnect = useCallback(async () => {
-    setConnectingDevice(null);
-    setConnectError(null);
-    await handleStartScan();
-  }, [handleStartScan]);
-
-  const handleStartHR = useCallback(async () => {
-    setHrResult(null);
-    setActiveTest('hr');
-    await sdk.startHeartRateTest();
-  }, []);
-
-  const handleStartBP = useCallback(async () => {
-    setBpResult(null);
-    setActiveTest('bp');
-    await sdk.startBloodPressureTest();
-  }, []);
-
-  const handleStartSpo2 = useCallback(async () => {
-    setSpo2Result(null);
-    setActiveTest('spo2');
-    await sdk.startBloodOxygenTest();
-  }, []);
-
-  const handleStopHR = useCallback(async () => {
-    await sdk.stopHeartRateTest();
-    setActiveTest(null);
-  }, []);
-
-  const handleStopBP = useCallback(async () => {
-    await sdk.stopBloodPressureTest();
-    setActiveTest(null);
-  }, []);
-
-  const handleStopSpo2 = useCallback(async () => {
-    await sdk.stopBloodOxygenTest();
-    setActiveTest(null);
-  }, []);
-
-  const handleSyncData = useCallback(async () => {
-    setDataSyncing(true);
-    setDataSyncProgress(null);
-    setSleepSummary(null);
-    setStepData(null);
-    await sdk.startReadOriginData();
-  }, []);
+  const { hrResult, bpResult, spo2Result, activeTest, startHR, stopHR, startBP, stopBP, startSpo2, stopSpo2 } = useHealthTests(appState);
+  const { dataSyncing, dataSyncProgress, sleepSummary, stepData, syncData } = useDataSync(appState);
 
   const permissionsGranted = permissions?.granted ?? false;
 
@@ -366,7 +81,7 @@ export default function Index() {
         </Text>
         <Pressable
           style={({ pressed }) => [styles.button, styles.buttonPrimary, pressed && styles.buttonPressed]}
-          onPress={handleReconnect}
+          onPress={reconnect}
           accessibilityRole="button"
         >
           <Text style={styles.buttonText}>
@@ -438,8 +153,8 @@ export default function Index() {
             progress={hrResult?.progress}
             state={hrResult?.state}
             resultLine={hrResult?.value != null ? `${hrResult.value} bpm` : null}
-            onStart={handleStartHR}
-            onStop={handleStopHR}
+            onStart={startHR}
+            onStop={stopHR}
           />
           <HealthTestCard
             label="Blood Pressure"
@@ -453,8 +168,8 @@ export default function Index() {
                 ? `${bpResult.systolic}/${bpResult.diastolic} mmHg · ${bpResult.pulse} bpm`
                 : null
             }
-            onStart={handleStartBP}
-            onStop={handleStopBP}
+            onStart={startBP}
+            onStop={stopBP}
           />
           <HealthTestCard
             label="Blood Oxygen (SpO₂)"
@@ -464,8 +179,8 @@ export default function Index() {
             progress={spo2Result?.progress}
             state={spo2Result?.state}
             resultLine={spo2Result?.value != null ? `${spo2Result.value}% SpO₂` : null}
-            onStart={handleStartSpo2}
-            onStop={handleStopSpo2}
+            onStart={startSpo2}
+            onStop={stopSpo2}
           />
 
           {/* ── Historical Data Sync (#9) ── */}
@@ -483,7 +198,7 @@ export default function Index() {
                   pressed && !dataSyncing && styles.buttonPressed,
                 ]}
                 disabled={dataSyncing}
-                onPress={handleSyncData}
+                onPress={syncData}
                 accessibilityRole="button"
                 accessibilityLabel="Sync historical data from device"
                 accessibilityState={{ disabled: dataSyncing }}
@@ -533,7 +248,7 @@ export default function Index() {
           {/* ── Disconnect ── */}
           <Pressable
             style={({ pressed }) => [styles.button, styles.buttonStop, pressed && styles.buttonPressed, styles.disconnectBtn]}
-            onPress={handleDisconnect}
+            onPress={disconnect}
             accessibilityRole="button"
             accessibilityLabel="Disconnect from device"
           >
@@ -580,7 +295,7 @@ export default function Index() {
         {appState === 'scanning' ? (
           <Pressable
             style={({ pressed }) => [styles.button, styles.buttonStop, pressed && styles.buttonPressed]}
-            onPress={handleStopScan}
+            onPress={stopScan}
             accessibilityRole="button"
           >
             <ActivityIndicator size="small" color="#fff" style={styles.spinnerInline} />
@@ -594,7 +309,7 @@ export default function Index() {
               pressed && permissionsGranted && styles.buttonPressed,
             ]}
             disabled={!permissionsGranted}
-            onPress={handleStartScan}
+            onPress={startScan}
             accessibilityRole="button"
             accessibilityState={{ disabled: !permissionsGranted }}
           >
@@ -615,7 +330,7 @@ export default function Index() {
             <Text style={styles.emptyText}>Scanning for nearby HBand devices…</Text>
           }
           renderItem={({ item }) => (
-            <DeviceRow device={item} onConnect={() => handleConnect(item)} />
+            <DeviceRow device={item} onConnect={() => connect(item)} />
           )}
         />
       )}
