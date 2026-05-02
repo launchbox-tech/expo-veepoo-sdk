@@ -8,7 +8,7 @@
 
 ## What to build
 
-**HITL**: Refresh **`docs/VeepooSDK Android Api.md`** and **`docs/VeepooSDK iOS Api.md`** against the living vendor wikis ([Android EN](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document), [iOS EN](https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document)): incorporate changelog rows / sections newer than the current snapshot tables.
+**HITL**: Refresh **`docs/veepoo-sdk-android-api.md`** and **`docs/veepoo-sdk-ios-api.md`** against the living vendor wikis ([Android EN](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document), [iOS EN](https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document)): incorporate changelog rows / sections newer than the current snapshot tables.
 
 ## Acceptance criteria
 

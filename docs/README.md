@@ -8,8 +8,8 @@ The `docs/` folder holds:
 
 ## Vendor SDK (offline snapshots)
 
-- `VeepooSDK Android Api.md`
-- `VeepooSDK iOS Api.md`
+- `veepoo-sdk-android-api.md`
+- `veepoo-sdk-ios-api.md`
 
 Each snapshot begins with a box linking the live wiki and drift checks; API coverage versus this bridge is in **`vendor-parity-matrix.md`**; policy is in **`adr/0002-vendor-upstream-tracking.md`**.
 

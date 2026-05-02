@@ -121,7 +121,7 @@ Tests:              src/__tests__/validators/ + normalizers.test.ts
 
 ## §7. Feature backlog — PRD queue (grill with docs before each, do not implement yet)
 
-Run `/grill-with-docs` against `docs/VeepooSDK Android Api.md` + `docs/VeepooSDK iOS Api.md` for each.
+Run `/grill-with-docs` against `docs/veepoo-sdk-android-api.md` + `docs/veepoo-sdk-ios-api.md` for each.
 
 ### Group A — Device control (high: stubs/flags already exist)
 - [ ] **Alarms read/write** — `DeviceAlarm` type exists; `alarm` flag in `DeviceFunctionPackage1`; Android: `settingAlarm`/`readAlarm`; iOS: `VPAlarmSetting`

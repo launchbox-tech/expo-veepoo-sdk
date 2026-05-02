@@ -2,7 +2,7 @@
 
 Canonical inventory of **vendor Veepoo/HBand capability areas** versus **`VeepooSDK` JavaScript API** in this package. Use this before assuming a wiki-only API exists on the bridge.
 
-**Upstream docs:** [Android wiki](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document) · [iOS wiki](https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document) · Offline snapshots: [`VeepooSDK Android Api.md`](VeepooSDK%20Android%20Api.md), [`VeepooSDK iOS Api.md`](VeepooSDK%20iOS%20Api.md).
+**Upstream docs:** [Android wiki](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document) · [iOS wiki](https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document) · Offline snapshots: [`veepoo-sdk-android-api.md`](veepoo-sdk-android-api.md), [`veepoo-sdk-ios-api.md`](veepoo-sdk-ios-api.md).
 
 **Vendored binaries & drift checks:** [`vendor-manifest.json`](../vendor-manifest.json) · `npm run vendor:check`.
 

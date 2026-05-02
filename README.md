@@ -382,8 +382,8 @@ npm publish
 
 Vendor SDK snapshots checked into this repo:
 
-- `docs/VeepooSDK Android Api.md`
-- `docs/VeepooSDK iOS Api.md`
+- `docs/veepoo-sdk-android-api.md`
+- `docs/veepoo-sdk-ios-api.md`
 
 ## License
 
