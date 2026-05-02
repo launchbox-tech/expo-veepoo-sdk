@@ -1,7 +1,7 @@
 # 103 — feat(settings): Women's health — bridge stub (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/103
-> Status: open | Labels: (sync with GitHub after merge)
+> Status: open | Labels: ready-for-human (verify on Band after merge)
 
 ## Parent
 

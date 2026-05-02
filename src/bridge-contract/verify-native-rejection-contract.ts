@@ -18,12 +18,12 @@ export interface NativeRejectionMappingJson {
 }
 
 export function loadNativeRejectionContract(repoRoot: string): NativeRejectionMappingJson {
-  const p = join(repoRoot, "bridge-contract", "native-rejection-codes.json");
+  const p = join(repoRoot, "src", "bridge-contract", "native-rejection-codes.json");
   const data = JSON.parse(
     readFileSync(p, "utf8"),
   ) as NativeRejectionMappingJson;
   if (!Array.isArray(data.allowedNativeRejectCodes) || !data.mapping) {
-    throw new Error("bridge-contract/native-rejection-codes.json: invalid shape");
+    throw new Error("src/bridge-contract/native-rejection-codes.json: invalid shape");
   }
   return data;
 }
@@ -47,7 +47,7 @@ export function verifyNativeRejectionContract(repoRoot: string): string[] {
   for (const c of extracted) {
     if (!allowed.has(c)) {
       errors.push(
-        `Native sources emit "${c}" but it is not in allowedNativeRejectCodes — add to bridge-contract/native-rejection-codes.json`,
+        `Native sources emit "${c}" but it is not in allowedNativeRejectCodes — add to src/bridge-contract/native-rejection-codes.json`,
       );
     }
   }

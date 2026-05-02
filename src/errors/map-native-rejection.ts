@@ -1,7 +1,5 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
 import type { NativeRejectionMappingJson } from "../bridge-contract/verify-native-rejection-contract.js";
+import mappingDocument from "../bridge-contract/native-rejection-codes.json";
 import type { VeepooError, VeepooErrorCode } from "../types/errors.js";
 
 const VEEPOO_CODES: readonly VeepooErrorCode[] = [
@@ -66,17 +64,7 @@ function extractNativeParts(error: unknown): { code?: string; message: string } 
 let mappingCache: NativeRejectionMappingJson["mapping"] | null = null;
 function getMapping(): NativeRejectionMappingJson["mapping"] {
   if (!mappingCache) {
-    const p = join(
-      __dirname,
-      "..",
-      "..",
-      "bridge-contract",
-      "native-rejection-codes.json",
-    );
-    const full = JSON.parse(
-      readFileSync(p, "utf8"),
-    ) as NativeRejectionMappingJson;
-    mappingCache = full.mapping;
+    mappingCache = (mappingDocument as NativeRejectionMappingJson).mapping;
   }
   return mappingCache;
 }
@@ -105,7 +93,7 @@ function getCollapseInvalidArgumentSet(): Set<string> {
   return collapseInvCache;
 }
 
-/** Mapping rules loaded from bridge-contract/native-rejection-codes.json (ADR 0003). */
+/** Mapping rules from bundled src/bridge-contract/native-rejection-codes.json (ADR 0003). */
 function mapKnownNativeCode(normalizedNative: string): {
   code: VeepooErrorCode;
   nativeCode?: string;

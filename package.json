@@ -7,7 +7,7 @@
   "scripts": {
     "prepare": "expo-module prepublishOnly",
     "prepublishOnly": "expo-module prepublishOnly",
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-native-rejection-json.cjs",
     "build:watch": "tsc --watch",
     "clean": "expo-module clean",
     "test": "expo-module test",

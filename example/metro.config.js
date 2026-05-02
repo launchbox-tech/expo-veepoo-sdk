@@ -3,13 +3,13 @@
 //
 // `file:..` symlinks the whole repo under node_modules; watching the entire parent tree
 // pulls in `…/expo-veepoo-sdk/example/node_modules/…` recursively (Watchman "File name too long").
-// We resolve the module to `../src` and only watch library roots we need.
+// We resolve the module to compiled `../build` and only watch library roots we need.
 const path = require("path");
 const { getDefaultConfig } = require("expo/metro-config");
 
 const projectRoot = __dirname;
 const libraryRoot = path.resolve(projectRoot, "..");
-const librarySourceEntry = path.join(libraryRoot, "src/index.ts");
+const libraryBuildEntry = path.join(libraryRoot, "build/index.js");
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(projectRoot);
@@ -28,7 +28,7 @@ if (config.resolver.unstable_enableSymlinks != null) {
 const upstreamResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform, ...rest) => {
   if (moduleName === "expo-veepoo-sdk") {
-    return { type: "sourceFile", filePath: librarySourceEntry };
+    return { type: "sourceFile", filePath: libraryBuildEntry };
   }
   if (typeof upstreamResolveRequest === "function") {
     return upstreamResolveRequest(context, moduleName, platform, ...rest);
