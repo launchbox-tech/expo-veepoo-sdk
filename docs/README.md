@@ -24,6 +24,7 @@ Each snapshot begins with a box linking the live wiki and drift checks; API cove
 - `release-notes/1.2.5.md`
 - `release-notes/1.2.6.md`
 - `release-notes/1.2.7.md`
+- `release-notes/1.2.8.md`
 
 For integration guidance, start with the root **`README.md`**.
 

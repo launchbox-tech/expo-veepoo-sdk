@@ -1,7 +1,7 @@
 # 72 — docs(example): vitals lab, parity matrix, release notes (#66 modalities)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/72
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 
@@ -13,11 +13,11 @@ After **HRV, ECG, fatigue, and breathing** bridges exist: update **`docs/vendor-
 
 ## Acceptance criteria
 
-- [ ] Parity matrix reflects all four modalities + mutex/error behavior as shipped; backlog bullets removed or narrowed per truth.
-- [ ] Release notes entry describes new APIs and upgrade notes.
-- [ ] Example app can trigger each new test and observe results/errors (minimal UI acceptable).
-- [ ] Where **#67–#71** PRs documented **research notes**, link or summarize non-obvious behavior in the matrix **Further notes** and/or release notes so consumers inherit the same traceability.
-- [ ] CI / example build green.
+- [x] Parity matrix reflects all four modalities + mutex/error behavior as shipped; backlog bullets removed or narrowed per truth.
+- [x] Release notes entry describes new APIs and upgrade notes.
+- [x] Example app can trigger each new test and observe results/errors (minimal UI acceptable).
+- [x] Where **#67–#71** PRs documented **research notes**, link or summarize non-obvious behavior in the matrix **Further notes** and/or release notes so consumers inherit the same traceability.
+- [x] CI / example build green.
 
 ## Blocked by
 
@@ -25,3 +25,9 @@ After **HRV, ECG, fatigue, and breathing** bridges exist: update **`docs/vendor-
 - #69
 - #70
 - #71
+
+## Delivery notes
+
+- Matrix: new rows for HRV / ECG / fatigue / breathing; **Further notes** subsection for mutex (`REALTIME_TEST_IN_PROGRESS`), iOS HRV / Android breathing `CAPABILITY_UNSUPPORTED`, ECG waveform opt-in; backlog line for vitals removed.
+- Release: [`docs/release-notes/1.2.8.md`](../release-notes/1.2.8.md); package version **1.2.8**.
+- Example: **Vitals lab** section in `example/src/app/index.tsx` with start/stop, ECG waveform switch, scrollable event log; hook `useHealthTests` subscribes to vitals events and logs `error`.

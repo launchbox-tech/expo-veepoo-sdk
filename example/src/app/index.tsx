@@ -3,10 +3,12 @@ import {
   ActivityIndicator,
   FlatList,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from "react-native";
@@ -44,13 +46,37 @@ export default function Index() {
   const hrResult = appState === "ready" ? healthTests.hrResult : null;
   const bpResult = appState === "ready" ? healthTests.bpResult : null;
   const spo2Result = appState === "ready" ? healthTests.spo2Result : null;
+  const hrvResult = appState === "ready" ? healthTests.hrvResult : null;
+  const ecgResult = appState === "ready" ? healthTests.ecgResult : null;
+  const fatigueResult = appState === "ready" ? healthTests.fatigueResult : null;
+  const breathingResult = appState === "ready" ? healthTests.breathingResult : null;
   const activeTest = appState === "ready" ? healthTests.activeTest : null;
+  const ecgIncludeWaveform =
+    appState === "ready" ? healthTests.ecgIncludeWaveform : false;
+  const labLog = appState === "ready" ? healthTests.labLog : [];
   const dataSyncing = appState === "ready" ? dataSync.dataSyncing : false;
   const dataSyncProgress =
     appState === "ready" ? dataSync.dataSyncProgress : null;
   const sleepSummary = appState === "ready" ? dataSync.sleepSummary : null;
   const stepData = appState === "ready" ? dataSync.stepData : null;
-  const { startHR, stopHR, startBP, stopBP, startSpo2, stopSpo2 } = healthTests;
+  const {
+    startHR,
+    stopHR,
+    startBP,
+    stopBP,
+    startSpo2,
+    stopSpo2,
+    startHrv,
+    stopHrv,
+    startEcg,
+    stopEcg,
+    startFatigue,
+    stopFatigue,
+    startBreathing,
+    stopBreathing,
+    setEcgIncludeWaveform,
+    clearLabLog,
+  } = healthTests;
   const { syncData } = dataSync;
 
   const permissionsGranted = permissions?.granted ?? false;
@@ -210,6 +236,125 @@ export default function Index() {
             onStop={stopSpo2}
           />
 
+          {/* ── Vitals lab (#66 / #72): HRV, ECG, fatigue, breathing ── */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Vitals lab</Text>
+          </View>
+
+          <HealthTestCard
+            label="HRV (manual)"
+            isActive={activeTest === "hrv"}
+            disabled={activeTest !== null && activeTest !== "hrv"}
+            progress={hrvResult?.progress}
+            state={typeof hrvResult?.state === "string" ? hrvResult.state : undefined}
+            resultLine={
+              hrvResult?.value != null ? `${hrvResult.value}` : null
+            }
+            onStart={startHrv}
+            onStop={stopHrv}
+          />
+          <HealthTestCard
+            label="ECG"
+            isActive={activeTest === "ecg"}
+            disabled={activeTest !== null && activeTest !== "ecg"}
+            progress={ecgResult?.progress}
+            state={typeof ecgResult?.state === "string" ? ecgResult.state : undefined}
+            resultLine={
+              ecgResult?.heartRate != null
+                ? `HR ${ecgResult.heartRate}${
+                    ecgResult.hrv != null ? ` · HRV ${ecgResult.hrv}` : ""
+                  }${
+                    ecgResult.waveform?.length
+                      ? ` · ${ecgResult.waveform.length} waveform samples`
+                      : ""
+                  }`
+                : null
+            }
+            footer={
+              <View style={styles.ecgWaveformRow}>
+                <Text style={styles.ecgWaveformLabel}>Include waveform</Text>
+                <Switch
+                  value={ecgIncludeWaveform}
+                  onValueChange={setEcgIncludeWaveform}
+                  disabled={activeTest === "ecg"}
+                />
+              </View>
+            }
+            onStart={startEcg}
+            onStop={stopEcg}
+          />
+          <HealthTestCard
+            label="Fatigue"
+            isActive={activeTest === "fatigue"}
+            disabled={activeTest !== null && activeTest !== "fatigue"}
+            progress={fatigueResult?.progress}
+            state={
+              typeof fatigueResult?.state === "string"
+                ? fatigueResult.state
+                : undefined
+            }
+            resultLine={
+              fatigueResult?.level != null
+                ? `Level ${fatigueResult.level}`
+                : null
+            }
+            onStart={startFatigue}
+            onStop={stopFatigue}
+          />
+          <HealthTestCard
+            label="Breathing rate"
+            isActive={activeTest === "breathing"}
+            disabled={activeTest !== null && activeTest !== "breathing"}
+            progress={breathingResult?.progress}
+            state={
+              typeof breathingResult?.state === "string"
+                ? breathingResult.state
+                : undefined
+            }
+            resultLine={
+              breathingResult?.rate != null
+                ? `${breathingResult.rate} bpm`
+                : null
+            }
+            onStart={startBreathing}
+            onStop={stopBreathing}
+          />
+
+          <View style={styles.card}>
+            <View style={styles.labLogHeader}>
+              <Text style={styles.cardLabel}>Event log</Text>
+              <Pressable
+                onPress={clearLabLog}
+                accessibilityRole="button"
+                accessibilityLabel="Clear event log"
+              >
+                <Text style={styles.labLogClear}>Clear</Text>
+              </Pressable>
+            </View>
+            <ScrollView
+              style={styles.labLogScroll}
+              nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
+            >
+              {labLog.length === 0 ? (
+                <Text style={styles.labLogEmpty}>
+                  Vitals events, errors from start/stop, and `error` events appear
+                  here (mutex: one realtime test at a time).
+                </Text>
+              ) : (
+                labLog.map((line, i) => (
+                  <Text
+                    key={`log-${i}`}
+                    style={styles.labLogLine}
+                    selectable
+                  >
+                    {line}
+                  </Text>
+                ))
+              )}
+            </ScrollView>
+          </View>
+
           {/* ── Historical Data Sync (#9) ── */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Historical Data</Text>
@@ -308,7 +453,7 @@ export default function Index() {
 
       <View style={styles.header}>
         <Text style={styles.title}>HBand Connect</Text>
-        <Text style={styles.version}>expo-veepoo-sdk v1.2.7</Text>
+        <Text style={styles.version}>expo-veepoo-sdk v1.2.8</Text>
       </View>
 
       <View style={styles.scanControls}>
@@ -513,4 +658,29 @@ const styles = StyleSheet.create({
   },
   dataSummaryValue: { fontSize: 22, fontWeight: "700", color: "#111" },
   dataSummaryMeta: { fontSize: 12, color: "#888" },
+  ecgWaveformRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: "#E5EDF7",
+  },
+  ecgWaveformLabel: { fontSize: 13, color: "#555" },
+  labLogHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  labLogClear: { fontSize: 13, fontWeight: "600", color: BLUE },
+  labLogScroll: { maxHeight: 200 },
+  labLogEmpty: { fontSize: 12, color: "#888", lineHeight: 18 },
+  labLogLine: {
+    fontSize: 11,
+    lineHeight: 16,
+    color: "#333",
+    fontFamily: Platform.select({ ios: "Menlo", default: "monospace" }),
+    marginBottom: 4,
+  },
 });

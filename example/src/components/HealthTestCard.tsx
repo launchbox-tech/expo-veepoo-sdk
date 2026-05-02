@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { BLUE, RED } from './theme';
 
@@ -8,6 +9,7 @@ export function HealthTestCard({
   progress,
   state,
   resultLine,
+  footer,
   onStart,
   onStop,
 }: {
@@ -17,8 +19,9 @@ export function HealthTestCard({
   progress?: number;
   state?: string;
   resultLine: string | null;
-  onStart: () => void;
-  onStop: () => void;
+  footer?: ReactNode;
+  onStart: () => void | Promise<void>;
+  onStop: () => void | Promise<void>;
 }) {
   const stateMsg =
     state === 'notWear'
@@ -69,6 +72,7 @@ export function HealthTestCard({
       )}
       {!isActive && resultLine && <Text style={styles.testResult}>{resultLine}</Text>}
       {stateMsg && <Text style={styles.testStateMsg}>{stateMsg}</Text>}
+      {footer}
     </View>
   );
 }
