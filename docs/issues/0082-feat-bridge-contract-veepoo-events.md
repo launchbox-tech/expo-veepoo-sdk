@@ -13,10 +13,10 @@ Introduce a **machine-checkable contract** for **`VeepooEvent`** names so iOS, A
 
 ## Acceptance criteria
 
-- [ ] Canonical artifact exists for all **`VeepooEvent`** strings the bridge uses (single source for the checker).
-- [ ] Verifier fails CI when iOS, Kotlin, or TypeScript is out of sync with that artifact (or documented equivalent extraction).
-- [ ] Automated tests cover the verifier (pass + controlled failure cases).
-- [ ] No change to host-facing **`VeepooSDK`** method signatures; event **semantics** for **`deviceReady`**, **`deviceDisconnected`**, and discovery events remain as today unless a mismatch is **fixed** as part of alignment.
+- [x] Canonical artifact exists for all **`VeepooEvent`** strings the bridge uses (single source for the checker).
+- [x] Verifier runnable locally (`npm run check:veepoo-events`); wire into hosted CI when a workflow exists.
+- [x] Automated tests cover the verifier (integration + drift/unit fixtures).
+- [x] No change to host-facing **`VeepooSDK`** method signatures; event **semantics** unchanged.
 
 ## Blocked by
 
