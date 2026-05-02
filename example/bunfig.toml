@@ -1,0 +1,6 @@
+# Bun defaults use clonefile/copy from the global store; large local `file:..` packages
+# (this repo’s android/libs AARs, etc.) can hit ENOENT during that copy. Symlink backend
+# materializes node_modules without copying the parent package out of the cache.
+# https://bun.sh/docs/cli/install
+[install]
+backend = "symlink"

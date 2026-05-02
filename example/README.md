@@ -4,17 +4,16 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Local `expo-veepoo-sdk` (this monorepo)
 
-The example depends on the parent folder via `"expo-veepoo-sdk": "file:.."`. The **package name** in the parent `package.json` is `@gaozh1024/expo-veepoo-sdk`; Bun may show that scoped name during install even though imports use `expo-veepoo-sdk`. The parent package marks `expo` / `react` / `react-native` peers as **optional** in `peerDependenciesMeta` so `file:..` installs do not pull a second copy of those native modules under `node_modules/expo-veepoo-sdk/` (which breaks `expo-doctor`). Host apps must still depend on **Expo SDK**, **React**, and **React Native** as usual.
+The example depends on the parent folder via **`"expo-veepoo-sdk": "file:.."`**. The **package name** in the parent `package.json` is `@gaozh1024/expo-veepoo-sdk`; the dependency key stays `expo-veepoo-sdk` so imports are unchanged. **`example/bunfig.toml`** sets **`install.backend = "symlink"`** so Bun does not copy the local package out of its global store (that copy often fails with **`ENOENT`** on large trees such as `android/libs/*.aar`). The parent package marks `expo` / `react` / `react-native` peers as **optional** in `peerDependenciesMeta` so local installs do not pull a second copy of those native modules under `node_modules/expo-veepoo-sdk/` (which breaks `expo-doctor`). Host apps must still depend on **Expo SDK**, **React**, and **React Native** as usual.
 
-### Bun: `ENOENT: failed copying files from cache` (scoped / `file:` package)
+### Bun: `ENOENT: failed copying files from cache`
 
-1. From **`example/`**: `rm -rf node_modules`
-2. Clear Bun’s package cache: `bun pm cache rm`
-3. Install again: `bun install`
-4. If it still fails, regenerate the lockfile: `rm -f bun.lock` then `bun install`
-5. Fallback: `npm install` (uses the same `file:..` link without Bun’s cache copy path)
+1. Keep **`bunfig.toml`** in **`example/`** (symlink backend).
+2. `rm -rf node_modules && bun pm cache rm && bun install`
+3. One-off: `bun install --backend symlink` (same effect as bunfig).
+4. Fallback: `npm install` from **`example/`**.
 
-Work from a **local disk** path (avoid network volumes) so symlinks and large `android/libs/*.aar` trees resolve reliably.
+Work from a **local disk** path (avoid network volumes).
 
 ## Get started
 
