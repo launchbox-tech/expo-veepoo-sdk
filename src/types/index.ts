@@ -37,6 +37,9 @@ export type {
   ScreenLightDuration,
   SedentaryReminderSettings,
   WristFlipWakeSettings,
+  WatchFaceDialType,
+  WatchFaceStyle,
+  WatchFaceStyleSettings,
   DeviceData,
 } from './device.js';
 

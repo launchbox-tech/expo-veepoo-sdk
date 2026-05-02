@@ -71,6 +71,7 @@ class VeepooSDKModule : Module() {
     defineSedentary(this@VeepooSDKModule)
     defineWristFlipWake(this@VeepooSDKModule)
     defineFirmwareDfu(this@VeepooSDKModule)
+    defineWatchFaceStyle(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

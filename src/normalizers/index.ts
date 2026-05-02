@@ -13,6 +13,7 @@ export {
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
   normalizeWristFlipWakeSettings,
+  normalizeWatchFaceStyle,
   normalizeSocialMsgData,
   normalizeDeviceVersion,
 } from './device.js';

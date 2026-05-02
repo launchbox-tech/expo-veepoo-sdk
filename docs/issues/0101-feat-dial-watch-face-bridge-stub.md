@@ -1,7 +1,7 @@
 # 101 — feat(device): Dial / watch face management — bridge stub (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/101
-> Status: open | Labels: needs-triage
+> Status: open | Labels: ready-for-human (device verify)
 
 ## Parent
 
@@ -9,17 +9,19 @@
 
 ## What to build
 
-**Stub issue** — vertical slice to be detailed after triage (`docs/checklist.md` §7 Group C/D). Target capability area: **Dial / face management: transfer or select watch faces per vendor capability flags.**. Related `DeviceFunctions` / capability hints (from checklist): **screenStyleFunction, aiDial, videoDial**.
+**Dial / screen-style slice:** read and set the Band’s active **dial category** (`default` | `market` | `photo`) and **slot index** (`screenIndex`). Related `DeviceFunctions` hints: **`screenStyleFunction`**, **`aiDial`**, **`videoDial`**.
 
-End state: full tracer bullet per `docs/templates/feature-issue.md` — Kotlin + Swift + TypeScript public API + validators + normalizers + events (if any) + Jest tests + minimal safe `example/` demo (OTA exempt from real flash). **Session** eligibility and error mapping follow **CONTEXT.md** and **ADR 0003**. Host apps gate UI with **`readDeviceFunctions()`**.
+**Out of scope (not this issue):** marketplace sync, custom photo dial **file transfer**, video dial assets — vendor APIs exist (`JLWatchFaceManager`, etc.) but are not exposed on `VeepooSDK`.
+
+**Session** eligibility and error mapping follow **CONTEXT.md** and **ADR 0003**. Host apps gate UI with **`readDeviceFunctions()`** and native `isSupportScreenStyle` / capability checks (`CAPABILITY_UNSUPPORTED` when unsupported).
 
 ## Acceptance criteria
 
-- [ ] Stub replaced or supplemented with vendor research notes (wiki/SDK symbols, iOS vs Android entry points) in a PR or issue comment before merge of implementation PR.
-- [ ] Public JS API + native implementations (or documented **Partial** with `CAPABILITY_UNSUPPORTED` on the gap platform).
-- [ ] Types, validators, normalizers, and unit tests for new payloads / methods.
-- [ ] `docs/vendor-api/vendor-parity-matrix.md` updated for this capability row.
-- [ ] `npm run typecheck` (or project equivalent) and tests green.
+- [x] Vendor entry points: Android `readScreenStyle` / `settingScreenStyle` (`VpSpGetUtil.isSupportScreenStyle`); iOS `veepooSDKSettingDeviceScreenStyle` (`VPDeviceDialType`).
+- [x] Public JS API + Kotlin + Swift: `readWatchFaceStyle`, `setWatchFaceStyle`.
+- [x] Types, validators, normalizers, and unit tests.
+- [x] `docs/vendor-api/vendor-parity-matrix.md` updated.
+- [x] `npm run typecheck` and tests green (CI).
 
 ## Blocked by
 

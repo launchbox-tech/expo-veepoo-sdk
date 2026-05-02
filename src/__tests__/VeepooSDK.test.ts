@@ -52,6 +52,11 @@ const NATIVE_ASYNC_MOCK_RESOLVES: Partial<
     lowThreshold: 60,
   },
   setHeartRateAlarm: 'success',
+  readWatchFaceStyle: {
+    dialType: 'default',
+    screenIndex: 0,
+    operationSuccess: true,
+  },
 };
 
 function makeMockNative(): MockNative {
@@ -547,6 +552,38 @@ describe('VeepooSDK', () => {
         sdk.setHeartRateAlarm({ enabled: true, highThreshold: 80, lowThreshold: 100 }),
       ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
       expect(native.setHeartRateAlarm).not.toHaveBeenCalled();
+    });
+
+    it('readWatchFaceStyle passes null to native when dialType omitted', async () => {
+      native.readWatchFaceStyle.mockResolvedValueOnce({
+        dialType: 'default',
+        screenIndex: 3,
+        operationSuccess: true,
+      });
+      const r = await sdk.readWatchFaceStyle();
+      expect(native.readWatchFaceStyle).toHaveBeenCalledWith(null);
+      expect(r.dialType).toBe('default');
+      expect(r.screenIndex).toBe(3);
+    });
+
+    it('readWatchFaceStyle passes dialType when set', async () => {
+      native.readWatchFaceStyle.mockResolvedValueOnce({
+        dialType: 'market',
+        screenIndex: 0,
+        operationSuccess: true,
+      });
+      await sdk.readWatchFaceStyle({ dialType: 'market' });
+      expect(native.readWatchFaceStyle).toHaveBeenCalledWith({ dialType: 'market' });
+    });
+
+    it('setWatchFaceStyle sends default dialType when omitted', async () => {
+      await sdk.setWatchFaceStyle({ screenIndex: 2 });
+      expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 2, dialType: 'default' });
+    });
+
+    it('setWatchFaceStyle forwards explicit dialType', async () => {
+      await sdk.setWatchFaceStyle({ screenIndex: 1, dialType: 'photo' });
+      expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 1, dialType: 'photo' });
     });
   });
 

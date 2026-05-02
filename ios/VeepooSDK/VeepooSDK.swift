@@ -848,6 +848,14 @@ public class VeepooSDKModule: Module {
       self.handleStartLocalFirmwareDfu(filePath: filePath, promise: promise)
     }
 
+    AsyncFunction("readWatchFaceStyle") { (options: [String: Any]?, promise: Promise) in
+      self.handleReadWatchFaceStyle(options, promise: promise)
+    }
+
+    AsyncFunction("setWatchFaceStyle") { (settings: [String: Any], promise: Promise) in
+      self.handleSetWatchFaceStyle(settings, promise: promise)
+    }
+
     // MARK: Tests
     AsyncFunction("startHeartRateTest") { (promise: Promise) in
       #if targetEnvironment(simulator)

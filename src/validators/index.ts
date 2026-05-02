@@ -11,5 +11,7 @@ export {
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
   validateFirmwareDfuFilePath,
+  validateReadWatchFaceStyleOptions,
+  validateWatchFaceStyleSettings,
   validateDeviceTime,
 } from './device-settings.js';

@@ -33,6 +33,7 @@ export default function Index() {
   const [screenDurationInfo, setScreenDurationInfo] = useState<string>("—");
   const [sedentaryInfo, setSedentaryInfo] = useState<string>("—");
   const [wristFlipInfo, setWristFlipInfo] = useState<string>("—");
+  const [watchFaceInfo, setWatchFaceInfo] = useState<string>("—");
   const { permissions } = useSDKInit(dispatch);
   const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
   const {
@@ -226,6 +227,32 @@ export default function Index() {
                 <Text style={styles.buttonTextSecondary}>Stop find</Text>
               </Pressable>
             </View>
+          </View>
+
+          {/* ── Watch face / dial (#101) — read only in example */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Watch face (dial)</Text>
+            <Text style={styles.findPhase} numberOfLines={5}>
+              {watchFaceInfo}
+            </Text>
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.buttonSecondary,
+                pressed && styles.buttonPressed,
+              ]}
+              onPress={() => {
+                void sdk
+                  .readWatchFaceStyle()
+                  .then(s => setWatchFaceInfo(JSON.stringify(s)))
+                  .catch(() =>
+                    setWatchFaceInfo("(unsupported or error — gate with screenStyleFunction)")
+                  );
+              }}
+              accessibilityRole="button"
+            >
+              <Text style={styles.buttonTextSecondary}>Read dial</Text>
+            </Pressable>
           </View>
 
           {/* ── Screen light & duration (#97) ── */}

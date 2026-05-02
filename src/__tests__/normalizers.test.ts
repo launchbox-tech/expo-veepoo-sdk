@@ -9,6 +9,7 @@ import {
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
   normalizeWristFlipWakeSettings,
+  normalizeWatchFaceStyle,
 } from '../normalizers';
 
 describe('normalizeAlarmList', () => {
@@ -522,6 +523,26 @@ describe('normalizeEventPayload firmwareDfuProgress', () => {
       state: 'bogus',
     }) as { state: string };
     expect(result.state).toBe('unknown');
+  });
+});
+
+describe('normalizeWatchFaceStyle', () => {
+  it('maps dialType and screenIndex', () => {
+    const r = normalizeWatchFaceStyle({
+      dialType: 'MARKET',
+      screenIndex: 4,
+      operationSuccess: true,
+    });
+    expect(r.dialType).toBe('market');
+    expect(r.screenIndex).toBe(4);
+    expect(r.operationSuccess).toBe(true);
+  });
+
+  it('defaults unknown dial to default and omits operationSuccess when absent', () => {
+    const r = normalizeWatchFaceStyle({ screenIndex: 1 });
+    expect(r.dialType).toBe('default');
+    expect(r.screenIndex).toBe(1);
+    expect(r.operationSuccess).toBeUndefined();
   });
 });
 

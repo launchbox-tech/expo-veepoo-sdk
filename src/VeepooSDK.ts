@@ -20,6 +20,9 @@ import type {
   ScreenLightSettings,
   SedentaryReminderSettings,
   WristFlipWakeSettings,
+  WatchFaceDialType,
+  WatchFaceStyle,
+  WatchFaceStyleSettings,
   ScanOptions,
   ConnectOptions,
   ConnectionStatus,
@@ -206,6 +209,12 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   startLocalFirmwareDfu = (filePath: string): Promise<void> =>
     this.deviceSettings.startLocalFirmwareDfu(filePath);
+
+  readWatchFaceStyle = (options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle> =>
+    this.deviceSettings.readWatchFaceStyle(options);
+
+  setWatchFaceStyle = (settings: WatchFaceStyleSettings): Promise<void> =>
+    this.deviceSettings.setWatchFaceStyle(settings);
 
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 

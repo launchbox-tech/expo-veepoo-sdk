@@ -12,6 +12,8 @@ import {
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
   validateFirmwareDfuFilePath,
+  validateReadWatchFaceStyleOptions,
+  validateWatchFaceStyleSettings,
   validateDeviceTime,
 } from '../../validators/index';
 
@@ -391,6 +393,38 @@ describe('validateSedentaryReminderSettings', () => {
     expectInvalidArgument(
       () => validateSedentaryReminderSettings({ ...valid, thresholdMinutes: 20 }),
       'thresholdMinutes',
+    );
+  });
+});
+
+describe('validateReadWatchFaceStyleOptions', () => {
+  it('allows undefined', () => {
+    expect(() => validateReadWatchFaceStyleOptions(undefined)).not.toThrow();
+  });
+
+  it('allows valid dialType', () => {
+    expect(() => validateReadWatchFaceStyleOptions({ dialType: 'market' })).not.toThrow();
+  });
+
+  it('rejects invalid dialType', () => {
+    expectInvalidArgument(() => validateReadWatchFaceStyleOptions({ dialType: 'x' as any }), 'dialType');
+  });
+});
+
+describe('validateWatchFaceStyleSettings', () => {
+  it('requires screenIndex in range', () => {
+    expect(() => validateWatchFaceStyleSettings({ screenIndex: 0 })).not.toThrow();
+    expectInvalidArgument(() => validateWatchFaceStyleSettings({ screenIndex: -1 }), 'screenIndex');
+    expectInvalidArgument(
+      () => validateWatchFaceStyleSettings({ screenIndex: 66_000 }),
+      'screenIndex',
+    );
+  });
+
+  it('validates optional dialType', () => {
+    expectInvalidArgument(
+      () => validateWatchFaceStyleSettings({ screenIndex: 0, dialType: 'oops' as any }),
+      'dialType',
     );
   });
 });

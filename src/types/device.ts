@@ -210,6 +210,24 @@ export interface SedentaryReminderSettings {
   enabled: boolean;
 }
 
+/** Dial / watch-face category from vendor screen-style APIs (`EUIFromType` / `VPDeviceDialType`). */
+export type WatchFaceDialType = 'default' | 'market' | 'photo';
+
+/** Current watch face selection from the Band (read). */
+export interface WatchFaceStyle {
+  dialType: WatchFaceDialType;
+  /** Style slot index (vendor-specific). */
+  screenIndex: number;
+  /** Native read includes this flag; omitted after normalization if unknown. */
+  operationSuccess?: boolean;
+}
+
+/** Arguments for `setWatchFaceStyle`. */
+export interface WatchFaceStyleSettings {
+  screenIndex: number;
+  dialType?: WatchFaceDialType;
+}
+
 /** Raise-to-wake / wrist-flip screen. Vendor `NightTurnWristSetting` / `VPDeviceRaiseHandModel`. */
 export interface WristFlipWakeSettings {
   enabled: boolean;

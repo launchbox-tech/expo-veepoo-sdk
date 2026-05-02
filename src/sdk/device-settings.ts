@@ -7,6 +7,7 @@ import {
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
   normalizeWristFlipWakeSettings,
+  normalizeWatchFaceStyle,
 } from "../normalizers/index.js";
 import {
   validatePersonalInfo,
@@ -20,6 +21,8 @@ import {
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
   validateFirmwareDfuFilePath,
+  validateReadWatchFaceStyleOptions,
+  validateWatchFaceStyleSettings,
 } from "../validators/index.js";
 import type {
   AutoMeasureSetting,
@@ -32,6 +35,9 @@ import type {
   ScreenLightSettings,
   SedentaryReminderSettings,
   WristFlipWakeSettings,
+  WatchFaceDialType,
+  WatchFaceStyle,
+  WatchFaceStyleSettings,
 } from "../types/index.js";
 import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
 
@@ -300,6 +306,34 @@ export class DeviceSettings {
     return invokeNative({
       validate: () => validateFirmwareDfuFilePath(filePath),
       invoke: () => this.rt.native.startLocalFirmwareDfu(filePath.trim()),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle> {
+    return invokeNative({
+      validate: () => validateReadWatchFaceStyleOptions(options),
+      invoke: () =>
+        this.rt.native.readWatchFaceStyle(
+          options?.dialType != null ? { dialType: options.dialType } : null,
+        ),
+      normalize: normalizeWatchFaceStyle,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void> {
+    return invokeNative({
+      validate: () => validateWatchFaceStyleSettings(settings),
+      invoke: () =>
+        this.rt.native.setWatchFaceStyle({
+          screenIndex: settings.screenIndex,
+          dialType: settings.dialType ?? "default",
+        }),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),

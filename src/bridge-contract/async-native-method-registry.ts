@@ -73,6 +73,8 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "readWristFlipWakeSettings",
   "setWristFlipWakeSettings",
   "startLocalFirmwareDfu",
+  "readWatchFaceStyle",
+  "setWatchFaceStyle",
 ] as const satisfies readonly NativeAsyncMethodName[];
 
 export type NativeAsyncRegistryUnion =

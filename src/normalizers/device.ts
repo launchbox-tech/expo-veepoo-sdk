@@ -9,6 +9,8 @@ import type {
   ScreenLightSettings,
   SedentaryReminderSettings,
   SocialMsgData,
+  WatchFaceDialType,
+  WatchFaceStyle,
   WristFlipWakeSettings,
 } from '../types/index.js';
 import { isRecord, toInt, toBoolean, toStringValue, normalizeFunctionStatus } from './shared.js';
@@ -302,6 +304,19 @@ export function normalizeFindDeviceStatePayload(value: unknown): {
     deviceId: toStringValue(record.deviceId),
     phase,
     rawState,
+  };
+}
+
+export function normalizeWatchFaceStyle(value: unknown): WatchFaceStyle {
+  const record = isRecord(value) ? value : {};
+  const raw = String(toStringValue(record.dialType, 'default')).toLowerCase();
+  const dialType: WatchFaceDialType =
+    raw === 'market' || raw === 'photo' ? raw : 'default';
+  const op = record.operationSuccess;
+  return {
+    dialType,
+    screenIndex: toInt(record.screenIndex),
+    ...(typeof op === 'boolean' ? { operationSuccess: op } : {}),
   };
 }
 
