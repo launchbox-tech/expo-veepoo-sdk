@@ -20,6 +20,7 @@ import type {
   ScreenLightSettings,
   SedentaryReminderSettings,
   WristFlipWakeSettings,
+  WomenHealthSettings,
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
@@ -206,6 +207,12 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   setWristFlipWakeSettings = (settings: WristFlipWakeSettings): Promise<void> =>
     this.deviceSettings.setWristFlipWakeSettings(settings);
+
+  readWomenHealthSettings = (): Promise<WomenHealthSettings> =>
+    this.deviceSettings.readWomenHealthSettings();
+
+  setWomenHealthSettings = (settings: WomenHealthSettings): Promise<void> =>
+    this.deviceSettings.setWomenHealthSettings(settings);
 
   startLocalFirmwareDfu = (filePath: string): Promise<void> =>
     this.deviceSettings.startLocalFirmwareDfu(filePath);

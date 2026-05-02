@@ -74,6 +74,8 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "setSedentaryReminder",
   "readWristFlipWakeSettings",
   "setWristFlipWakeSettings",
+  "readWomenHealthSettings",
+  "setWomenHealthSettings",
   "startLocalFirmwareDfu",
   "readWatchFaceStyle",
   "setWatchFaceStyle",

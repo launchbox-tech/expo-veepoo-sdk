@@ -846,6 +846,14 @@ public class VeepooSDKModule: Module {
       self.handleSetWristFlipWakeSettings(settings, promise: promise)
     }
 
+    AsyncFunction("readWomenHealthSettings") { (promise: Promise) in
+      self.handleReadWomenHealthSettings(promise: promise)
+    }
+
+    AsyncFunction("setWomenHealthSettings") { (settings: [String: Any], promise: Promise) in
+      self.handleSetWomenHealthSettings(settings, promise: promise)
+    }
+
     AsyncFunction("startLocalFirmwareDfu") { (filePath: String, promise: Promise) in
       self.handleStartLocalFirmwareDfu(filePath: filePath, promise: promise)
     }

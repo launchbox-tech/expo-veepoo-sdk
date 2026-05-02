@@ -11,6 +11,7 @@ import {
   validateScreenLightSettings,
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
+  validateWomenHealthSettings,
   validateFirmwareDfuFilePath,
   validateReadWatchFaceStyleOptions,
   validateWatchFaceStyleSettings,
@@ -457,6 +458,43 @@ describe('validateWristFlipWakeSettings', () => {
     expectInvalidArgument(
       () => validateWristFlipWakeSettings({ ...valid, sensitivityLevel: 11 }),
       'sensitivityLevel',
+    );
+  });
+});
+
+describe('validateWomenHealthSettings', () => {
+  it('passes for menstrual with required fields', () => {
+    expect(() =>
+      validateWomenHealthSettings({
+        status: 'menstrual',
+        lastMenstrualDate: '2026-04-01',
+        menstrualLengthDays: 5,
+        menstrualCycleDays: 28,
+      }),
+    ).not.toThrow();
+  });
+
+  it('requires expectedDeliveryDate for pregnancy', () => {
+    expectInvalidArgument(
+      () =>
+        validateWomenHealthSettings({
+          status: 'pregnancy',
+          lastMenstrualDate: '2026-04-01',
+        }),
+      'expectedDeliveryDate',
+    );
+  });
+
+  it('throws for bad date format', () => {
+    expectInvalidArgument(
+      () =>
+        validateWomenHealthSettings({
+          status: 'menstrual',
+          lastMenstrualDate: '04-01-2026',
+          menstrualLengthDays: 5,
+          menstrualCycleDays: 28,
+        }),
+      'lastMenstrualDate',
     );
   });
 });

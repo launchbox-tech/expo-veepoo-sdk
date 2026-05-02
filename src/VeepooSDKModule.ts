@@ -18,6 +18,7 @@ import type {
   ScreenLightSettings,
   SedentaryReminderSettings,
   WristFlipWakeSettings,
+  WomenHealthSettings,
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
@@ -96,6 +97,8 @@ export interface VeepooSDKModuleInterface {
   setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
   readWristFlipWakeSettings(): Promise<WristFlipWakeSettings>;
   setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
+  readWomenHealthSettings(): Promise<WomenHealthSettings>;
+  setWomenHealthSettings(settings: WomenHealthSettings): Promise<void>;
   startLocalFirmwareDfu(filePath: string): Promise<void>;
   readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle>;
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;

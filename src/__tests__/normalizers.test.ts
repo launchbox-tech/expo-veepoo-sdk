@@ -9,6 +9,7 @@ import {
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
   normalizeWristFlipWakeSettings,
+  normalizeWomenHealthSettings,
   normalizeWatchFaceStyle,
 } from '../normalizers';
 
@@ -580,5 +581,35 @@ describe('normalizeWristFlipWakeSettings', () => {
     expect(r.sensitivityLevel).toBe(3);
     expect(r.supportsCustomTimeWindow).toBe(true);
     expect(r.defaultSensitivityLevel).toBe(5);
+  });
+});
+
+describe('normalizeWomenHealthSettings', () => {
+  it('maps vendor aliases and optional fields', () => {
+    const r = normalizeWomenHealthSettings({
+      status: 'MENES',
+      menstrualLengthDays: 5,
+      menstrualCycleDays: 28,
+      lastMenstrualDate: '2026-04-01',
+      expectedDeliveryDate: '2026-12-01',
+      babyBirthday: '2025-06-15',
+      babySex: 'man',
+      currentMenstrualDays: 3,
+      operationStatus: 'READ_SUCCESS',
+    });
+    expect(r.status).toBe('menstrual');
+    expect(r.menstrualLengthDays).toBe(5);
+    expect(r.menstrualCycleDays).toBe(28);
+    expect(r.lastMenstrualDate).toBe('2026-04-01');
+    expect(r.expectedDeliveryDate).toBe('2026-12-01');
+    expect(r.babyBirthday).toBe('2025-06-15');
+    expect(r.babySex).toBe('male');
+    expect(r.currentMenstrualDays).toBe(3);
+    expect(r.operationStatus).toBe('READ_SUCCESS');
+  });
+
+  it('defaults unknown status to none', () => {
+    const r = normalizeWomenHealthSettings({ status: 'weird' });
+    expect(r.status).toBe('none');
   });
 });

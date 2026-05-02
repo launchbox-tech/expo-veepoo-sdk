@@ -13,6 +13,7 @@ export {
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
   normalizeWristFlipWakeSettings,
+  normalizeWomenHealthSettings,
   normalizeWatchFaceStyle,
   normalizeSocialMsgData,
   normalizeDeviceVersion,

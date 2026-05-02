@@ -243,6 +243,33 @@ export interface WristFlipWakeSettings {
   defaultSensitivityLevel?: number;
 }
 
+/** Vendor `EWomenStatus` / `VPDeviceFemaleState` (physiology mode, not user sex). */
+export type WomenHealthStatus =
+  | 'none'
+  | 'menstrual'
+  | 'pregnancy_prep'
+  | 'pregnancy'
+  | 'postpartum';
+
+export type WomenHealthBabySex = 'female' | 'male';
+
+/** Women's health / cycle settings. Android `WomenSetting` / `WomenData`; iOS `VPDeviceFemaleModel`. */
+export interface WomenHealthSettings {
+  status: WomenHealthStatus;
+  /** Menstrual length in days (vendor range typically 4–28). */
+  menstrualLengthDays?: number;
+  menstrualCycleDays?: number;
+  /** Calendar date `yyyy-MM-dd`. */
+  lastMenstrualDate?: string;
+  expectedDeliveryDate?: string;
+  babyBirthday?: string;
+  babySex?: WomenHealthBabySex;
+  /** Some Bands report current-cycle day count on read. */
+  currentMenstrualDays?: number;
+  /** Android-only: `EWomenOprateStatus` name when present. */
+  operationStatus?: string;
+}
+
 export interface DeviceData {
   deviceId: string;
   data: unknown;

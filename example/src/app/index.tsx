@@ -33,6 +33,7 @@ export default function Index() {
   const [screenDurationInfo, setScreenDurationInfo] = useState<string>("—");
   const [sedentaryInfo, setSedentaryInfo] = useState<string>("—");
   const [wristFlipInfo, setWristFlipInfo] = useState<string>("—");
+  const [womenHealthInfo, setWomenHealthInfo] = useState<string>("—");
   const [watchFaceInfo, setWatchFaceInfo] = useState<string>("—");
   const { permissions } = useSDKInit(dispatch);
   const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
@@ -352,6 +353,32 @@ export default function Index() {
                     .readWristFlipWakeSettings()
                     .then(s => setWristFlipInfo(JSON.stringify(s)))
                     .catch(() => setWristFlipInfo("(unsupported or error)"));
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Read</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* ── Women's health (#103) — gate with readDeviceFunctions().woman ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Women&apos;s health</Text>
+            <Text style={styles.findPhase} numberOfLines={8}>
+              {womenHealthInfo}
+            </Text>
+            <View style={styles.findRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk
+                    .readWomenHealthSettings()
+                    .then(s => setWomenHealthInfo(JSON.stringify(s)))
+                    .catch(() => setWomenHealthInfo("(unsupported or error)"));
                 }}
                 accessibilityRole="button"
               >

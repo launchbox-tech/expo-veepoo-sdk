@@ -7,6 +7,7 @@ import {
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
   normalizeWristFlipWakeSettings,
+  normalizeWomenHealthSettings,
   normalizeWatchFaceStyle,
 } from "../normalizers/index.js";
 import {
@@ -20,6 +21,7 @@ import {
   validateScreenLightSettings,
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
+  validateWomenHealthSettings,
   validateFirmwareDfuFilePath,
   validateReadWatchFaceStyleOptions,
   validateWatchFaceStyleSettings,
@@ -35,6 +37,7 @@ import type {
   ScreenLightSettings,
   SedentaryReminderSettings,
   WristFlipWakeSettings,
+  WomenHealthSettings,
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
@@ -292,6 +295,26 @@ export class DeviceSettings {
     return invokeNative({
       validate: () => validateWristFlipWakeSettings(settings),
       invoke: () => this.rt.native.setWristFlipWakeSettings(settings),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  readWomenHealthSettings(): Promise<WomenHealthSettings> {
+    return invokeNative({
+      invoke: () => this.rt.native.readWomenHealthSettings(),
+      normalize: normalizeWomenHealthSettings,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setWomenHealthSettings(settings: WomenHealthSettings): Promise<void> {
+    return invokeNative({
+      validate: () => validateWomenHealthSettings(settings),
+      invoke: () => this.rt.native.setWomenHealthSettings(settings),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),

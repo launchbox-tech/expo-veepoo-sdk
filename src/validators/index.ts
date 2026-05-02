@@ -10,6 +10,7 @@ export {
   validateScreenLightDurationSeconds,
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
+  validateWomenHealthSettings,
   validateFirmwareDfuFilePath,
   validateReadWatchFaceStyleOptions,
   validateWatchFaceStyleSettings,

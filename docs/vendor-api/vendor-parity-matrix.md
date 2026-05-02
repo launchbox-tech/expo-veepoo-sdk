@@ -51,6 +51,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Screen brightness & on-time | `readScreenLightSettings`, `setScreenLightSettings`, `readScreenLightDuration`, `setScreenLightDuration` | Shipped | TBD |
 | Sedentary (long-sit) reminder | `readSedentaryReminder`, `setSedentaryReminder` | Shipped | TBD |
 | Wrist-flip / raise-to-wake | `readWristFlipWakeSettings`, `setWristFlipWakeSettings` | Shipped | TBD |
+| Women's health (cycle / maternity modes) | `readWomenHealthSettings`, `setWomenHealthSettings` | Shipped | TBD |
 | Watch face / screen style (dial slot) | `readWatchFaceStyle`, `setWatchFaceStyle` | Shipped | TBD |
 | Local firmware DFU (OTA file on disk) | `startLocalFirmwareDfu`; `firmwareDfuProgress` | Partial | TBD |
 
@@ -61,6 +62,8 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 **Sedentary reminder:** Gate with `readDeviceFunctions().sedentaryRemind`. **Android:** `readLongSeat` / `settingLongSeat` (`LongSeatSetting`); `VpSpGetUtil.isSupportLongseat`. **iOS:** `veepooSDKSettingDeviceLongSeatWithLongSeatModel` (read `settingMode` 2, on `1` / off `0`); threshold (gate) 30–240 minutes per vendor model.
 
 **Wrist-flip wake:** Gate with `readDeviceFunctions().nightTurnSetting` / `isOpenNightTurnWrist`. **Android:** `readNightTurnWriste` / `settingNightTurnWriste` (`NightTurnWristSetting`, `TimeData` window, sensitivity 1–10); `VpSpGetUtil.isSupportNightturnSetting`. **iOS:** `veepooSDKSettingRaiseHandWithRaiseHandModel` (read mode 2, on 1 / off 0); `VPDeviceRaiseHandModel` (`sensitive` / `defaultSensitive`).
+
+**Women's health:** Gate with `readDeviceFunctions().woman`. **Android:** `readWomenState` / `settingWomenState` (`WomenSetting`, `IWomenDataListener`, `WomenData`); `VpSpGetUtil.isSupportWomenSetting`. **iOS:** `veepooSDKSettingDeviceFemaleWithFemaleModel` (read `settingMode` 2 / set 1, `VPDeviceFemaleModel`). Dates are `yyyy-MM-dd` strings on iOS; Android uses `TimeData` internally.
 
 **Watch face / screen style:** Gate with `readDeviceFunctions().screenStyleFunction` (and related `aiDial` / `videoDial` hints where applicable). **Android:** `readScreenStyle` / `settingScreenStyle` (`ScreenStyleData`, `EScreenStyle`); `VpSpGetUtil.isSupportScreenStyle`. **iOS:** `veepooSDKSettingDeviceScreenStyle` (read `settingMode` 2 / set 1, `VPDeviceDialType`). **Partial scope:** this bridge exposes **read/set of the active dial category + slot index** only — custom image transfer, marketplace sync, and video dials are **not** implemented here.
 
@@ -122,7 +125,7 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 
 - Remote OTA metadata / download (`checkDeviceOTAInfo`, `getOadVersion`, `veepooSDKStartDfu` server path) and non-JL Android DFU  
 - Server / marketplace dial transfer, custom photo push pipelines, video dials (beyond slot read/set)  
-- Women’s health, weather push, contacts/SOS, AGPS, music/camera remote  
+- Weather push, contacts/SOS, AGPS, music/camera remote  
 - Platform-specific extras (e.g. toggling OS Bluetooth from SDK)
 
 Treat gaps as **Not in JS** until a PR adds methods **and** updates this matrix.
