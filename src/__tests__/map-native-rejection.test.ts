@@ -75,4 +75,12 @@ describe('mapNativeRejection', () => {
     expect(out.code).toBe('DEVICE_NOT_CONNECTED');
     expect(out.nativeCode).toBeUndefined();
   });
+
+  /** Vendor-opaque codes from bridge-contract allowed list → OPERATION_FAILED (ADR 0003). */
+  it('maps CONTEXT_ERROR (Android) to OPERATION_FAILED with nativeCode', () => {
+    const err = Object.assign(new Error('no ctx'), { code: 'CONTEXT_ERROR' });
+    const out = mapNativeRejection(err, { fallbackCode: 'UNKNOWN' });
+    expect(out.code).toBe('OPERATION_FAILED');
+    expect(out.nativeCode).toBe('CONTEXT_ERROR');
+  });
 });

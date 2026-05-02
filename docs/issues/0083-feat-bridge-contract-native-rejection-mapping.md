@@ -13,10 +13,10 @@ Extend bridge contract tooling so **native `reject` string codes** (and/or the *
 
 ## Acceptance criteria
 
-- [ ] Contract or checklist covers branch-worthy native codes relevant to **`mapNativeRejection`** (and documents **`OPERATION_FAILED`** bucket policy where applicable).
-- [ ] CI fails when native emitters or the TS mapper drifts from the contract in an unreviewed way.
-- [ ] Tests include representative **fixtures** (iOS- and Android-shaped rejections) tied to the contract.
-- [ ] **Validators** and pure TS **`VeepooError`** construction remain **outside** the mapper scope per **ADR 0003**.
+- [x] Contract covers native **`.reject("CODE")`** surface + **`mapNativeRejection`** mapping in **`bridge-contract/native-rejection-codes.json`** (including **`OPERATION_FAILED`** / **`INVALID_ARGUMENT`** collapse rows).
+- [x] `npm run check:native-rejection` and Jest contract test fail on extract ↔ allowed list drift; add hosted CI when a workflow exists.
+- [x] Jest: contract integration test + **`CONTEXT_ERROR`** Android-style mapping in **`map-native-rejection.test.ts`**.
+- [x] **`isVeepooErrorShape`** / validator pass-through unchanged (**ADR 0003**).
 
 ## Blocked by
 
