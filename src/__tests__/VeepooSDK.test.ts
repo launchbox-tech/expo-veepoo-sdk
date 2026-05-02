@@ -5,6 +5,10 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
+import {
+  NATIVE_ASYNC_METHOD_NAMES,
+  type NativeAsyncMethodName,
+} from '../bridge-contract/async-native-method-registry';
 import { VeepooSDK } from '../VeepooSDK';
 import type { NativeVeepooSDKInterface } from '../NativeVeepooSDK';
 
@@ -12,52 +16,56 @@ type MockNative = jest.Mocked<NativeVeepooSDKInterface> & {
   _emit(event: string, payload: unknown): void;
 };
 
+/** Resolved values for `jest.fn().mockResolvedValue` — keys not listed default to `undefined`. */
+const NATIVE_ASYNC_MOCK_RESOLVES: Partial<
+  Record<NativeAsyncMethodName, unknown>
+> = {
+  isBluetoothEnabled: true,
+  requestPermissions: {
+    granted: true,
+    status: 'granted',
+    canAskAgain: false,
+  },
+  getConnectionStatus: 'connected',
+  verifyPassword: { status: 'CHECK_SUCCESS' },
+  readBattery: { level: 80, state: 0 },
+  syncPersonalInfo: true,
+  readDeviceFunctions: {},
+  readSocialMsgData: {},
+  readDeviceVersion: {},
+  readDeviceAllData: true,
+  readSleepData: [],
+  readSportStepData: {},
+  readOriginData: [],
+  readDaySummaryData: {},
+  readAutoMeasureSetting: [],
+  modifyAutoMeasureSetting: [],
+  setLanguage: true,
+  writeSocialMsgData: 'success',
+  readAlarms: [],
+  setAlarm: 'success',
+  deleteAlarm: 'success',
+  setDeviceTime: true,
+  readHeartRateAlarm: {
+    enabled: true,
+    highThreshold: 120,
+    lowThreshold: 60,
+  },
+  setHeartRateAlarm: 'success',
+};
+
 function makeMockNative(): MockNative {
   const listeners = new Map<string, Set<(p: unknown) => void>>();
+  const base = {} as Record<string, jest.Mock>;
+  for (const name of NATIVE_ASYNC_METHOD_NAMES) {
+    const resolved = NATIVE_ASYNC_MOCK_RESOLVES[name];
+    base[name] =
+      resolved !== undefined
+        ? jest.fn().mockResolvedValue(resolved)
+        : jest.fn().mockResolvedValue(undefined);
+  }
   return {
-    init: jest.fn().mockResolvedValue(undefined),
-    isBluetoothEnabled: jest.fn().mockResolvedValue(true),
-    requestPermissions: jest.fn().mockResolvedValue({ granted: true, status: 'granted', canAskAgain: false }),
-    startScan: jest.fn().mockResolvedValue(undefined),
-    stopScan: jest.fn().mockResolvedValue(undefined),
-    connect: jest.fn().mockResolvedValue(undefined),
-    disconnect: jest.fn().mockResolvedValue(undefined),
-    getConnectionStatus: jest.fn().mockResolvedValue('connected' as const),
-    verifyPassword: jest.fn().mockResolvedValue({ status: 'CHECK_SUCCESS' }),
-    readBattery: jest.fn().mockResolvedValue({ level: 80, state: 0 }),
-    syncPersonalInfo: jest.fn().mockResolvedValue(true),
-    readDeviceFunctions: jest.fn().mockResolvedValue({}),
-    readSocialMsgData: jest.fn().mockResolvedValue({}),
-    readDeviceVersion: jest.fn().mockResolvedValue({}),
-    startReadOriginData: jest.fn().mockResolvedValue(undefined),
-    readDeviceAllData: jest.fn().mockResolvedValue(true),
-    readSleepData: jest.fn().mockResolvedValue([]),
-    readSportStepData: jest.fn().mockResolvedValue({}),
-    readOriginData: jest.fn().mockResolvedValue([]),
-    readDaySummaryData: jest.fn().mockResolvedValue({}),
-    readAutoMeasureSetting: jest.fn().mockResolvedValue([]),
-    modifyAutoMeasureSetting: jest.fn().mockResolvedValue([]),
-    setLanguage: jest.fn().mockResolvedValue(true),
-    startHeartRateTest: jest.fn().mockResolvedValue(undefined),
-    stopHeartRateTest: jest.fn().mockResolvedValue(undefined),
-    startBloodPressureTest: jest.fn().mockResolvedValue(undefined),
-    stopBloodPressureTest: jest.fn().mockResolvedValue(undefined),
-    startBloodOxygenTest: jest.fn().mockResolvedValue(undefined),
-    stopBloodOxygenTest: jest.fn().mockResolvedValue(undefined),
-    startTemperatureTest: jest.fn().mockResolvedValue(undefined),
-    stopTemperatureTest: jest.fn().mockResolvedValue(undefined),
-    startStressTest: jest.fn().mockResolvedValue(undefined),
-    stopStressTest: jest.fn().mockResolvedValue(undefined),
-    startBloodGlucoseTest: jest.fn().mockResolvedValue(undefined),
-    stopBloodGlucoseTest: jest.fn().mockResolvedValue(undefined),
-    startHrvTest: jest.fn().mockResolvedValue(undefined),
-    stopHrvTest: jest.fn().mockResolvedValue(undefined),
-    startEcgTest: jest.fn().mockResolvedValue(undefined),
-    stopEcgTest: jest.fn().mockResolvedValue(undefined),
-    startFatigueTest: jest.fn().mockResolvedValue(undefined),
-    stopFatigueTest: jest.fn().mockResolvedValue(undefined),
-    startBreathingTest: jest.fn().mockResolvedValue(undefined),
-    stopBreathingTest: jest.fn().mockResolvedValue(undefined),
+    ...base,
     addListener: jest.fn().mockImplementation((event: string, listener: (p: unknown) => void) => {
       if (!listeners.has(event)) listeners.set(event, new Set());
       listeners.get(event)!.add(listener);
@@ -68,16 +76,10 @@ function makeMockNative(): MockNative {
       };
     }),
     removeListeners: jest.fn(),
-    readHeartRateAlarm: jest.fn().mockResolvedValue({
-      enabled: true,
-      highThreshold: 120,
-      lowThreshold: 60,
-    }),
-    setHeartRateAlarm: jest.fn().mockResolvedValue('success'),
     _emit(event: string, payload: unknown) {
       listeners.get(event)?.forEach(l => l(payload));
     },
-  };
+  } as MockNative;
 }
 
 // ── VeepooSDK class ───────────────────────────────────────────────────────────

@@ -13,10 +13,10 @@ Create a **single source of truth** for **`AsyncFunction`** / bridge method defi
 
 ## Acceptance criteria
 
-- [ ] Adding or renaming a bridged method updates **one canonical place** that feeds typings and/or test doubles (document the workflow for contributors).
-- [ ] Existing **`VeepooSDK`** public API remains stable; **typecheck** and **tests** pass.
-- [ ] Jest native mock setup is **slimmer or generated** compared to hand-duplicated per-method stubs (measurable reduction or clear pattern).
-- [ ] No new mandatory runtime npm dependencies unless justified in PR description.
+- [x] **`NATIVE_ASYNC_METHOD_NAMES`** in **`src/bridge-contract/async-native-method-registry.ts`** is the canonical list; **`satisfies`** + **`NATIVE_ASYNC_REGISTRY_INTEGRITY`** fail compile if it drifts from **`NativeVeepooSDKInterface`** async keys.
+- [x] **`VeepooSDK`** public API unchanged; **typecheck** + **tests** pass.
+- [x] **`makeMockNative`** builds async stubs by iterating the registry + **`NATIVE_ASYNC_MOCK_RESOLVES`** overrides (no duplicated method-name list in the mock).
+- [x] No new runtime dependencies.
 
 ## Blocked by
 
