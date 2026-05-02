@@ -11,6 +11,7 @@
     "build:watch": "tsc --watch",
     "clean": "expo-module clean",
     "test": "expo-module test",
+    "test:coverage": "EXPO_NONINTERACTIVE=1 expo-module test --coverage",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "vendor:check": "node scripts/vendor-check.mjs",
