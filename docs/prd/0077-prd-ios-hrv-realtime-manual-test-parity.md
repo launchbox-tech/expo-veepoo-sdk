@@ -53,3 +53,7 @@ Deliver **iOS native bindings** for the realtime HRV manual test (or an explicit
 - **Domain language:** Use **Band**, **Session**, **Band Discovery**, **Pairing** per **AGENTS.md**; avoid “watch” / “peripheral” in user-facing copy.
 - **Matrix maintenance:** After merge, update **`docs/vendor-parity-matrix.md`** HRV row and **Further notes** (remove or narrow the iOS-only unsupported bullet).
 - If research proves no suitable iOS API in the pinned framework version, the outcome should be an explicit **ADR or matrix decision** rather than an eternal stub.
+
+## Research outcome (issue #78)
+
+**Decision:** **No-go** for iOS realtime HRV manual test parity with the current pinned **VeepooBleSDK** headers: there is no public API mirroring Android `readDeviceManualData` + `DeviceManualDataType.HRV`. Historical HRV remains available via native sync/read paths; **`startHrvTest`** on **iOS** (device) continues to reject **`CAPABILITY_UNSUPPORTED`** with a message that points consumers to **`docs/vendor-parity-matrix.md`**. Full symbol inventory and Android delta are recorded in **`docs/issues/0078-feat-ios-hrv-realtime-vendor-research-go-no-go.md`** and the matrix **Further notes**.

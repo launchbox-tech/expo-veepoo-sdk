@@ -25,4 +25,4 @@ If **#78** is **no-go**, close this issue as **not planned** or replace with doc
 
 ## Blocked by
 
-- #78
+- #78 — **2026-05-02:** research **no-go** (no iOS vendor API equivalent to Android `readDeviceManualData(HRV)` in pinned `VeepooBleSDK`). Keep issue **open** for tracking or close **not planned** on GitHub per maintainer; no implementation until vendor/framework upgrade.

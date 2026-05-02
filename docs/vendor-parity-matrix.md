@@ -73,7 +73,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Temperature | `startTemperatureTest`, `stopTemperatureTest`; `temperatureTestResult` | Shipped | TBD |
 | Stress | `startStressTest`, `stopStressTest`; `stressData` | Shipped | TBD |
 | Blood glucose | `startBloodGlucoseTest`, `stopBloodGlucoseTest`; `bloodGlucoseData` | Shipped | TBD |
-| HRV (manual realtime) | `startHrvTest`, `stopHrvTest`; `hrvTestResult` | Partial — Android shipped; **iOS** rejects `CAPABILITY_UNSUPPORTED` (see notes) | TBD |
+| HRV (manual realtime) | `startHrvTest`, `stopHrvTest`; `hrvTestResult` | Partial — Android shipped; **iOS** `CAPABILITY_UNSUPPORTED` (no matching vendor API in pinned framework; see notes) | TBD |
 | ECG (manual realtime) | `startEcgTest`, `stopEcgTest`; `ecgTestResult` (optional `includeWaveform`) | Shipped | TBD |
 | Fatigue (manual realtime) | `startFatigueTest`, `stopFatigueTest`; `fatigueTestResult` | Shipped | TBD |
 | Breathing rate (manual realtime) | `startBreathingTest`, `stopBreathingTest`; `breathingTestResult` | Shipped | TBD |
@@ -81,7 +81,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 ### Further notes (realtime vitals, PRD #66)
 
 - **Single active realtime test:** Starting any supported `start*Test` while another realtime test is active rejects with **`REALTIME_TEST_IN_PROGRESS`** ([issue #67](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/67)). Eligibility errors may use **`DEVICE_NOT_READY`**, **`DEVICE_NOT_CONNECTED`**, or **`CAPABILITY_UNSUPPORTED`** ([`VeepooErrorCode`](../src/types/errors.ts) in source).
-- **HRV:** Android uses the vendor manual-data path for HRV during the test loop. **iOS** does not expose a matching realtime HRV manual API in this bridge; `startHrvTest` fails fast with `CAPABILITY_UNSUPPORTED` — use historical HRV flows or Android for this modality.
+- **HRV:** **Android** uses `readDeviceManualData` + `DeviceManualDataType.HRV` with `IDeviceManualDetectDataListener.onHrvManualDataChange` (polling loop in `VeepooSDKModuleHelpers.kt`). **iOS** (`VPPeripheralBaseManage.h`): `VPManualTestDataType` defines only blood pressure and heart rate bits—no HRV; `readManualTestDataWithTimestamp` returns `VPManualTestDataModel` (manual BP). Historical HRV uses `veepooSdkStartReadDeviceHrvData` / DB helpers, not an app-driven manual realtime test. There is no `veepooSDKTestHrvStart`-style entry point alongside stress/temperature/ECG. **`startHrvTest`** therefore rejects with **`CAPABILITY_UNSUPPORTED`** with a message pointing here; use **historical HRV** or **Android** for this modality until the vendor ships a documented iOS equivalent.
 - **ECG:** Summary-style fields are always emitted on `ecgTestResult`. **`startEcgTest({ includeWaveform: true })`** may populate `result.waveform` when the Band and native stack support it; payloads can be large.
 - **Breathing:** **iOS** uses `veepooSDKTestBreathingRateStart`; **Android** uses `startDetectBreath` / `stopDetectBreath` with `BreathData` (maps `deviceState` / progress / value into the same `breathingTestResult` shape as iOS).
 

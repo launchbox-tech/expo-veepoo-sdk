@@ -5,7 +5,7 @@ extension VeepooSDKModule {
   func handleStartHrvTest(promise: Promise) {
     promise.reject(
       "CAPABILITY_UNSUPPORTED",
-      "Real-time HRV manual test is not exposed on iOS for this VeepooBleSDK bundle; use Android (`readDeviceManualData` HRV) or historical HRV sync."
+      "iOS VeepooBleSDK (this bundle) has no public realtime HRV manual-test API comparable to Android readDeviceManualData(HRV); use historical HRV sync or Android. See docs/vendor-parity-matrix.md (HRV row)."
     )
   }
 

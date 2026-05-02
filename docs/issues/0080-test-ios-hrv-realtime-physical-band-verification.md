@@ -20,4 +20,4 @@ With **#79** merged (or native HRV otherwise available), run **manual acceptance
 
 ## Blocked by
 
-- #79
+- #79 — N/A until native iOS HRV path exists (**#78** no-go as of 2026-05-02).
