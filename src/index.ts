@@ -75,6 +75,7 @@ export type {
   ScreenLightSettings,
   ScreenLightDuration,
   SedentaryReminderSettings,
+  WristFlipWakeSettings,
   DeviceData,
   PermissionsResult,
   PermissionStatus,

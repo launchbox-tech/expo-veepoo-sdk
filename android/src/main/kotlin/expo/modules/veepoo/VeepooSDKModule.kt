@@ -67,6 +67,7 @@ class VeepooSDKModule : Module() {
     defineFindDevice(this@VeepooSDKModule)
     defineScreenLight(this@VeepooSDKModule)
     defineSedentary(this@VeepooSDKModule)
+    defineWristFlipWake(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

@@ -6,6 +6,7 @@ import type {
   ScreenLightSettings,
   SedentaryReminderSettings,
   SocialMsgData,
+  WristFlipWakeSettings,
 } from '../types/index.js';
 import { requireInRange, requireValidHour, requireValidMinute } from './shared.js';
 
@@ -91,6 +92,14 @@ export function validateSedentaryReminderSettings(s: SedentaryReminderSettings):
   requireValidHour(s.endHour, 'endHour');
   requireValidMinute(s.endMinute, 'endMinute');
   requireInRange(s.thresholdMinutes, 'thresholdMinutes', 30, 240);
+}
+
+export function validateWristFlipWakeSettings(s: WristFlipWakeSettings): void {
+  requireValidHour(s.startHour, 'startHour');
+  requireValidMinute(s.startMinute, 'startMinute');
+  requireValidHour(s.endHour, 'endHour');
+  requireValidMinute(s.endMinute, 'endMinute');
+  requireInRange(s.sensitivityLevel, 'sensitivityLevel', 1, 10);
 }
 
 export function validateDeviceTime(time?: Date): void {

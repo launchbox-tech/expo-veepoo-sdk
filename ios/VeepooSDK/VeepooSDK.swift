@@ -832,6 +832,14 @@ public class VeepooSDKModule: Module {
       self.handleSetSedentaryReminder(settings, promise: promise)
     }
 
+    AsyncFunction("readWristFlipWakeSettings") { (promise: Promise) in
+      self.handleReadWristFlipWakeSettings(promise: promise)
+    }
+
+    AsyncFunction("setWristFlipWakeSettings") { (settings: [String: Any], promise: Promise) in
+      self.handleSetWristFlipWakeSettings(settings, promise: promise)
+    }
+
     // MARK: Tests
     AsyncFunction("startHeartRateTest") { (promise: Promise) in
       #if targetEnvironment(simulator)

@@ -32,6 +32,7 @@ export default function Index() {
   const [screenLightInfo, setScreenLightInfo] = useState<string>("—");
   const [screenDurationInfo, setScreenDurationInfo] = useState<string>("—");
   const [sedentaryInfo, setSedentaryInfo] = useState<string>("—");
+  const [wristFlipInfo, setWristFlipInfo] = useState<string>("—");
   const { permissions } = useSDKInit(dispatch);
   const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
   const {
@@ -294,6 +295,32 @@ export default function Index() {
                     .readSedentaryReminder()
                     .then(s => setSedentaryInfo(JSON.stringify(s)))
                     .catch(() => setSedentaryInfo("(unsupported or error)"));
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Read</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* ── Wrist-flip wake (#99) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Wrist-flip wake</Text>
+            <Text style={styles.findPhase} numberOfLines={6}>
+              {wristFlipInfo}
+            </Text>
+            <View style={styles.findRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk
+                    .readWristFlipWakeSettings()
+                    .then(s => setWristFlipInfo(JSON.stringify(s)))
+                    .catch(() => setWristFlipInfo("(unsupported or error)"));
                 }}
                 accessibilityRole="button"
               >

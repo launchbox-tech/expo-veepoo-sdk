@@ -12,6 +12,7 @@ export {
   normalizeScreenLightDuration,
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
+  normalizeWristFlipWakeSettings,
   normalizeSocialMsgData,
   normalizeDeviceVersion,
 } from './device.js';

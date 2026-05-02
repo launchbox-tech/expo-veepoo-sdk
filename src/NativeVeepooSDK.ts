@@ -9,6 +9,7 @@ import type {
   PersonalInfo,
   ScreenLightSettings,
   SedentaryReminderSettings,
+  WristFlipWakeSettings,
   VeepooEvent,
   ScanOptions,
   ConnectOptions,
@@ -82,6 +83,8 @@ export interface NativeVeepooSDKInterface {
   setScreenLightDuration(seconds: number): Promise<void>;
   readSedentaryReminder(): Promise<unknown>;
   setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
+  readWristFlipWakeSettings(): Promise<unknown>;
+  setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
   addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
   removeListeners(count: number): void;
 }

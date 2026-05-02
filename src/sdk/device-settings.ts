@@ -6,6 +6,7 @@ import {
   normalizeScreenLightDuration,
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
+  normalizeWristFlipWakeSettings,
 } from "../normalizers/index.js";
 import {
   validatePersonalInfo,
@@ -17,6 +18,7 @@ import {
   validateScreenLightDurationSeconds,
   validateScreenLightSettings,
   validateSedentaryReminderSettings,
+  validateWristFlipWakeSettings,
 } from "../validators/index.js";
 import type {
   AutoMeasureSetting,
@@ -28,6 +30,7 @@ import type {
   ScreenLightDuration,
   ScreenLightSettings,
   SedentaryReminderSettings,
+  WristFlipWakeSettings,
 } from "../types/index.js";
 import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
 
@@ -262,6 +265,26 @@ export class DeviceSettings {
     return invokeNative({
       validate: () => validateSedentaryReminderSettings(settings),
       invoke: () => this.rt.native.setSedentaryReminder(settings),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  readWristFlipWakeSettings(): Promise<WristFlipWakeSettings> {
+    return invokeNative({
+      invoke: () => this.rt.native.readWristFlipWakeSettings(),
+      normalize: normalizeWristFlipWakeSettings,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void> {
+    return invokeNative({
+      validate: () => validateWristFlipWakeSettings(settings),
+      invoke: () => this.rt.native.setWristFlipWakeSettings(settings),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),

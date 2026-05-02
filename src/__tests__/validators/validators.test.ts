@@ -10,6 +10,7 @@ import {
   validateScreenLightDurationSeconds,
   validateScreenLightSettings,
   validateSedentaryReminderSettings,
+  validateWristFlipWakeSettings,
   validateDeviceTime,
 } from '../../validators/index';
 
@@ -389,6 +390,28 @@ describe('validateSedentaryReminderSettings', () => {
     expectInvalidArgument(
       () => validateSedentaryReminderSettings({ ...valid, thresholdMinutes: 20 }),
       'thresholdMinutes',
+    );
+  });
+});
+
+describe('validateWristFlipWakeSettings', () => {
+  const valid = {
+    enabled: true,
+    startHour: 22,
+    startMinute: 0,
+    endHour: 8,
+    endMinute: 0,
+    sensitivityLevel: 5,
+  };
+
+  it('passes for typical night window', () => {
+    expect(() => validateWristFlipWakeSettings(valid)).not.toThrow();
+  });
+
+  it('throws when sensitivity out of range', () => {
+    expectInvalidArgument(
+      () => validateWristFlipWakeSettings({ ...valid, sensitivityLevel: 11 }),
+      'sensitivityLevel',
     );
   });
 });

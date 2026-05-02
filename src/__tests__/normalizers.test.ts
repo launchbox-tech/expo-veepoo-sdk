@@ -8,6 +8,7 @@ import {
   normalizeScreenLightDuration,
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,
+  normalizeWristFlipWakeSettings,
 } from '../normalizers';
 
 describe('normalizeAlarmList', () => {
@@ -499,5 +500,24 @@ describe('normalizeSedentaryReminderSettings', () => {
     expect(r.startHour).toBe(8);
     expect(r.thresholdMinutes).toBe(45);
     expect(r.enabled).toBe(true);
+  });
+});
+
+describe('normalizeWristFlipWakeSettings', () => {
+  it('coerces fields and optional flags', () => {
+    const r = normalizeWristFlipWakeSettings({
+      enabled: 0,
+      startHour: 21,
+      startMinute: 30,
+      endHour: 7,
+      endMinute: 0,
+      sensitivityLevel: 3,
+      supportsCustomTimeWindow: true,
+      defaultSensitivityLevel: 5,
+    });
+    expect(r.enabled).toBe(false);
+    expect(r.sensitivityLevel).toBe(3);
+    expect(r.supportsCustomTimeWindow).toBe(true);
+    expect(r.defaultSensitivityLevel).toBe(5);
   });
 });

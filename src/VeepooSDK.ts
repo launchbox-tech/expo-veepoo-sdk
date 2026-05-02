@@ -19,6 +19,7 @@ import type {
   ScreenLightDuration,
   ScreenLightSettings,
   SedentaryReminderSettings,
+  WristFlipWakeSettings,
   ScanOptions,
   ConnectOptions,
   ConnectionStatus,
@@ -196,6 +197,12 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   setSedentaryReminder = (settings: SedentaryReminderSettings): Promise<void> =>
     this.deviceSettings.setSedentaryReminder(settings);
+
+  readWristFlipWakeSettings = (): Promise<WristFlipWakeSettings> =>
+    this.deviceSettings.readWristFlipWakeSettings();
+
+  setWristFlipWakeSettings = (settings: WristFlipWakeSettings): Promise<void> =>
+    this.deviceSettings.setWristFlipWakeSettings(settings);
 
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 

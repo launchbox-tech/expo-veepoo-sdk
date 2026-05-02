@@ -136,7 +136,7 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 - [x] **Anti-loss / find device** — [#96](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/96) shipped: `startFindDevice`, `stopFindDevice`; `findDeviceState`. Flag: `findDeviceByPhoneFunction`.
 - [x] **Screen settings** — [#97](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/97) shipped: `readScreenLightSettings`, `setScreenLightSettings`, `readScreenLightDuration`, `setScreenLightDuration`. Flags: `screenLight`, `screenLightTime`.
 - [x] **Sedentary reminder** — [#98](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/98) shipped: `readSedentaryReminder`, `setSedentaryReminder`. Flag: `sedentaryRemind`. Android: `readLongSeat` / `settingLongSeat` (`LongSeatSetting`); `VpSpGetUtil.isSupportLongseat`.
-- [ ] **Wrist-flip wake** — [#99](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/99) stub. Flags: `nightTurnSetting`, `isOpenNightTurnWrist`. No dedicated read/write settings API.
+- [x] **Wrist-flip wake** — [#99](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/99) shipped: `readWristFlipWakeSettings`, `setWristFlipWakeSettings`. Flags: `nightTurnSetting`, `isOpenNightTurnWrist`. Android: `readNightTurnWriste` / `settingNightTurnWriste`; `VpSpGetUtil.isSupportNightturnSetting`.
 
 ### Group D — Advanced (not in public API yet)
 - [ ] **OTA firmware upgrade** — [#100](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/100) stub. AARs `libdfu` / `libfastdfu` present in config; no DFU/OTA methods or events in the module.

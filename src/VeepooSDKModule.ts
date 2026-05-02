@@ -17,6 +17,7 @@ import type {
   ScreenLightDuration,
   ScreenLightSettings,
   SedentaryReminderSettings,
+  WristFlipWakeSettings,
   SleepData,
   SportStepData,
   OriginData,
@@ -88,6 +89,8 @@ export interface VeepooSDKModuleInterface {
   setScreenLightDuration(seconds: number): Promise<void>;
   readSedentaryReminder(): Promise<SedentaryReminderSettings>;
   setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
+  readWristFlipWakeSettings(): Promise<WristFlipWakeSettings>;
+  setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
   setLogEnabled(enabled: boolean): this;
   isLogEnabled(): boolean;
   setLogger(logger: LogListener | null): this;

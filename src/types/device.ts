@@ -210,6 +210,21 @@ export interface SedentaryReminderSettings {
   enabled: boolean;
 }
 
+/** Raise-to-wake / wrist-flip screen. Vendor `NightTurnWristSetting` / `VPDeviceRaiseHandModel`. */
+export interface WristFlipWakeSettings {
+  enabled: boolean;
+  startHour: number;
+  startMinute: number;
+  endHour: number;
+  endMinute: number;
+  /** Sensitivity 1–10 (`level` / `sensitive`); 0 on read may mean not supported. */
+  sensitivityLevel: number;
+  /** Android read: `isSupportCustomSettingTime`. */
+  supportsCustomTimeWindow?: boolean;
+  /** Vendor default sensitivity when non-zero. */
+  defaultSensitivityLevel?: number;
+}
+
 export interface DeviceData {
   deviceId: string;
   data: unknown;
