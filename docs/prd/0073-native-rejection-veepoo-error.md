@@ -74,3 +74,4 @@ Implement a **single normalization path** for failures originating from **`await
 - Domain language: **Band**, **Session**, **Pairing**, **Band Discovery** per **`AGENTS.md`**.
 - Parent context: **`CONTEXT.md`** (Bridge errors), **`docs/adr/0003-native-rejection-to-veepoo-error.md`**.
 - **Device tested:** Not required for merge; mapping is JS-only and validated by unit tests; optional manual check with dev build + intentional native rejection.
+- **Child issues:** [#74](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/74) → [#75](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/75) → [#76](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/76).
