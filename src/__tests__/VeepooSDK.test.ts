@@ -447,7 +447,7 @@ describe('VeepooSDK', () => {
     it('logger callback that throws is caught silently', async () => {
       const logger = jest.fn().mockImplementation(() => { throw new Error('logger boom'); });
       sdk.setLogger(logger);
-      await expect(sdk.init()).resolves.not.toThrow();
+      await expect(Promise.resolve(sdk.init())).resolves.toBeUndefined();
     });
 
     it('suppresses console output when __DEV__ is false (production mode)', async () => {
