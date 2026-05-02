@@ -56,6 +56,7 @@ export interface NativeVeepooSDKInterface {
   stopStressTest(): Promise<void>;
   startBloodGlucoseTest(): Promise<void>;
   stopBloodGlucoseTest(): Promise<void>;
+  setDeviceTime(time?: Date): Promise<boolean>;
   readAlarms(): Promise<unknown>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
   deleteAlarm(alarmId: number): Promise<OperationStatus>;

@@ -30,7 +30,7 @@ import type {
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
 import type { VeepooSDKModuleInterface, LogListener } from "./VeepooSDKModule.js";
-import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting, validateAlarm, validateDeleteAlarm, validateSocialMsgData } from "./validators/index.js";
+import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting, validateAlarm, validateDeleteAlarm, validateSocialMsgData, validateDeviceTime } from "./validators/index.js";
 import {
   normalizeAlarmList,
   normalizeAutoMeasureSettings,
@@ -726,6 +726,11 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   setLanguage = (language: Language): Promise<boolean> => this.native.setLanguage(language);
+
+  async setDeviceTime(time?: Date): Promise<boolean> {
+    validateDeviceTime(time);
+    return this.native.setDeviceTime(time);
+  }
 
   async readAlarms(): Promise<DeviceAlarm[]> {
     const raw = await this.native.readAlarms();

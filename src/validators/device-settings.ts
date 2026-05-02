@@ -58,3 +58,10 @@ export function validateHeartRateAlarm(alarm: HeartRateAlarm): void {
     throw { code: 'INVALID_ARGUMENT', message: 'highThreshold must be greater than lowThreshold' };
   }
 }
+
+export function validateDeviceTime(time?: Date): void {
+  if (time === undefined) return;
+  if (!(time instanceof Date) || isNaN(time.getTime())) {
+    throw { code: 'INVALID_ARGUMENT', message: 'time must be a valid Date' };
+  }
+}

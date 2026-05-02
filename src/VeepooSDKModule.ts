@@ -61,6 +61,7 @@ export interface VeepooSDKModuleInterface {
   stopStressTest(): Promise<void>;
   startBloodGlucoseTest(): Promise<void>;
   stopBloodGlucoseTest(): Promise<void>;
+  setDeviceTime(time?: Date): Promise<boolean>;
   readAlarms(): Promise<DeviceAlarm[]>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
