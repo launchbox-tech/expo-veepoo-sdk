@@ -68,20 +68,39 @@ export function extractVeepooSDKListenerEvents(source: string): Set<string> {
   return out;
 }
 
-/** `VeepooEvent` union members in types/events.ts */
-export function extractTsVeepooEventUnion(source: string): Set<string> {
-  const start = source.indexOf("export type VeepooEvent =");
+/**
+ * Top-level keys of `VeepooEventPayload` in types/events.ts (these are {@link VeepooEvent}).
+ * Parses brace-balanced object type body; top-level properties use two-space indent.
+ */
+export function extractTsVeepooEventPayloadKeys(source: string): Set<string> {
+  const marker = "export type VeepooEventPayload = ";
+  const start = source.indexOf(marker);
   if (start === -1) {
-    throw new Error("src/types/events.ts: missing VeepooEvent type");
+    throw new Error("src/types/events.ts: missing VeepooEventPayload type");
   }
-  const brace = source.indexOf(";", start);
-  if (brace === -1) throw new Error("src/types/events.ts: unterminated VeepooEvent");
-  const block = source.slice(start, brace);
-  const out = new Set<string>();
-  for (const m of block.matchAll(/\| '([^']+)'/g)) {
-    out.add(m[1]);
+  const open = source.indexOf("{", start);
+  if (open === -1) {
+    throw new Error("src/types/events.ts: VeepooEventPayload missing opening brace");
   }
-  return out;
+  let depth = 0;
+  for (let i = open; i < source.length; i++) {
+    const c = source[i];
+    if (c === "{") depth++;
+    else if (c === "}") {
+      depth--;
+      if (depth === 0) {
+        const body = source.slice(open + 1, i);
+        const out = new Set<string>();
+        const keyLine = /^ {2}([a-zA-Z][a-zA-Z0-9]*)\???:/;
+        for (const line of body.split(/\r?\n/)) {
+          const m = line.match(keyLine);
+          if (m) out.add(m[1]);
+        }
+        return out;
+      }
+    }
+  }
+  throw new Error("src/types/events.ts: unterminated VeepooEventPayload");
 }
 
 export function setDiff(a: Set<string>, b: Set<string>): {
@@ -120,13 +139,13 @@ export function verifyVeepooEventsContract(repoRoot: string): string[] {
   const sdkPath = join(repoRoot, "src/sdk/veepoo-sdk-runtime.ts");
   const listeners = extractVeepooSDKListenerEvents(readFileSync(sdkPath, "utf8"));
   const typesPath = join(repoRoot, "src/types/events.ts");
-  const tsUnion = extractTsVeepooEventUnion(readFileSync(typesPath, "utf8"));
+  const tsUnion = extractTsVeepooEventPayloadKeys(readFileSync(typesPath, "utf8"));
 
   const checks: Array<[string, Set<string>, Set<string>]> = [
     ["Kotlin VeepooSDKConstants.kt", expectedNative, kotlin],
     ["Swift VeepooSDK.swift (header)", expectedNative, swift],
     ["veepoo-sdk-runtime.ts setupEventListeners", expectedNative, listeners],
-    ["TypeScript VeepooEvent ∪ contract", expectedUnion, tsUnion],
+    ["TypeScript VeepooEventPayload keys ∪ contract", expectedUnion, tsUnion],
   ];
 
   for (const [label, exp, act] of checks) {

@@ -3,6 +3,7 @@ import { join } from "path";
 import {
   extractKotlinNativeEvents,
   extractSwiftNativeEvents,
+  extractTsVeepooEventPayloadKeys,
   extractVeepooSDKListenerEvents,
   setDiff,
   sliceSwiftEventsHeader,
@@ -12,7 +13,7 @@ import {
 const repoRoot = join(__dirname, "..", "..");
 
 describe("VeepooEvent bridge contract", () => {
-  it("repo satisfies contract (native + TS union)", () => {
+  it("repo satisfies contract (native + VeepooEventPayload keys)", () => {
     expect(verifyVeepooEventsContract(repoRoot)).toEqual([]);
   });
 
@@ -51,6 +52,24 @@ let X = "hrvTestResult"
 enum ConnectionState { case idle }`;
     expect(sliceSwiftEventsHeader(src)).toBe(`let A = "deviceFound"
 `);
+  });
+
+  it("extractTsVeepooEventPayloadKeys reads top-level keys from VeepooEventPayload", () => {
+    const src = `
+export type VeepooEventPayload = {
+  deviceFound: { x: number };
+  deviceConnected: {
+    deviceId: string;
+  };
+  error: Error;
+};
+export type VeepooEvent = keyof VeepooEventPayload;
+`;
+    expect([...extractTsVeepooEventPayloadKeys(src)].sort()).toEqual([
+      "deviceConnected",
+      "deviceFound",
+      "error",
+    ]);
   });
 
   it("extractVeepooSDKListenerEvents reads VeepooEvent array block", () => {

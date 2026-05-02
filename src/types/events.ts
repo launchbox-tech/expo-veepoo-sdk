@@ -34,41 +34,11 @@ import type {
 } from './health-tests.js';
 import type { VeepooError } from './errors.js';
 
-export type VeepooEvent =
-  | 'deviceFound'
-  | 'deviceConnected'
-  | 'deviceDisconnected'
-  | 'deviceConnectStatus'
-  | 'deviceReady'
-  | 'bluetoothStateChanged'
-  | 'deviceFunction'
-  | 'deviceVersion'
-  | 'passwordData'
-  | 'socialMsgData'
-  | 'readOriginProgress'
-  | 'readOriginComplete'
-  | 'originFiveMinuteData'
-  | 'originHalfHourData'
-  | 'sleepData'
-  | 'sportStepData'
-  | 'heartRateTestResult'
-  | 'bloodPressureTestResult'
-  | 'bloodOxygenTestResult'
-  | 'temperatureTestResult'
-  | 'stressData'
-  | 'bloodGlucoseData'
-  | 'hrvTestResult'
-  | 'ecgTestResult'
-  | 'fatigueTestResult'
-  | 'breathingTestResult'
-  | 'batteryData'
-  | 'connectionStatusChanged'
-  | 'originSpo2Data'
-  | 'alarmData'
-  | 'heartRateAlarmData'
-  | 'error';
-
-export interface VeepooEventPayload {
+/**
+ * Single source of truth for SDK events: each key is an event name, value is its listener payload.
+ * {@link VeepooEvent} is `keyof VeepooEventPayload`.
+ */
+export type VeepooEventPayload = {
   deviceFound: { device: VeepooDevice; timestamp: number };
   deviceConnected: {
     deviceId: string;
@@ -77,10 +47,18 @@ export interface VeepooEventPayload {
     isOadModel?: boolean;
   };
   deviceDisconnected: { deviceId: string };
-  deviceConnectStatus: { deviceId: string; status: ConnectionStatus; code?: number };
+  deviceConnectStatus: {
+    deviceId: string;
+    status: ConnectionStatus;
+    code?: number;
+  };
   deviceReady: { deviceId: string; isOadModel?: boolean };
   bluetoothStateChanged: BluetoothStatus;
-  deviceFunction: { deviceId: string; functions?: DeviceFunctions; data?: DeviceFunctions };
+  deviceFunction: {
+    deviceId: string;
+    functions?: DeviceFunctions;
+    data?: DeviceFunctions;
+  };
   deviceVersion: { deviceId: string; version: DeviceVersion };
   passwordData: { deviceId: string; data: PasswordData };
   socialMsgData: { deviceId: string; data: SocialMsgData };
@@ -91,7 +69,10 @@ export interface VeepooEventPayload {
   sleepData: { deviceId: string; date: string; data: SleepData };
   sportStepData: { deviceId: string; date: string; data: SportStepData };
   heartRateTestResult: { deviceId: string; result: HeartRateTestResult };
-  bloodPressureTestResult: { deviceId: string; result: BloodPressureTestResult };
+  bloodPressureTestResult: {
+    deviceId: string;
+    result: BloodPressureTestResult;
+  };
   bloodOxygenTestResult: { deviceId: string; result: BloodOxygenTestResult };
   temperatureTestResult: { deviceId: string; result: TemperatureTestResult };
   stressData: { deviceId: string; data: StressData };
@@ -106,4 +87,6 @@ export interface VeepooEventPayload {
   alarmData: { deviceId: string; alarms: DeviceAlarm[] };
   heartRateAlarmData: { deviceId: string; data: HeartRateAlarm };
   error: VeepooError;
-}
+};
+
+export type VeepooEvent = keyof VeepooEventPayload;
