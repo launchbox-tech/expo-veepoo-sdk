@@ -4,7 +4,13 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Local `expo-veepoo-sdk` (this monorepo)
 
-The example depends on the parent folder via **`"expo-veepoo-sdk": "file:.."`**. The **package name** in the parent `package.json` is `@gaozh1024/expo-veepoo-sdk`; the dependency key stays `expo-veepoo-sdk` so imports are unchanged. **`example/bunfig.toml`** sets **`install.backend = "symlink"`** so Bun does not copy the local package out of its global store (that copy often fails with **`ENOENT`** on large trees such as `android/libs/*.aar`). The parent package marks `expo` / `react` / `react-native` peers as **optional** in `peerDependenciesMeta` so local installs do not pull a second copy of those native modules under `node_modules/expo-veepoo-sdk/` (which breaks `expo-doctor`). Host apps must still depend on **Expo SDK**, **React**, and **React Native** as usual.
+The example depends on the parent folder via **`"expo-veepoo-sdk": "file:.."`**. The **package name** in the parent `package.json` is `@gaozh1024/expo-veepoo-sdk`; the dependency key stays `expo-veepoo-sdk` so imports match the host-app README. TypeScript maps that specifier to `../src` via **`tsconfig.json` `paths`**; **Metro ignores `paths`**, so **`metro.config.js`** resolves `expo-veepoo-sdk` to **`../src/index.ts`**, watches only the library’s `src` / `build` / `android` / `ios` (not the whole repo), and **blockLists** the recursive symlink path `…/expo-veepoo-sdk/example/node_modules/expo-veepoo-sdk/…` that otherwise triggers Watchman **File name too long**.
+
+**`example/bunfig.toml`** sets **`install.backend = "symlink"`** so Bun does not copy the local package out of its global store (that copy often fails with **`ENOENT`** on large trees such as `android/libs/*.aar`). The parent package marks `expo` / `react` / `react-native` peers as **optional** in `peerDependenciesMeta` so local installs do not pull a second copy of those native modules under `node_modules/expo-veepoo-sdk/` (which breaks `expo-doctor`). Host apps must still depend on **Expo SDK**, **React**, and **React Native** as usual.
+
+If Watchman still warns after upgrading, reset the watch from the **repo root**:
+
+`watchman watch-del '/path/to/expo-veepoo-sdk' ; watchman watch-project '/path/to/expo-veepoo-sdk'`
 
 ### Bun: `ENOENT: failed copying files from cache`
 
