@@ -10,5 +10,6 @@ export {
   validateScreenLightDurationSeconds,
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
+  validateFirmwareDfuFilePath,
   validateDeviceTime,
 } from './device-settings.js';

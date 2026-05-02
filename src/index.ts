@@ -64,6 +64,8 @@ export type {
   LogEntry,
   VeepooEvent,
   VeepooEventPayload,
+  FirmwareDfuState,
+  FirmwareDfuProgress,
   OperationStatus,
   TemperatureUnit,
   DistanceUnit,

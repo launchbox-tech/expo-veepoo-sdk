@@ -19,6 +19,7 @@ import {
   validateScreenLightSettings,
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
+  validateFirmwareDfuFilePath,
 } from "../validators/index.js";
 import type {
   AutoMeasureSetting,
@@ -285,6 +286,20 @@ export class DeviceSettings {
     return invokeNative({
       validate: () => validateWristFlipWakeSettings(settings),
       invoke: () => this.rt.native.setWristFlipWakeSettings(settings),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  /**
+   * Local-file firmware DFU. Listen to `firmwareDfuProgress`. **High risk:** can brick a Band if misused.
+   * Android: JL-platform Bands only (`VPOperateManager.isJLDevice`). iOS: `VPDFUOperation` local file path.
+   */
+  startLocalFirmwareDfu(filePath: string): Promise<void> {
+    return invokeNative({
+      validate: () => validateFirmwareDfuFilePath(filePath),
+      invoke: () => this.rt.native.startLocalFirmwareDfu(filePath.trim()),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),

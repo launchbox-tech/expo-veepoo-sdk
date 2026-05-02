@@ -20,6 +20,7 @@
     "error",
     "fatigueTestResult",
     "findDeviceState",
+    "firmwareDfuProgress",
     "heartRateTestResult",
     "hrvTestResult",
     "originFiveMinuteData",

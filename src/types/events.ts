@@ -35,6 +35,28 @@ import type {
 } from './health-tests.js';
 import type { VeepooError } from './errors.js';
 
+/** Normalized DFU / OTA progress (`firmwareDfuProgress` event). */
+export type FirmwareDfuState =
+  | 'fileNotExist'
+  | 'start'
+  | 'updating'
+  | 'success'
+  | 'failure'
+  | 'prepared'
+  | 'reboot'
+  | 'reconnecting'
+  | 'dfuLangConnectSuccess'
+  | 'dfuLangConnectFailed'
+  | 'unknown';
+
+export type FirmwareDfuProgress = {
+  deviceId: string;
+  /** 0–100 */
+  progress: number;
+  state: FirmwareDfuState;
+  message?: string;
+};
+
 /**
  * Single source of truth for SDK events: each key is an event name, value is its listener payload.
  * {@link VeepooEvent} is `keyof VeepooEventPayload`.
@@ -92,6 +114,7 @@ export type VeepooEventPayload = {
     phase: FindDevicePhase;
     rawState?: number;
   };
+  firmwareDfuProgress: FirmwareDfuProgress;
   error: VeepooError;
 };
 

@@ -91,6 +91,7 @@ export interface VeepooSDKModuleInterface {
   setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
   readWristFlipWakeSettings(): Promise<WristFlipWakeSettings>;
   setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
+  startLocalFirmwareDfu(filePath: string): Promise<void>;
   setLogEnabled(enabled: boolean): this;
   isLogEnabled(): boolean;
   setLogger(logger: LogListener | null): this;

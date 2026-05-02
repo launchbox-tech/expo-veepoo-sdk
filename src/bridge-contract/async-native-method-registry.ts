@@ -72,6 +72,7 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "setSedentaryReminder",
   "readWristFlipWakeSettings",
   "setWristFlipWakeSettings",
+  "startLocalFirmwareDfu",
 ] as const satisfies readonly NativeAsyncMethodName[];
 
 export type NativeAsyncRegistryUnion =

@@ -1,5 +1,9 @@
-import type { ReadOriginProgress, VeepooEvent } from '../types/index.js';
-import { isRecord, clamp } from './shared.js';
+import type {
+  ReadOriginProgress,
+  VeepooEvent,
+  FirmwareDfuState,
+} from '../types/index.js';
+import { isRecord, clamp, toInt, toStringValue } from './shared.js';
 import { normalizeBluetoothStatus, normalizePasswordData } from './connection.js';
 import {
   normalizeAlarmList,
@@ -29,6 +33,43 @@ import {
   normalizeHrvTestResult,
   normalizeTemperatureTestResult,
 } from './health-tests.js';
+
+const FIRMWARE_DFU_STATES: readonly FirmwareDfuState[] = [
+  'fileNotExist',
+  'start',
+  'updating',
+  'success',
+  'failure',
+  'prepared',
+  'reboot',
+  'reconnecting',
+  'dfuLangConnectSuccess',
+  'dfuLangConnectFailed',
+  'unknown',
+];
+
+export function normalizeFirmwareDfuProgressPayload(value: unknown): unknown {
+  if (!isRecord(value)) return value;
+  const stateRaw = toStringValue(value.state, 'unknown');
+  const state: FirmwareDfuState = (FIRMWARE_DFU_STATES as readonly string[]).includes(
+    stateRaw
+  )
+    ? (stateRaw as FirmwareDfuState)
+    : 'unknown';
+  let message: string | undefined;
+  if (value.message !== undefined && value.message !== null) {
+    message = String(value.message);
+  }
+  const out: Record<string, unknown> = {
+    deviceId: toStringValue(value.deviceId),
+    progress: clamp(toInt(value.progress), 0, 100),
+    state,
+  };
+  if (message !== undefined) {
+    out.message = message;
+  }
+  return out;
+}
 
 export function normalizeReadOriginProgressPayload(value: unknown): unknown {
   if (!isRecord(value) || !isRecord(value.progress)) return value;
@@ -112,6 +153,8 @@ export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unk
       return { ...p, data: normalizeHeartRateAlarm(p.data) };
     case 'findDeviceState':
       return normalizeFindDeviceStatePayload(p);
+    case 'firmwareDfuProgress':
+      return normalizeFirmwareDfuProgressPayload(p);
     case 'hrvTestResult':
       return { ...p, result: normalizeHrvTestResult(p.result) };
     case 'ecgTestResult':

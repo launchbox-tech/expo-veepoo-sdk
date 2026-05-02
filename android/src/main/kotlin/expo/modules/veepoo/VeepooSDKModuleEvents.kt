@@ -36,6 +36,7 @@ fun ModuleDefinitionBuilder.defineEvents() {
     ORIGIN_SPO2_DATA,
     ALARM_DATA,
     FIND_DEVICE_STATE,
+    FIRMWARE_DFU_PROGRESS,
     ERROR
   )
 }

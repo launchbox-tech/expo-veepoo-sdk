@@ -204,6 +204,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   setWristFlipWakeSettings = (settings: WristFlipWakeSettings): Promise<void> =>
     this.deviceSettings.setWristFlipWakeSettings(settings);
 
+  startLocalFirmwareDfu = (filePath: string): Promise<void> =>
+    this.deviceSettings.startLocalFirmwareDfu(filePath);
+
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 
   stopHeartRateTest = (): Promise<void> => this.realtime.stopHeartRateTest();

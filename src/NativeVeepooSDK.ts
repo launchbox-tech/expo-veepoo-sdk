@@ -85,6 +85,7 @@ export interface NativeVeepooSDKInterface {
   setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
   readWristFlipWakeSettings(): Promise<unknown>;
   setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
+  startLocalFirmwareDfu(filePath: string): Promise<void>;
   addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
   removeListeners(count: number): void;
 }

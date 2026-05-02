@@ -139,7 +139,7 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 - [x] **Wrist-flip wake** — [#99](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/99) shipped: `readWristFlipWakeSettings`, `setWristFlipWakeSettings`. Flags: `nightTurnSetting`, `isOpenNightTurnWrist`. Android: `readNightTurnWriste` / `settingNightTurnWriste`; `VpSpGetUtil.isSupportNightturnSetting`.
 
 ### Group D — Advanced (not in public API yet)
-- [ ] **OTA firmware upgrade** — [#100](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/100) stub. AARs `libdfu` / `libfastdfu` present in config; no DFU/OTA methods or events in the module.
+- [x] **OTA firmware upgrade** — [#100](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/100) shipped (local file): `startLocalFirmwareDfu`, `firmwareDfuProgress`. **Android:** JL OTA (`startJLDeviceOTAUpgrade`) only. **iOS:** `VPDFUOperation.veepooSDKStartDfuWithFilePath`. Remote server check / non-JL paths not bridged.
 - [ ] **Dial / face management** — [#101](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/101) stub. Flags: `screenStyleFunction`, `aiDial`, `videoDial`. No dial management API.
 - [ ] **Body composition** — [#102](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/102) stub. Vendor types exist upstream; no bridge types or methods.
 - [ ] **Women's health** — [#103](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/103) stub. Flag: `woman` on device functions. No settings API.

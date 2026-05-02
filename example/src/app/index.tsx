@@ -329,6 +329,18 @@ export default function Index() {
             </View>
           </View>
 
+          {/* ── Firmware DFU (#100) — no flash in example (CONTEXT) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Firmware DFU (local file)</Text>
+            <Text style={styles.findPhase} numberOfLines={8}>
+              Use{" "}
+              <Text style={{ fontWeight: "600" }}>startLocalFirmwareDfu(path)</Text>{" "}
+              from your host app with a vendor OTA package. Subscribe to{" "}
+              <Text style={{ fontWeight: "600" }}>firmwareDfuProgress</Text>. Android:
+              JL-platform Bands only. This example does not run DFU.
+            </Text>
+          </View>
+
           {/* ── Personal Info Sync ── */}
           <View style={styles.card}>
             <Text style={styles.cardLabel}>Personal Info Sync</Text>

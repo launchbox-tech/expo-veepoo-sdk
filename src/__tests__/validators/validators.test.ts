@@ -11,6 +11,7 @@ import {
   validateScreenLightSettings,
   validateSedentaryReminderSettings,
   validateWristFlipWakeSettings,
+  validateFirmwareDfuFilePath,
   validateDeviceTime,
 } from '../../validators/index';
 
@@ -391,6 +392,16 @@ describe('validateSedentaryReminderSettings', () => {
       () => validateSedentaryReminderSettings({ ...valid, thresholdMinutes: 20 }),
       'thresholdMinutes',
     );
+  });
+});
+
+describe('validateFirmwareDfuFilePath', () => {
+  it('passes for non-empty path', () => {
+    expect(() => validateFirmwareDfuFilePath('/tmp/f.bin')).not.toThrow();
+  });
+
+  it('throws for empty string', () => {
+    expectInvalidArgument(() => validateFirmwareDfuFilePath(''), 'filePath');
   });
 });
 

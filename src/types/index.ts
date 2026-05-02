@@ -83,6 +83,11 @@ export type {
   OperationStatus,
 } from './settings.js';
 
-export type { VeepooEvent, VeepooEventPayload } from './events.js';
+export type {
+  VeepooEvent,
+  VeepooEventPayload,
+  FirmwareDfuState,
+  FirmwareDfuProgress,
+} from './events.js';
 
 export type { VeepooErrorCode, VeepooError, LogLevel, LogScope, LogEntry } from './errors.js';

@@ -503,6 +503,28 @@ describe('normalizeSedentaryReminderSettings', () => {
   });
 });
 
+describe('normalizeEventPayload firmwareDfuProgress', () => {
+  it('normalizes state and progress', () => {
+    const result = normalizeEventPayload('firmwareDfuProgress', {
+      deviceId: 'ab',
+      progress: '50',
+      state: 'updating',
+    }) as { deviceId: string; progress: number; state: string };
+    expect(result.deviceId).toBe('ab');
+    expect(result.progress).toBe(50);
+    expect(result.state).toBe('updating');
+  });
+
+  it('maps unknown state to unknown', () => {
+    const result = normalizeEventPayload('firmwareDfuProgress', {
+      deviceId: 'x',
+      progress: 2,
+      state: 'bogus',
+    }) as { state: string };
+    expect(result.state).toBe('unknown');
+  });
+});
+
 describe('normalizeWristFlipWakeSettings', () => {
   it('coerces fields and optional flags', () => {
     const r = normalizeWristFlipWakeSettings({

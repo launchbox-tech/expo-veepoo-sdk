@@ -42,6 +42,8 @@ class VeepooSDKModule : Module() {
   /** Single active realtime health test (same mutex contract as iOS `activeMeasurementType`). */
   @Volatile var activeRealtimeTest: String? = null
 
+  @Volatile var isFirmwareDfuActive: Boolean = false
+
   @Volatile var isHrvTesting: Boolean = false
   @Volatile var isFatigueTesting: Boolean = false
   @Volatile var ecgWantWaveform: Boolean = false
@@ -68,6 +70,7 @@ class VeepooSDKModule : Module() {
     defineScreenLight(this@VeepooSDKModule)
     defineSedentary(this@VeepooSDKModule)
     defineWristFlipWake(this@VeepooSDKModule)
+    defineFirmwareDfu(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

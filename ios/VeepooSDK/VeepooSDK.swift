@@ -30,6 +30,7 @@ enum VeepooEvent {
   static let originSpo2Data = "originSpo2Data"
   static let socialMsgData = "socialMsgData"
   static let findDeviceState = "findDeviceState"
+  static let firmwareDfuProgress = "firmwareDfuProgress"
   static let error = "error"
 }
 
@@ -59,6 +60,7 @@ let ORIGIN_HALF_HOUR_DATA = VeepooEvent.originHalfHourData
 let ORIGIN_SPO2_DATA = VeepooEvent.originSpo2Data
 let SOCIAL_MSG_DATA = VeepooEvent.socialMsgData
 let FIND_DEVICE_STATE = VeepooEvent.findDeviceState
+let FIRMWARE_DFU_PROGRESS = VeepooEvent.firmwareDfuProgress
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -118,6 +120,7 @@ public class VeepooSDKModule: Module {
   var cachedDeviceFunctions: [String: Any] = [:]
   var activeMeasurementType: String?
   var ecgIncludeWaveform: Bool = false
+  var isFirmwareDfuActive: Bool = false
 
   var connectionState: ConnectionState = .idle {
     didSet {
@@ -206,8 +209,9 @@ public class VeepooSDKModule: Module {
       ORIGIN_FIVE_MINUTE_DATA, ORIGIN_HALF_HOUR_DATA,
       ORIGIN_SPO2_DATA, SOCIAL_MSG_DATA,
       SLEEP_DATA, SPORT_STEP_DATA, ALARM_DATA,
-      HRV_TEST_RESULT, ECG_TEST_RESULT, FATIGUE_TEST_RESULT, BREATHING_TEST_RESULT,
+      HRV_TEST_RESULT, ECG_TEST_RESULT, FATIGUE_TEST_RESULT,       BREATHING_TEST_RESULT,
       FIND_DEVICE_STATE,
+      FIRMWARE_DFU_PROGRESS,
       ERROR
     )
 
@@ -838,6 +842,10 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("setWristFlipWakeSettings") { (settings: [String: Any], promise: Promise) in
       self.handleSetWristFlipWakeSettings(settings, promise: promise)
+    }
+
+    AsyncFunction("startLocalFirmwareDfu") { (filePath: String, promise: Promise) in
+      self.handleStartLocalFirmwareDfu(filePath: filePath, promise: promise)
     }
 
     // MARK: Tests

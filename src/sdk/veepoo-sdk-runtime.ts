@@ -143,6 +143,7 @@ export class VeepooSDKRuntime {
       "originSpo2Data",
       "alarmData",
       "findDeviceState",
+      "firmwareDfuProgress",
       "error",
     ];
 
