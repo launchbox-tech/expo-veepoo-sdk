@@ -1,4 +1,3 @@
-import { requireNativeModule } from "expo-modules-core";
 import type { EventSubscription } from "expo-modules-core";
 import { Platform } from "react-native";
 
@@ -27,6 +26,7 @@ import type {
   PermissionsResult,
 } from "./types/index.js";
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
+import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
 import type { VeepooSDKModuleInterface, LogListener } from "./VeepooSDKModule.js";
 import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting } from "./validators/index.js";
 import {
@@ -46,22 +46,6 @@ import {
 
 type EventListener = (payload: unknown) => void;
 
-const LINKING_ERROR =
-  "The package 'expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +
-  "- You rebuilt the app after installing the package\n" +
-  "- You are not using Expo Go (this module requires a development build)\n";
-
-let NativeModule: NativeVeepooSDKInterface;
-try {
-  NativeModule = requireNativeModule<NativeVeepooSDKInterface>("VeepooSDK");
-} catch {
-  NativeModule = new Proxy({} as NativeVeepooSDKInterface, {
-    get() {
-      throw new Error(LINKING_ERROR);
-    },
-  });
-}
-
 export class VeepooSDK implements VeepooSDKModuleInterface {
   private readonly native: NativeVeepooSDKInterface;
   private isScanning = false;
@@ -74,7 +58,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   private listeners: Map<VeepooEvent, Set<EventListener>> = new Map();
   private nativeSubscriptions: EventSubscription[] = [];
 
-  constructor(native: NativeVeepooSDKInterface = NativeModule) {
+  constructor(native: NativeVeepooSDKInterface = NativeVeepooSDK) {
     this.native = native;
   }
 
@@ -119,7 +103,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
           : undefined,
     };
 
-    if (this.logEnabled && (globalThis as any).__DEV__ !== false) {
+    if (this.logEnabled && (typeof __DEV__ === 'undefined' || __DEV__)) {
       const consoleMethod =
         level === "error"
           ? console.error
@@ -574,10 +558,10 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     return result;
   }
 
-  async syncPersonalInfo(info: PersonalInfo): Promise<boolean> {
+  syncPersonalInfo = (info: PersonalInfo): Promise<boolean> => {
     validatePersonalInfo(info);
     return this.native.syncPersonalInfo(info);
-  }
+  };
 
   async readDeviceFunctions(): Promise<DeviceFunctions> {
     const result = normalizeDeviceFunctions(
@@ -637,9 +621,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     return this.native.startReadOriginData();
   }
 
-  async readDeviceAllData(): Promise<boolean> {
-    return this.native.readDeviceAllData();
-  }
+  readDeviceAllData = (): Promise<boolean> => this.native.readDeviceAllData();
 
   async readSleepData(date?: string): Promise<SleepData[]> {
     const result = normalizeSleepDataList(
@@ -738,9 +720,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     return result;
   }
 
-  async setLanguage(language: Language): Promise<boolean> {
-    return this.native.setLanguage(language);
-  }
+  setLanguage = (language: Language): Promise<boolean> => this.native.setLanguage(language);
 
   async startHeartRateTest(): Promise<void> {
     this.log(
