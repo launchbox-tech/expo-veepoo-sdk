@@ -29,6 +29,10 @@ export {
   normalizeBloodPressureTestResult,
   normalizeBloodOxygenTestResult,
   normalizeTemperatureTestResult,
+  normalizeHrvTestResult,
+  normalizeEcgTestResult,
+  normalizeFatigueTestResult,
+  normalizeBreathingTestResult,
 } from './health-tests.js';
 
 export { normalizeAutoMeasureSettings } from './settings.js';

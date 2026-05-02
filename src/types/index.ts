@@ -59,6 +59,11 @@ export type {
   BloodOxygenTestResult,
   TemperatureTestResult,
   BloodGlucoseTestResult,
+  HrvTestResult,
+  EcgTestOptions,
+  EcgTestResult,
+  FatigueTestResult,
+  BreathingTestResult,
   ReadState,
   ReadOriginProgress,
 } from './health-tests.js';

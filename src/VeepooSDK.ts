@@ -26,6 +26,7 @@ import type {
   VeepooEvent,
   VeepooEventPayload,
   PermissionsResult,
+  EcgTestOptions,
 } from "./types/index.js";
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
@@ -164,6 +165,10 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       "temperatureTestResult",
       "stressData",
       "bloodGlucoseData",
+      "hrvTestResult",
+      "ecgTestResult",
+      "fatigueTestResult",
+      "breathingTestResult",
       "batteryData",
       "connectionStatusChanged",
       "originSpo2Data",
@@ -314,7 +319,11 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       event === "bloodOxygenTestResult" ||
       event === "temperatureTestResult" ||
       event === "stressData" ||
-      event === "bloodGlucoseData"
+      event === "bloodGlucoseData" ||
+      event === "hrvTestResult" ||
+      event === "ecgTestResult" ||
+      event === "fatigueTestResult" ||
+      event === "breathingTestResult"
     ) {
       return "test";
     }
@@ -803,6 +812,35 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   stopBloodGlucoseTest = (): Promise<void> =>
     this.loggedVoidCall("test", "test.bloodGlucose.stop", "Stopping blood glucose test", () => this.native.stopBloodGlucoseTest());
+
+  startHrvTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.hrv.start", "Starting HRV test", () => this.native.startHrvTest());
+
+  stopHrvTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.hrv.stop", "Stopping HRV test", () => this.native.stopHrvTest());
+
+  async startEcgTest(options?: EcgTestOptions): Promise<void> {
+    this.log("info", "test", "test.ecg.start", "Starting ECG test", {
+      deviceId: this.connectedDeviceId ?? undefined,
+      data: options,
+    });
+    await this.native.startEcgTest(options);
+  }
+
+  stopEcgTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.ecg.stop", "Stopping ECG test", () => this.native.stopEcgTest());
+
+  startFatigueTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.fatigue.start", "Starting fatigue test", () => this.native.startFatigueTest());
+
+  stopFatigueTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.fatigue.stop", "Stopping fatigue test", () => this.native.stopFatigueTest());
+
+  startBreathingTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.breathing.start", "Starting breathing test", () => this.native.startBreathingTest());
+
+  stopBreathingTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.breathing.stop", "Stopping breathing test", () => this.native.stopBreathingTest());
 
   setLogEnabled(enabled: boolean): this {
     this.logEnabled = enabled;

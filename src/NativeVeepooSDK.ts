@@ -57,6 +57,14 @@ export interface NativeVeepooSDKInterface {
   stopStressTest(): Promise<void>;
   startBloodGlucoseTest(): Promise<void>;
   stopBloodGlucoseTest(): Promise<void>;
+  startHrvTest(): Promise<void>;
+  stopHrvTest(): Promise<void>;
+  startEcgTest(options?: { includeWaveform?: boolean }): Promise<void>;
+  stopEcgTest(): Promise<void>;
+  startFatigueTest(): Promise<void>;
+  stopFatigueTest(): Promise<void>;
+  startBreathingTest(): Promise<void>;
+  stopBreathingTest(): Promise<void>;
   setDeviceTime(time?: Omit<DeviceTimeSetting, 'system'>): Promise<boolean>;
   readAlarms(): Promise<unknown>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;

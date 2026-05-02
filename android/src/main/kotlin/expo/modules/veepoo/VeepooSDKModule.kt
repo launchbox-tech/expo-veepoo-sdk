@@ -9,6 +9,7 @@ import com.veepoo.protocol.model.datas.FunctionSocailMsgData
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import com.veepoo.protocol.listener.data.IECGDetectListener
 
 // Expo 模块入口
 class VeepooSDKModule : Module() {
@@ -40,6 +41,11 @@ class VeepooSDKModule : Module() {
   /** Single active realtime health test (same mutex contract as iOS `activeMeasurementType`). */
   @Volatile var activeRealtimeTest: String? = null
 
+  @Volatile var isHrvTesting: Boolean = false
+  @Volatile var isFatigueTesting: Boolean = false
+  @Volatile var ecgWantWaveform: Boolean = false
+  var ecgDetectListener: IECGDetectListener? = null
+
   val context: Context
     get() = appContext.reactContext
       ?: appContext.currentActivity?.applicationContext
@@ -56,6 +62,7 @@ class VeepooSDKModule : Module() {
     defineWriteData(this@VeepooSDKModule)
     defineAlarms(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
+    defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)
   }
 

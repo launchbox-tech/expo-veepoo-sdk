@@ -292,6 +292,25 @@ describe('normalizeEventPayload', () => {
     expect(result.data.glucose).toBeCloseTo(5.5);
   });
 
+  it('hrvTestResult: normalizes value from hrv alias', () => {
+    const result = normalizeEventPayload('hrvTestResult', {
+      deviceId: 'd1',
+      result: { rawState: 'testing', hrv: 55, progress: 10 },
+    }) as any;
+    expect(result.result.state).toBe('testing');
+    expect(result.result.value).toBe(55);
+    expect(result.result.progress).toBe(10);
+  });
+
+  it('ecgTestResult: normalizes waveform array', () => {
+    const result = normalizeEventPayload('ecgTestResult', {
+      deviceId: 'd1',
+      result: { state: 'testing', progress: 50, heartRate: 72, waveform: [1, 2, 3] },
+    }) as any;
+    expect(result.result.heartRate).toBe(72);
+    expect(result.result.waveform).toEqual([1, 2, 3]);
+  });
+
   it('batteryData: normalizes level and chargeState', () => {
     const result = normalizeEventPayload('batteryData', {
       deviceId: 'd1',

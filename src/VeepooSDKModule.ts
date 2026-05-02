@@ -20,6 +20,7 @@ import type {
   VeepooEvent,
   VeepooEventPayload,
   PermissionsResult,
+  EcgTestOptions,
 } from './types/index.js';
 
 export type LogListener = (entry: LogEntry) => void;
@@ -61,6 +62,14 @@ export interface VeepooSDKModuleInterface {
   stopStressTest(): Promise<void>;
   startBloodGlucoseTest(): Promise<void>;
   stopBloodGlucoseTest(): Promise<void>;
+  startHrvTest(): Promise<void>;
+  stopHrvTest(): Promise<void>;
+  startEcgTest(options?: EcgTestOptions): Promise<void>;
+  stopEcgTest(): Promise<void>;
+  startFatigueTest(): Promise<void>;
+  stopFatigueTest(): Promise<void>;
+  startBreathingTest(): Promise<void>;
+  stopBreathingTest(): Promise<void>;
   setDeviceTime(time?: Date): Promise<boolean>;
   readAlarms(): Promise<DeviceAlarm[]>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;

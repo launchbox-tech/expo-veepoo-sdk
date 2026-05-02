@@ -58,6 +58,10 @@ let ORIGIN_HALF_HOUR_DATA = VeepooEvent.originHalfHourData
 let ORIGIN_SPO2_DATA = VeepooEvent.originSpo2Data
 let SOCIAL_MSG_DATA = VeepooEvent.socialMsgData
 let ALARM_DATA = "alarmData"
+let HRV_TEST_RESULT = "hrvTestResult"
+let ECG_TEST_RESULT = "ecgTestResult"
+let FATIGUE_TEST_RESULT = "fatigueTestResult"
+let BREATHING_TEST_RESULT = "breathingTestResult"
 let ERROR = VeepooEvent.error
 
 // MARK: - 权限回调委托
@@ -111,7 +115,8 @@ public class VeepooSDKModule: Module {
   var activeConnectDeviceId: String?
   var cachedDeviceFunctions: [String: Any] = [:]
   var activeMeasurementType: String?
-  
+  var ecgIncludeWaveform: Bool = false
+
   var connectionState: ConnectionState = .idle {
     didSet {
       print("[VeepooSDK] 状态变化: \(oldValue.rawValue) -> \(connectionState.rawValue)")
@@ -198,7 +203,9 @@ public class VeepooSDKModule: Module {
       READ_ORIGIN_PROGRESS, READ_ORIGIN_COMPLETE,
       ORIGIN_FIVE_MINUTE_DATA, ORIGIN_HALF_HOUR_DATA,
       ORIGIN_SPO2_DATA, SOCIAL_MSG_DATA,
-      SLEEP_DATA, SPORT_STEP_DATA, ALARM_DATA, ERROR
+      SLEEP_DATA, SPORT_STEP_DATA, ALARM_DATA,
+      HRV_TEST_RESULT, ECG_TEST_RESULT, FATIGUE_TEST_RESULT, BREATHING_TEST_RESULT,
+      ERROR
     )
 
     // MARK: Initialization
@@ -901,6 +908,64 @@ public class VeepooSDKModule: Module {
       self.peripheralManage?.veepooSDKTestBloodGlucoseStart(false, isPersonalModel: false) { _, _, _, _ in }
       self.finishMeasurement(type: "bloodGlucose", reason: "manual_stop")
       promise.resolve(nil)
+      #endif
+    }
+
+    // MARK: Vitals (HRV / ECG / fatigue / breathing)
+    AsyncFunction("startHrvTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStartHrvTest(promise: promise)
+      #endif
+    }
+    AsyncFunction("stopHrvTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStopHrvTest(promise: promise)
+      #endif
+    }
+    AsyncFunction("startEcgTest") { (options: [String: Any]?, promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStartEcgTest(options: options, promise: promise)
+      #endif
+    }
+    AsyncFunction("stopEcgTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStopEcgTest(promise: promise)
+      #endif
+    }
+    AsyncFunction("startFatigueTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStartFatigueTest(promise: promise)
+      #endif
+    }
+    AsyncFunction("stopFatigueTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStopFatigueTest(promise: promise)
+      #endif
+    }
+    AsyncFunction("startBreathingTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStartBreathingTest(promise: promise)
+      #endif
+    }
+    AsyncFunction("stopBreathingTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStopBreathingTest(promise: promise)
       #endif
     }
 

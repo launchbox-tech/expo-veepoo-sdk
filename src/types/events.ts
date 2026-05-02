@@ -24,7 +24,11 @@ import type {
 import type {
   BloodOxygenTestResult,
   BloodPressureTestResult,
+  BreathingTestResult,
+  EcgTestResult,
+  FatigueTestResult,
   HeartRateTestResult,
+  HrvTestResult,
   ReadOriginProgress,
   TemperatureTestResult,
 } from './health-tests.js';
@@ -53,6 +57,10 @@ export type VeepooEvent =
   | 'temperatureTestResult'
   | 'stressData'
   | 'bloodGlucoseData'
+  | 'hrvTestResult'
+  | 'ecgTestResult'
+  | 'fatigueTestResult'
+  | 'breathingTestResult'
   | 'batteryData'
   | 'connectionStatusChanged'
   | 'originSpo2Data'
@@ -88,6 +96,10 @@ export interface VeepooEventPayload {
   temperatureTestResult: { deviceId: string; result: TemperatureTestResult };
   stressData: { deviceId: string; data: StressData };
   bloodGlucoseData: { deviceId: string; data: BloodGlucoseData };
+  hrvTestResult: { deviceId: string; result: HrvTestResult };
+  ecgTestResult: { deviceId: string; result: EcgTestResult };
+  fatigueTestResult: { deviceId: string; result: FatigueTestResult };
+  breathingTestResult: { deviceId: string; result: BreathingTestResult };
   batteryData: { deviceId: string; data: BatteryInfo };
   connectionStatusChanged: { deviceId: string; status: ConnectionStatus };
   originSpo2Data: { deviceId: string; data: Spo2OriginData };

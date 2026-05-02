@@ -34,6 +34,8 @@ import com.veepoo.protocol.model.datas.DeviceFunctionPackage3
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage4
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage5
 import com.veepoo.protocol.model.enums.DeviceManualDataType
+import com.inuker.bluetooth.library.Code
+import com.veepoo.protocol.model.enums.DeviceManualDataType
 import com.veepoo.protocol.model.settings.CustomSettingData
 import expo.modules.kotlin.Promise
 
@@ -203,6 +205,9 @@ fun VeepooSDKModule.cleanup() {
   })
   isScanning = false
   isPressureMeasuring = false
+  isHrvTesting = false
+  isFatigueTesting = false
+  ecgDetectListener = null
   activeRealtimeTest = null
   connectedDeviceId = null
   isInitialized = false
@@ -284,6 +289,170 @@ fun VeepooSDKModule.startPressureLoop(firstPromise: Promise? = null) {
       override fun onReadFail() {
         if (isPressureMeasuring) {
           mainHandler.postDelayed({ startPressureLoop() }, 2000)
+        }
+      }
+    }
+  )
+}
+
+private fun manualProbeInt(target: Any?, vararg names: String): Int {
+  if (target == null) return 0
+  for (name in names) {
+    try {
+      val f = target.javaClass.getDeclaredField(name)
+      f.isAccessible = true
+      when (val v = f.get(target)) {
+        is Int -> return v
+        is Float -> return v.toInt()
+        is Double -> return v.toInt()
+      }
+    } catch (_: Exception) {
+    }
+  }
+  return 0
+}
+
+/** HRV manual path via [readDeviceManualData] + [DeviceManualDataType.HRV] (same family as stress manual read). */
+fun VeepooSDKModule.startHrvManualReadLoop(firstPromise: Promise?) {
+  if (!isHrvTesting) return
+
+  val dataTypeList = java.util.ArrayList<DeviceManualDataType>()
+  dataTypeList.add(DeviceManualDataType.HRV)
+  val emptyList = java.util.ArrayList<DeviceManualDataType>()
+
+  VPOperateManager.getInstance().readDeviceManualData(
+    object : IBleWriteResponse {
+      override fun onResponse(code: Int) {
+        if (code != Code.REQUEST_SUCCESS) {
+          if (firstPromise != null) {
+            isHrvTesting = false
+            endRealtimeTest("hrv")
+            firstPromise.reject("START_FAILED", "HRV manual read failed: $code", null)
+          }
+        } else {
+          firstPromise?.resolve(null)
+        }
+      }
+    },
+    0L,
+    dataTypeList,
+    emptyList,
+    object : IDeviceManualDetectDataListener {
+      override fun onHrvManualDataChange(list: List<HrvManualData>?) {
+        if (isHrvTesting && list != null && list.isNotEmpty()) {
+          val latest = list.last()
+          val v = manualProbeInt(latest, "hrv", "value", "hrvValue")
+          val progress = manualProbeInt(latest, "progress", "testProgress")
+          sendEvent(
+            HRV_TEST_RESULT,
+            mapOf(
+              "deviceId" to (connectedDeviceId ?: ""),
+              "result" to mapOf(
+                "state" to "testing",
+                "rawState" to "testing",
+                "value" to v,
+                "progress" to progress
+              )
+            )
+          )
+        }
+      }
+
+      override fun onBloodPressureDataChange(list: List<BloodPressureManualData>?) {}
+      override fun onHeartRateDataChange(list: List<HeartRateManualData>?) {}
+      override fun onBloodGlucoseDataChange(list: List<BloodGlucoseManualData>?) {}
+      override fun onBloodOxygenDataChange(list: List<BloodOxygenManualData>?) {}
+      override fun onBodyTemperatureDataChange(list: List<BodyTemperatureManualData>?) {}
+      override fun onPressureManualDataChange(list: List<PressureManualData>?) {}
+      override fun onMetoManualDataChange(list: List<MetoManualData>?) {}
+      override fun onBloodComponentManualDataChange(list: List<BloodComponentManualData>?) {}
+      override fun onMiniCheckupManualDataChange(list: List<MiniCheckupManualData>?) {}
+      override fun onEmotionManualDataChange(list: List<EmotionManualData>?) {}
+      override fun onFatigueManualDataChange(list: List<FatigueManualData>?) {}
+      override fun onSkinConductanceManualDataChange(list: List<SkinConductanceManualData>?) {}
+      override fun onReadProgress(progress: Float) {}
+      override fun onReadComplete() {
+        if (isHrvTesting) {
+          mainHandler.postDelayed({ startHrvManualReadLoop(null) }, 1000)
+        }
+      }
+
+      override fun onReadFail() {
+        if (isHrvTesting) {
+          mainHandler.postDelayed({ startHrvManualReadLoop(null) }, 2000)
+        }
+      }
+    }
+  )
+}
+
+fun VeepooSDKModule.startFatigueManualReadLoop(firstPromise: Promise?) {
+  if (!isFatigueTesting) return
+
+  val dataTypeList = java.util.ArrayList<DeviceManualDataType>()
+  dataTypeList.add(DeviceManualDataType.FATIGUE)
+  val emptyList = java.util.ArrayList<DeviceManualDataType>()
+
+  VPOperateManager.getInstance().readDeviceManualData(
+    object : IBleWriteResponse {
+      override fun onResponse(code: Int) {
+        if (code != Code.REQUEST_SUCCESS) {
+          if (firstPromise != null) {
+            isFatigueTesting = false
+            endRealtimeTest("fatigue")
+            firstPromise.reject("START_FAILED", "Fatigue manual read failed: $code", null)
+          }
+        } else {
+          firstPromise?.resolve(null)
+        }
+      }
+    },
+    0L,
+    dataTypeList,
+    emptyList,
+    object : IDeviceManualDetectDataListener {
+      override fun onFatigueManualDataChange(list: List<FatigueManualData>?) {
+        if (isFatigueTesting && list != null && list.isNotEmpty()) {
+          val latest = list.last()
+          val level = manualProbeInt(latest, "fatigueLevel", "level", "value")
+          val progress = manualProbeInt(latest, "progress", "testProgress")
+          sendEvent(
+            FATIGUE_TEST_RESULT,
+            mapOf(
+              "deviceId" to (connectedDeviceId ?: ""),
+              "result" to mapOf(
+                "state" to "testing",
+                "rawState" to "testing",
+                "level" to level,
+                "progress" to progress
+              )
+            )
+          )
+        }
+      }
+
+      override fun onBloodPressureDataChange(list: List<BloodPressureManualData>?) {}
+      override fun onHeartRateDataChange(list: List<HeartRateManualData>?) {}
+      override fun onBloodGlucoseDataChange(list: List<BloodGlucoseManualData>?) {}
+      override fun onBloodOxygenDataChange(list: List<BloodOxygenManualData>?) {}
+      override fun onBodyTemperatureDataChange(list: List<BodyTemperatureManualData>?) {}
+      override fun onPressureManualDataChange(list: List<PressureManualData>?) {}
+      override fun onHrvManualDataChange(list: List<HrvManualData>?) {}
+      override fun onMetoManualDataChange(list: List<MetoManualData>?) {}
+      override fun onBloodComponentManualDataChange(list: List<BloodComponentManualData>?) {}
+      override fun onMiniCheckupManualDataChange(list: List<MiniCheckupManualData>?) {}
+      override fun onEmotionManualDataChange(list: List<EmotionManualData>?) {}
+      override fun onSkinConductanceManualDataChange(list: List<SkinConductanceManualData>?) {}
+      override fun onReadProgress(progress: Float) {}
+      override fun onReadComplete() {
+        if (isFatigueTesting) {
+          mainHandler.postDelayed({ startFatigueManualReadLoop(null) }, 1000)
+        }
+      }
+
+      override fun onReadFail() {
+        if (isFatigueTesting) {
+          mainHandler.postDelayed({ startFatigueManualReadLoop(null) }, 2000)
         }
       }
     }

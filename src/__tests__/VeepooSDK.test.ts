@@ -50,6 +50,14 @@ function makeMockNative(): MockNative {
     stopStressTest: jest.fn().mockResolvedValue(undefined),
     startBloodGlucoseTest: jest.fn().mockResolvedValue(undefined),
     stopBloodGlucoseTest: jest.fn().mockResolvedValue(undefined),
+    startHrvTest: jest.fn().mockResolvedValue(undefined),
+    stopHrvTest: jest.fn().mockResolvedValue(undefined),
+    startEcgTest: jest.fn().mockResolvedValue(undefined),
+    stopEcgTest: jest.fn().mockResolvedValue(undefined),
+    startFatigueTest: jest.fn().mockResolvedValue(undefined),
+    stopFatigueTest: jest.fn().mockResolvedValue(undefined),
+    startBreathingTest: jest.fn().mockResolvedValue(undefined),
+    stopBreathingTest: jest.fn().mockResolvedValue(undefined),
     addListener: jest.fn().mockImplementation((event: string, listener: (p: unknown) => void) => {
       if (!listeners.has(event)) listeners.set(event, new Set());
       listeners.get(event)!.add(listener);
@@ -513,6 +521,21 @@ describe('VeepooSDK', () => {
     it('stopHeartRateTest() delegates to native', async () => {
       await sdk.stopHeartRateTest();
       expect(native.stopHeartRateTest).toHaveBeenCalled();
+    });
+
+    it('startHrvTest() delegates to native', async () => {
+      await sdk.startHrvTest();
+      expect(native.startHrvTest).toHaveBeenCalled();
+    });
+
+    it('startEcgTest({ includeWaveform: true }) passes options to native', async () => {
+      await sdk.startEcgTest({ includeWaveform: true });
+      expect(native.startEcgTest).toHaveBeenCalledWith({ includeWaveform: true });
+    });
+
+    it('stopFatigueTest() delegates to native', async () => {
+      await sdk.stopFatigueTest();
+      expect(native.stopFatigueTest).toHaveBeenCalled();
     });
   });
 });

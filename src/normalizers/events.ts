@@ -21,7 +21,11 @@ import {
 import {
   normalizeBloodOxygenTestResult,
   normalizeBloodPressureTestResult,
+  normalizeBreathingTestResult,
+  normalizeEcgTestResult,
+  normalizeFatigueTestResult,
   normalizeHeartRateTestResult,
+  normalizeHrvTestResult,
   normalizeTemperatureTestResult,
 } from './health-tests.js';
 
@@ -105,6 +109,14 @@ export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unk
       return { ...p, alarms: normalizeAlarmList(p.alarms ?? p.data) };
     case 'heartRateAlarmData':
       return { ...p, data: normalizeHeartRateAlarm(p.data) };
+    case 'hrvTestResult':
+      return { ...p, result: normalizeHrvTestResult(p.result) };
+    case 'ecgTestResult':
+      return { ...p, result: normalizeEcgTestResult(p.result) };
+    case 'fatigueTestResult':
+      return { ...p, result: normalizeFatigueTestResult(p.result) };
+    case 'breathingTestResult':
+      return { ...p, result: normalizeBreathingTestResult(p.result) };
     default:
       return payload;
   }
