@@ -1,7 +1,7 @@
 # Issue #13: example: extract useBandScan hook
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/13
-> Status: closed | Labels: enhancement, needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 

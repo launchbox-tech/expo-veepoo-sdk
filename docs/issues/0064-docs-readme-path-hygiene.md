@@ -1,5 +1,7 @@
 # 64 — docs(readme): remove foreign paths; fix doc links
 
+> Status: closed | Labels: enhancement
+
 ## Parent
 
 #59

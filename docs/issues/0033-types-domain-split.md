@@ -1,8 +1,7 @@
 # refactor(types): domain-split types.ts into src/types/ with barrel re-export
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/33
-> Labels: needs-triage
-> Status: open
+> Status: closed | Labels: enhancement
 > Parent: #32
 
 ## What to build

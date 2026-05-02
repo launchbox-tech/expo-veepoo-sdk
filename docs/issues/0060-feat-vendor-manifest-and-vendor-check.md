@@ -1,5 +1,7 @@
 # 60 — feat(vendor): manifest + npm run vendor:check (warn-only)
 
+> Status: closed | Labels: enhancement
+
 ## Parent
 
 #59

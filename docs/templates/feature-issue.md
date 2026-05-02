@@ -1,5 +1,7 @@
 # Feature vertical-slice checklist
 
+> **Labels (GitHub):** start with `needs-triage` for new work; after maintainer triage, switch to `ready-for-agent` and/or `ready-for-human` and/or `enhancement`, and **remove** `needs-triage`. Do not leave `needs-triage` on **closed** issues; update the local mirror under `docs/issues/` the same way.
+
 Every feature PR must satisfy all items below before merge.
 
 ## Native — Android

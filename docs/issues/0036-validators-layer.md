@@ -1,8 +1,7 @@
 # feat(validators): add src/validators/ layer and wire into VeepooSDK
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/36
-> Labels: needs-triage
-> Status: open
+> Status: closed | Labels: enhancement
 > Parent: #32
 
 ## What to build

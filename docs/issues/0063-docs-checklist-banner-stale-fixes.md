@@ -1,5 +1,7 @@
 # 63 — docs(checklist): banner + fix stale §2 (originSpo2Data)
 
+> Status: closed | Labels: enhancement
+
 ## Parent
 
 #59

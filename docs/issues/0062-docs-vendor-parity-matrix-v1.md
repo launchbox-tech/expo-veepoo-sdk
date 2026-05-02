@@ -1,5 +1,7 @@
 # 62 — docs(vendor): vendor-parity-matrix.md v1
 
+> Status: closed | Labels: enhancement
+
 ## Parent
 
 #59

@@ -1,8 +1,7 @@
 # PRD: refactor(sdk): eliminate emitLocal nested ternary chain
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/29
-> Labels: needs-triage, enhancement
-> Status: open
+> Status: closed | Labels: enhancement
 
 ## Problem Statement
 

@@ -1,6 +1,7 @@
 # 59 — feat(docs): vendor upstream tracking and API parity
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/59
+> Status: closed | Labels: enhancement
 
 ## Problem Statement
 
@@ -81,3 +82,4 @@ Refresh **stale maintainer checklists** with a **banner** pointing at the parity
 
 - Mirror this PRD under **`docs/prd/`** with filename keyed to this issue number per AGENTS sync rule.
 - Grill decisions already locked: manifest-only, warn-only check, matrix in docs, checklist trim not delete, ADR yes, epic + children, no duplicate CONTEXT for vendor terms.
+- **Labels:** `needs-triage` was used when opening related GitHub issues; after closure, **`needs-triage` was removed from GitHub and local mirrors** per label hygiene (queue-only label — see AGENTS.md).

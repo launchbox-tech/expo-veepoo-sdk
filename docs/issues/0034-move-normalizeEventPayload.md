@@ -1,8 +1,7 @@
 # refactor(normalizers): move normalizeEventPayload into normalizers.ts
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/34
-> Labels: needs-triage
-> Status: open
+> Status: closed | Labels: enhancement
 > Parent: #32
 
 ## What to build

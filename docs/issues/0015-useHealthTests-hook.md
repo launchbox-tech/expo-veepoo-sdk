@@ -1,7 +1,7 @@
 # Issue #15: example: extract useHealthTests hook
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/15
-> Status: closed | Labels: enhancement, needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 

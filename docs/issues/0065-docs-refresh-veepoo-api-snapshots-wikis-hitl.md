@@ -1,5 +1,7 @@
 # 65 — docs(vendor): refresh offline Veepoo API snapshots from wikis (HITL)
 
+> Status: closed | Labels: enhancement
+
 ## Parent
 
 #59

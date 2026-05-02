@@ -1,8 +1,7 @@
 # PRD: refactor(sdk): TDD refactor of VeepooSDK
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/22
-> Labels: needs-triage
-> Status: open
+> Status: closed | Labels: enhancement
 
 ## Problem Statement
 

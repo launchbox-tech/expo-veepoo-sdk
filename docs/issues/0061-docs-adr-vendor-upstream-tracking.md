@@ -1,5 +1,7 @@
 # 61 — docs(adr): ADR 0002 vendor upstream tracking
 
+> Status: closed | Labels: enhancement
+
 ## Parent
 
 #59

@@ -1,7 +1,7 @@
 # Issue #17: example: final wiring — stale-state derivation + drop useCallback
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/17
-> Status: closed | Labels: enhancement, needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 

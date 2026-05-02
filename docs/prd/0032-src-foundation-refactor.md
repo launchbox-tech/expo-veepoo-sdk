@@ -1,8 +1,7 @@
 # PRD: refactor(src): foundation — domain-split types, thin native adapter, validators layer
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/32
-> Labels: needs-triage
-> Status: open
+> Status: closed | Labels: enhancement
 
 ## Problem Statement
 

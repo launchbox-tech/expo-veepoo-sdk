@@ -8,7 +8,8 @@
 ---
 
 ## §0. Triage
-- [ ] Close GitHub issue #32 — all sub-issues (#33, #34, #35, #36) shipped
+- [x] Close GitHub issue #32 — all sub-issues (#33, #34, #35, #36) shipped
+- [x] Clear **`needs-triage`** from closed GitHub issues and local **`docs/issues/`** / **`docs/prd/`** mirrors (queue label only — remove after triage).
 
 ---
 

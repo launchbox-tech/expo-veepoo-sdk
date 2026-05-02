@@ -35,3 +35,5 @@ Wiki 实时文档与 drift 说明见各文件顶部提示框；API 与 JS 桥对
 | [`vendor-parity-matrix.md`](vendor-parity-matrix.md) | Vendor 能力与 `VeepooSDK` JS API / 事件对照表 |
 | [`adr/0002-vendor-upstream-tracking.md`](adr/0002-vendor-upstream-tracking.md) | 不落 submodule、manifest、`vendor:check` 决策 |
 | [`prd/0059-vendor-upstream-tracking-and-parity.md`](prd/0059-vendor-upstream-tracking-and-parity.md) | PRD #59（父工单） |
+
+本地 **`docs/issues/`** / **`docs/prd/`** 卡片里的 **`Labels:`** 应与 GitHub 一致；**`needs-triage`** 仅作入库队列，结案或分流后应从远端与镜像中去掉（见根目录 **AGENTS.md**）。

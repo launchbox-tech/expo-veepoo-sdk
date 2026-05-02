@@ -1,7 +1,7 @@
 # Issue #12: example: extract useSDKInit hook
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/12
-> Status: closed | Labels: enhancement, needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 

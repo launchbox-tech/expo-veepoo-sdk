@@ -1,7 +1,7 @@
 # Issue #16: example: extract useDataSync hook
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/16
-> Status: closed | Labels: enhancement, needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 

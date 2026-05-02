@@ -1,7 +1,7 @@
 # Issue #11: example: useSDKEvent primitive + appStateReducer + CONTEXT.md Band Discovery
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/11
-> Status: closed | Labels: enhancement, needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 

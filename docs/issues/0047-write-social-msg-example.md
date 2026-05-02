@@ -1,7 +1,7 @@
 # Issue #47: writeSocialMsgData — example app read-then-write demo
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/47
-> Status: open | Type: HITL | Blocked by: #44, #45
+> Status: open | Labels: ready-for-human | Type: HITL | Blocked by: #44, #45
 
 ## Parent
 
