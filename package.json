@@ -13,6 +13,7 @@
     "test": "expo-module test",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
+    "vendor:check": "node scripts/vendor-check.mjs",
     "android": "expo run:android",
     "ios": "expo run:ios"
   },
