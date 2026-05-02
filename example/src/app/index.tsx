@@ -58,6 +58,8 @@ export default function Index() {
   const ecgResult = appState === "ready" ? healthTests.ecgResult : null;
   const fatigueResult = appState === "ready" ? healthTests.fatigueResult : null;
   const breathingResult = appState === "ready" ? healthTests.breathingResult : null;
+  const bodyCompositionResult =
+    appState === "ready" ? healthTests.bodyCompositionResult : null;
   const activeTest = appState === "ready" ? healthTests.activeTest : null;
   const ecgIncludeWaveform =
     appState === "ready" ? healthTests.ecgIncludeWaveform : false;
@@ -82,6 +84,8 @@ export default function Index() {
     stopFatigue,
     startBreathing,
     stopBreathing,
+    startBodyComposition,
+    stopBodyComposition,
     setEcgIncludeWaveform,
     clearLabLog,
   } = healthTests;
@@ -509,6 +513,29 @@ export default function Index() {
             }
             onStart={startBreathing}
             onStop={stopBreathing}
+          />
+          <HealthTestCard
+            label="Body composition (#102)"
+            isActive={activeTest === "bodyComposition"}
+            disabled={
+              activeTest !== null && activeTest !== "bodyComposition"
+            }
+            progress={bodyCompositionResult?.progress}
+            state={
+              typeof bodyCompositionResult?.state === "string"
+                ? bodyCompositionResult.state
+                : undefined
+            }
+            resultLine={
+              bodyCompositionResult?.composition?.bmi != null
+                ? `BMI ${bodyCompositionResult.composition.bmi.toFixed(1)}`
+                : bodyCompositionResult?.composition?.bodyFatPercentage !=
+                    null
+                ? `Fat ${bodyCompositionResult.composition.bodyFatPercentage}%`
+                : null
+            }
+            onStart={startBodyComposition}
+            onStop={stopBodyComposition}
           />
 
           <View style={styles.card}>

@@ -72,6 +72,8 @@ export type {
   EcgTestResult,
   FatigueTestResult,
   BreathingTestResult,
+  BodyCompositionMetrics,
+  BodyCompositionTestResult,
   ReadState,
   ReadOriginProgress,
 } from './health-tests.js';

@@ -66,6 +66,7 @@ let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
 let FATIGUE_TEST_RESULT = "fatigueTestResult"
 let BREATHING_TEST_RESULT = "breathingTestResult"
+let BODY_COMPOSITION_TEST_RESULT = "bodyCompositionTestResult"
 let ERROR = VeepooEvent.error
 
 // MARK: - 权限回调委托
@@ -210,6 +211,7 @@ public class VeepooSDKModule: Module {
       ORIGIN_SPO2_DATA, SOCIAL_MSG_DATA,
       SLEEP_DATA, SPORT_STEP_DATA, ALARM_DATA,
       HRV_TEST_RESULT, ECG_TEST_RESULT, FATIGUE_TEST_RESULT,       BREATHING_TEST_RESULT,
+      BODY_COMPOSITION_TEST_RESULT,
       FIND_DEVICE_STATE,
       FIRMWARE_DFU_PROGRESS,
       ERROR
@@ -1033,6 +1035,22 @@ public class VeepooSDKModule: Module {
       promise.resolve(nil)
       #else
       self.handleStopBreathingTest(promise: promise)
+      #endif
+    }
+
+    AsyncFunction("startBodyCompositionTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStartBodyCompositionTest(promise: promise)
+      #endif
+    }
+
+    AsyncFunction("stopBodyCompositionTest") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(nil)
+      #else
+      self.handleStopBodyCompositionTest(promise: promise)
       #endif
     }
 

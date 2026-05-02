@@ -585,6 +585,16 @@ describe('VeepooSDK', () => {
       await sdk.setWatchFaceStyle({ screenIndex: 1, dialType: 'photo' });
       expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 1, dialType: 'photo' });
     });
+
+    it('startBodyCompositionTest delegates to native', async () => {
+      await sdk.startBodyCompositionTest();
+      expect(native.startBodyCompositionTest).toHaveBeenCalled();
+    });
+
+    it('stopBodyCompositionTest delegates to native', async () => {
+      await sdk.stopBodyCompositionTest();
+      expect(native.stopBodyCompositionTest).toHaveBeenCalled();
+    });
   });
 
   // ── Data methods ───────────────────────────────────────────────────────────

@@ -38,6 +38,7 @@ export {
   normalizeEcgTestResult,
   normalizeFatigueTestResult,
   normalizeBreathingTestResult,
+  normalizeBodyCompositionTestResult,
 } from './health-tests.js';
 
 export { normalizeAutoMeasureSettings } from './settings.js';

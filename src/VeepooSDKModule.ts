@@ -78,6 +78,8 @@ export interface VeepooSDKModuleInterface {
   stopFatigueTest(): Promise<void>;
   startBreathingTest(): Promise<void>;
   stopBreathingTest(): Promise<void>;
+  startBodyCompositionTest(): Promise<void>;
+  stopBodyCompositionTest(): Promise<void>;
   setDeviceTime(time?: Date): Promise<boolean>;
   readAlarms(): Promise<DeviceAlarm[]>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;

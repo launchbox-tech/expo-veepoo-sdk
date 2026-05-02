@@ -26,6 +26,7 @@ import {
 import {
   normalizeBloodOxygenTestResult,
   normalizeBloodPressureTestResult,
+  normalizeBodyCompositionTestResult,
   normalizeBreathingTestResult,
   normalizeEcgTestResult,
   normalizeFatigueTestResult,
@@ -163,6 +164,8 @@ export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unk
       return { ...p, result: normalizeFatigueTestResult(p.result) };
     case 'breathingTestResult':
       return { ...p, result: normalizeBreathingTestResult(p.result) };
+    case 'bodyCompositionTestResult':
+      return { ...p, result: normalizeBodyCompositionTestResult(p.result) };
     default:
       return payload;
   }

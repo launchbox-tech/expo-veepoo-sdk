@@ -90,4 +90,20 @@ export class RealtimeTests {
 
   stopBreathingTest = (): Promise<void> =>
     this.invokeRealtimeTestVoid("test", "test.breathing.stop", "Stopping breathing test", () => this.rt.native.stopBreathingTest());
+
+  startBodyCompositionTest = (): Promise<void> =>
+    this.invokeRealtimeTestVoid(
+      "test",
+      "test.bodyComposition.start",
+      "Starting body composition test",
+      () => this.rt.native.startBodyCompositionTest(),
+    );
+
+  stopBodyCompositionTest = (): Promise<void> =>
+    this.invokeRealtimeTestVoid(
+      "test",
+      "test.bodyComposition.stop",
+      "Stopping body composition test",
+      () => this.rt.native.stopBodyCompositionTest(),
+    );
 }

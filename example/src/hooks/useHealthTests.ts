@@ -3,6 +3,7 @@ import sdk from 'expo-veepoo-sdk';
 import type {
   BloodOxygenTestResult,
   BloodPressureTestResult,
+  BodyCompositionTestResult,
   BreathingTestResult,
   EcgTestResult,
   FatigueTestResult,
@@ -21,13 +22,19 @@ export type ActiveRealtimeTest =
   | 'ecg'
   | 'fatigue'
   | 'breathing'
+  | 'bodyComposition'
   | null;
 
 const LOG_CAP = 48;
 
 function isTerminalState(state: string | undefined): boolean {
   if (!state) return false;
-  return state === 'over' || state === 'error' || state === 'notWear';
+  return (
+    state === 'over' ||
+    state === 'error' ||
+    state === 'notWear' ||
+    state === 'complete'
+  );
 }
 
 function formatErr(e: unknown): string {
@@ -56,6 +63,7 @@ export function useHealthTests(appState: AppState): {
   ecgResult: EcgTestResult | null;
   fatigueResult: FatigueTestResult | null;
   breathingResult: BreathingTestResult | null;
+  bodyCompositionResult: BodyCompositionTestResult | null;
   activeTest: ActiveRealtimeTest;
   ecgIncludeWaveform: boolean;
   setEcgIncludeWaveform: (v: boolean) => void;
@@ -75,6 +83,8 @@ export function useHealthTests(appState: AppState): {
   stopFatigue: () => Promise<void>;
   startBreathing: () => Promise<void>;
   stopBreathing: () => Promise<void>;
+  startBodyComposition: () => Promise<void>;
+  stopBodyComposition: () => Promise<void>;
 } {
   const [hrResult, setHrResult] = useState<HeartRateTestResult | null>(null);
   const [bpResult, setBpResult] = useState<BloodPressureTestResult | null>(null);
@@ -83,6 +93,8 @@ export function useHealthTests(appState: AppState): {
   const [ecgResult, setEcgResult] = useState<EcgTestResult | null>(null);
   const [fatigueResult, setFatigueResult] = useState<FatigueTestResult | null>(null);
   const [breathingResult, setBreathingResult] = useState<BreathingTestResult | null>(null);
+  const [bodyCompositionResult, setBodyCompositionResult] =
+    useState<BodyCompositionTestResult | null>(null);
   const [activeTest, setActiveTest] = useState<ActiveRealtimeTest>(null);
   const [ecgIncludeWaveform, setEcgIncludeWaveform] = useState(false);
   const [labLog, setLabLog] = useState<string[]>([]);
@@ -179,6 +191,18 @@ export function useHealthTests(appState: AppState): {
       appendLog(`breathingTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
         setActiveTest(prev => (prev === 'breathing' ? null : prev));
+      }
+    },
+    isReady
+  );
+
+  useSDKEvent(
+    'bodyCompositionTestResult',
+    ({ result }) => {
+      setBodyCompositionResult(result);
+      appendLog(`bodyCompositionTestResult ${clipJson(result)}`);
+      if (result.isEnd === true || isTerminalState(String(result.state))) {
+        setActiveTest(prev => (prev === 'bodyComposition' ? null : prev));
       }
     },
     isReady
@@ -339,6 +363,27 @@ export function useHealthTests(appState: AppState): {
     }
   }
 
+  async function startBodyComposition() {
+    setBodyCompositionResult(null);
+    try {
+      setActiveTest('bodyComposition');
+      await sdk.startBodyCompositionTest();
+      appendLog('startBodyCompositionTest ok');
+    } catch (e) {
+      setActiveTest(null);
+      appendLog(`startBodyCompositionTest ${formatErr(e)}`);
+    }
+  }
+
+  async function stopBodyComposition() {
+    try {
+      await sdk.stopBodyCompositionTest();
+      appendLog('stopBodyCompositionTest ok');
+    } finally {
+      setActiveTest(null);
+    }
+  }
+
   return {
     hrResult,
     bpResult,
@@ -347,6 +392,7 @@ export function useHealthTests(appState: AppState): {
     ecgResult,
     fatigueResult,
     breathingResult,
+    bodyCompositionResult,
     activeTest,
     ecgIncludeWaveform,
     setEcgIncludeWaveform,
@@ -366,5 +412,7 @@ export function useHealthTests(appState: AppState): {
     stopFatigue,
     startBreathing,
     stopBreathing,
+    startBodyComposition,
+    stopBodyComposition,
   };
 }

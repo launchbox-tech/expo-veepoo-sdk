@@ -177,6 +177,74 @@ extension VeepooSDKModule {
     #endif
   }
 
+  func handleStartBodyCompositionTest(promise: Promise) {
+    #if targetEnvironment(simulator)
+    promise.resolve(nil)
+    #else
+    guard self.ensureMeasurementCanStart(type: "bodyComposition", promise: promise) else {
+      return
+    }
+    guard let peripheralManage = self.peripheralManage else {
+      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+      return
+    }
+    if (self.bleManager?.peripheralModel?.bodyCompositionType ?? 0) == 0 {
+      self.finishMeasurement(type: "bodyComposition", reason: "capability_unsupported")
+      promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support body composition")
+      return
+    }
+
+    peripheralManage.veepooSDKTestBodyCompositionStart(true, progress: { [weak self] lead, nsProgress in
+      guard let self = self else { return }
+      let pct = Int((nsProgress.fractionCompleted * 100.0).rounded())
+      self.sendEvent(BODY_COMPOSITION_TEST_RESULT, [
+        "deviceId": self.connectedDeviceId ?? "",
+        "result": [
+          "state": "testing",
+          "progress": pct,
+          "lead": lead,
+          "rawState": "progress",
+          "isEnd": false
+        ]
+      ])
+    }, testResult: { [weak self] state, model in
+      guard let self = self else { return }
+      let rawVal = state.rawValue
+      var payload: [String: Any] = [
+        "state": self.bodyCompositionStateLabel(state),
+        "rawState": rawVal,
+        "isEnd": self.bodyCompositionStateIsTerminal(state)
+      ]
+      if let model = model {
+        payload["composition"] = self.bodyCompositionValueModelToMap(model)
+      }
+      if let p = self.bodyCompositionProgressHint(state) {
+        payload["progress"] = p
+      }
+      self.sendEvent(BODY_COMPOSITION_TEST_RESULT, [
+        "deviceId": self.connectedDeviceId ?? "",
+        "result": payload
+      ])
+      if self.bodyCompositionStateIsTerminal(state) {
+        peripheralManage.veepooSDKTestBodyCompositionStart(false, progress: { _, _ in }, testResult: { _, _ in })
+        self.finishMeasurement(type: "bodyComposition", reason: "terminal_\(rawVal)")
+      }
+    })
+
+    promise.resolve(nil)
+    #endif
+  }
+
+  func handleStopBodyCompositionTest(promise: Promise) {
+    #if targetEnvironment(simulator)
+    promise.resolve(nil)
+    #else
+    self.peripheralManage?.veepooSDKTestBodyCompositionStart(false, progress: { _, _ in }, testResult: { _, _ in })
+    self.finishMeasurement(type: "bodyComposition", reason: "manual_stop")
+    promise.resolve(nil)
+    #endif
+  }
+
   // MARK: - Mapping helpers
 
   private func ecgTestStateLabel(_ state: VPTestECGState) -> String {
@@ -244,5 +312,63 @@ extension VeepooSDKModule {
     default:
       return false
     }
+  }
+
+  private func bodyCompositionStateLabel(_ state: VPDeviceBodyCompositionState) -> String {
+    switch state {
+    case .noFunction: return "unsupported"
+    case .deviceBusy: return "deviceBusy"
+    case .over: return "over"
+    case .lowPower: return "lowPower"
+    case .failure: return "error"
+    case .complete: return "complete"
+    @unknown default: return "testing"
+    }
+  }
+
+  private func bodyCompositionStateIsTerminal(_ state: VPDeviceBodyCompositionState) -> Bool {
+    switch state {
+    case .noFunction, .deviceBusy, .over, .lowPower, .failure, .complete:
+      return true
+    @unknown default:
+      return false
+    }
+  }
+
+  private func bodyCompositionProgressHint(_ state: VPDeviceBodyCompositionState) -> Int? {
+    switch state {
+    case .complete: return 100
+    default: return nil
+    }
+  }
+
+  private func bodyCompositionMetricDouble(_ s: String?) -> Double? {
+    guard let s = s?.trimmingCharacters(in: .whitespacesAndNewlines), !s.isEmpty else { return nil }
+    return Double(s.replacingOccurrences(of: ",", with: "."))
+  }
+
+  private func bodyCompositionValueModelToMap(_ m: VPBodyCompositionValueModel) -> [String: Any] {
+    var o: [String: Any] = [:]
+    if let d = m.date { o["date"] = d }
+    if let t = m.testTime { o["testTime"] = t }
+    o["isDeviceTest"] = m.isDeviceTest
+    o["statureCm"] = m.stature
+    o["weightKg"] = m.weight
+    o["gender"] = m.gender
+    if let v = bodyCompositionMetricDouble(m.bmi) { o["bmi"] = v }
+    if let v = bodyCompositionMetricDouble(m.bodyFatPercentage) { o["bodyFatPercentage"] = v }
+    if let v = bodyCompositionMetricDouble(m.fatMass) { o["fatMassKg"] = v }
+    if let v = bodyCompositionMetricDouble(m.leanBodyMass) { o["leanBodyMassKg"] = v }
+    if let v = bodyCompositionMetricDouble(m.muscleRate) { o["muscleRate"] = v }
+    if let v = bodyCompositionMetricDouble(m.muscleMass) { o["muscleMassKg"] = v }
+    if let v = bodyCompositionMetricDouble(m.subcutaneousFat) { o["subcutaneousFatPercentage"] = v }
+    if let v = bodyCompositionMetricDouble(m.bodyMoisture) { o["bodyWaterPercentage"] = v }
+    if let v = bodyCompositionMetricDouble(m.waterContent) { o["waterMassKg"] = v }
+    if let v = bodyCompositionMetricDouble(m.skeletalMuscleRate) { o["skeletalMuscleRate"] = v }
+    if let v = bodyCompositionMetricDouble(m.boneMass) { o["boneMassKg"] = v }
+    if let v = bodyCompositionMetricDouble(m.proportionOfProtein) { o["proteinPercentage"] = v }
+    if let v = bodyCompositionMetricDouble(m.proteinAmount) { o["proteinMassKg"] = v }
+    if let v = bodyCompositionMetricDouble(m.basalMetabolicRate) { o["basalMetabolicRateKcal"] = v }
+    return o
   }
 }

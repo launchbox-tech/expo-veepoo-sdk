@@ -1,7 +1,7 @@
-# 102 — feat(health): Body composition — bridge stub (#95)
+# 102 — feat(health): Body composition — bridge (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/102
-> Status: open | Labels: needs-triage
+> Status: open | Labels: ready-for-human (device verify)
 
 ## Parent
 
@@ -9,18 +9,22 @@
 
 ## What to build
 
-**Stub issue** — vertical slice to be detailed after triage (`docs/checklist.md` §7 Group C/D). Target capability area: **Body composition: bridge vendor body-composition reads/writes with TypeScript types, normalizers, and parity matrix row.**. Related `DeviceFunctions` / capability hints (from checklist): **(vendor types upstream)**.
+**Manual body-composition test** on the Band: **`startBodyCompositionTest` / `stopBodyCompositionTest`** with progress and results on **`bodyCompositionTestResult`**. Gate with **`readDeviceFunctions().bodyComponent`** (and native support checks).
 
-End state: full tracer bullet per `docs/templates/feature-issue.md` — Kotlin + Swift + TypeScript public API + validators + normalizers + events (if any) + Jest tests + minimal safe `example/` demo (OTA exempt from real flash). **Session** eligibility and error mapping follow **CONTEXT.md** and **ADR 0003**. Host apps gate UI with **`readDeviceFunctions()`**.
+**Android:** `VPOperateManager.startDetectBodyComponent` / `stopDetectBodyComponent`; `VpSpGetUtil.isSupportBodyComponent`.
+
+**iOS:** `veepooSDKTestBodyCompositionStart` / stop via `start(false,…)`; `peripheralModel.bodyCompositionType`.
+
+**Out of scope:** Android `readBodyComponentData` / ID list, iOS `veepooSDKGetDeviceOffStoreBodyCompositionWithDate`, marketplace / private-mode extras.
 
 ## Acceptance criteria
 
-- [ ] Stub replaced or supplemented with vendor research notes (wiki/SDK symbols, iOS vs Android entry points) in a PR or issue comment before merge of implementation PR.
-- [ ] Public JS API + native implementations (or documented **Partial** with `CAPABILITY_UNSUPPORTED` on the gap platform).
-- [ ] Types, validators, normalizers, and unit tests for new payloads / methods.
-- [ ] `docs/vendor-api/vendor-parity-matrix.md` updated for this capability row.
-- [ ] `npm run typecheck` (or project equivalent) and tests green.
+- [x] Vendor entry points documented in parity matrix.
+- [x] Public JS API + Kotlin + Swift for start/stop + event.
+- [x] Types, normalizers, unit tests, `bridge-contract/veepoo-events.json` updated.
+- [x] Minimal `example/` HealthTest card.
+- [x] `npm run typecheck` and tests green.
 
 ## Blocked by
 
-None — stub; **implementation order** follows **CONTEXT.md** delivery sequence (Group **C** personalization before higher-risk **D** work; Android Bluetooth control last). Coordinate with maintainers before starting if another open issue already owns this slice.
+None.

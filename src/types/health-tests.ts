@@ -87,6 +87,45 @@ export interface BreathingTestResult {
   rawState?: string;
 }
 
+/** Normalized body-composition metrics (manual test). Vendor strings scaled per firmware; values are best-effort doubles. */
+export interface BodyCompositionMetrics {
+  date?: string;
+  testTime?: string;
+  isDeviceTest?: boolean;
+  statureCm?: number;
+  weightKg?: number;
+  /** Vendor: 0 female, 1 male */
+  gender?: number;
+  bmi?: number;
+  bodyFatPercentage?: number;
+  fatMassKg?: number;
+  leanBodyMassKg?: number;
+  muscleRate?: number;
+  muscleMassKg?: number;
+  subcutaneousFatPercentage?: number;
+  bodyWaterPercentage?: number;
+  waterMassKg?: number;
+  skeletalMuscleRate?: number;
+  boneMassKg?: number;
+  proteinPercentage?: number;
+  proteinMassKg?: number;
+  basalMetabolicRateKcal?: number;
+  measurementDurationSeconds?: number;
+  /** Android: 1 device test, 2 app test */
+  sourceIdType?: number;
+  measurementTime?: { year?: number; month?: number; day?: number; hour?: number; minute?: number };
+}
+
+export interface BodyCompositionTestResult {
+  state: TestState | string;
+  progress?: number;
+  /** iOS progress callback: 0 lead OK, 1 lead off */
+  lead?: number;
+  rawState?: number | string;
+  isEnd?: boolean;
+  composition?: BodyCompositionMetrics;
+}
+
 export type ReadState = 'idle' | 'start' | 'reading' | 'complete' | 'invalid';
 
 export interface ReadOriginProgress {

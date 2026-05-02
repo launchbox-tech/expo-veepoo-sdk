@@ -141,7 +141,7 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 ### Group D — Advanced (not in public API yet)
 - [x] **OTA firmware upgrade** — [#100](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/100) shipped (local file): `startLocalFirmwareDfu`, `firmwareDfuProgress`. **Android:** JL OTA (`startJLDeviceOTAUpgrade`) only. **iOS:** `VPDFUOperation.veepooSDKStartDfuWithFilePath`. Remote server check / non-JL paths not bridged.
 - [x] **Dial / face management** — [#101](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/101) shipped: `readWatchFaceStyle`, `setWatchFaceStyle` (dial category + slot index). Flags: `screenStyleFunction`, `aiDial`, `videoDial`. Custom image / server catalog transfer not bridged.
-- [ ] **Body composition** — [#102](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/102) stub. Vendor types exist upstream; no bridge types or methods.
+- [x] **Body composition** — [#102](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/102) shipped: `startBodyCompositionTest`, `stopBodyCompositionTest`, `bodyCompositionTestResult`. Flag: `bodyComponent`. Historical `readBodyComponentData` / iOS DB export not bridged.
 - [ ] **Women's health** — [#103](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/103) stub. Flag: `woman` on device functions. No settings API.
 - [ ] **Weather push** — [#104](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/104) stub. Flags: `weatherFunction`, `weatherStyle`. No weather push API.
 - [ ] **Contact management with SOS** — [#105](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/105) stub. Flags: `contactFunction`, `contactType`, `contactMsgLength`. No contact API.

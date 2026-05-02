@@ -258,6 +258,10 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   stopBreathingTest = (): Promise<void> => this.realtime.stopBreathingTest();
 
+  startBodyCompositionTest = (): Promise<void> => this.realtime.startBodyCompositionTest();
+
+  stopBodyCompositionTest = (): Promise<void> => this.realtime.stopBodyCompositionTest();
+
   setLogEnabled(enabled: boolean): this {
     this.rt.setLogEnabled(enabled);
     return this;

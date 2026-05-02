@@ -5,9 +5,11 @@ import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
 import com.veepoo.protocol.listener.data.*
 import com.veepoo.protocol.model.datas.*
+import com.veepoo.protocol.model.enums.DetectState
 import com.veepoo.protocol.model.enums.EBPDetectModel
 import com.veepoo.protocol.model.enums.EBloodGlucoseRiskLevel
 import com.veepoo.protocol.model.enums.EBloodGlucoseStatus
+import com.veepoo.protocol.shareprence.VpSpGetUtil
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.ModuleDefinitionBuilder
 
@@ -593,5 +595,176 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
         override fun onBGMultipleAdjustingSettingFailed() {}
       }
     )
+  }
+
+  AsyncFunction("startBodyCompositionTest") { promise: Promise ->
+    if (!module.tryBeginRealtimeTest("bodyComposition", promise)) {
+      return@AsyncFunction
+    }
+    val ctx = module.context
+    if (!VpSpGetUtil.getVpSpVariInstance(ctx).isSupportBodyComponent) {
+      module.endRealtimeTest("bodyComposition")
+      promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support body composition", null)
+      return@AsyncFunction
+    }
+    val manager = VPOperateManager.getInstance() ?: run {
+      module.endRealtimeTest("bodyComposition")
+      promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
+      return@AsyncFunction
+    }
+
+    manager.startDetectBodyComponent(
+      object : IBleWriteResponse {
+        override fun onResponse(code: Int) {
+          if (code == Code.REQUEST_SUCCESS) {
+            promise.resolve(null)
+          } else {
+            module.endRealtimeTest("bodyComposition")
+            promise.reject("START_FAILED", "Start body composition failed: $code", null)
+          }
+        }
+      },
+      object : IBodyComponentDetectListener {
+        override fun onDetecting(progress: Int, leadState: Int) {
+          module.sendEvent(BODY_COMPOSITION_TEST_RESULT, mapOf(
+            "deviceId" to (module.connectedDeviceId ?: ""),
+            "result" to mapOf(
+              "state" to "testing",
+              "progress" to progress,
+              "lead" to leadState,
+              "rawState" to "detecting",
+              "isEnd" to false
+            )
+          ))
+        }
+
+        override fun onDetectSuccess(bodyComponent: BodyComponent) {
+          module.endRealtimeTest("bodyComposition")
+          module.sendEvent(BODY_COMPOSITION_TEST_RESULT, mapOf(
+            "deviceId" to (module.connectedDeviceId ?: ""),
+            "result" to mapOf(
+              "state" to "complete",
+              "progress" to 100,
+              "rawState" to "success",
+              "isEnd" to true,
+              "composition" to bodyComponentToCompositionMap(bodyComponent)
+            )
+          ))
+        }
+
+        override fun onDetectFailed(detectState: DetectState) {
+          module.endRealtimeTest("bodyComposition")
+          module.sendEvent(BODY_COMPOSITION_TEST_RESULT, mapOf(
+            "deviceId" to (module.connectedDeviceId ?: ""),
+            "result" to mapOf(
+              "state" to detectStateToBodyCompLabel(detectState),
+              "progress" to 0,
+              "rawState" to detectState.name,
+              "isEnd" to true
+            )
+          ))
+        }
+
+        override fun onDetectStop() {
+          module.endRealtimeTest("bodyComposition")
+          module.sendEvent(BODY_COMPOSITION_TEST_RESULT, mapOf(
+            "deviceId" to (module.connectedDeviceId ?: ""),
+            "result" to mapOf(
+              "state" to "over",
+              "progress" to 100,
+              "rawState" to "stop",
+              "isEnd" to true
+            )
+          ))
+        }
+      }
+    )
+  }
+
+  AsyncFunction("stopBodyCompositionTest") { promise: Promise ->
+    if (!module.isInitialized || module.connectedDeviceId == null) {
+      promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
+      return@AsyncFunction
+    }
+    module.endRealtimeTest("bodyComposition")
+    val manager = VPOperateManager.getInstance() ?: run {
+      promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
+      return@AsyncFunction
+    }
+    manager.stopDetectBodyComponent(
+      object : IBleWriteResponse {
+        override fun onResponse(code: Int) {
+          if (code == Code.REQUEST_SUCCESS) {
+            promise.resolve(null)
+          } else {
+            promise.reject("STOP_FAILED", "Stop body composition failed: $code", null)
+          }
+        }
+      }
+    )
+  }
+}
+
+private fun readBodyFloat(bean: BodyComponent, vararg names: String): Double? {
+  val cls = bean.javaClass
+  for (n in names) {
+    try {
+      val m = cls.getMethod(n)
+      val v = m.invoke(bean) ?: continue
+      return when (v) {
+        is Float -> v.toDouble()
+        is Double -> v
+        is Int -> v.toDouble()
+        else -> null
+      }
+    } catch (_: Exception) {
+    }
+  }
+  return null
+}
+
+private fun bodyComponentToCompositionMap(b: BodyComponent): Map<String, Any?> {
+  val out = mutableMapOf<String, Any?>()
+  readBodyFloat(b, "getBMI", "getBmi")?.let { out["bmi"] = it }
+  readBodyFloat(b, "getBodyFatRate", "getBodyFatPercentage")?.let { out["bodyFatPercentage"] = it }
+  readBodyFloat(b, "getFatRate", "getFatMass")?.let { out["fatMassKg"] = it }
+  readBodyFloat(b, "getFFM", "getFfm", "getLeanBodyMass")?.let { out["leanBodyMassKg"] = it }
+  readBodyFloat(b, "getMuscleRate")?.let { out["muscleRate"] = it }
+  readBodyFloat(b, "getMuscleMass")?.let { out["muscleMassKg"] = it }
+  readBodyFloat(b, "getSubcutaneousFat")?.let { out["subcutaneousFatPercentage"] = it }
+  readBodyFloat(b, "getBodyWater", "getBodyMoisture")?.let { out["bodyWaterPercentage"] = it }
+  readBodyFloat(b, "getWaterContent")?.let { out["waterMassKg"] = it }
+  readBodyFloat(b, "getSkeletalMuscleRate")?.let { out["skeletalMuscleRate"] = it }
+  readBodyFloat(b, "getBoneMass")?.let { out["boneMassKg"] = it }
+  readBodyFloat(b, "getProteinProportion", "getProportionOfProtein")?.let { out["proteinPercentage"] = it }
+  readBodyFloat(b, "getProteinMass")?.let { out["proteinMassKg"] = it }
+  readBodyFloat(b, "getBasalMetabolicRate")?.let { out["basalMetabolicRateKcal"] = it }
+  try {
+    val d = b.duration
+    out["measurementDurationSeconds"] = d
+  } catch (_: Exception) {
+  }
+  try {
+    out["sourceIdType"] = b.idType
+  } catch (_: Exception) {
+  }
+  try {
+    val tb = b.timeBean
+    if (tb != null) {
+      out["measurementTime"] = mapOf("hour" to tb.hour, "minute" to tb.minute)
+    }
+  } catch (_: Exception) {
+  }
+  return out
+}
+
+private fun detectStateToBodyCompLabel(ds: DetectState): String {
+  return when (ds) {
+    DetectState.PROGRESS -> "testing"
+    DetectState.SUCCESS -> "complete"
+    DetectState.FAILED -> "error"
+    DetectState.BUSY -> "deviceBusy"
+    DetectState.LOW_POWER -> "lowPower"
+    else -> "error"
   }
 }

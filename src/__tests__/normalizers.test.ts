@@ -504,6 +504,24 @@ describe('normalizeSedentaryReminderSettings', () => {
   });
 });
 
+describe('normalizeEventPayload bodyCompositionTestResult', () => {
+  it('normalizes result and nested composition', () => {
+    const result = normalizeEventPayload('bodyCompositionTestResult', {
+      deviceId: 'd1',
+      result: {
+        state: 'complete',
+        progress: 100,
+        rawState: 5,
+        isEnd: true,
+        composition: { bmi: '22.5', bodyFatPercentage: 18.2, fatMassKg: 12.3 },
+      },
+    }) as { deviceId: string; result: { composition?: { bmi?: number; bodyFatPercentage?: number } } };
+    expect(result.deviceId).toBe('d1');
+    expect(result.result.composition?.bmi).toBe(22.5);
+    expect(result.result.composition?.bodyFatPercentage).toBe(18.2);
+  });
+});
+
 describe('normalizeEventPayload firmwareDfuProgress', () => {
   it('normalizes state and progress', () => {
     const result = normalizeEventPayload('firmwareDfuProgress', {

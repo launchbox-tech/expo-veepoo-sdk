@@ -138,6 +138,7 @@ export class VeepooSDKRuntime {
       "ecgTestResult",
       "fatigueTestResult",
       "breathingTestResult",
+      "bodyCompositionTestResult",
       "batteryData",
       "connectionStatusChanged",
       "originSpo2Data",
@@ -295,7 +296,8 @@ export class VeepooSDKRuntime {
       event === "hrvTestResult" ||
       event === "ecgTestResult" ||
       event === "fatigueTestResult" ||
-      event === "breathingTestResult"
+      event === "breathingTestResult" ||
+      event === "bodyCompositionTestResult"
     ) {
       return "test";
     }

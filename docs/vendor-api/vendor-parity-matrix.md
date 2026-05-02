@@ -95,6 +95,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | ECG (manual realtime) | `startEcgTest`, `stopEcgTest`; `ecgTestResult` (optional `includeWaveform`) | Shipped | TBD |
 | Fatigue (manual realtime) | `startFatigueTest`, `stopFatigueTest`; `fatigueTestResult` | Shipped | TBD |
 | Breathing rate (manual realtime) | `startBreathingTest`, `stopBreathingTest`; `breathingTestResult` | Shipped | TBD |
+| Body composition (manual realtime) | `startBodyCompositionTest`, `stopBodyCompositionTest`; `bodyCompositionTestResult` | Shipped | TBD |
 
 ### Further notes (realtime vitals, PRD #66)
 
@@ -102,6 +103,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 - **HRV:** **Android** uses `readDeviceManualData` + `DeviceManualDataType.HRV` with `IDeviceManualDetectDataListener.onHrvManualDataChange` (polling loop in `VeepooSDKModuleHelpers.kt`). **iOS** (`VPPeripheralBaseManage.h`): `VPManualTestDataType` defines only blood pressure and heart rate bits—no HRV; `readManualTestDataWithTimestamp` returns `VPManualTestDataModel` (manual BP). Historical HRV uses `veepooSdkStartReadDeviceHrvData` / DB helpers, not an app-driven manual realtime test. There is no `veepooSDKTestHrvStart`-style entry point alongside stress/temperature/ECG. **`startHrvTest`** therefore rejects with **`CAPABILITY_UNSUPPORTED`** with a message pointing here; use **historical HRV** or **Android** for this modality until the vendor ships a documented iOS equivalent.
 - **ECG:** Summary-style fields are always emitted on `ecgTestResult`. **`startEcgTest({ includeWaveform: true })`** may populate `result.waveform` when the Band and native stack support it; payloads can be large.
 - **Breathing:** **iOS** uses `veepooSDKTestBreathingRateStart`; **Android** uses `startDetectBreath` / `stopDetectBreath` with `BreathData` (maps `deviceState` / progress / value into the same `breathingTestResult` shape as iOS).
+- **Body composition:** Gate with `readDeviceFunctions().bodyComponent` where applicable. **Android:** `startDetectBodyComponent` / `stopDetectBodyComponent` (`IBodyComponentDetectListener`, `BodyComponent`); `VpSpGetUtil.isSupportBodyComponent`. **iOS:** `veepooSDKTestBodyCompositionStart` (progress + `VPDeviceBodyCompositionState` / `VPBodyCompositionValueModel`); `peripheralModel.bodyCompositionType`. **Partial:** historical `readBodyComponentData` / DB offline lists are **not** bridged in this slice.
 
 ---
 
@@ -120,7 +122,7 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 
 - Remote OTA metadata / download (`checkDeviceOTAInfo`, `getOadVersion`, `veepooSDKStartDfu` server path) and non-JL Android DFU  
 - Server / marketplace dial transfer, custom photo push pipelines, video dials (beyond slot read/set)  
-- Body composition, women’s health, weather push, contacts/SOS, AGPS, music/camera remote  
+- Women’s health, weather push, contacts/SOS, AGPS, music/camera remote  
 - Platform-specific extras (e.g. toggling OS Bluetooth from SDK)
 
 Treat gaps as **Not in JS** until a PR adds methods **and** updates this matrix.

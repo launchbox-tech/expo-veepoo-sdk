@@ -1,6 +1,8 @@
 import type {
   BloodOxygenTestResult,
   BloodPressureTestResult,
+  BodyCompositionMetrics,
+  BodyCompositionTestResult,
   BreathingTestResult,
   EcgTestResult,
   FatigueTestResult,
@@ -100,5 +102,59 @@ export function normalizeBreathingTestResult(value: unknown): BreathingTestResul
     progress: toInt(record.progress),
     rate: toInt(record.rate ?? record.breathingRate),
     rawState: typeof record.rawState === 'string' ? record.rawState : undefined,
+  };
+}
+
+export function normalizeBodyCompositionMetrics(value: unknown): BodyCompositionMetrics | undefined {
+  if (!isRecord(value)) return undefined;
+  const r = value;
+  const mt = r.measurementTime;
+  const timeRec = isRecord(mt) ? mt : undefined;
+  return {
+    date: typeof r.date === 'string' ? r.date : undefined,
+    testTime: typeof r.testTime === 'string' ? r.testTime : undefined,
+    isDeviceTest: typeof r.isDeviceTest === 'boolean' ? r.isDeviceTest : undefined,
+    statureCm: toInt(r.statureCm ?? r.stature),
+    weightKg: toInt(r.weightKg ?? r.weight),
+    gender: toInt(r.gender),
+    bmi: toNumber(r.bmi),
+    bodyFatPercentage: toNumber(r.bodyFatPercentage),
+    fatMassKg: toNumber(r.fatMassKg ?? r.fatMass),
+    leanBodyMassKg: toNumber(r.leanBodyMassKg ?? r.leanBodyMass),
+    muscleRate: toNumber(r.muscleRate),
+    muscleMassKg: toNumber(r.muscleMassKg ?? r.muscleMass),
+    subcutaneousFatPercentage: toNumber(r.subcutaneousFatPercentage ?? r.subcutaneousFat),
+    bodyWaterPercentage: toNumber(r.bodyWaterPercentage ?? r.bodyMoisture),
+    waterMassKg: toNumber(r.waterMassKg ?? r.waterContent),
+    skeletalMuscleRate: toNumber(r.skeletalMuscleRate),
+    boneMassKg: toNumber(r.boneMassKg ?? r.boneMass),
+    proteinPercentage: toNumber(r.proteinPercentage ?? r.proportionOfProtein),
+    proteinMassKg: toNumber(r.proteinMassKg ?? r.proteinAmount),
+    basalMetabolicRateKcal: toNumber(r.basalMetabolicRateKcal ?? r.basalMetabolicRate),
+    measurementDurationSeconds: toInt(r.measurementDurationSeconds ?? r.duration),
+    sourceIdType: toInt(r.sourceIdType ?? r.idType),
+    measurementTime:
+      timeRec ?
+        {
+          year: toInt(timeRec.year),
+          month: toInt(timeRec.month),
+          day: toInt(timeRec.day),
+          hour: toInt(timeRec.hour),
+          minute: toInt(timeRec.minute),
+        }
+      : undefined,
+  };
+}
+
+export function normalizeBodyCompositionTestResult(value: unknown): BodyCompositionTestResult {
+  const record = isRecord(value) ? value : {};
+  const raw = record.rawState;
+  return {
+    state: normalizeTestState(record.state),
+    progress: toInt(record.progress),
+    lead: toInt(record.lead),
+    rawState: typeof raw === 'string' || typeof raw === 'number' ? raw : undefined,
+    isEnd: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
+    composition: normalizeBodyCompositionMetrics(record.composition),
   };
 }

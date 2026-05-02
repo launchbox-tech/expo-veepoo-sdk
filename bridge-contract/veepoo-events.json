@@ -8,6 +8,7 @@
     "bloodPressureTestResult",
     "bluetoothStateChanged",
     "breathingTestResult",
+    "bodyCompositionTestResult",
     "connectionStatusChanged",
     "deviceConnectStatus",
     "deviceConnected",

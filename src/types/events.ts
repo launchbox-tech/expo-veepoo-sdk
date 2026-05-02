@@ -25,6 +25,7 @@ import type {
 import type {
   BloodOxygenTestResult,
   BloodPressureTestResult,
+  BodyCompositionTestResult,
   BreathingTestResult,
   EcgTestResult,
   FatigueTestResult,
@@ -104,6 +105,7 @@ export type VeepooEventPayload = {
   ecgTestResult: { deviceId: string; result: EcgTestResult };
   fatigueTestResult: { deviceId: string; result: FatigueTestResult };
   breathingTestResult: { deviceId: string; result: BreathingTestResult };
+  bodyCompositionTestResult: { deviceId: string; result: BodyCompositionTestResult };
   batteryData: { deviceId: string; data: BatteryInfo };
   connectionStatusChanged: { deviceId: string; status: ConnectionStatus };
   originSpo2Data: { deviceId: string; data: Spo2OriginData };
