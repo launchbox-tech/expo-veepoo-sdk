@@ -1,4 +1,7 @@
 # Pre-Feature Refactor Checklist
+
+> **Vendor / API inventory:** [`vendor-parity-matrix.md`](vendor-parity-matrix.md) is the canonical map from vendor wiki capability areas to `VeepooSDK` methods and events. Update it when you ship features. Upstream drift: [`vendor-manifest.json`](../vendor-manifest.json) · `npm run vendor:check`.
+
 > Created: 2026-05-01. Continue from here tomorrow.
 > Start at §0 and work top to bottom. Answer §8 grilling questions before touching any feature code.
 
@@ -16,20 +19,15 @@
 
 ---
 
-## §2. Native ↔ TypeScript event parity (critical — fix before anything else)
+## §2. Native ↔ TypeScript event parity
 
 Both native modules declare an `Events(...)` block. Every event in that block must exist in the TS `VeepooEvent` union, `VeepooEventPayload`, `setupEventListeners()`, and `normalizeEventPayload`.
 
 | Event | Android | iOS | TS union | `setupEventListeners` | normalizer |
 |---|---|---|---|---|---|
-| `originSpo2Data` | ✅ | ✅ | ❌ | ❌ | ❌ |
+| `originSpo2Data` | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-- [ ] Add `'originSpo2Data'` to `VeepooEvent` union in `src/types/events.ts`
-- [ ] Define `Spo2OriginData` payload type; add `originSpo2Data` entry to `VeepooEventPayload`
-- [ ] Export `Spo2OriginData` from `src/index.ts`
-- [ ] Add `'originSpo2Data'` to the `events` array in `setupEventListeners()` in `src/VeepooSDK.ts`
-- [ ] Add normalization case in `normalizeEventPayload` for `'originSpo2Data'`
-- [ ] Add test in `normalizers.test.ts` for the new case
+`originSpo2Data` parity is **done** — keep this row when adding **new** native events (mirror checklist for each).
 
 ---
 
