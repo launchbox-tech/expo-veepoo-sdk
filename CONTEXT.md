@@ -24,4 +24,6 @@ Vocabulary for **Band**, **Session**, **Band Discovery**, and **Pairing** follow
 
 **Delivery sequence (C / D):** Capabilities ship in a **fixed order** that combines **lower blast radius first** with **dependency order**: Group **C** settings-style APIs (find Band, screen, sedentary, wrist-flip) before medium-integration features (weather, women’s health, AGPS, music/camera), then higher-risk work (**OTA/DFU**, **dial management**, **contacts/SOS**, **body composition**), with **Android-only** controls (e.g. Bluetooth power) **last**.
 
+**Cross-platform API shape:** The module keeps a **unified JavaScript API** on iOS and Android for each capability. If the pinned native SDK on one platform has **no** compatible vendor entry point, that platform’s implementation **rejects** with **`CAPABILITY_UNSUPPORTED`** (per **`VeepooError`** / **ADR 0003**), and the gap is recorded in **`docs/vendor-api/vendor-parity-matrix.md`**. Host apps rely on **`readDeviceFunctions()`** and runtime errors rather than platform-conditional TypeScript exports.
+
 _(Grill-with-docs #4 — Q1–Q6.)_
