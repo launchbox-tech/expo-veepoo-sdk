@@ -13,7 +13,7 @@
 ---
 
 ## §1. `expo-module.config.json` audit
-- [ ] **`"ios"` → `"apple"`** — skill recommends `"apple"` as the platform key (covers iOS + macOS). Current config uses legacy `"ios"`. Verify with `references/module-config.md`.
+- [x] **`"ios"` → `"apple"`** — config uses **`apple`** and **`platforms`: `["apple", "android"]`**. Confirm autolinking after changes via `example/` **`expo prebuild --clean`** or **`expo run:ios`**.
 - [x] **No `"web"` platform** — correct; repo has no `*.web.ts` files.
 - [ ] **AAR project names** — 10 vendor AARs in `gradleAarProjects`; verify each name matches the actual `.aar` file and that no new AARs are needed for upcoming features (OTA needs `libdfu`/`libfastdfu`, already listed ✓).
 
@@ -155,8 +155,8 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 1. **Error event on validation failure?** **Resolved** (grill-with-docs): **throw-only** for sync validators; **`error`** event stays for async/native paths — see **`CONTEXT.md`** (*Validator vs `error` event*).
 2. **`normalizers.ts` split: now or after features?** **Resolved:** split landed under `src/normalizers/`; new work extends domain files + `events.ts`.
 3. **`VeepooSDK.ts` split: now or after Group A?** **Resolved:** façade + `src/sdk/*` split is in place; monitor size of individual `sdk/` modules as features land.
-4. **Native layer in scope for this refactor pass?** Kotlin/Swift style/organization audit before features, or TS-only for now?
-5. **`"ios"` → `"apple"` in config: safe to change now?** Or wait until a device build is possible to verify it doesn't break anything?
+4. **Native layer in scope for this refactor pass?** **Resolved** (grill-with-docs): **Per-PR native** for each C/D slice; incremental consistency — see **`CONTEXT.md`** (*Native work scope*).
+5. **`"ios"` → `"apple"` in config: safe to change now?** **Resolved:** **`expo-module.config.json`** uses **`apple`**; verify with **`example/`** prebuild or **`expo run:ios`** — see **`CONTEXT.md`** (*expo-module.config.json*).
 6. **Example app demos for new features?** **Resolved** (grill-with-docs): minimal safe demos for new **C/D** APIs; **OTA/DFU** exempt from real flash — see **`CONTEXT.md`** (*Example app*).
 
 ---
@@ -164,10 +164,8 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 ## Quick-start — next actions
 
 ```
-1.  §1 — Decide `"ios"` → `"apple"` + run a device/prebuild smoke test, or defer with rationale
-2.  §1 — Spot-check AAR names vs android/libs/*.aar
-3.  §3 — Manual: 0001 prebuild/permissions; confirm 0032 / #32 status on GitHub
-4.  §5 — Answer §8 Q4, Q5 (native audit scope, `"apple"` config key)
-5.  §5-B — Optional: move VeepooSDKModuleInterface to src/types/module.ts
-6.  §7 — Next vendor gaps: historical HRV origin + RR data (Group B partial), then Group C/D PRDs after §8 decisions
+1.  §1 — Spot-check AAR names vs android/libs/*.aar
+2.  §3 — Manual: 0001 prebuild/permissions; confirm 0032 / #32 status on GitHub
+3.  §5-B — Optional: move VeepooSDKModuleInterface to src/types/module.ts
+4.  §7 — Next vendor gaps: historical HRV origin + RR data (Group B partial), then Group C/D PRDs (fixed sequence in **CONTEXT.md**)
 ```

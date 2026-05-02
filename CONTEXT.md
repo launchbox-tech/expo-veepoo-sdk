@@ -32,4 +32,8 @@ Vocabulary for **Band**, **Session**, **Band Discovery**, and **Pairing** follow
 
 **Validator vs `error` event:** **Synchronous validation** (`INVALID_ARGUMENT` and related) **throws** and **does not** emit **`error`** on the SDK event bus. The **`error`** event remains for **async / native** fault paths mapped per **ADR 0003**. Host apps unify logging via **`try/catch`** at call sites or a wrapper if they need one stream.
 
+**Native work scope (C / D parity):** Each **vertical-slice PR** that adds a **C** or **D** capability includes **Kotlin + Swift** changes following the existing **per-feature** native layout (`VeepooSDKModule<Feature>.kt`, `VeepooSDKModule+<Feature>.swift`, constants/events as today). There is **no separate** repo-wide native “audit” gate before shipping; **consistency and cleanup** happen **incrementally** when those files are touched.
+
+**`expo-module.config.json` platform key:** Use the canonical **`apple`** key (and **`"apple"`** in **`platforms`**) per Expo autolinking docs — not legacy **`ios`**. After changing, run **`npx expo prebuild --clean`** (or **`expo run:ios`**) in a consuming app (e.g. **`example/`**) to confirm autolinking; physical Band not required for that check.
+
 _(Grill-with-docs #4 — Q1–Q6.)_
