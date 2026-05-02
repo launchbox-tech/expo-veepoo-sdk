@@ -291,4 +291,33 @@ describe('normalizeEventPayload', () => {
     expect(result.data).toBeDefined();
     expect(result.data.heartValue).toBe(72);
   });
+
+  it('originSpo2Data: normalizes spo2 origin fields', () => {
+    const result = normalizeEventPayload('originSpo2Data', {
+      deviceId: 'd1',
+      data: {
+        time: '08:00',
+        date: '2024-01-01',
+        heartValue: 68,
+        value: 98,
+        rate: 15,
+        isHypoxia: 0,
+        cardiacLoad: 5,
+        temp1: 36,
+        sportValue: 0,
+        apneaResult: 0,
+        hypoxiaTime: 0,
+        hypopnea: 0,
+        stepValue: 100,
+        allPackNumber: 10,
+        currentPackNumber: 1,
+      },
+    }) as any;
+    expect(result.deviceId).toBe('d1');
+    expect(result.data.time).toBe('08:00');
+    expect(result.data.heartValue).toBe(68);
+    expect(result.data.value).toBe(98);
+    expect(result.data.allPackNumber).toBe(10);
+    expect(result.data.currentPackNumber).toBe(1);
+  });
 });

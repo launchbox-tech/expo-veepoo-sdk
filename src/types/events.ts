@@ -15,6 +15,7 @@ import type {
   HalfHourData,
   OriginData,
   SleepData,
+  Spo2OriginData,
   SportStepData,
   StressData,
 } from './health-data.js';
@@ -52,6 +53,7 @@ export type VeepooEvent =
   | 'bloodGlucoseData'
   | 'batteryData'
   | 'connectionStatusChanged'
+  | 'originSpo2Data'
   | 'error';
 
 export interface VeepooEventPayload {
@@ -84,5 +86,6 @@ export interface VeepooEventPayload {
   bloodGlucoseData: { deviceId: string; data: BloodGlucoseData };
   batteryData: { deviceId: string; data: BatteryInfo };
   connectionStatusChanged: { deviceId: string; status: ConnectionStatus };
+  originSpo2Data: { deviceId: string; data: Spo2OriginData };
   error: VeepooError;
 }

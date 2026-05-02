@@ -39,6 +39,7 @@ export type {
   DaySummaryData,
   OriginData,
   HalfHourData,
+  Spo2OriginData,
   TestState,
   HeartRateTestResult,
   BloodPressureTestResult,

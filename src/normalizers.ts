@@ -25,6 +25,7 @@ import type {
   TestState,
   OriginData,
   BloodPressureTestResult,
+  Spo2OriginData,
 } from './types/index.js';
 
 const bluetoothStatesByCode: BluetoothState[] = [
@@ -802,6 +803,27 @@ export function normalizeBloodGlucoseData(value: unknown): BloodGlucoseData {
   };
 }
 
+export function normalizeSpo2OriginData(value: unknown): Spo2OriginData {
+  const record = isRecord(value) ? value : {};
+  return {
+    time: toStringValue(record.time) ?? '',
+    date: toStringValue(record.date) ?? '',
+    heartValue: toInt(record.heartValue),
+    value: toInt(record.value),
+    rate: toInt(record.rate),
+    isHypoxia: toInt(record.isHypoxia),
+    cardiacLoad: toInt(record.cardiacLoad),
+    temp1: toInt(record.temp1),
+    sportValue: toInt(record.sportValue),
+    apneaResult: toInt(record.apneaResult),
+    hypoxiaTime: toInt(record.hypoxiaTime),
+    hypopnea: toInt(record.hypopnea),
+    stepValue: toInt(record.stepValue),
+    allPackNumber: toInt(record.allPackNumber),
+    currentPackNumber: toInt(record.currentPackNumber),
+  };
+}
+
 export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unknown {
   if (typeof payload !== 'object' || payload === null) return payload;
   const p = payload as Record<string, any>;
@@ -844,6 +866,8 @@ export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unk
       return { ...p, data: normalizeBloodGlucoseData(p.data) };
     case 'batteryData':
       return { ...p, data: normalizeBatteryInfo(p.data) };
+    case 'originSpo2Data':
+      return { ...p, data: normalizeSpo2OriginData(p.data) };
     default:
       return payload;
   }

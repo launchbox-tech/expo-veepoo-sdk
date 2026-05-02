@@ -179,6 +179,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       "bloodGlucoseData",
       "batteryData",
       "connectionStatusChanged",
+      "originSpo2Data",
       "error",
     ];
 
