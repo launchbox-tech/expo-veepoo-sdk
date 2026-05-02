@@ -1,5 +1,9 @@
 # VeepooSDK iOS API 文档
 
+> **Offline snapshot.** The changelog table below mirrors a frozen import from the vendor wiki. For the latest API additions and wording, use the live **[iOS API wiki (English)](https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document)**. Maintainer drift check: compare pins in [`vendor-manifest.json`](../vendor-manifest.json) with `npm run vendor:check`; parity versus this bridge: [`vendor-parity-matrix.md`](vendor-parity-matrix.md).
+>
+> **Last manifest-aligned upstream review:** `upstreamReference.iosBleSdk.lastReviewedHeadSha` in `vendor-manifest.json` (default branch `HEAD` at time of pin).
+
 | 版本  | 修改内容                                                     | 修改日期   |
 | ----- | ------------------------------------------------------------ | ---------- |
 | 1.0.0 | SDK初版                                                      | 2023.05.15 |
