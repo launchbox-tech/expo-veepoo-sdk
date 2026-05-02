@@ -115,7 +115,7 @@ Tests:              src/__tests__/validators/ + normalizers.test.ts
 
 ## §7. Feature backlog — PRD queue
 
-**Inventory audit (2026-05-02):** Compared each item to `VeepooSDKModuleInterface`, `NATIVE_ASYNC_METHOD_NAMES`, and native modules. Groups A–B are **already shipped** in the JS public API unless marked partial. Groups C–D have **capability flags** on `DeviceFunctions` / `ConnectionStatus` where the vendor exposes them, but **no** matching `VeepooSDK` methods or events yet.
+**Inventory audit (2026-05-02):** Compared each item to `VeepooSDKModuleInterface`, `NATIVE_ASYNC_METHOD_NAMES`, and native modules. Groups A–B are **already shipped** in the JS public API unless marked partial. Groups C–D have **capability flags** on `DeviceFunctions` / `ConnectionStatus` where the vendor exposes them, but **no** matching `VeepooSDK` methods or events yet. **Stub issues (needs-triage):** Group C → [#96](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/96) [#97](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/97) [#98](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/98) [#99](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/99); Group D → [#100](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/100) [#101](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/101) [#102](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/102) [#103](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/103) [#104](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/104) [#105](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/105) [#106](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/106) [#107](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/107) [#108](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/108). Parent PRD [#95](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/95).
 
 For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepoo-sdk-android-api.md` + `docs/vendor-api/veepoo-sdk-ios-api.md` before writing a PRD.
 
@@ -132,21 +132,21 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 - [x] **Breathing / respiration** — Shipped: `startBreathingTest`, `stopBreathingTest`; event `breathingTestResult`.
 
 ### Group C — Device personalization (not in public API yet)
-- [ ] **Anti-loss / find device** — Flag: `findDeviceByPhoneFunction`. No `sendFindDevice` (or similar) on `VeepooSDK`.
-- [ ] **Screen settings** — Flags: `screenLight`, `screenLightTime`. No brightness/duration read/write methods.
-- [ ] **Sedentary reminder** — Flag: `sedentaryRemind`. No `LongSeatSetting` read/write.
-- [ ] **Wrist-flip wake** — Flags: `nightTurnSetting`, `isOpenNightTurnWrist`. No dedicated read/write settings API.
+- [ ] **Anti-loss / find device** — [#96](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/96) stub. Flag: `findDeviceByPhoneFunction`. No `sendFindDevice` (or similar) on `VeepooSDK`.
+- [ ] **Screen settings** — [#97](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/97) stub. Flags: `screenLight`, `screenLightTime`. No brightness/duration read/write methods.
+- [ ] **Sedentary reminder** — [#98](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/98) stub. Flag: `sedentaryRemind`. No `LongSeatSetting` read/write.
+- [ ] **Wrist-flip wake** — [#99](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/99) stub. Flags: `nightTurnSetting`, `isOpenNightTurnWrist`. No dedicated read/write settings API.
 
 ### Group D — Advanced (not in public API yet)
-- [ ] **OTA firmware upgrade** — AARs `libdfu` / `libfastdfu` present in config; no DFU/OTA methods or events in the module.
-- [ ] **Dial / face management** — Flags: `screenStyleFunction`, `aiDial`, `videoDial`. No dial management API.
-- [ ] **Body composition** — Vendor types exist upstream; no bridge types or methods.
-- [ ] **Women's health** — Flag: `woman` on device functions. No settings API.
-- [ ] **Weather push** — Flags: `weatherFunction`, `weatherStyle`. No weather push API.
-- [ ] **Contact management with SOS** — Flags: `contactFunction`, `contactType`, `contactMsgLength`. No contact API.
-- [ ] **GPS / location settings** — Flag: `agpsFunction`. No AGPS settings API.
-- [ ] **Music / camera control** — Flag: `musicStyle` (and related HID flags). No music/camera remote API.
-- [ ] **Bluetooth on/off** — No `openBluetooth` / `closeBluetooth` in the Expo module.
+- [ ] **OTA firmware upgrade** — [#100](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/100) stub. AARs `libdfu` / `libfastdfu` present in config; no DFU/OTA methods or events in the module.
+- [ ] **Dial / face management** — [#101](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/101) stub. Flags: `screenStyleFunction`, `aiDial`, `videoDial`. No dial management API.
+- [ ] **Body composition** — [#102](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/102) stub. Vendor types exist upstream; no bridge types or methods.
+- [ ] **Women's health** — [#103](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/103) stub. Flag: `woman` on device functions. No settings API.
+- [ ] **Weather push** — [#104](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/104) stub. Flags: `weatherFunction`, `weatherStyle`. No weather push API.
+- [ ] **Contact management with SOS** — [#105](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/105) stub. Flags: `contactFunction`, `contactType`, `contactMsgLength`. No contact API.
+- [ ] **GPS / location settings** — [#106](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/106) stub. Flag: `agpsFunction`. No AGPS settings API.
+- [ ] **Music / camera control** — [#107](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/107) stub. Flag: `musicStyle` (and related HID flags). No music/camera remote API.
+- [ ] **Bluetooth on/off** — [#108](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/108) stub. No `openBluetooth` / `closeBluetooth` in the Expo module.
 
 ---
 
