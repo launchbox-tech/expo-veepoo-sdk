@@ -67,6 +67,8 @@ let ECG_TEST_RESULT = "ecgTestResult"
 let FATIGUE_TEST_RESULT = "fatigueTestResult"
 let BREATHING_TEST_RESULT = "breathingTestResult"
 let BODY_COMPOSITION_TEST_RESULT = "bodyCompositionTestResult"
+let CONTACTS_DATA = "contactsData"
+let SOS_CALL_TIMES_DATA = "sosCallTimesData"
 let ERROR = VeepooEvent.error
 
 // MARK: - 权限回调委托
@@ -214,6 +216,8 @@ public class VeepooSDKModule: Module {
       BODY_COMPOSITION_TEST_RESULT,
       FIND_DEVICE_STATE,
       FIRMWARE_DFU_PROGRESS,
+      CONTACTS_DATA,
+      SOS_CALL_TIMES_DATA,
       ERROR
     )
 
@@ -864,6 +868,30 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("pushWeatherData") { (data: [String: Any], promise: Promise) in
       self.handlePushWeatherData(data, promise: promise)
+    }
+
+    AsyncFunction("readContacts") { (crc: Int?, promise: Promise) in
+      self.handleReadContacts(crc: crc, promise: promise)
+    }
+
+    AsyncFunction("addContact") { (data: [String: Any], promise: Promise) in
+      self.handleAddContact(data, promise: promise)
+    }
+
+    AsyncFunction("deleteContact") { (contactId: Int, promise: Promise) in
+      self.handleDeleteContact(contactId: contactId, promise: promise)
+    }
+
+    AsyncFunction("setContactSosState") { (contactId: Int, isOpen: Bool, promise: Promise) in
+      self.handleSetContactSosState(contactId: contactId, isOpen: isOpen, promise: promise)
+    }
+
+    AsyncFunction("readSosCallTimes") { (promise: Promise) in
+      self.handleReadSosCallTimes(promise: promise)
+    }
+
+    AsyncFunction("setSosCallTimes") { (times: Int, promise: Promise) in
+      self.handleSetSosCallTimes(times: times, promise: promise)
     }
 
     AsyncFunction("startLocalFirmwareDfu") { (filePath: String, promise: Promise) in

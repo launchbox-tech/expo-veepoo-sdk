@@ -326,3 +326,30 @@ export interface DeviceData {
   deviceId: string;
   data: unknown;
 }
+
+/** A contact entry stored on the Band. Android `Contact`; iOS `VPDeviceContactsModel`. */
+export interface DeviceContact {
+  contactID: number;
+  /** Display name — vendor limit: 20 bytes UTF-8. */
+  name: string;
+  phoneNumber: string;
+  /** Whether this contact is marked as an SOS (emergency) contact. */
+  isSOS: boolean;
+  /** Whether the Band supports designating this contact as SOS. Android-only; may be absent on iOS. */
+  isSupportSOS?: boolean;
+}
+
+/** Payload for `addContact` — the Band assigns the `contactID`. */
+export interface NewDeviceContact {
+  name: string;
+  phoneNumber: string;
+  /** Mark as SOS on add; defaults to false. */
+  isSOS?: boolean;
+}
+
+/** SOS call-attempt count from the Band. Vendor enforces `times` stays within `[minTimes, maxTimes]`. */
+export interface SosCallTimesSettings {
+  times: number;
+  minTimes: number;
+  maxTimes: number;
+}

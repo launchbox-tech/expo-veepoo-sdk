@@ -1,6 +1,7 @@
 import type {
   BatteryInfo,
   DeviceAlarm,
+  DeviceContact,
   DeviceFunctions,
   DeviceVersion,
   FindDevicePhase,
@@ -9,6 +10,7 @@ import type {
   ScreenLightSettings,
   SedentaryReminderSettings,
   SocialMsgData,
+  SosCallTimesSettings,
   WatchFaceDialType,
   WatchFaceStyle,
   WeatherSettings,
@@ -408,5 +410,40 @@ export function normalizeWeatherSettings(value: unknown): WeatherSettings {
     isOpen: toBoolean(record.isOpen),
     unit,
     crc: toInt(record.crc),
+  };
+}
+
+/** Normalizes a single raw contact entry from either platform. */
+function normalizeContact(raw: unknown): DeviceContact | null {
+  if (!isRecord(raw)) return null;
+  const name = toStringValue(raw.name ?? raw.nickName);
+  const phoneNumber = toStringValue(raw.phoneNumber);
+  if (!name && !phoneNumber) return null;
+  return {
+    contactID: toInt(raw.contactID ?? raw.contactId ?? raw.id),
+    name,
+    phoneNumber,
+    isSOS: toBoolean(raw.isSOS ?? raw.isSettingSOS),
+    isSupportSOS:
+      raw.isSupportSOS !== undefined ? toBoolean(raw.isSupportSOS) : undefined,
+  };
+}
+
+/** Normalizes the contact list returned from `readContacts`. */
+export function normalizeContactList(value: unknown): DeviceContact[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    const c = normalizeContact(item);
+    return c !== null ? [c] : [];
+  });
+}
+
+/** Normalizes SOS call-times data from either platform. */
+export function normalizeSosCallTimesSettings(value: unknown): SosCallTimesSettings {
+  const record = isRecord(value) ? value : {};
+  return {
+    times: toInt(record.times),
+    minTimes: toInt(record.minTimes),
+    maxTimes: toInt(record.maxTimes),
   };
 }

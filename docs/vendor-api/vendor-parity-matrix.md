@@ -54,6 +54,8 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Women's health (cycle / maternity modes) | `readWomenHealthSettings`, `setWomenHealthSettings` | Shipped | TBD |
 | Weather push | `readWeatherSettings`, `setWeatherSettings`, `pushWeatherData` | Shipped | TBD |
 | Watch face / screen style (dial slot) | `readWatchFaceStyle`, `setWatchFaceStyle` | Shipped | TBD |
+| Contacts (emergency contact list) | `readContacts`, `addContact`, `deleteContact`, `setContactSosState`; `contactsData` | Shipped | TBD |
+| SOS call times | `readSosCallTimes`, `setSosCallTimes`; `sosCallTimesData` | Shipped | TBD |
 | Local firmware DFU (OTA file on disk) | `startLocalFirmwareDfu`; `firmwareDfuProgress` | Partial | TBD |
 
 **Find device:** Gate with `readDeviceFunctions().findDeviceByPhoneFunction`. **Android** uses `startFindDeviceByPhone` / `stopFindDeviceByPhone` (`IFindDevicelistener`). **iOS** uses `veepooSDK_searchDeviceFuntionWithState` + `peripheralModel.searchDeviceFunction`; callback states map to `searching` / `stopped` / `timeout` (no separate `found` phase on iOS — see `rawState`).
@@ -69,6 +71,8 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 **Women's health:** Gate with `readDeviceFunctions().woman`. **Android:** `readWomenState` / `settingWomenState` (`WomenSetting`, `IWomenDataListener`, `WomenData`); `VpSpGetUtil.isSupportWomenSetting`. **iOS:** `veepooSDKSettingDeviceFemaleWithFemaleModel` (read `settingMode` 2 / set 1, `VPDeviceFemaleModel`). Dates are `yyyy-MM-dd` strings on iOS; Android uses `TimeData` internally.
 
 **Watch face / screen style:** Gate with `readDeviceFunctions().screenStyleFunction` (and related `aiDial` / `videoDial` hints where applicable). **Android:** `readScreenStyle` / `settingScreenStyle` (`ScreenStyleData`, `EScreenStyle`); `VpSpGetUtil.isSupportScreenStyle`. **iOS:** `veepooSDKSettingDeviceScreenStyle` (read `settingMode` 2 / set 1, `VPDeviceDialType`). **Partial scope:** this bridge exposes **read/set of the active dial category + slot index** only — custom image transfer, marketplace sync, and video dials are **not** implemented here.
+
+**Contacts & SOS:** Gate with `readDeviceFunctions().package3.contactFunction` (`"support"` or better). SOS-specific operations (`setContactSosState`, `readSosCallTimes`, `setSosCallTimes`) additionally require `contactType >= 2`; both reject with `CAPABILITY_UNSUPPORTED` otherwise. **Android:** `VPOperateManager` — `readContact(crc, IContactOptListener, IBleWriteResponse)` (CRC optimization: `onContactReadASSameCRC` returns empty list when device CRC matches), `addContact`, `deleteContact`, `setContactSOSState` (`IContactOptListener`); SOS call times via `readSOSCallTimes` / `setSOSCallTimes` (`ISOSCallTimesListener`). **iOS:** single entry point `veepooSDKSettingDeviceContactsWithOpCode:opModel:toID:resultBlock:` with `VPDeviceContactsOpCode` enum (`.read`, `.add`, `.delete`, `.edit`); SOS call times via `veepooSDKSettingDeviceContactsSOSInfoWithOpCode:times:resultBlock:` (`VPSOSOperationType.read` / `.setting`). **Contact model:** `name` (Android) / `nickName` (iOS) ≤ 20 bytes UTF-8; `phoneNumber` ≤ 20 chars; `isSOS` / `isSettingSOS` flag. **Not bridged:** `moveContact` / `VPDeviceContactsOpCodeMove` (reorder), device-initiated SOS command callback (`ReceiveDeviceSOSCommand`).
 
 **Local firmware DFU:** High-risk — host apps must gate UX (e.g. battery > 30%). **iOS:** `VPDFUOperation` `veepooSDKStartDfuWithFilePath` (+ `DeviceDFUState` in `firmwareDfuProgress`). **Android:** `VPOperateManager.startJLDeviceOTAUpgrade` when `isJLDevice` (Jerry / JL path only). Remote `checkDeviceOTAInfo` / `getOadVersion` and non-JL DFU are **not** in this bridge yet.
 
@@ -128,7 +132,7 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 
 - Remote OTA metadata / download (`checkDeviceOTAInfo`, `getOadVersion`, `veepooSDKStartDfu` server path) and non-JL Android DFU  
 - Server / marketplace dial transfer, custom photo push pipelines, video dials (beyond slot read/set)  
-- Contacts/SOS, AGPS, music/camera remote  
+- AGPS, music/camera remote  
 - Platform-specific extras (e.g. toggling OS Bluetooth from SDK)
 
 Treat gaps as **Not in JS** until a PR adds methods **and** updates this matrix.

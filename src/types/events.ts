@@ -7,11 +7,13 @@ import type {
 import type {
   BatteryInfo,
   DeviceAlarm,
+  DeviceContact,
   DeviceFunctions,
   DeviceVersion,
   HeartRateAlarm,
   FindDevicePhase,
   SocialMsgData,
+  SosCallTimesSettings,
 } from './device.js';
 import type {
   BloodGlucoseData,
@@ -117,6 +119,8 @@ export type VeepooEventPayload = {
     rawState?: number;
   };
   firmwareDfuProgress: FirmwareDfuProgress;
+  contactsData: { deviceId: string; contacts: DeviceContact[] };
+  sosCallTimesData: { deviceId: string; data: SosCallTimesSettings };
   error: VeepooError;
 };
 

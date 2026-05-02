@@ -82,6 +82,12 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "startLocalFirmwareDfu",
   "readWatchFaceStyle",
   "setWatchFaceStyle",
+  "readContacts",
+  "addContact",
+  "deleteContact",
+  "setContactSosState",
+  "readSosCallTimes",
+  "setSosCallTimes",
 ] as const satisfies readonly NativeAsyncMethodName[];
 
 export type NativeAsyncRegistryUnion =

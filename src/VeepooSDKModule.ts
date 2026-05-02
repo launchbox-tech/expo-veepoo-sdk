@@ -1,6 +1,8 @@
 import type {
   ConnectionStatus,
   DeviceAlarm,
+  DeviceContact,
+  NewDeviceContact,
   OperationStatus,
   ScanOptions,
   ConnectOptions,
@@ -17,6 +19,7 @@ import type {
   ScreenLightDuration,
   ScreenLightSettings,
   SedentaryReminderSettings,
+  SosCallTimesSettings,
   WristFlipWakeSettings,
   WomenHealthSettings,
   WatchFaceDialType,
@@ -104,6 +107,12 @@ export interface VeepooSDKModuleInterface {
   readWeatherSettings(): Promise<WeatherSettings>;
   setWeatherSettings(settings: WeatherSettings): Promise<void>;
   pushWeatherData(data: WeatherData): Promise<void>;
+  readContacts(crc?: number): Promise<DeviceContact[]>;
+  addContact(contact: NewDeviceContact): Promise<void>;
+  deleteContact(contactId: number): Promise<void>;
+  setContactSosState(contactId: number, isOpen: boolean): Promise<void>;
+  readSosCallTimes(): Promise<SosCallTimesSettings>;
+  setSosCallTimes(times: number): Promise<void>;
   startLocalFirmwareDfu(filePath: string): Promise<void>;
   readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle>;
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;

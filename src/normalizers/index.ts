@@ -18,6 +18,8 @@ export {
   normalizeSocialMsgData,
   normalizeDeviceVersion,
   normalizeWeatherSettings,
+  normalizeContactList,
+  normalizeSosCallTimesSettings,
 } from './device.js';
 
 export {

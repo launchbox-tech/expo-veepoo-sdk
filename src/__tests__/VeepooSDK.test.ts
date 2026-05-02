@@ -57,6 +57,8 @@ const NATIVE_ASYNC_MOCK_RESOLVES: Partial<
     screenIndex: 0,
     operationSuccess: true,
   },
+  readContacts: [],
+  readSosCallTimes: { times: 3, minTimes: 1, maxTimes: 9 },
 };
 
 function makeMockNative(): MockNative {

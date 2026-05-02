@@ -49,6 +49,9 @@ export type {
   WeatherDailyForecast,
   WeatherData,
   DeviceData,
+  DeviceContact,
+  NewDeviceContact,
+  SosCallTimesSettings,
 } from './device.js';
 
 export type {

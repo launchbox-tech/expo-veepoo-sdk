@@ -145,6 +145,8 @@ export class VeepooSDKRuntime {
       "alarmData",
       "findDeviceState",
       "firmwareDfuProgress",
+      "contactsData",
+      "sosCallTimesData",
       "error",
     ];
 

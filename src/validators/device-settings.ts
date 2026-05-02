@@ -3,6 +3,7 @@ import type {
   DeviceAlarm,
   FunctionStatus,
   HeartRateAlarm,
+  NewDeviceContact,
   ScreenLightSettings,
   SedentaryReminderSettings,
   SocialMsgData,
@@ -298,4 +299,34 @@ export function validateWeatherData(d: WeatherData): void {
   }
   d.hourly.forEach((h, i) => validateHourlyForecast(h, i));
   d.daily.forEach((day, i) => validateDailyForecast(day, i));
+}
+
+/** Vendor iOS limit: nickName ≤ 20 bytes. Android is flexible but we apply the same cap. */
+const CONTACT_NAME_MAX_BYTES = 20;
+
+export function validateNewContact(contact: NewDeviceContact): void {
+  if (typeof contact.name !== 'string' || contact.name.trim().length === 0) {
+    throw { code: 'INVALID_ARGUMENT', message: 'name is required' };
+  }
+  if (new TextEncoder().encode(contact.name).byteLength > CONTACT_NAME_MAX_BYTES) {
+    throw { code: 'INVALID_ARGUMENT', message: `name must not exceed ${CONTACT_NAME_MAX_BYTES} bytes` };
+  }
+  if (typeof contact.phoneNumber !== 'string' || contact.phoneNumber.trim().length === 0) {
+    throw { code: 'INVALID_ARGUMENT', message: 'phoneNumber is required' };
+  }
+  if (contact.phoneNumber.trim().length > 20) {
+    throw { code: 'INVALID_ARGUMENT', message: 'phoneNumber must not exceed 20 characters' };
+  }
+}
+
+export function validateContactId(contactId: number): void {
+  if (!Number.isInteger(contactId) || contactId < 0) {
+    throw { code: 'INVALID_ARGUMENT', message: 'contactId must be a non-negative integer' };
+  }
+}
+
+export function validateSosCallTimes(times: number): void {
+  if (!Number.isInteger(times) || times < 1) {
+    throw { code: 'INVALID_ARGUMENT', message: 'times must be a positive integer' };
+  }
 }

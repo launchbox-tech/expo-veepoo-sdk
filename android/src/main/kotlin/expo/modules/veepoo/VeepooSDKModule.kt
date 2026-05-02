@@ -72,6 +72,7 @@ class VeepooSDKModule : Module() {
     defineWristFlipWake(this@VeepooSDKModule)
     defineWomenHealth(this@VeepooSDKModule)
     defineWeather(this@VeepooSDKModule)
+    defineContacts(this@VeepooSDKModule)
     defineFirmwareDfu(this@VeepooSDKModule)
     defineWatchFaceStyle(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)

@@ -602,3 +602,79 @@ describe('validateWeatherData', () => {
     expectInvalidArgument(() => validateWeatherData({ ...validData, hourly: bad }), 'hourly[0].visibilityM');
   });
 });
+
+describe('validateNewContact', () => {
+  const { validateNewContact } = require('../../validators/index');
+
+  it('passes for a valid contact', () => {
+    expect(() => validateNewContact({ name: 'Alice', phoneNumber: '+1234567890' })).not.toThrow();
+  });
+
+  it('passes with isSOS true', () => {
+    expect(() => validateNewContact({ name: 'Bob', phoneNumber: '555-1234', isSOS: true })).not.toThrow();
+  });
+
+  it('throws for empty name', () => {
+    expectInvalidArgument(() => validateNewContact({ name: '', phoneNumber: '123' }), 'name');
+  });
+
+  it('throws for whitespace-only name', () => {
+    expectInvalidArgument(() => validateNewContact({ name: '   ', phoneNumber: '123' }), 'name');
+  });
+
+  it('throws when name exceeds 20 bytes', () => {
+    expectInvalidArgument(() => validateNewContact({ name: 'A'.repeat(21), phoneNumber: '123' }), 'name');
+  });
+
+  it('throws for empty phoneNumber', () => {
+    expectInvalidArgument(() => validateNewContact({ name: 'Alice', phoneNumber: '' }), 'phoneNumber');
+  });
+
+  it('throws when phoneNumber exceeds 20 characters', () => {
+    expectInvalidArgument(() => validateNewContact({ name: 'Alice', phoneNumber: '1'.repeat(21) }), 'phoneNumber');
+  });
+});
+
+describe('validateContactId', () => {
+  const { validateContactId } = require('../../validators/index');
+
+  it('passes for zero', () => {
+    expect(() => validateContactId(0)).not.toThrow();
+  });
+
+  it('passes for a positive integer', () => {
+    expect(() => validateContactId(5)).not.toThrow();
+  });
+
+  it('throws for negative integer', () => {
+    expectInvalidArgument(() => validateContactId(-1), 'contactId');
+  });
+
+  it('throws for non-integer', () => {
+    expectInvalidArgument(() => validateContactId(1.5), 'contactId');
+  });
+});
+
+describe('validateSosCallTimes', () => {
+  const { validateSosCallTimes } = require('../../validators/index');
+
+  it('passes for 1', () => {
+    expect(() => validateSosCallTimes(1)).not.toThrow();
+  });
+
+  it('passes for 9', () => {
+    expect(() => validateSosCallTimes(9)).not.toThrow();
+  });
+
+  it('throws for zero', () => {
+    expectInvalidArgument(() => validateSosCallTimes(0), 'times');
+  });
+
+  it('throws for negative', () => {
+    expectInvalidArgument(() => validateSosCallTimes(-1), 'times');
+  });
+
+  it('throws for non-integer', () => {
+    expectInvalidArgument(() => validateSosCallTimes(2.5), 'times');
+  });
+});

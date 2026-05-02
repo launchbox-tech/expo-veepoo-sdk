@@ -11,6 +11,8 @@ import {
   normalizeWristFlipWakeSettings,
   normalizeWomenHealthSettings,
   normalizeWatchFaceStyle,
+  normalizeContactList,
+  normalizeSosCallTimesSettings,
 } from '../normalizers';
 
 describe('normalizeAlarmList', () => {
@@ -647,5 +649,67 @@ describe('normalizeWeatherSettings', () => {
     expect(r.isOpen).toBe(false);
     expect(r.unit).toBe('C');
     expect(r.crc).toBe(0);
+  });
+});
+
+describe('normalizeContactList', () => {
+  it('returns empty array for non-array input', () => {
+    expect(normalizeContactList(null)).toEqual([]);
+    expect(normalizeContactList(undefined)).toEqual([]);
+    expect(normalizeContactList({})).toEqual([]);
+  });
+
+  it('normalizes a standard Android-shaped contact (name + phoneNumber)', () => {
+    const raw = [{ contactID: 1, name: 'Alice', phoneNumber: '+1234567890', isSettingSOS: true, isSupportSOS: true }];
+    const result = normalizeContactList(raw);
+    expect(result).toHaveLength(1);
+    expect(result[0].contactID).toBe(1);
+    expect(result[0].name).toBe('Alice');
+    expect(result[0].phoneNumber).toBe('+1234567890');
+    expect(result[0].isSOS).toBe(true);
+    expect(result[0].isSupportSOS).toBe(true);
+  });
+
+  it('normalizes an iOS-shaped contact (nickName field)', () => {
+    const raw = [{ contactID: 2, nickName: 'Bob', phoneNumber: '555-0100', isSOS: false }];
+    const result = normalizeContactList(raw);
+    expect(result[0].name).toBe('Bob');
+    expect(result[0].isSOS).toBe(false);
+    expect(result[0].isSupportSOS).toBeUndefined();
+  });
+
+  it('drops entries that have no name or phone', () => {
+    const raw = [{ contactID: 3 }];
+    expect(normalizeContactList(raw)).toHaveLength(0);
+  });
+
+  it('handles mixed valid and invalid entries', () => {
+    const raw = [
+      { contactID: 1, name: 'Alice', phoneNumber: '123' },
+      null,
+      { contactID: 2, name: 'Bob', phoneNumber: '456' },
+    ];
+    expect(normalizeContactList(raw)).toHaveLength(2);
+  });
+});
+
+describe('normalizeSosCallTimesSettings', () => {
+  it('normalizes a well-formed payload', () => {
+    const r = normalizeSosCallTimesSettings({ times: 3, minTimes: 1, maxTimes: 9 });
+    expect(r.times).toBe(3);
+    expect(r.minTimes).toBe(1);
+    expect(r.maxTimes).toBe(9);
+  });
+
+  it('returns zeros for non-object input', () => {
+    const r = normalizeSosCallTimesSettings(null);
+    expect(r.times).toBe(0);
+    expect(r.minTimes).toBe(0);
+    expect(r.maxTimes).toBe(0);
+  });
+
+  it('coerces string numbers', () => {
+    const r = normalizeSosCallTimesSettings({ times: '5', minTimes: '1', maxTimes: '9' });
+    expect(r.times).toBe(5);
   });
 });

@@ -5,6 +5,7 @@ import type {
   DeviceAlarm,
   DeviceTimeSetting,
   HeartRateAlarm,
+  NewDeviceContact,
   OperationStatus,
   PersonalInfo,
   ScreenLightSettings,
@@ -104,6 +105,12 @@ export interface NativeVeepooSDKInterface {
     options?: { dialType?: WatchFaceDialType } | null,
   ): Promise<unknown>;
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;
+  readContacts(crc?: number): Promise<unknown>;
+  addContact(contact: NewDeviceContact): Promise<void>;
+  deleteContact(contactId: number): Promise<void>;
+  setContactSosState(contactId: number, isOpen: boolean): Promise<void>;
+  readSosCallTimes(): Promise<unknown>;
+  setSosCallTimes(times: number): Promise<void>;
   addListener(
     event: VeepooEvent,
     listener: (payload: unknown) => void,

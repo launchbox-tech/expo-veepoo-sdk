@@ -1,8 +1,10 @@
 import type {
   BatteryInfo,
+  DeviceContact,
   PersonalInfo,
   DeviceFunctions,
   DeviceVersion,
+  NewDeviceContact,
   PasswordData,
   SocialMsgData,
   Language,
@@ -19,6 +21,7 @@ import type {
   ScreenLightDuration,
   ScreenLightSettings,
   SedentaryReminderSettings,
+  SosCallTimesSettings,
   WristFlipWakeSettings,
   WomenHealthSettings,
   WatchFaceDialType,
@@ -233,6 +236,24 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   setWatchFaceStyle = (settings: WatchFaceStyleSettings): Promise<void> =>
     this.deviceSettings.setWatchFaceStyle(settings);
+
+  readContacts = (crc?: number): Promise<DeviceContact[]> =>
+    this.deviceSettings.readContacts(crc);
+
+  addContact = (contact: NewDeviceContact): Promise<void> =>
+    this.deviceSettings.addContact(contact);
+
+  deleteContact = (contactId: number): Promise<void> =>
+    this.deviceSettings.deleteContact(contactId);
+
+  setContactSosState = (contactId: number, isOpen: boolean): Promise<void> =>
+    this.deviceSettings.setContactSosState(contactId, isOpen);
+
+  readSosCallTimes = (): Promise<SosCallTimesSettings> =>
+    this.deviceSettings.readSosCallTimes();
+
+  setSosCallTimes = (times: number): Promise<void> =>
+    this.deviceSettings.setSosCallTimes(times);
 
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 

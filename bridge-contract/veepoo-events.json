@@ -3,6 +3,8 @@
   "nativeEmitted": [
     "alarmData",
     "batteryData",
+    "contactsData",
+    "sosCallTimesData",
     "bloodGlucoseData",
     "bloodOxygenTestResult",
     "bloodPressureTestResult",

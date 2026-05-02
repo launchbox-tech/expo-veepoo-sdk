@@ -17,4 +17,7 @@ export {
   validateDeviceTime,
   validateWeatherSettings,
   validateWeatherData,
+  validateNewContact,
+  validateContactId,
+  validateSosCallTimes,
 } from './device-settings.js';

@@ -38,6 +38,8 @@ fun ModuleDefinitionBuilder.defineEvents() {
     ALARM_DATA,
     FIND_DEVICE_STATE,
     FIRMWARE_DFU_PROGRESS,
+    CONTACTS_DATA,
+    SOS_CALL_TIMES_DATA,
     ERROR
   )
 }
