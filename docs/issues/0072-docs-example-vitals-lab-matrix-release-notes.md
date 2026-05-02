@@ -28,6 +28,6 @@ After **HRV, ECG, fatigue, and breathing** bridges exist: update **`docs/vendor-
 
 ## Delivery notes
 
-- Matrix: new rows for HRV / ECG / fatigue / breathing; **Further notes** subsection for mutex (`REALTIME_TEST_IN_PROGRESS`), iOS HRV / Android breathing `CAPABILITY_UNSUPPORTED`, ECG waveform opt-in; backlog line for vitals removed.
+- Matrix: new rows for HRV / ECG / fatigue / breathing; **Further notes** for mutex (`REALTIME_TEST_IN_PROGRESS`), iOS HRV gap, **Android breathing** shipped in **1.2.11** (`startDetectBreath`), ECG waveform opt-in; backlog line for vitals removed.
 - Release: [`docs/release-notes/1.2.8.md`](../release-notes/1.2.8.md); package version **1.2.8**.
 - Example: **Vitals lab** section in `example/src/app/index.tsx` with start/stop, ECG waveform switch, scrollable event log; hook `useHealthTests` subscribes to vitals events and logs `error`.

@@ -1,7 +1,7 @@
 # 71 — feat(vitals): breathing realtime test JS bridge (iOS + Android)
 
-> GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/71
-> Status: open | Labels: needs-triage
+> GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/71  
+> Status: closed (sync from GitHub) | Android native completed in **1.2.11**
 
 ## Parent
 
@@ -15,12 +15,13 @@ Expose **breathing realtime manual test** end-to-end (vendor-equivalent breathin
 
 ## Acceptance criteria
 
-- [ ] Public API matches PRD naming; both native platforms unless **Partial** with justification.
-- [ ] Normalizers + unit tests for breathing result payloads.
-- [ ] Stable errors for unsupported / mutex / Session eligibility.
-- [ ] **Research notes (AFK):** Document vendor wiki/SDK symbols, start/stop entry points, listener/delegate names, representative payload shapes, and **iOS vs Android** deltas in the **PR description or an issue comment** before merge (capture any naming ambiguity—e.g. training vs measurement—so AFK agents pick the right vendor API).
-- [ ] CI green.
+- [x] Public API matches PRD naming; both native platforms unless **Partial** with justification.
+- [x] Normalizers + unit tests for breathing result payloads.
+- [x] Stable errors for unsupported / mutex / Session eligibility.
+- [x] **Research notes (AFK):** Android: `VPOperateManager.startDetectBreath` / `stopDetectBreath`, `IBreathDataListener.onDataChange(BreathData)`; fields `progressValue`, `value` (rate), `deviceState` / `deviceStateEnum` (`EDeviceStatus`). iOS: `veepooSDKTestBreathingRateStart` / `VPTestBreathingRateState`. Matrix **Further notes** updated.
+- [x] CI green (TS tests; native rebuild in consuming app).
 
-## Blocked by
+## Native mapping (Android, 1.2.11)
 
-- #67
+- Mutex kind: **`breathing`**. Listener reference held on module for **`stopDetectBreath`** (vendor requires the same `IBreathDataListener` instance).
+- Terminal: `FINISH`, `UNPASS_WEAR`, `BUSY`, `CHARGING`, `CHARG_LOW`, `KEEP_QUIT`, or `progressValue >= 100`; then auto `stopDetectBreath` + `endRealtimeTest`.

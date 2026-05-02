@@ -453,7 +453,7 @@ export default function Index() {
 
       <View style={styles.header}>
         <Text style={styles.title}>HBand Connect</Text>
-        <Text style={styles.version}>expo-veepoo-sdk v1.2.10</Text>
+        <Text style={styles.version}>expo-veepoo-sdk v1.2.11</Text>
       </View>
 
       <View style={styles.scanControls}>

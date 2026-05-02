@@ -3,10 +3,13 @@ package expo.modules.veepoo
 import com.inuker.bluetooth.library.Code
 import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
+import com.veepoo.protocol.listener.data.IBreathDataListener
 import com.veepoo.protocol.listener.data.IECGDetectListener
+import com.veepoo.protocol.model.datas.BreathData
 import com.veepoo.protocol.model.datas.EcgDetectInfo
 import com.veepoo.protocol.model.datas.EcgDetectResult
 import com.veepoo.protocol.model.datas.EcgDetectState
+import com.veepoo.protocol.model.enums.EDeviceStatus
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.ModuleDefinitionBuilder
 
@@ -162,15 +165,109 @@ fun ModuleDefinitionBuilder.defineVitals(module: VeepooSDKModule) {
   }
 
   AsyncFunction("startBreathingTest") { promise: Promise ->
-    promise.reject(
-      "CAPABILITY_UNSUPPORTED",
-      "Breathing realtime test is not implemented on Android in this bridge build; use iOS or extend native with the vendor breathing API.",
-      null
+    if (!module.tryBeginRealtimeTest("breathing", promise)) {
+      return@AsyncFunction
+    }
+
+    val manager = VPOperateManager.getInstance() ?: run {
+      module.endRealtimeTest("breathing")
+      promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
+      return@AsyncFunction
+    }
+
+    val listener = object : IBreathDataListener {
+      override fun onDataChange(data: BreathData) {
+        val rawDevice = data.deviceStateEnum?.name ?: data.deviceState.toString()
+        val stateLabel = mapBreathingDeviceState(data)
+        val progress = data.progressValue.coerceIn(0, 100)
+        val rate = data.value
+
+        module.sendEvent(
+          BREATHING_TEST_RESULT,
+          mapOf(
+            "deviceId" to (module.connectedDeviceId ?: ""),
+            "result" to mapOf(
+              "state" to stateLabel,
+              "rawState" to rawDevice,
+              "progress" to progress,
+              "rate" to rate
+            )
+          )
+        )
+
+        if (isBreathingDeviceTerminal(data)) {
+          module.breathDataListener = null
+          module.endRealtimeTest("breathing")
+          manager.stopDetectBreath(
+            object : IBleWriteResponse {
+              override fun onResponse(code: Int) {}
+            },
+            this
+          )
+        }
+      }
+    }
+    module.breathDataListener = listener
+
+    manager.startDetectBreath(
+      object : IBleWriteResponse {
+        override fun onResponse(code: Int) {
+          if (code == Code.REQUEST_SUCCESS) {
+            promise.resolve(null)
+          } else {
+            module.breathDataListener = null
+            module.endRealtimeTest("breathing")
+            promise.reject("START_FAILED", "Start breath detect failed: $code", null)
+          }
+        }
+      },
+      listener
     )
   }
 
   AsyncFunction("stopBreathingTest") { promise: Promise ->
-    promise.resolve(null)
+    val manager = VPOperateManager.getInstance()
+    val listener = module.breathDataListener
+    module.breathDataListener = null
+    module.endRealtimeTest("breathing")
+    if (manager != null && listener != null) {
+      manager.stopDetectBreath(
+        object : IBleWriteResponse {
+          override fun onResponse(code: Int) {
+            if (code == Code.REQUEST_SUCCESS) {
+              promise.resolve(null)
+            } else {
+              promise.reject("STOP_FAILED", "Stop breath detect failed: $code", null)
+            }
+          }
+        },
+        listener
+      )
+    } else {
+      promise.resolve(null)
+    }
+  }
+}
+
+private fun mapBreathingDeviceState(data: BreathData): String {
+  val ds = data.deviceStateEnum
+  if (ds == EDeviceStatus.FREE) {
+    return if (data.progressValue > 0) "testing" else "start"
+  }
+  val name = ds?.name ?: ""
+  return normalizeTestState(name)
+}
+
+private fun isBreathingDeviceTerminal(data: BreathData): Boolean {
+  val ds = data.deviceStateEnum ?: return data.progressValue >= 100
+  return when (ds) {
+    EDeviceStatus.FINISH -> true
+    EDeviceStatus.UNPASS_WEAR -> true
+    EDeviceStatus.BUSY -> true
+    EDeviceStatus.CHARGING -> true
+    EDeviceStatus.CHARG_LOW -> true
+    EDeviceStatus.KEEP_QUIT -> true
+    else -> data.progressValue >= 100
   }
 }
 

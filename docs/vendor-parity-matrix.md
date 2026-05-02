@@ -76,14 +76,14 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | HRV (manual realtime) | `startHrvTest`, `stopHrvTest`; `hrvTestResult` | Partial — Android shipped; **iOS** rejects `CAPABILITY_UNSUPPORTED` (see notes) | TBD |
 | ECG (manual realtime) | `startEcgTest`, `stopEcgTest`; `ecgTestResult` (optional `includeWaveform`) | Shipped | TBD |
 | Fatigue (manual realtime) | `startFatigueTest`, `stopFatigueTest`; `fatigueTestResult` | Shipped | TBD |
-| Breathing rate (manual realtime) | `startBreathingTest`, `stopBreathingTest`; `breathingTestResult` | Partial — **iOS** shipped; **Android** rejects `CAPABILITY_UNSUPPORTED` until native path is wired | TBD |
+| Breathing rate (manual realtime) | `startBreathingTest`, `stopBreathingTest`; `breathingTestResult` | Shipped | TBD |
 
 ### Further notes (realtime vitals, PRD #66)
 
 - **Single active realtime test:** Starting any supported `start*Test` while another realtime test is active rejects with **`REALTIME_TEST_IN_PROGRESS`** ([issue #67](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/67)). Eligibility errors may use **`DEVICE_NOT_READY`**, **`DEVICE_NOT_CONNECTED`**, or **`CAPABILITY_UNSUPPORTED`** ([`VeepooErrorCode`](../src/types/errors.ts) in source).
 - **HRV:** Android uses the vendor manual-data path for HRV during the test loop. **iOS** does not expose a matching realtime HRV manual API in this bridge; `startHrvTest` fails fast with `CAPABILITY_UNSUPPORTED` — use historical HRV flows or Android for this modality.
 - **ECG:** Summary-style fields are always emitted on `ecgTestResult`. **`startEcgTest({ includeWaveform: true })`** may populate `result.waveform` when the Band and native stack support it; payloads can be large.
-- **Breathing:** **iOS** drives the vendor breathing-rate test. **Android** returns `CAPABILITY_UNSUPPORTED` in the current Kotlin bridge; extend native when the vendor API is bound.
+- **Breathing:** **iOS** uses `veepooSDKTestBreathingRateStart`; **Android** uses `startDetectBreath` / `stopDetectBreath` with `BreathData` (maps `deviceState` / progress / value into the same `breathingTestResult` shape as iOS).
 
 ---
 

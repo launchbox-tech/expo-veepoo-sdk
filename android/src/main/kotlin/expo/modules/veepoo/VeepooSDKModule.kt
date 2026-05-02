@@ -10,6 +10,7 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import com.veepoo.protocol.listener.data.IECGDetectListener
+import com.veepoo.protocol.listener.data.IBreathDataListener
 
 // Expo 模块入口
 class VeepooSDKModule : Module() {
@@ -45,6 +46,7 @@ class VeepooSDKModule : Module() {
   @Volatile var isFatigueTesting: Boolean = false
   @Volatile var ecgWantWaveform: Boolean = false
   var ecgDetectListener: IECGDetectListener? = null
+  var breathDataListener: IBreathDataListener? = null
 
   val context: Context
     get() = appContext.reactContext
