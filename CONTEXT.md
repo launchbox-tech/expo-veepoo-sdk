@@ -18,4 +18,8 @@ Vocabulary for **Band**, **Session**, **Band Discovery**, and **Pairing** follow
 
 **Mapper scope:** **`mapNativeRejection`** (working name) applies only to failures from **`await` native module methods** (`NativeVeepooSDK` / Expo `AsyncFunction` rejections). **Validators** and other pure TypeScript preflight checks continue to construct **`VeepooError`** directly and **do not** pass through the native mapper.
 
+## Bridge capability scope
+
+**Vendor parity:** The module targets **full coverage** of vendor-exposed Band capabilities for device personalization and advanced features (settings-style APIs, OTA/DFU, dial management, etc.), not a permanently capped subset. Individual capabilities remain **optional per Band model**: host apps should use **`readDeviceFunctions()`** (and related device metadata) to decide what to show; unsupported capabilities should fail with clear, documented errors rather than silent no-ops.
+
 _(Grill-with-docs #4 — Q1–Q6.)_
