@@ -50,6 +50,7 @@ import {
   normalizeHeartRateAlarm,
 } from "./normalizers/index.js";
 import { mapNativeRejection } from "./errors/map-native-rejection.js";
+import { invokeNative } from "./bridge/native-invoke-pipeline.js";
 
 type EventListener = (payload: unknown) => void;
 
@@ -367,78 +368,96 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     deviceId: string | undefined,
     fn: () => Promise<T>,
   ): Promise<T> {
-    try {
-      return await fn();
-    } catch (error) {
-      throw this.handleError(error, fallbackCode, deviceId);
-    }
+    return invokeNative({
+      invoke: fn,
+      fallbackCode,
+      deviceId,
+      throwMapped: (error: unknown) => {
+        throw this.handleError(error, fallbackCode, deviceId);
+      },
+    });
   }
 
   async init(): Promise<void> {
     if (this.isInitialized) return;
     this.log("info", "sdk", "init.start", "Initializing SDK");
     this.setupEventListeners();
-    try {
-      await this.native.init();
-    } catch (error) {
-      throw this.handleError(error, "UNKNOWN");
-    }
-    this.isInitialized = true;
-    this.log("info", "sdk", "init.success", "SDK initialized");
+    await invokeNative({
+      invoke: () => this.native.init(),
+      fallbackCode: "UNKNOWN",
+      throwMapped: (error: unknown) => {
+        throw this.handleError(error, "UNKNOWN");
+      },
+      afterSuccess: () => {
+        this.isInitialized = true;
+        this.log("info", "sdk", "init.success", "SDK initialized");
+      },
+    });
   }
 
   async checkBluetoothStatus(): Promise<boolean> {
-    try {
-      const enabled = await this.native.isBluetoothEnabled();
-      this.log(
-        "debug",
-        "bluetooth",
-        "bluetooth.check",
-        "Checked Bluetooth status",
-        {
-          data: { enabled },
-        },
-      );
-      return enabled;
-    } catch (error) {
-      this.handleError(error, "UNKNOWN");
-      return false;
-    }
+    return invokeNative({
+      invoke: () => this.native.isBluetoothEnabled(),
+      fallbackCode: "UNKNOWN",
+      recover: (error: unknown) => {
+        this.handleError(error, "UNKNOWN");
+        return false;
+      },
+      afterSuccess: (enabled: boolean) => {
+        this.log(
+          "debug",
+          "bluetooth",
+          "bluetooth.check",
+          "Checked Bluetooth status",
+          {
+            data: { enabled },
+          },
+        );
+      },
+    });
   }
 
   async requestPermissions(): Promise<PermissionsResult> {
-    try {
-      const result = normalizePermissionsResult(
-        await this.native.requestPermissions(),
-      );
-      this.log(
-        "info",
-        "permissions",
-        "permissions.request",
-        "Requested Bluetooth permissions",
-        {
-          data: result,
-        },
-      );
-      return result;
-    } catch (error) {
-      this.handleError(error, "PERMISSION_DENIED");
-      return { granted: false, status: "denied", canAskAgain: true };
-    }
+    return invokeNative({
+      invoke: () => this.native.requestPermissions(),
+      normalize: normalizePermissionsResult,
+      fallbackCode: "PERMISSION_DENIED",
+      recover: (error: unknown) => {
+        this.handleError(error, "PERMISSION_DENIED");
+        return { granted: false, status: "denied", canAskAgain: true };
+      },
+      afterSuccess: (result: PermissionsResult) => {
+        this.log(
+          "info",
+          "permissions",
+          "permissions.request",
+          "Requested Bluetooth permissions",
+          {
+            data: result,
+          },
+        );
+      },
+    });
   }
 
   async startScan(options?: ScanOptions): Promise<void> {
     if (this.isScanning) return;
 
+    this.isScanning = true;
     try {
-      this.isScanning = true;
       this.log("info", "scan", "scan.start", "Starting device scan", {
         data: options,
       });
-      await this.native.startScan(options);
-    } catch (error) {
+      await invokeNative({
+        invoke: () => this.native.startScan(options),
+        fallbackCode: "UNKNOWN",
+        throwMapped: (error: unknown) => {
+          throw this.handleError(error, "UNKNOWN");
+        },
+      });
+    } catch (e) {
       this.isScanning = false;
-      throw this.handleError(error, "UNKNOWN");
+      throw e;
     }
   }
 
@@ -446,128 +465,123 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     if (!this.isScanning) return;
 
     try {
-      await this.native.stopScan();
+      await invokeNative({
+        invoke: () => this.native.stopScan(),
+        fallbackCode: "UNKNOWN",
+        throwMapped: (error: unknown) => {
+          throw this.handleError(error, "UNKNOWN");
+        },
+      });
       this.isScanning = false;
       this.log("info", "scan", "scan.stop", "Stopped device scan");
-    } catch (error) {
+    } catch (e) {
       this.isScanning = false;
-      throw this.handleError(error, "UNKNOWN");
+      throw e;
     }
   }
 
   async connect(deviceId: string, options?: ConnectOptions): Promise<void> {
     validateDeviceId(deviceId);
     if (options) validateConnectOptions(options);
-    try {
-      this.log("info", "connection", "connect.start", "Connecting device", {
-        deviceId,
-        data: options,
-      });
-      await this.native.connect(deviceId, options);
-      this.connectedDeviceId = deviceId;
-      this.log(
-        "info",
-        "connection",
-        "connect.success",
-        "Device connect request completed",
-        {
-          deviceId,
-        },
-      );
-    } catch (error) {
-      throw this.handleError(error, "CONNECTION_FAILED", deviceId);
-    }
+    this.log("info", "connection", "connect.start", "Connecting device", {
+      deviceId,
+      data: options,
+    });
+    await invokeNative({
+      invoke: () => this.native.connect(deviceId, options),
+      fallbackCode: "CONNECTION_FAILED",
+      deviceId,
+      throwMapped: (error: unknown) => {
+        throw this.handleError(error, "CONNECTION_FAILED", deviceId);
+      },
+      afterSuccess: () => {
+        this.connectedDeviceId = deviceId;
+        this.log(
+          "info",
+          "connection",
+          "connect.success",
+          "Device connect request completed",
+          {
+            deviceId,
+          },
+        );
+      },
+    });
   }
 
   async disconnect(deviceId?: string): Promise<void> {
     const id = deviceId || this.connectedDeviceId;
     if (!id) return;
 
-    try {
-      this.log(
-        "info",
-        "connection",
-        "disconnect.start",
-        "Disconnecting device",
-        {
+    this.log("info", "connection", "disconnect.start", "Disconnecting device", {
+      deviceId: id,
+    });
+    await invokeNative({
+      invoke: () => this.native.disconnect(id),
+      fallbackCode: "DISCONNECTION_FAILED",
+      deviceId: id,
+      throwMapped: (error: unknown) => {
+        throw this.handleError(error, "DISCONNECTION_FAILED", id);
+      },
+      afterSuccess: () => {
+        if (this.connectedDeviceId === id) {
+          this.connectedDeviceId = null;
+        }
+        this.log("info", "connection", "disconnect.success", "Device disconnected", {
           deviceId: id,
-        },
-      );
-      await this.native.disconnect(id);
-      if (this.connectedDeviceId === id) {
-        this.connectedDeviceId = null;
-      }
-      this.log(
-        "info",
-        "connection",
-        "disconnect.success",
-        "Device disconnected",
-        {
-          deviceId: id,
-        },
-      );
-    } catch (error) {
-      throw this.handleError(error, "DISCONNECTION_FAILED", id);
-    }
+        });
+      },
+    });
   }
 
   async getConnectionStatus(deviceId?: string): Promise<ConnectionStatus> {
     const id = deviceId || this.connectedDeviceId;
     if (!id) return "disconnected";
 
-    try {
-      const status = await this.native.getConnectionStatus(id);
-      this.log(
-        "debug",
-        "connection",
-        "connection.status",
-        "Fetched connection status",
-        {
+    return invokeNative({
+      invoke: () => this.native.getConnectionStatus(id),
+      fallbackCode: "UNKNOWN",
+      deviceId: id,
+      recover: (error: unknown) => {
+        this.handleError(error, "UNKNOWN", id);
+        return "disconnected";
+      },
+      afterSuccess: (status: ConnectionStatus) => {
+        this.log("debug", "connection", "connection.status", "Fetched connection status", {
           deviceId: id,
           data: { status },
-        },
-      );
-      return status;
-    } catch (error) {
-      this.handleError(error, "UNKNOWN", id);
-      return "disconnected";
-    }
+        });
+      },
+    });
   }
 
   async verifyPassword(
     password: string = "0000",
     is24Hour: boolean = false,
   ): Promise<PasswordData> {
-    this.log(
-      "info",
-      "connection",
-      "password.verify.start",
-      "Verifying device password",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: { is24Hour },
+    this.log("info", "connection", "password.verify.start", "Verifying device password", {
+      deviceId: this.connectedDeviceId ?? undefined,
+      data: { is24Hour },
+    });
+    return invokeNative({
+      invoke: () => this.native.verifyPassword(password, is24Hour),
+      normalize: normalizePasswordData,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (error: unknown) => {
+        throw this.handleError(error, "OPERATION_FAILED", this.connectedDeviceId ?? undefined);
       },
-    );
-    const result = normalizePasswordData(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.verifyPassword(password, is24Hour),
-      ),
-    );
-    this.log(
-      "info",
-      "connection",
-      "password.verify.result",
-      "Device password verified",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: {
-          status: result.status,
-          deviceNumber: result.deviceNumber,
-          deviceVersion: result.deviceVersion,
-        },
+      afterSuccess: (result: PasswordData) => {
+        this.log("info", "connection", "password.verify.result", "Device password verified", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: {
+            status: result.status,
+            deviceNumber: result.deviceNumber,
+            deviceVersion: result.deviceVersion,
+          },
+        });
       },
-    );
-    return result;
+    });
   }
 
   async readBattery(): Promise<BatteryInfo> {

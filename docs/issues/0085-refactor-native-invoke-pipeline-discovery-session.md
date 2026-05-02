@@ -13,10 +13,10 @@ Introduce a **small, deep** **native invoke pipeline** module (**validate → aw
 
 ## Acceptance criteria
 
-- [ ] All listed methods use the shared pipeline (no one-off **`catch`** paths that bypass **`mapNativeRejection`** for native failures).
-- [ ] **Band Discovery** and **Session** entry behaviour matches pre-refactor semantics (same errors, same normalized shapes).
-- [ ] Tests exercise happy path and at least one **mapped** native rejection on this path (e.g. connection failure).
-- [ ] **ADR 0003** scope preserved: validators still throw **`VeepooError`** without the native mapper.
+- [x] **`invokeNative`** in **`src/bridge/native-invoke-pipeline.ts`** drives **init**, **checkBluetoothStatus**, **requestPermissions**, **startScan** / **stopScan**, **connect** / **disconnect**, **getConnectionStatus**, **verifyPassword**; **`withNative`** delegates to the same helper (all native failures go through **`handleError`** → **`mapNativeRejection`**).
+- [x] Scanning / **connectedDeviceId** / logging order preserved; **`setupEventListeners`** still runs before **`native.init`**.
+- [x] Jest: handshake **scan → connect → verifyPassword**; **connect** with native **`CONNECTION_FAILED`** code; **`native-invoke-pipeline`** unit tests.
+- [x] **`validateDeviceId` / `validateConnectOptions`** unchanged (validators outside mapper per **ADR 0003**).
 
 ## Blocked by
 

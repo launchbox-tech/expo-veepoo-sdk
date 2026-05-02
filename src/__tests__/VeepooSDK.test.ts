@@ -203,6 +203,30 @@ describe('VeepooSDK', () => {
       );
     });
 
+    it('connect() maps native CONNECTION_FAILED rejection code for host branching', async () => {
+      native.connect.mockRejectedValueOnce(
+        Object.assign(new Error('ble'), { code: 'CONNECTION_FAILED' }),
+      );
+      const errorListener = jest.fn();
+      sdk.on('error', errorListener);
+      await expect(sdk.connect('device-1')).rejects.toMatchObject({
+        code: 'CONNECTION_FAILED',
+      });
+      expect(errorListener).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'CONNECTION_FAILED' }),
+      );
+    });
+
+    it('handshake path: scan → connect → verifyPassword', async () => {
+      await sdk.startScan();
+      await sdk.connect('band-1');
+      const pwd = await sdk.verifyPassword('0000', false);
+      expect(pwd.status).toBe('CHECK_SUCCESS');
+      expect(native.startScan).toHaveBeenCalled();
+      expect(native.connect).toHaveBeenCalledWith('band-1', undefined);
+      expect(native.verifyPassword).toHaveBeenCalledWith('0000', false);
+    });
+
     it('disconnect(id) calls native.disconnect with the given ID', async () => {
       await sdk.connect('device-1');
       await sdk.disconnect('device-1');
