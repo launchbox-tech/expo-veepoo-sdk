@@ -2,6 +2,7 @@ import type { ReadOriginProgress, VeepooEvent } from '../types/index.js';
 import { isRecord, clamp } from './shared.js';
 import { normalizeBluetoothStatus, normalizePasswordData } from './connection.js';
 import {
+  normalizeAlarmList,
   normalizeBatteryInfo,
   normalizeDeviceFunctions,
   normalizeDeviceVersion,
@@ -99,6 +100,8 @@ export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unk
       return { ...p, data: normalizeBatteryInfo(p.data) };
     case 'originSpo2Data':
       return { ...p, data: normalizeSpo2OriginData(p.data) };
+    case 'alarmData':
+      return { ...p, alarms: normalizeAlarmList(p.alarms ?? p.data) };
     default:
       return payload;
   }

@@ -6,6 +6,7 @@ import type {
 } from './connection.js';
 import type {
   BatteryInfo,
+  DeviceAlarm,
   DeviceFunctions,
   DeviceVersion,
   SocialMsgData,
@@ -54,6 +55,7 @@ export type VeepooEvent =
   | 'batteryData'
   | 'connectionStatusChanged'
   | 'originSpo2Data'
+  | 'alarmData'
   | 'error';
 
 export interface VeepooEventPayload {
@@ -87,5 +89,6 @@ export interface VeepooEventPayload {
   batteryData: { deviceId: string; data: BatteryInfo };
   connectionStatusChanged: { deviceId: string; status: ConnectionStatus };
   originSpo2Data: { deviceId: string; data: Spo2OriginData };
+  alarmData: { deviceId: string; alarms: DeviceAlarm[] };
   error: VeepooError;
 }

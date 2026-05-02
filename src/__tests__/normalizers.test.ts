@@ -1,9 +1,52 @@
 import {
+  normalizeAlarmList,
   normalizeBluetoothStatus,
   normalizeEventPayload,
   normalizePermissionsResult,
   normalizeReadOriginProgressPayload,
 } from '../normalizers';
+
+describe('normalizeAlarmList', () => {
+  it('returns empty array for non-array input', () => {
+    expect(normalizeAlarmList(null)).toEqual([]);
+    expect(normalizeAlarmList(undefined)).toEqual([]);
+    expect(normalizeAlarmList({})).toEqual([]);
+  });
+
+  it('converts repeat binary string "0000011" to [1, 2]', () => {
+    const result = normalizeAlarmList([{ id: 1, enabled: 1, hour: 7, minute: 30, repeat: '0000011' }]);
+    expect(result[0].repeat).toEqual([1, 2]);
+  });
+
+  it('converts "0000000" to [] (one-shot)', () => {
+    const result = normalizeAlarmList([{ id: 1, enabled: 1, hour: 7, minute: 30, repeat: '0000000' }]);
+    expect(result[0].repeat).toEqual([]);
+  });
+
+  it('converts "1111111" to [1,2,3,4,5,6,7]', () => {
+    const result = normalizeAlarmList([{ id: 1, enabled: 1, hour: 7, minute: 30, repeat: '1111111' }]);
+    expect(result[0].repeat).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  });
+
+  it('passes through scene and text when present', () => {
+    const result = normalizeAlarmList([
+      { id: 2, enabled: true, hour: 8, minute: 0, repeat: '0000000', scene: 5, text: 'wake up' },
+    ]);
+    expect(result[0].scene).toBe(5);
+    expect(result[0].text).toBe('wake up');
+  });
+
+  it('defaults scene and text to undefined when absent', () => {
+    const result = normalizeAlarmList([{ id: 1, enabled: true, hour: 7, minute: 0, repeat: '0000000' }]);
+    expect(result[0].scene).toBeUndefined();
+    expect(result[0].text).toBeUndefined();
+  });
+
+  it('passes through an already-decoded repeat array unchanged', () => {
+    const result = normalizeAlarmList([{ id: 1, enabled: true, hour: 7, minute: 0, repeat: [1, 5] }]);
+    expect(result[0].repeat).toEqual([1, 5]);
+  });
+});
 
 describe('normalizePermissionsResult', () => {
   it('normalizes legacy string payloads', () => {
@@ -290,6 +333,16 @@ describe('normalizeEventPayload', () => {
     }) as any;
     expect(result.data).toBeDefined();
     expect(result.data.heartValue).toBe(72);
+  });
+
+  it('alarmData: normalizes alarm list and converts repeat string', () => {
+    const result = normalizeEventPayload('alarmData', {
+      deviceId: 'd1',
+      alarms: [{ id: 1, enabled: 1, hour: 7, minute: 30, repeat: '0000011' }],
+    }) as any;
+    expect(result.deviceId).toBe('d1');
+    expect(result.alarms[0].repeat).toEqual([1, 2]);
+    expect(result.alarms[0].hour).toBe(7);
   });
 
   it('originSpo2Data: normalizes spo2 origin fields', () => {

@@ -5,6 +5,7 @@ export {
 } from './connection.js';
 
 export {
+  normalizeAlarmList,
   normalizeBatteryInfo,
   normalizeDeviceFunctions,
   normalizeSocialMsgData,
