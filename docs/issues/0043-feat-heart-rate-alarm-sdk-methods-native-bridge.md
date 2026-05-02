@@ -1,5 +1,8 @@
 # 43 — feat(heart-rate-alarm): SDK methods + native bridge — readHeartRateAlarm / setHeartRateAlarm
 
+**Status:** closed  
+**Labels:** (sync from GitHub)
+
 ## Parent
 
 #40
@@ -15,15 +18,11 @@ Expose `readHeartRateAlarm()` and `setHeartRateAlarm()` through the full stack: 
 
 ## Acceptance criteria
 
-- [ ] `readHeartRateAlarm()` and `setHeartRateAlarm()` are declared on `VeepooSDKModuleInterface`
-- [ ] `readHeartRateAlarm()` resolves with a `HeartRateAlarm` and emits `heartRateAlarmData`
-- [ ] `setHeartRateAlarm({ enabled: true, highThreshold: 120, lowThreshold: 50 })` resolves with `'success'` or `'fail'`
-- [ ] `setHeartRateAlarm({ enabled: false, ... })` disables the alarm without losing threshold values
-- [ ] `setHeartRateAlarm` throws `VeepooError(INVALID_ARGUMENT)` before hitting the bridge when thresholds are invalid
-- [ ] Android bridge correctly maps to/from `HeartWaringSetting`
-- [ ] iOS bridge correctly maps to/from `VPDeviceHeartAlarmModel` with `settingMode` derived from `enabled`
+- [x] `readHeartRateAlarm()` and `setHeartRateAlarm()` are declared on `VeepooSDKModuleInterface`
+- [x] `readHeartRateAlarm()` resolves with a `HeartRateAlarm` and emits `heartRateAlarmData`
+- [x] `setHeartRateAlarm({ enabled: true, highThreshold: 120, lowThreshold: 50 })` resolves with `'success'` or `'fail'`
+- [x] `setHeartRateAlarm({ enabled: false, ... })` disables the alarm without losing threshold values (native model carries thresholds + `isOpen`)
+- [x] `setHeartRateAlarm` throws `VeepooError(INVALID_ARGUMENT)` before hitting the bridge when thresholds are invalid
+- [x] Android bridge correctly maps to/from `HeartWaringSetting`
+- [x] iOS bridge correctly maps to/from `VPDeviceHeartAlarmModel` with `settingMode` derived from `enabled`
 - [ ] Verified on a physical Band that read and set round-trip correctly
-
-## Blocked by
-
-- #41

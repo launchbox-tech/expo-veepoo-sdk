@@ -4,6 +4,7 @@ import type {
   ConnectionStatus,
   DeviceAlarm,
   DeviceTimeSetting,
+  HeartRateAlarm,
   OperationStatus,
   PersonalInfo,
   VeepooEvent,
@@ -69,6 +70,8 @@ export interface NativeVeepooSDKInterface {
   readAlarms(): Promise<unknown>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
+  readHeartRateAlarm(): Promise<unknown>;
+  setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>;
   addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
   removeListeners(count: number): void;
 }

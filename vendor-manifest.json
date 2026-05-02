@@ -18,7 +18,7 @@
     ]
   },
   "ios": {
-    "podspecModuleVersion": "1.2.9",
+    "podspecModuleVersion": "1.2.10",
     "frameworksRelativePath": "ios/VeepooSDK/Frameworks",
     "linkedFrameworks": [
       "VeepooBleSDK",

@@ -27,11 +27,12 @@ import type {
   VeepooEventPayload,
   PermissionsResult,
   EcgTestOptions,
+  HeartRateAlarm,
 } from "./types/index.js";
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
 import type { VeepooSDKModuleInterface, LogListener } from "./VeepooSDKModule.js";
-import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting, validateAlarm, validateDeleteAlarm, validateSocialMsgData, validateDeviceTime } from "./validators/index.js";
+import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting, validateAlarm, validateDeleteAlarm, validateSocialMsgData, validateDeviceTime, validateHeartRateAlarm } from "./validators/index.js";
 import {
   normalizeAlarmList,
   normalizeAutoMeasureSettings,
@@ -46,6 +47,7 @@ import {
   normalizeSocialMsgData,
   normalizeSportStepData,
   normalizeEventPayload,
+  normalizeHeartRateAlarm,
 } from "./normalizers/index.js";
 import { mapNativeRejection } from "./errors/map-native-rejection.js";
 
@@ -820,6 +822,30 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
       this.native.deleteAlarm(alarmId),
     );
+  }
+
+  async readHeartRateAlarm(): Promise<HeartRateAlarm> {
+    const raw = await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.readHeartRateAlarm(),
+    );
+    const data = normalizeHeartRateAlarm(raw);
+    this.emitLocal("heartRateAlarmData", {
+      deviceId: this.connectedDeviceId ?? "",
+      data,
+    });
+    return data;
+  }
+
+  async setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> {
+    validateHeartRateAlarm(alarm);
+    const status = await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.setHeartRateAlarm(alarm),
+    );
+    this.emitLocal("heartRateAlarmData", {
+      deviceId: this.connectedDeviceId ?? "",
+      data: alarm,
+    });
+    return status;
   }
 
   private loggedVoidCall(

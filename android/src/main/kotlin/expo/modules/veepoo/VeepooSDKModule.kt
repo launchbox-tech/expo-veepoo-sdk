@@ -61,6 +61,7 @@ class VeepooSDKModule : Module() {
     defineReadData(this@VeepooSDKModule)
     defineWriteData(this@VeepooSDKModule)
     defineAlarms(this@VeepooSDKModule)
+    defineHeartRateAlarm(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

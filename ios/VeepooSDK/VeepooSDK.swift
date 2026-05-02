@@ -789,6 +789,14 @@ public class VeepooSDKModule: Module {
       self.handleDeleteAlarm(alarmId, promise: promise)
     }
 
+    AsyncFunction("readHeartRateAlarm") { (promise: Promise) in
+      self.handleReadHeartRateAlarm(promise: promise)
+    }
+
+    AsyncFunction("setHeartRateAlarm") { (alarm: [String: Any], promise: Promise) in
+      self.handleSetHeartRateAlarm(alarm, promise: promise)
+    }
+
     // MARK: Tests
     AsyncFunction("startHeartRateTest") { (promise: Promise) in
       #if targetEnvironment(simulator)

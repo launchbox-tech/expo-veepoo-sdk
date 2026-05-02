@@ -13,6 +13,7 @@ import type {
   SocialMsgData,
   Language,
   AutoMeasureSetting,
+  HeartRateAlarm,
   SleepData,
   SportStepData,
   OriginData,
@@ -74,6 +75,8 @@ export interface VeepooSDKModuleInterface {
   readAlarms(): Promise<DeviceAlarm[]>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
+  readHeartRateAlarm(): Promise<HeartRateAlarm>;
+  setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>;
   setLogEnabled(enabled: boolean): this;
   isLogEnabled(): boolean;
   setLogger(logger: LogListener | null): this;

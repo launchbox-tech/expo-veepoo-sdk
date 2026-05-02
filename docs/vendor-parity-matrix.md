@@ -46,7 +46,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Auto measurement windows | `readAutoMeasureSetting`, `modifyAutoMeasureSetting` | Shipped | TBD |
 | Clock / device time | `setDeviceTime` | Shipped | TBD |
 | Alarms | `readAlarms`, `setAlarm`, `deleteAlarm`; `alarmData` | Shipped | TBD |
-| Heart rate alarm thresholds | JS types + `heartRateAlarmData` event path; **no** `readHeartRateAlarm` / `setHeartRateAlarm` on `VeepooSDK` yet | Partial | TBD |
+| Heart rate alarm thresholds | `readHeartRateAlarm`, `setHeartRateAlarm`; `heartRateAlarmData` | Shipped | TBD |
 
 ---
 

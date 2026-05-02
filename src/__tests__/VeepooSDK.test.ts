@@ -68,6 +68,12 @@ function makeMockNative(): MockNative {
       };
     }),
     removeListeners: jest.fn(),
+    readHeartRateAlarm: jest.fn().mockResolvedValue({
+      enabled: true,
+      highThreshold: 120,
+      lowThreshold: 60,
+    }),
+    setHeartRateAlarm: jest.fn().mockResolvedValue('success'),
     _emit(event: string, payload: unknown) {
       listeners.get(event)?.forEach(l => l(payload));
     },
@@ -482,6 +488,40 @@ describe('VeepooSDK', () => {
     it('setLanguage delegates to native.setLanguage', async () => {
       await sdk.setLanguage('english');
       expect(native.setLanguage).toHaveBeenCalledWith('english');
+    });
+
+    it('readHeartRateAlarm delegates to native, normalizes, and emits heartRateAlarmData', async () => {
+      const listener = jest.fn();
+      sdk.on('heartRateAlarmData', listener);
+      const result = await sdk.readHeartRateAlarm();
+      expect(native.readHeartRateAlarm).toHaveBeenCalled();
+      expect(result.highThreshold).toBe(120);
+      expect(result.lowThreshold).toBe(60);
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({
+          deviceId: '',
+          data: expect.objectContaining({ highThreshold: 120, lowThreshold: 60, enabled: true }),
+        }),
+      );
+    });
+
+    it('setHeartRateAlarm validates then delegates to native and emits heartRateAlarmData', async () => {
+      const listener = jest.fn();
+      sdk.on('heartRateAlarmData', listener);
+      const alarm = { enabled: true, highThreshold: 120, lowThreshold: 50 };
+      const status = await sdk.setHeartRateAlarm(alarm);
+      expect(native.setHeartRateAlarm).toHaveBeenCalledWith(alarm);
+      expect(status).toBe('success');
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({ deviceId: '', data: alarm }),
+      );
+    });
+
+    it('setHeartRateAlarm throws INVALID_ARGUMENT when highThreshold <= lowThreshold', async () => {
+      await expect(
+        sdk.setHeartRateAlarm({ enabled: true, highThreshold: 80, lowThreshold: 100 }),
+      ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+      expect(native.setHeartRateAlarm).not.toHaveBeenCalled();
     });
   });
 
