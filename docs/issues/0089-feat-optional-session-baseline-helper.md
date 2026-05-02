@@ -1,7 +1,7 @@
 # 89 — feat: Optional Session baseline helper (post–deviceReady) (#81)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/89  
-> Status: open | Labels: needs-triage, enhancement
+> Status: open | Labels: enhancement, ready-for-human
 
 ## Parent
 

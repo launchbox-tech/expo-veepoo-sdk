@@ -1,7 +1,7 @@
 # 81 — PRD: JavaScript bridge architecture hardening (contract, depth, optional Session recipe)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/81  
-> Status: open | Labels: needs-triage, enhancement
+> Status: open | Labels: enhancement, ready-for-human
 
 ## Problem Statement
 

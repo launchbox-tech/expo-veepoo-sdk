@@ -1,7 +1,7 @@
 # 73 — PRD: Native rejection normalization to `VeepooError` (JS bridge)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/73
-> Status: open | Labels: needs-triage, enhancement
+> Status: closed | Labels: enhancement
 
 ## Problem Statement
 

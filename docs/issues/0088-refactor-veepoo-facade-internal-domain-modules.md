@@ -1,7 +1,7 @@
 # 88 — refactor: VeepooSDK façade — internal domain modules (#81)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/88  
-> Status: open | Labels: needs-triage, enhancement
+> Status: open | Labels: enhancement, ready-for-agent
 
 ## Parent
 
