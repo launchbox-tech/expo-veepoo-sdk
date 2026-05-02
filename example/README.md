@@ -2,6 +2,20 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## Local `expo-veepoo-sdk` (this monorepo)
+
+The example depends on the parent folder via `"expo-veepoo-sdk": "file:.."`. The **package name** in the parent `package.json` is `@gaozh1024/expo-veepoo-sdk`; Bun may show that scoped name during install even though imports use `expo-veepoo-sdk`.
+
+### Bun: `ENOENT: failed copying files from cache` (scoped / `file:` package)
+
+1. From **`example/`**: `rm -rf node_modules`
+2. Clear Bun’s package cache: `bun pm cache rm`
+3. Install again: `bun install`
+4. If it still fails, regenerate the lockfile: `rm -f bun.lock` then `bun install`
+5. Fallback: `npm install` (uses the same `file:..` link without Bun’s cache copy path)
+
+Work from a **local disk** path (avoid network volumes) so symlinks and large `android/libs/*.aar` trees resolve reliably.
+
 ## Get started
 
 1. Install dependencies
@@ -9,6 +23,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```bash
    npm install
    ```
+
+   Or with Bun: `bun install`
 
 2. Start the app
 
