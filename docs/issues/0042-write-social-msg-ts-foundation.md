@@ -1,7 +1,7 @@
 # Issue #42: writeSocialMsgData — TypeScript foundation (validator + interface + JS wrapper)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/42
-> Status: open | Type: AFK | Blocked by: none
+> Status: closed | Type: AFK | Blocked by: none
 
 ## Parent
 

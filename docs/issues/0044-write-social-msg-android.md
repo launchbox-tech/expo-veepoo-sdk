@@ -1,7 +1,7 @@
 # Issue #44: writeSocialMsgData — Android native implementation
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/44
-> Status: open | Type: AFK | Blocked by: #42
+> Status: closed | Type: AFK | Blocked by: #42
 
 ## Parent
 
