@@ -4,15 +4,16 @@ An Expo SDK for integrating HBand wearable devices into React Native / Expo appl
 
 [![npm version](https://badge.fury.io/js/@gaozh1024%2Fexpo-veepoo-sdk.svg)](https://badge.fury.io/js/@gaozh1024%2Fexpo-veepoo-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey.svg)](https://github.com/gaozh1024/expo-veepoo-sdk)
+[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey.svg)](https://github.com/launchbox-tech/expo-veepoo-sdk)
 
 Expo 模块，用于 Veepoo 设备的蓝牙连接、数据读取和健康测试。
 
 当前最新版本：`1.2.7`
 
 - 使用文档：当前 `README.md`
-- 升级说明：[1.2.7.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/release-notes/1.2.7.md)
-- 历史版本：[docs/README.md](/Users/gzh/Projects/framework/expo-veepoo-sdk/docs/README.md)
+- 升级说明：[docs/release-notes/1.2.7.md](docs/release-notes/1.2.7.md)
+- 历史版本：[docs/README.md](docs/README.md)
+- Vendor API 对照表：[docs/vendor-parity-matrix.md](docs/vendor-parity-matrix.md)
 
 这个包的原则是：
 
