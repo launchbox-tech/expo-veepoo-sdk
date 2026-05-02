@@ -1,7 +1,7 @@
 ---
 number: 52
 title: "feat(alarms): JS methods readAlarms, setAlarm, deleteAlarm"
-state: open
+state: closed
 parent: 37
 ---
 

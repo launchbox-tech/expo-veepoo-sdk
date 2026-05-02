@@ -1,7 +1,7 @@
 ---
 number: 54
 title: "feat(alarms): iOS native implementation (VPDeviceNewAlarmModel/VPDeviceTextAlarmModel)"
-state: open
+state: closed
 parent: 37
 ---
 

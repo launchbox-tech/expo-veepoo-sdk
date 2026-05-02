@@ -1,7 +1,7 @@
 ---
 number: 51
 title: "feat(alarms): normalizeAlarmList and alarmData event wiring"
-state: open
+state: closed
 parent: 37
 ---
 

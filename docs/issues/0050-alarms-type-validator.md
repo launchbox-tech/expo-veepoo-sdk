@@ -1,7 +1,7 @@
 ---
 number: 50
 title: "feat(alarms): update DeviceAlarm type and complete validateAlarm"
-state: open
+state: closed
 parent: 37
 ---
 
