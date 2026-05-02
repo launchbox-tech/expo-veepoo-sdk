@@ -30,6 +30,7 @@ fun ModuleDefinitionBuilder.defineEvents() {
     ORIGIN_FIVE_MINUTE_DATA,
     ORIGIN_HALF_HOUR_DATA,
     ORIGIN_SPO2_DATA,
+    ALARM_DATA,
     ERROR
   )
 }

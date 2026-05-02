@@ -48,6 +48,7 @@ class VeepooSDKModule : Module() {
     defineConnection(this@VeepooSDKModule)
     defineReadData(this@VeepooSDKModule)
     defineWriteData(this@VeepooSDKModule)
+    defineAlarms(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)
   }

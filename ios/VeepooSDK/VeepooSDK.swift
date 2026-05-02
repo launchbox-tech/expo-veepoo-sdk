@@ -57,6 +57,7 @@ let ORIGIN_FIVE_MINUTE_DATA = VeepooEvent.originFiveMinuteData
 let ORIGIN_HALF_HOUR_DATA = VeepooEvent.originHalfHourData
 let ORIGIN_SPO2_DATA = VeepooEvent.originSpo2Data
 let SOCIAL_MSG_DATA = VeepooEvent.socialMsgData
+let ALARM_DATA = "alarmData"
 let ERROR = VeepooEvent.error
 
 // MARK: - 权限回调委托
@@ -197,7 +198,7 @@ public class VeepooSDKModule: Module {
       READ_ORIGIN_PROGRESS, READ_ORIGIN_COMPLETE,
       ORIGIN_FIVE_MINUTE_DATA, ORIGIN_HALF_HOUR_DATA,
       ORIGIN_SPO2_DATA, SOCIAL_MSG_DATA,
-      SLEEP_DATA, SPORT_STEP_DATA, ERROR
+      SLEEP_DATA, SPORT_STEP_DATA, ALARM_DATA, ERROR
     )
 
     // MARK: Initialization
@@ -716,6 +717,19 @@ public class VeepooSDKModule: Module {
         promise.resolve(success)
       }
       #endif
+    }
+
+    // MARK: Alarms
+    AsyncFunction("readAlarms") { (promise: Promise) in
+      self.handleReadAlarms(promise: promise)
+    }
+
+    AsyncFunction("setAlarm") { (alarm: [String: Any], promise: Promise) in
+      self.handleSetAlarm(alarm, promise: promise)
+    }
+
+    AsyncFunction("deleteAlarm") { (alarmId: Int, promise: Promise) in
+      self.handleDeleteAlarm(alarmId, promise: promise)
     }
 
     // MARK: Tests
