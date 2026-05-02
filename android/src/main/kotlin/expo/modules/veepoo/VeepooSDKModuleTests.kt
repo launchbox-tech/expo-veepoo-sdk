@@ -5,7 +5,6 @@ import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
 import com.veepoo.protocol.listener.data.*
 import com.veepoo.protocol.model.datas.*
-import com.veepoo.protocol.model.enums.DetectState
 import com.veepoo.protocol.model.enums.EBPDetectModel
 import com.veepoo.protocol.model.enums.EBloodGlucoseRiskLevel
 import com.veepoo.protocol.model.enums.EBloodGlucoseStatus
@@ -652,14 +651,14 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
           ))
         }
 
-        override fun onDetectFailed(detectState: DetectState) {
+        override fun onDetectFailed(detectState: com.veepoo.protocol.model.enums.DetectState) {
           module.endRealtimeTest("bodyComposition")
           module.sendEvent(BODY_COMPOSITION_TEST_RESULT, mapOf(
             "deviceId" to (module.connectedDeviceId ?: ""),
             "result" to mapOf(
               "state" to detectStateToBodyCompLabel(detectState),
               "progress" to 0,
-              "rawState" to detectState.name,
+              "rawState" to detectStateRawForJs(detectState),
               "isEnd" to true
             )
           ))
@@ -705,18 +704,43 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
   }
 }
 
-private fun readBodyFloat(bean: BodyComponent, vararg names: String): Double? {
+/**
+ * Body composition helpers are defensive against vpprotocol refactors: no hard-coded enum constant
+ * names (use [Enum.name] + ordinal), and numeric fields are resolved via getters, boolean accessors,
+ * and declared fields.
+ */
+private fun readBodyNumeric(bean: Any, methods: Array<String>, fields: Array<String> = emptyArray()): Double? {
   val cls = bean.javaClass
-  for (n in names) {
+  for (n in methods) {
     try {
       val m = cls.getMethod(n)
       val v = m.invoke(bean) ?: continue
-      return when (v) {
+      val d = when (v) {
         is Float -> v.toDouble()
         is Double -> v
         is Int -> v.toDouble()
+        is Long -> v.toDouble()
+        is Number -> v.toDouble()
         else -> null
       }
+      if (d != null) return d
+    } catch (_: Exception) {
+    }
+  }
+  for (name in fields) {
+    try {
+      val f = cls.getDeclaredField(name)
+      f.isAccessible = true
+      val v = f.get(bean) ?: continue
+      val d = when (v) {
+        is Float -> v.toDouble()
+        is Double -> v
+        is Int -> v.toDouble()
+        is Long -> v.toDouble()
+        is Number -> v.toDouble()
+        else -> null
+      }
+      if (d != null) return d
     } catch (_: Exception) {
     }
   }
@@ -725,46 +749,101 @@ private fun readBodyFloat(bean: BodyComponent, vararg names: String): Double? {
 
 private fun bodyComponentToCompositionMap(b: BodyComponent): Map<String, Any?> {
   val out = mutableMapOf<String, Any?>()
-  readBodyFloat(b, "getBMI", "getBmi")?.let { out["bmi"] = it }
-  readBodyFloat(b, "getBodyFatRate", "getBodyFatPercentage")?.let { out["bodyFatPercentage"] = it }
-  readBodyFloat(b, "getFatRate", "getFatMass")?.let { out["fatMassKg"] = it }
-  readBodyFloat(b, "getFFM", "getFfm", "getLeanBodyMass")?.let { out["leanBodyMassKg"] = it }
-  readBodyFloat(b, "getMuscleRate")?.let { out["muscleRate"] = it }
-  readBodyFloat(b, "getMuscleMass")?.let { out["muscleMassKg"] = it }
-  readBodyFloat(b, "getSubcutaneousFat")?.let { out["subcutaneousFatPercentage"] = it }
-  readBodyFloat(b, "getBodyWater", "getBodyMoisture")?.let { out["bodyWaterPercentage"] = it }
-  readBodyFloat(b, "getWaterContent")?.let { out["waterMassKg"] = it }
-  readBodyFloat(b, "getSkeletalMuscleRate")?.let { out["skeletalMuscleRate"] = it }
-  readBodyFloat(b, "getBoneMass")?.let { out["boneMassKg"] = it }
-  readBodyFloat(b, "getProteinProportion", "getProportionOfProtein")?.let { out["proteinPercentage"] = it }
-  readBodyFloat(b, "getProteinMass")?.let { out["proteinMassKg"] = it }
-  readBodyFloat(b, "getBasalMetabolicRate")?.let { out["basalMetabolicRateKcal"] = it }
-  try {
-    val d = b.duration
-    out["measurementDurationSeconds"] = d
-  } catch (_: Exception) {
-  }
-  try {
-    out["sourceIdType"] = b.idType
-  } catch (_: Exception) {
-  }
-  try {
-    val tb = b.timeBean
-    if (tb != null) {
-      out["measurementTime"] = mapOf("hour" to tb.hour, "minute" to tb.minute)
-    }
-  } catch (_: Exception) {
-  }
+  val bean: Any = b
+  readBodyNumeric(bean, arrayOf("getBMI", "getBmi", "getbmi"), arrayOf("BMI", "bmi"))?.let { out["bmi"] = it }
+  readBodyNumeric(bean, arrayOf("getBodyFatRate", "getBodyFatPercentage"), arrayOf("bodyFatRate", "bodyFatPercentage"))?.let { out["bodyFatPercentage"] = it }
+  readBodyNumeric(bean, arrayOf("getFatRate", "getFatMass"), arrayOf("fatRate", "fatMass"))?.let { out["fatMassKg"] = it }
+  readBodyNumeric(bean, arrayOf("getFFM", "getFfm", "getLeanBodyMass"), arrayOf("FFM", "ffm", "leanBodyMass"))?.let { out["leanBodyMassKg"] = it }
+  readBodyNumeric(bean, arrayOf("getMuscleRate"), arrayOf("muscleRate"))?.let { out["muscleRate"] = it }
+  readBodyNumeric(bean, arrayOf("getMuscleMass"), arrayOf("muscleMass"))?.let { out["muscleMassKg"] = it }
+  readBodyNumeric(bean, arrayOf("getSubcutaneousFat"), arrayOf("subcutaneousFat"))?.let { out["subcutaneousFatPercentage"] = it }
+  readBodyNumeric(bean, arrayOf("getBodyWater", "getBodyMoisture"), arrayOf("bodyWater", "bodyMoisture"))?.let { out["bodyWaterPercentage"] = it }
+  readBodyNumeric(bean, arrayOf("getWaterContent"), arrayOf("waterContent"))?.let { out["waterMassKg"] = it }
+  readBodyNumeric(bean, arrayOf("getSkeletalMuscleRate"), arrayOf("skeletalMuscleRate"))?.let { out["skeletalMuscleRate"] = it }
+  readBodyNumeric(bean, arrayOf("getBoneMass"), arrayOf("boneMass"))?.let { out["boneMassKg"] = it }
+  readBodyNumeric(bean, arrayOf("getProteinProportion", "getProportionOfProtein"), arrayOf("proteinProportion", "proportionOfProtein"))?.let { out["proteinPercentage"] = it }
+  readBodyNumeric(bean, arrayOf("getProteinMass"), arrayOf("proteinMass"))?.let { out["proteinMassKg"] = it }
+  readBodyNumeric(bean, arrayOf("getBasalMetabolicRate"), arrayOf("basalMetabolicRate"))?.let { out["basalMetabolicRateKcal"] = it }
+
+  probeIntMember(bean, "getDuration", "getMeasurementDuration", "duration")?.let { out["measurementDurationSeconds"] = it }
+  probeIntMember(bean, "getIdType", "getIDType", "idType")?.let { out["sourceIdType"] = it }
+
+  val tb = probeTimeBean(bean)
+  if (tb != null) out["measurementTime"] = tb
   return out
 }
 
-private fun detectStateToBodyCompLabel(ds: DetectState): String {
-  return when (ds) {
-    DetectState.PROGRESS -> "testing"
-    DetectState.SUCCESS -> "complete"
-    DetectState.FAILED -> "error"
-    DetectState.BUSY -> "deviceBusy"
-    DetectState.LOW_POWER -> "lowPower"
+private fun probeIntMember(target: Any, vararg names: String): Int? {
+  val cls = target.javaClass
+  for (name in names) {
+    try {
+      val m = cls.getMethod(name)
+      val v = m.invoke(target) ?: continue
+      return when (v) {
+        is Int -> v
+        is Number -> v.toInt()
+        else -> null
+      }
+    } catch (_: Exception) {
+    }
+    try {
+      val f = cls.getDeclaredField(name)
+      f.isAccessible = true
+      val v = f.get(target) ?: continue
+      return when (v) {
+        is Int -> v
+        is Number -> v.toInt()
+        else -> null
+      }
+    } catch (_: Exception) {
+    }
+  }
+  return null
+}
+
+private fun probeTimeBean(bean: Any): Map<String, Int>? {
+  val cls = bean.javaClass
+  val tb: Any? = try {
+    try {
+      cls.getMethod("getTimeBean").invoke(bean)
+    } catch (_: Exception) {
+      try {
+        cls.getDeclaredField("timeBean").apply { isAccessible = true }.get(bean)
+      } catch (_: Exception) {
+        null
+      }
+    }
+  } catch (_: Exception) {
+    null
+  } ?: return null
+  val hour = probeIntMember(tb, "getHour", "getH", "hour")
+  val minute = probeIntMember(tb, "getMinute", "getM", "minute")
+  if (hour == null && minute == null) return null
+  return mapOf("hour" to (hour ?: 0), "minute" to (minute ?: 0))
+}
+
+/** JS `rawState`: vendor enum name for debugging. */
+private fun detectStateRawForJs(ds: com.veepoo.protocol.model.enums.DetectState): String = ds.name
+
+/**
+ * Map vendor [DetectState] without referencing enum constants (renames / code generation safe).
+ * Prefer [Enum.name] tokens; fall back to typical ordinal order from vendor docs.
+ */
+private fun detectStateToBodyCompLabel(ds: com.veepoo.protocol.model.enums.DetectState): String {
+  val e = ds as Enum<*>
+  val name = e.name.lowercase()
+  if (name.contains("progress")) return "testing"
+  if (name.contains("success")) return "complete"
+  if (name.contains("fail")) return "error"
+  if (name.contains("busy")) return "deviceBusy"
+  if (name.contains("low") && name.contains("power")) return "lowPower"
+  if (name == "low_power" || name.contains("lowpower")) return "lowPower"
+  return when (e.ordinal) {
+    0 -> "testing"
+    1 -> "complete"
+    2 -> "error"
+    3 -> "deviceBusy"
+    4 -> "lowPower"
     else -> "error"
   }
 }
