@@ -729,7 +729,16 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   async setDeviceTime(time?: Date): Promise<boolean> {
     validateDeviceTime(time);
-    return this.native.setDeviceTime(time);
+    return this.native.setDeviceTime(
+      time === undefined ? undefined : {
+        year: time.getFullYear(),
+        month: time.getMonth() + 1,
+        day: time.getDate(),
+        hour: time.getHours(),
+        minute: time.getMinutes(),
+        second: time.getSeconds(),
+      }
+    );
   }
 
   async readAlarms(): Promise<DeviceAlarm[]> {

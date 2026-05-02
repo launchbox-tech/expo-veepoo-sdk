@@ -3,6 +3,7 @@ import { requireNativeModule, EventSubscription } from 'expo-modules-core';
 import type {
   ConnectionStatus,
   DeviceAlarm,
+  DeviceTimeSetting,
   OperationStatus,
   PersonalInfo,
   VeepooEvent,
@@ -56,7 +57,7 @@ export interface NativeVeepooSDKInterface {
   stopStressTest(): Promise<void>;
   startBloodGlucoseTest(): Promise<void>;
   stopBloodGlucoseTest(): Promise<void>;
-  setDeviceTime(time?: Date): Promise<boolean>;
+  setDeviceTime(time?: Omit<DeviceTimeSetting, 'system'>): Promise<boolean>;
   readAlarms(): Promise<unknown>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
