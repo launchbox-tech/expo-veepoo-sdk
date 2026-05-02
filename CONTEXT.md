@@ -22,4 +22,6 @@ Vocabulary for **Band**, **Session**, **Band Discovery**, and **Pairing** follow
 
 **Vendor parity:** The module targets **full coverage** of vendor-exposed Band capabilities for device personalization and advanced features (settings-style APIs, OTA/DFU, dial management, etc.), not a permanently capped subset. Individual capabilities remain **optional per Band model**: host apps should use **`readDeviceFunctions()`** (and related device metadata) to decide what to show; unsupported capabilities should fail with clear, documented errors rather than silent no-ops.
 
+**Delivery sequence (C / D):** Capabilities ship in a **fixed order** that combines **lower blast radius first** with **dependency order**: Group **C** settings-style APIs (find Band, screen, sedentary, wrist-flip) before medium-integration features (weather, women’s health, AGPS, music/camera), then higher-risk work (**OTA/DFU**, **dial management**, **contacts/SOS**, **body composition**), with **Android-only** controls (e.g. Bluetooth power) **last**.
+
 _(Grill-with-docs #4 — Q1–Q6.)_
