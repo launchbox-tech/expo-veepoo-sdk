@@ -28,4 +28,6 @@ Vocabulary for **Band**, **Session**, **Band Discovery**, and **Pairing** follow
 
 **Session semantics (C / D):** New Band-facing APIs **default** to the **same Session eligibility and native invocation patterns** as existing **`DeviceSettings`** flows (connected Band, shared error mapping per **ADR 0003**). If vendor documentation shows a capability requires a **non-standard mode** (e.g. **OTA/DFU** or bulk **dial** transfer), capture the real contract in the implementing **PRD** (and **ADR** only if the trade-off is hard to reverse) before diverging from that default.
 
+**Example app (`example/`):** Shipping a new **C** or **D** capability should include a **minimal, safe demo** in the example app (control + outcome text or readout) so humans can regression-test parity. **OTA/DFU** is **exempt** from a real flash: use a **dry-run**, a disabled control with doc link, or another **non-bricking** pattern; document the choice in **`example/`** or release notes.
+
 _(Grill-with-docs #4 — Q1–Q6.)_
