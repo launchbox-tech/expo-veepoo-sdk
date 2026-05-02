@@ -363,6 +363,14 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     return veepooError;
   }
 
+  private nativeOpFailed(error: unknown): never {
+    throw this.handleError(
+      error,
+      "OPERATION_FAILED",
+      this.connectedDeviceId ?? undefined,
+    );
+  }
+
   private async withNative<T>(
     fallbackCode: VeepooError["code"],
     deviceId: string | undefined,
@@ -588,67 +596,60 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     this.log("debug", "device", "battery.read.start", "Reading battery info", {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    const result = normalizeBatteryInfo(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readBattery(),
-      ),
-    );
-    this.log(
-      "debug",
-      "device",
-      "battery.read.result",
-      "Battery info received",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: result,
+    return invokeNative({
+      invoke: () => this.native.readBattery(),
+      normalize: normalizeBatteryInfo,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: BatteryInfo) => {
+        this.log("debug", "device", "battery.read.result", "Battery info received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: result,
+        });
       },
-    );
-    return result;
+    });
   }
 
-  syncPersonalInfo = (info: PersonalInfo): Promise<boolean> => {
-    validatePersonalInfo(info);
-    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.syncPersonalInfo(info),
-    );
-  };
+  syncPersonalInfo = (info: PersonalInfo): Promise<boolean> =>
+    invokeNative({
+      validate: () => validatePersonalInfo(info),
+      invoke: () => this.native.syncPersonalInfo(info),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
 
   async readDeviceFunctions(): Promise<DeviceFunctions> {
-    const result = normalizeDeviceFunctions(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readDeviceFunctions(),
-      ),
-    );
-    this.log(
-      "debug",
-      "device",
-      "device.functions.read",
-      "Device functions received",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: result,
+    return invokeNative({
+      invoke: () => this.native.readDeviceFunctions(),
+      normalize: normalizeDeviceFunctions,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: DeviceFunctions) => {
+        this.log("debug", "device", "device.functions.read", "Device functions received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: result,
+        });
       },
-    );
-    return result;
+    });
   }
 
   async readSocialMsgData(): Promise<SocialMsgData> {
-    const result = normalizeSocialMsgData(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readSocialMsgData(),
-      ),
-    );
-    this.log(
-      "debug",
-      "device",
-      "device.social.read",
-      "Social message settings received",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: result,
+    return invokeNative({
+      invoke: () => this.native.readSocialMsgData(),
+      normalize: normalizeSocialMsgData,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: SocialMsgData) => {
+        this.log("debug", "device", "device.social.read", "Social message settings received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: result,
+        });
       },
-    );
-    return result;
+    });
   }
 
   async writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus> {
@@ -659,107 +660,119 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   async readDeviceVersion(): Promise<DeviceVersion> {
-    const result = normalizeDeviceVersion(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readDeviceVersion(),
-      ),
-    );
-    this.log(
-      "debug",
-      "device",
-      "device.version.read",
-      "Device version received",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: result,
+    return invokeNative({
+      invoke: () => this.native.readDeviceVersion(),
+      normalize: normalizeDeviceVersion,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: DeviceVersion) => {
+        this.log("debug", "device", "device.version.read", "Device version received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: result,
+        });
       },
-    );
-    return result;
+    });
   }
 
-  startReadOriginData = (): Promise<void> =>
-    this.loggedVoidCall("read", "read.origin.start", "Starting origin data read", () => this.native.startReadOriginData());
+  startReadOriginData = (): Promise<void> => {
+    this.log("info", "read", "read.origin.start", "Starting origin data read", {
+      deviceId: this.connectedDeviceId ?? undefined,
+    });
+    return invokeNative({
+      invoke: () => this.native.startReadOriginData(),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
+  };
 
   readDeviceAllData = (): Promise<boolean> =>
-    this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.readDeviceAllData(),
-    );
+    invokeNative({
+      invoke: () => this.native.readDeviceAllData(),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
 
   async readSleepData(date?: string): Promise<SleepData[]> {
-    const result = normalizeSleepDataList(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readSleepData(date),
-      ),
-    );
-    this.log("debug", "read", "read.sleep.result", "Sleep data received", {
+    return invokeNative({
+      invoke: () => this.native.readSleepData(date),
+      normalize: normalizeSleepDataList,
+      fallbackCode: "OPERATION_FAILED",
       deviceId: this.connectedDeviceId ?? undefined,
-      data: { date, count: result.length },
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: SleepData[]) => {
+        this.log("debug", "read", "read.sleep.result", "Sleep data received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: { date, count: result.length },
+        });
+      },
     });
-    return result;
   }
 
   async readSportStepData(date?: string): Promise<SportStepData> {
-    const result = normalizeSportStepData(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readSportStepData(date),
-      ),
-    );
-    this.log("debug", "read", "read.sport.result", "Sport step data received", {
+    return invokeNative({
+      invoke: () => this.native.readSportStepData(date),
+      normalize: normalizeSportStepData,
+      fallbackCode: "OPERATION_FAILED",
       deviceId: this.connectedDeviceId ?? undefined,
-      data: result,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: SportStepData) => {
+        this.log("debug", "read", "read.sport.result", "Sport step data received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: result,
+        });
+      },
     });
-    return result;
   }
 
   async readOriginData(dayOffset: number = 0): Promise<OriginData[]> {
-    const result = normalizeOriginDataList(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readOriginData(dayOffset),
-      ),
-    );
-    this.log("debug", "read", "read.origin.result", "Origin data received", {
+    return invokeNative({
+      invoke: () => this.native.readOriginData(dayOffset),
+      normalize: normalizeOriginDataList,
+      fallbackCode: "OPERATION_FAILED",
       deviceId: this.connectedDeviceId ?? undefined,
-      data: { dayOffset, count: result.length },
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: OriginData[]) => {
+        this.log("debug", "read", "read.origin.result", "Origin data received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: { dayOffset, count: result.length },
+        });
+      },
     });
-    return result;
   }
 
   async readDaySummaryData(dayOffset: number = 0): Promise<DaySummaryData> {
-    const result = normalizeDaySummaryData(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readDaySummaryData(dayOffset),
-      ),
-    );
-    this.log(
-      "debug",
-      "read",
-      "read.summary.result",
-      "Day summary data received",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: { dayOffset, date: result.date },
+    return invokeNative({
+      invoke: () => this.native.readDaySummaryData(dayOffset),
+      normalize: normalizeDaySummaryData,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: DaySummaryData) => {
+        this.log("debug", "read", "read.summary.result", "Day summary data received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: { dayOffset, date: result.date },
+        });
       },
-    );
-    return result;
+    });
   }
 
   async readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
-    const result = normalizeAutoMeasureSettings(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.readAutoMeasureSetting(),
-      ),
-    );
-    this.log(
-      "debug",
-      "device",
-      "autoMeasure.read",
-      "Auto measure settings received",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: { count: result.length },
+    return invokeNative({
+      invoke: () => this.native.readAutoMeasureSetting(),
+      normalize: normalizeAutoMeasureSettings,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: AutoMeasureSetting[]) => {
+        this.log("debug", "device", "autoMeasure.read", "Auto measure settings received", {
+          deviceId: this.connectedDeviceId ?? undefined,
+          data: { count: result.length },
+        });
       },
-    );
-    return result;
+    });
   }
 
   async modifyAutoMeasureSetting(

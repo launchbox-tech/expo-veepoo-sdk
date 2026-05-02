@@ -13,10 +13,10 @@ Migrate **health data read** **`AsyncFunction`**s through the same **native invo
 
 ## Acceptance criteria
 
-- [ ] Each migrated method uses the shared pipeline for native failures and existing normalizers for success paths.
-- [ ] **Origin read progress** / caching behaviour (if any) remains correct; bugs stay localized to this slice’s diff.
-- [ ] Tests cover at least one representative read per category and a **normalized** shape assertion.
-- [ ] No host-facing API changes.
+- [x] Each migrated method uses the shared pipeline for native failures and existing normalizers for success paths.
+- [x] **Origin read progress** / caching behaviour (if any) remains correct; bugs stay localized to this slice’s diff.
+- [x] Tests cover at least one representative read per category and a **normalized** shape assertion.
+- [x] No host-facing API changes.
 
 ## Blocked by
 

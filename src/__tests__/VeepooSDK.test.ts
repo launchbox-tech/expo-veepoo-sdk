@@ -579,6 +579,53 @@ describe('VeepooSDK', () => {
       expect(result[0].heartValue).toBe(72);
     });
 
+    it('readSportStepData(date) normalizes step alias to stepCount', async () => {
+      native.readSportStepData.mockResolvedValueOnce({ date: '2024-01-02', step: 5000 });
+      const result = await sdk.readSportStepData('2024-01-02');
+      expect(native.readSportStepData).toHaveBeenCalledWith('2024-01-02');
+      expect(result.stepCount).toBe(5000);
+    });
+
+    it('readDaySummaryData(dayOffset) returns normalized DaySummaryData', async () => {
+      native.readDaySummaryData.mockResolvedValueOnce({
+        date: '2024-06-01',
+        allStep: 100,
+        sportList: [],
+        rateList: [],
+        bpList: [],
+      });
+      const result = await sdk.readDaySummaryData(0);
+      expect(native.readDaySummaryData).toHaveBeenCalledWith(0);
+      expect(result.date).toBe('2024-06-01');
+      expect(result.allStep).toBe(100);
+    });
+
+    it('readDeviceVersion() returns normalized DeviceVersion', async () => {
+      native.readDeviceVersion.mockResolvedValueOnce({
+        hardwareVersion: '1',
+        softwareVersion: '2',
+      });
+      const result = await sdk.readDeviceVersion();
+      expect(native.readDeviceVersion).toHaveBeenCalled();
+      expect(result.hardwareVersion).toBe('1');
+      expect(result.softwareVersion).toBe('2');
+    });
+
+    it('readAutoMeasureSetting() returns normalized list', async () => {
+      native.readAutoMeasureSetting.mockResolvedValueOnce([
+        { funType: 1, measureInterval: 30 },
+      ]);
+      const result = await sdk.readAutoMeasureSetting();
+      expect(native.readAutoMeasureSetting).toHaveBeenCalled();
+      expect(result).toHaveLength(1);
+      expect(result[0].measureInterval).toBe(30);
+    });
+
+    it('startReadOriginData() delegates to native', async () => {
+      await sdk.startReadOriginData();
+      expect(native.startReadOriginData).toHaveBeenCalled();
+    });
+
     it('startHeartRateTest() delegates to native', async () => {
       await sdk.startHeartRateTest();
       expect(native.startHeartRateTest).toHaveBeenCalled();
