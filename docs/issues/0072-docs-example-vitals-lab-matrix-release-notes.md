@@ -16,6 +16,7 @@ After **HRV, ECG, fatigue, and breathing** bridges exist: update **`docs/vendor-
 - [ ] Parity matrix reflects all four modalities + mutex/error behavior as shipped; backlog bullets removed or narrowed per truth.
 - [ ] Release notes entry describes new APIs and upgrade notes.
 - [ ] Example app can trigger each new test and observe results/errors (minimal UI acceptable).
+- [ ] Where **#67–#71** PRs documented **research notes**, link or summarize non-obvious behavior in the matrix **Further notes** and/or release notes so consumers inherit the same traceability.
 - [ ] CI / example build green.
 
 ## Blocked by

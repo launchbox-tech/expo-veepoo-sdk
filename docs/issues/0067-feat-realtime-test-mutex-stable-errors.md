@@ -19,6 +19,7 @@ Implement coordination **consistently on iOS and Kotlin** (and mirror in JS wher
 - [ ] Same stable failure semantics when Session missing / not ready for tests (aligned with existing tests).
 - [ ] Existing realtime tests (HR, BP, SpO₂, temp, stress, glucose) participate in the single-test rule—verified conceptually and via example if applicable.
 - [ ] Error codes and messages are suitable for host-app branching; vendor diagnostics remain available for logs.
+- [ ] **Research notes (AFK):** Summarize new or changed `VeepooError` codes, mutex sequencing, and any vendor callback edge cases in the **PR description or an issue comment** so maintainers can trace decisions without a live handoff.
 - [ ] CI green; no requirement to change vendor parity matrix rows for HRV/ECG/etc. (those land in follow-up issues).
 
 ## Blocked by

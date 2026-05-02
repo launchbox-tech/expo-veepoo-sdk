@@ -19,6 +19,7 @@ Expose **HRV realtime manual test** end-to-end: `startHrvTest` / `stopHrvTest`, 
 - [ ] iOS and Android both implemented; **Partial** only if one vendor SDK lacks API (document in PR description).
 - [ ] Unsupported capability and mutex conflicts use stable `VeepooError` codes from foundation work.
 - [ ] Normalizers + unit tests for `hrvTestResult` payloads (prior art: other realtime test normalizers).
+- [ ] **Research notes (AFK):** Document vendor wiki/SDK symbols, start/stop entry points, listener/delegate names, representative payload shapes, and **iOS vs Android** deltas in the **PR description or an issue comment** before merge.
 - [ ] CI green; **Device tested** remains TBD until hardware verification recorded elsewhere.
 
 ## Blocked by

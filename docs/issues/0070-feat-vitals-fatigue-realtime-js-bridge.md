@@ -18,6 +18,7 @@ Expose **fatigue realtime manual test** end-to-end: `startFatigueTest` / `stopFa
 - [ ] Public API matches PRD naming; both native platforms unless **Partial** with justification.
 - [ ] Normalizers + unit tests for fatigue result payloads.
 - [ ] Stable errors for unsupported / mutex / Session eligibility.
+- [ ] **Research notes (AFK):** Document vendor wiki/SDK symbols, start/stop entry points, listener/delegate names, representative payload shapes, and **iOS vs Android** deltas in the **PR description or an issue comment** before merge.
 - [ ] CI green.
 
 ## Blocked by

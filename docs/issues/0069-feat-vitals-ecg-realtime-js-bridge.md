@@ -19,6 +19,7 @@ Respect mutex + stable errors from foundation. **No** example app, parity matrix
 - [ ] Both platforms implemented unless **Partial** with justification.
 - [ ] Normalizers + tests for summary and waveform shapes (as applicable).
 - [ ] Stable errors for unsupported / mutex / Session eligibility.
+- [ ] **Research notes (AFK):** Document vendor wiki/SDK symbols, start/stop entry points, listener/delegate names, waveform/chunking behavior, representative payload shapes, and **iOS vs Android** deltas in the **PR description or an issue comment** before merge.
 - [ ] CI green.
 
 ## Blocked by

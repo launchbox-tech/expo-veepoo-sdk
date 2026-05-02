@@ -18,6 +18,7 @@ Expose **breathing realtime manual test** end-to-end (vendor-equivalent breathin
 - [ ] Public API matches PRD naming; both native platforms unless **Partial** with justification.
 - [ ] Normalizers + unit tests for breathing result payloads.
 - [ ] Stable errors for unsupported / mutex / Session eligibility.
+- [ ] **Research notes (AFK):** Document vendor wiki/SDK symbols, start/stop entry points, listener/delegate names, representative payload shapes, and **iOS vs Android** deltas in the **PR description or an issue comment** before merge (capture any naming ambiguity—e.g. training vs measurement—so AFK agents pick the right vendor API).
 - [ ] CI green.
 
 ## Blocked by
