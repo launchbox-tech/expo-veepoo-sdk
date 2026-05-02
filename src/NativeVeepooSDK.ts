@@ -11,6 +11,7 @@ import type {
   Language,
   AutoMeasureSetting,
   PermissionsResult,
+  SocialMsgData,
 } from './types/index.js';
 
 const LINKING_ERROR =
@@ -32,6 +33,7 @@ export interface NativeVeepooSDKInterface {
   syncPersonalInfo(info: PersonalInfo): Promise<boolean>;
   readDeviceFunctions(): Promise<unknown>;
   readSocialMsgData(): Promise<unknown>;
+  writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus>;
   readDeviceVersion(): Promise<unknown>;
   startReadOriginData(): Promise<void>;
   readDeviceAllData(): Promise<boolean>;

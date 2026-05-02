@@ -30,7 +30,7 @@ import type {
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
 import type { VeepooSDKModuleInterface, LogListener } from "./VeepooSDKModule.js";
-import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting, validateAlarm, validateDeleteAlarm } from "./validators/index.js";
+import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting, validateAlarm, validateDeleteAlarm, validateSocialMsgData } from "./validators/index.js";
 import {
   normalizeAlarmList,
   normalizeAutoMeasureSettings,
@@ -599,6 +599,11 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       },
     );
     return result;
+  }
+
+  async writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus> {
+    validateSocialMsgData(data);
+    return this.native.writeSocialMsgData(data);
   }
 
   async readDeviceVersion(): Promise<DeviceVersion> {

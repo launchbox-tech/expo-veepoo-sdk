@@ -38,6 +38,7 @@ export interface VeepooSDKModuleInterface {
   syncPersonalInfo(info: PersonalInfo): Promise<boolean>;
   readDeviceFunctions(): Promise<DeviceFunctions>;
   readSocialMsgData(): Promise<SocialMsgData>;
+  writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus>;
   readDeviceVersion(): Promise<DeviceVersion>;
   startReadOriginData(): Promise<void>;
   readDeviceAllData(): Promise<boolean>;
