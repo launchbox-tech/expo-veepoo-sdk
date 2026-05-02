@@ -1,7 +1,7 @@
 # 76 — docs(errors): release notes for native rejection mapping (PRD #73)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/76
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 
@@ -13,9 +13,9 @@ Add **`docs/release-notes/`** entry for consuming apps: **`nativeCode`**, stable
 
 ## Acceptance criteria
 
-- [ ] New release-notes file describes upgrade impact and behaviour; **`docs/README.md`** index updated if required by repo convention.
-- [ ] Root **`README.md`** “Latest release” / upgrade link updated if version bumped.
-- [ ] Optional: example **`error`** listener shows **`nativeCode`** in the event log when set.
+- [x] New release-notes file describes upgrade impact and behaviour; **`docs/README.md`** index updated if required by repo convention.
+- [x] Root **`README.md`** “Latest release” / upgrade link updated if version bumped.
+- [x] Optional: example **`error`** listener shows **`nativeCode`** in the event log when set.
 
 ## Blocked by
 

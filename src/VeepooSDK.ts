@@ -47,6 +47,7 @@ import {
   normalizeSportStepData,
   normalizeEventPayload,
 } from "./normalizers/index.js";
+import { mapNativeRejection } from "./errors/map-native-rejection.js";
 
 type EventListener = (payload: unknown) => void;
 
@@ -347,27 +348,39 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   private handleError(
     error: unknown,
-    code: VeepooError["code"],
+    fallbackCode: VeepooError["code"],
     deviceId?: string,
   ): VeepooError {
-    const veepooError: VeepooError = {
-      code,
-      message: error instanceof Error ? error.message : String(error),
-      deviceId,
-    };
-    this.log("error", "sdk", `error.${code}`, veepooError.message, {
-      deviceId,
+    const veepooError = mapNativeRejection(error, { fallbackCode, deviceId });
+    this.log("error", "sdk", `error.${veepooError.code}`, veepooError.message, {
+      deviceId: veepooError.deviceId,
       error,
     });
     this.emitLocal("error", veepooError);
     return veepooError;
   }
 
+  private async withNative<T>(
+    fallbackCode: VeepooError["code"],
+    deviceId: string | undefined,
+    fn: () => Promise<T>,
+  ): Promise<T> {
+    try {
+      return await fn();
+    } catch (error) {
+      throw this.handleError(error, fallbackCode, deviceId);
+    }
+  }
+
   async init(): Promise<void> {
     if (this.isInitialized) return;
     this.log("info", "sdk", "init.start", "Initializing SDK");
     this.setupEventListeners();
-    await this.native.init();
+    try {
+      await this.native.init();
+    } catch (error) {
+      throw this.handleError(error, "UNKNOWN");
+    }
     this.isInitialized = true;
     this.log("info", "sdk", "init.success", "SDK initialized");
   }
@@ -534,7 +547,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       },
     );
     const result = normalizePasswordData(
-      await this.native.verifyPassword(password, is24Hour),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.verifyPassword(password, is24Hour),
+      ),
     );
     this.log(
       "info",
@@ -557,7 +572,11 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     this.log("debug", "device", "battery.read.start", "Reading battery info", {
       deviceId: this.connectedDeviceId ?? undefined,
     });
-    const result = normalizeBatteryInfo(await this.native.readBattery());
+    const result = normalizeBatteryInfo(
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readBattery(),
+      ),
+    );
     this.log(
       "debug",
       "device",
@@ -573,12 +592,16 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   syncPersonalInfo = (info: PersonalInfo): Promise<boolean> => {
     validatePersonalInfo(info);
-    return this.native.syncPersonalInfo(info);
+    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.syncPersonalInfo(info),
+    );
   };
 
   async readDeviceFunctions(): Promise<DeviceFunctions> {
     const result = normalizeDeviceFunctions(
-      await this.native.readDeviceFunctions(),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readDeviceFunctions(),
+      ),
     );
     this.log(
       "debug",
@@ -595,7 +618,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   async readSocialMsgData(): Promise<SocialMsgData> {
     const result = normalizeSocialMsgData(
-      await this.native.readSocialMsgData(),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readSocialMsgData(),
+      ),
     );
     this.log(
       "debug",
@@ -612,12 +637,16 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   async writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus> {
     validateSocialMsgData(data);
-    return this.native.writeSocialMsgData(data);
+    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.writeSocialMsgData(data),
+    );
   }
 
   async readDeviceVersion(): Promise<DeviceVersion> {
     const result = normalizeDeviceVersion(
-      await this.native.readDeviceVersion(),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readDeviceVersion(),
+      ),
     );
     this.log(
       "debug",
@@ -635,11 +664,16 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   startReadOriginData = (): Promise<void> =>
     this.loggedVoidCall("read", "read.origin.start", "Starting origin data read", () => this.native.startReadOriginData());
 
-  readDeviceAllData = (): Promise<boolean> => this.native.readDeviceAllData();
+  readDeviceAllData = (): Promise<boolean> =>
+    this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.readDeviceAllData(),
+    );
 
   async readSleepData(date?: string): Promise<SleepData[]> {
     const result = normalizeSleepDataList(
-      await this.native.readSleepData(date),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readSleepData(date),
+      ),
     );
     this.log("debug", "read", "read.sleep.result", "Sleep data received", {
       deviceId: this.connectedDeviceId ?? undefined,
@@ -650,7 +684,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   async readSportStepData(date?: string): Promise<SportStepData> {
     const result = normalizeSportStepData(
-      await this.native.readSportStepData(date),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readSportStepData(date),
+      ),
     );
     this.log("debug", "read", "read.sport.result", "Sport step data received", {
       deviceId: this.connectedDeviceId ?? undefined,
@@ -661,7 +697,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   async readOriginData(dayOffset: number = 0): Promise<OriginData[]> {
     const result = normalizeOriginDataList(
-      await this.native.readOriginData(dayOffset),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readOriginData(dayOffset),
+      ),
     );
     this.log("debug", "read", "read.origin.result", "Origin data received", {
       deviceId: this.connectedDeviceId ?? undefined,
@@ -672,7 +710,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   async readDaySummaryData(dayOffset: number = 0): Promise<DaySummaryData> {
     const result = normalizeDaySummaryData(
-      await this.native.readDaySummaryData(dayOffset),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readDaySummaryData(dayOffset),
+      ),
     );
     this.log(
       "debug",
@@ -689,7 +729,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   async readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
     const result = normalizeAutoMeasureSettings(
-      await this.native.readAutoMeasureSetting(),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.readAutoMeasureSetting(),
+      ),
     );
     this.log(
       "debug",
@@ -719,7 +761,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       },
     );
     const result = normalizeAutoMeasureSettings(
-      await this.native.modifyAutoMeasureSetting(setting),
+      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+        this.native.modifyAutoMeasureSetting(setting),
+      ),
     );
     this.log(
       "info",
@@ -734,24 +778,31 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     return result;
   }
 
-  setLanguage = (language: Language): Promise<boolean> => this.native.setLanguage(language);
+  setLanguage = (language: Language): Promise<boolean> =>
+    this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.setLanguage(language),
+    );
 
   async setDeviceTime(time?: Date): Promise<boolean> {
     validateDeviceTime(time);
-    return this.native.setDeviceTime(
-      time === undefined ? undefined : {
-        year: time.getFullYear(),
-        month: time.getMonth() + 1,
-        day: time.getDate(),
-        hour: time.getHours(),
-        minute: time.getMinutes(),
-        second: time.getSeconds(),
-      }
+    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.setDeviceTime(
+        time === undefined ? undefined : {
+          year: time.getFullYear(),
+          month: time.getMonth() + 1,
+          day: time.getDate(),
+          hour: time.getHours(),
+          minute: time.getMinutes(),
+          second: time.getSeconds(),
+        },
+      ),
     );
   }
 
   async readAlarms(): Promise<DeviceAlarm[]> {
-    const raw = await this.native.readAlarms();
+    const raw = await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.readAlarms(),
+    );
     const alarms = normalizeAlarmList(raw);
     this.emitLocal('alarmData', { deviceId: this.connectedDeviceId, alarms: raw });
     return alarms;
@@ -759,12 +810,16 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   async setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> {
     validateAlarm(alarm);
-    return this.native.setAlarm(alarm);
+    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.setAlarm(alarm),
+    );
   }
 
   async deleteAlarm(alarmId: number): Promise<OperationStatus> {
     validateDeleteAlarm(alarmId);
-    return this.native.deleteAlarm(alarmId);
+    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.deleteAlarm(alarmId),
+    );
   }
 
   private loggedVoidCall(
@@ -774,7 +829,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     fn: () => Promise<void>,
   ): Promise<void> {
     this.log("info", scope, action, message, { deviceId: this.connectedDeviceId ?? undefined });
-    return fn();
+    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, fn);
   }
 
   startHeartRateTest = (): Promise<void> =>
@@ -824,7 +879,9 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       deviceId: this.connectedDeviceId ?? undefined,
       data: options,
     });
-    await this.native.startEcgTest(options);
+    await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
+      this.native.startEcgTest(options),
+    );
   }
 
   stopEcgTest = (): Promise<void> =>

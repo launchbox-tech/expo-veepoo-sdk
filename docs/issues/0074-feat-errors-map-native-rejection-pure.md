@@ -1,7 +1,7 @@
 # 74 — feat(errors): mapNativeRejection pure module + Jest (PRD #73)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/74
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 
@@ -13,10 +13,10 @@ Implement **`VeepooError.nativeCode?`** and a **pure** **`mapNativeRejection`** 
 
 ## Acceptance criteria
 
-- [ ] **`VeepooError`** includes optional **`nativeCode`**; **`VeepooErrorCode`** updated per alias policy (expand or bucket per PRD #73).
-- [ ] Pure mapper module with unit tests covering: mutex, capability unsupported, device not ready/connected, SDK not initialized, operational collapse (**`START_FAILED`** → **`OPERATION_FAILED`** with **`nativeCode`**), identical code omits **`nativeCode`**, missing code → **`UNKNOWN`**, representative Expo-like error shapes.
-- [ ] Validators / pre-thrown **`VeepooError`** objects are **not** passed through mapper (documented test or helper guard).
-- [ ] `npm run typecheck` and **`npm test`** (mapper tests) green; no native or **`VeepooSDK`** behaviour change yet.
+- [x] **`VeepooError`** includes optional **`nativeCode`**; **`VeepooErrorCode`** updated per alias policy (expand or bucket per PRD #73).
+- [x] Pure mapper module with unit tests covering: mutex, capability unsupported, device not ready/connected, SDK not initialized, operational collapse (**`START_FAILED`** → **`OPERATION_FAILED`** with **`nativeCode`**), identical code omits **`nativeCode`**, missing code → **`UNKNOWN`**, representative Expo-like error shapes.
+- [x] Validators / pre-thrown **`VeepooError`** objects are **not** passed through mapper (documented test or helper guard).
+- [x] `npm run typecheck` and **`npm test`** (mapper tests) green; no native or **`VeepooSDK`** behaviour change yet.
 
 ## Blocked by
 

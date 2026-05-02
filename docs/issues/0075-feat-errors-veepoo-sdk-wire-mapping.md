@@ -1,7 +1,7 @@
 # 75 — feat(errors): VeepooSDK native catches use mapNativeRejection (PRD #73)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/75
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: enhancement
 
 ## Parent
 
@@ -13,10 +13,10 @@ Route **every** **`catch`** around **`await this.native.<method>(…)`** in **`V
 
 ## Acceptance criteria
 
-- [ ] All native **`await`** failure paths in **`VeepooSDK`** use the mapper; no silent **`UNKNOWN`** where native supplied a mappable code.
-- [ ] **`handleError`** (or call sites) preserves **`nativeCode`** on emitted **`error`** payloads.
-- [ ] `npm run typecheck` and `npm run build` green; **`npm test`** green to the extent existing suite allows (known **`VeepooSDK.test.ts`** RN limitation may remain).
-- [ ] No Kotlin/Swift changes unless discovery proves Expo cannot surface codes (document in PR if so).
+- [x] All native **`await`** failure paths in **`VeepooSDK`** use the mapper; no silent **`UNKNOWN`** where native supplied a mappable code.
+- [x] **`handleError`** (or call sites) preserves **`nativeCode`** on emitted **`error`** payloads.
+- [x] `npm run typecheck` and `npm run build` green; **`npm test`** green to the extent existing suite allows (known **`VeepooSDK.test.ts`** RN limitation may remain).
+- [x] No Kotlin/Swift changes unless discovery proves Expo cannot surface codes (document in PR if so).
 
 ## Blocked by
 

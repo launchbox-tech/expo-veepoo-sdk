@@ -8,10 +8,10 @@ An Expo SDK for integrating HBand wearable devices into React Native / Expo appl
 
 Expo module for Bluetooth connectivity to Veepoo hardware, data reads, and health tests.
 
-**Latest release:** `1.2.8`
+**Latest release:** `1.2.9`
 
 - Usage: this `README.md`
-- Upgrade notes: [docs/release-notes/1.2.8.md](docs/release-notes/1.2.8.md)
+- Upgrade notes: [docs/release-notes/1.2.9.md](docs/release-notes/1.2.9.md)
 - Older releases: [docs/README.md](docs/README.md)
 - Vendor API parity table: [docs/vendor-parity-matrix.md](docs/vendor-parity-matrix.md)
 

@@ -32,8 +32,9 @@ function isTerminalState(state: string | undefined): boolean {
 
 function formatErr(e: unknown): string {
   if (e && typeof e === 'object' && 'code' in e) {
-    const x = e as { code?: string; message?: string };
-    return `${x.code ?? 'UNKNOWN'}: ${x.message ?? ''}`;
+    const x = e as { code?: string; message?: string; nativeCode?: string };
+    const nc = x.nativeCode ? ` nativeCode=${x.nativeCode}` : '';
+    return `${x.code ?? 'UNKNOWN'}: ${x.message ?? ''}${nc}`;
   }
   return e instanceof Error ? e.message : String(e);
 }

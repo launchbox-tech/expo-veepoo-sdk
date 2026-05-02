@@ -77,3 +77,6 @@ export type {
 } from './types';
 
 export type { VeepooSDKModuleInterface, LogListener } from './VeepooSDKModule.js';
+
+export { mapNativeRejection, isVeepooErrorShape } from './errors/map-native-rejection.js';
+export type { MapNativeRejectionContext } from './errors/map-native-rejection.js';

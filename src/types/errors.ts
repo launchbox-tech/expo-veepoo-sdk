@@ -20,6 +20,8 @@ export type VeepooErrorCode =
 export interface VeepooError {
   code: VeepooErrorCode;
   message: string;
+  /** Raw native rejection code when the bridge collapsed/aliased into `code` (ADR 0003). */
+  nativeCode?: string;
   deviceId?: string;
 }
 

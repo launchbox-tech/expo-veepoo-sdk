@@ -92,7 +92,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Vendor area (summary) | JS methods / events | Status | Device tested |
 |----------------------|---------------------|--------|---------------|
 | Structured logs | `setLogEnabled`, `isLogEnabled`, `setLogger` | Shipped | TBD |
-| Unified errors | `error` event / `VeepooError` | Shipped | TBD |
+| Unified errors | `error` event / `VeepooError` (native rejects mapped per ADR 0003; optional `nativeCode` when collapsed) | Shipped | TBD |
 
 ---
 
