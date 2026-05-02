@@ -5,10 +5,14 @@
 - Veepoo 原厂 SDK 文档
 - 包版本升级说明
 
-## Vendor SDK
+以及维护者用的 **vendor / 上游对照**（根目录 `vendor-manifest.json`、`npm run vendor:check`）。
+
+## Vendor SDK（离线快照）
 
 - `VeepooSDK Android Api.md`
 - `VeepooSDK iOS Api.md`
+
+Wiki 实时文档与 drift 说明见各文件顶部提示框；API 与 JS 桥对照见 **`vendor-parity-matrix.md`**；策略见 **`adr/0002-vendor-upstream-tracking.md`**。
 
 ## Release Notes
 
@@ -23,3 +27,11 @@
 - `release-notes/1.2.7.md`
 
 对外使用说明请优先查看仓库根目录 `README.md`。
+
+## Vendor parity（维护）
+
+| 文档 | 用途 |
+|------|------|
+| [`vendor-parity-matrix.md`](vendor-parity-matrix.md) | Vendor 能力与 `VeepooSDK` JS API / 事件对照表 |
+| [`adr/0002-vendor-upstream-tracking.md`](adr/0002-vendor-upstream-tracking.md) | 不落 submodule、manifest、`vendor:check` 决策 |
+| [`prd/0059-vendor-upstream-tracking-and-parity.md`](prd/0059-vendor-upstream-tracking-and-parity.md) | PRD #59（父工单） |
