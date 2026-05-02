@@ -6,45 +6,45 @@ An Expo SDK for integrating HBand wearable devices into React Native / Expo appl
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey.svg)](https://github.com/launchbox-tech/expo-veepoo-sdk)
 
-Expo 模块，用于 Veepoo 设备的蓝牙连接、数据读取和健康测试。
+Expo module for Bluetooth connectivity to Veepoo hardware, data reads, and health tests.
 
-当前最新版本：`1.2.7`
+**Latest release:** `1.2.7`
 
-- 使用文档：当前 `README.md`
-- 升级说明：[docs/release-notes/1.2.7.md](docs/release-notes/1.2.7.md)
-- 历史版本：[docs/README.md](docs/README.md)
-- Vendor API 对照表：[docs/vendor-parity-matrix.md](docs/vendor-parity-matrix.md)
+- Usage: this `README.md`
+- Upgrade notes: [docs/release-notes/1.2.7.md](docs/release-notes/1.2.7.md)
+- Older releases: [docs/README.md](docs/README.md)
+- Vendor API parity table: [docs/vendor-parity-matrix.md](docs/vendor-parity-matrix.md)
 
-这个包的原则是：
+Design goals:
 
-- Android 和 iOS 原生层尽量贴近各自 SDK 文档
-- 对 App 暴露时，统一在 TypeScript 层做返回值归一化
-- App 侧通过 `VeepooSDK` 使用时，拿到的是统一后的返回结构
+- Keep Android / iOS native layers close to each vendor SDK
+- Normalize values exposed to the app in TypeScript
+- Apps calling through `VeepooSDK` receive consistent shapes
 
-## 平台要求
+## Platform requirements
 
-| 平台 | 最低版本 | Expo Go 支持 | 备注 |
+| Platform | Minimum | Expo Go | Notes |
 | --- | --- | --- | --- |
-| iOS | 15.1+ | 不支持 | 需要开发构建，Simulator 可编译但不支持真实蓝牙能力 |
-| Android | 6.0+ (API 23+) | 不支持 | 需要开发构建 |
+| iOS | 15.1+ | No | Dev build required; Simulator builds run without real Bluetooth |
+| Android | 6.0+ (API 23+) | No | Dev build required |
 
-## 安装
+## Installation
 
 ```bash
 npm install @gaozh1024/expo-veepoo-sdk
 ```
 
-或
+or
 
 ```bash
 yarn add @gaozh1024/expo-veepoo-sdk
 ```
 
-## Expo 配置
+## Expo configuration
 
 ### iOS
 
-在 `app.json` 或 `app.config.js` 中添加插件配置：
+Add the config plugin in `app.json` or `app.config.js`:
 
 ```json
 {
@@ -53,8 +53,8 @@ yarn add @gaozh1024/expo-veepoo-sdk
       [
         "@gaozh1024/expo-veepoo-sdk",
         {
-          "bluetoothAlwaysPermission": "需要蓝牙权限来连接设备",
-          "bluetoothPeripheralPermission": "需要蓝牙权限来扫描设备"
+          "bluetoothAlwaysPermission": "Bluetooth access is required to connect to your Band",
+          "bluetoothPeripheralPermission": "Bluetooth access is required to scan for Bands"
         }
       ]
     ]
@@ -62,7 +62,7 @@ yarn add @gaozh1024/expo-veepoo-sdk
 }
 ```
 
-然后重新预构建：
+Then prebuild again:
 
 ```bash
 npx expo prebuild --clean
@@ -70,25 +70,25 @@ cd ios && pod install && cd ..
 npx expo run:ios
 ```
 
-iOS 说明：
+iOS notes:
 
-- 真机支持完整蓝牙能力
-- Simulator 现在支持编译和启动开发构建
-- 但由于上游厂商二进制仅提供 device slice，Simulator 下走的是框架内置 stub/no-op 路径，不能用于真实蓝牙联调
-- `1.2.1` 修复了 iOS 设备构建下 `FRAMEWORK_SEARCH_PATHS` 对 `$(inherited)` 的错误引用问题
-- `1.2.2` 修复了 iOS 真机构建下动态 frameworks 未自动 embed 导致的启动崩溃问题
-- `1.2.3` 修复了 iOS embed 脚本在部分构建环境下 `FRAMEWORKS_FOLDER_PATH` 未定义导致的构建失败
+- Physical devices support full Bluetooth behavior.
+- The Simulator can compile and run dev builds.
+- Vendor binaries are device-only; on Simulator the frameworks use a stub/no-op path—do not use it for real BLE debugging.
+- `1.2.1` fixes `FRAMEWORK_SEARCH_PATHS` incorrectly quoting `$(inherited)` on device builds.
+- `1.2.2` fixes missing embed for dynamic frameworks on real devices (startup crashes).
+- `1.2.3` fixes the embed script when `FRAMEWORKS_FOLDER_PATH` is unset in some Xcode/CocoaPods setups.
 
 ### Android
 
-Android 权限会自动注入。首次接入后也需要重新构建：
+Permissions are injected automatically. After first integrating, rebuild:
 
 ```bash
 npx expo prebuild --clean
 npx expo run:android
 ```
 
-## 快速开始
+## Quick start
 
 ```ts
 import VeepooSDK from '@gaozh1024/expo-veepoo-sdk';
@@ -112,7 +112,7 @@ VeepooSDK.on('deviceFound', ({ device }) => {
 await VeepooSDK.startScan({ timeout: 10000 });
 ```
 
-连接设备：
+Connect:
 
 ```ts
 await VeepooSDK.connect(deviceId, {
@@ -129,7 +129,7 @@ VeepooSDK.on('deviceReady', ({ deviceId }) => {
 });
 ```
 
-读取数据：
+Read data:
 
 ```ts
 const battery = await VeepooSDK.readBattery();
@@ -143,15 +143,15 @@ console.log(sleepList);
 console.log(sport.stepCount, sport.distance);
 ```
 
-## 统一返回说明
+## Unified return shapes
 
-App 侧请使用：
+Import:
 
 ```ts
 import VeepooSDK from '@gaozh1024/expo-veepoo-sdk';
 ```
 
-不要直接依赖 `NativeVeepooSDK`。`VeepooSDK` 会在 TS 层统一这些返回：
+Do not rely on `NativeVeepooSDK` directly. `VeepooSDK` normalizes returns from:
 
 - `requestPermissions`
 - `verifyPassword`
@@ -166,7 +166,7 @@ import VeepooSDK from '@gaozh1024/expo-veepoo-sdk';
 - `readAutoMeasureSetting`
 - `modifyAutoMeasureSetting`
 
-也会统一这些事件 payload：
+…and normalizes payloads for:
 
 - `bluetoothStateChanged`
 - `readOriginProgress`
@@ -186,16 +186,16 @@ import VeepooSDK from '@gaozh1024/expo-veepoo-sdk';
 - `bloodGlucoseData`
 - `batteryData`
 
-其中 `readOriginProgress` 当前统一语义为：
+For `readOriginProgress`, `progress` means:
 
-- `progress` 返回 `0-100` 的整数百分比
-- 小数部分直接截断，不做四舍五入
-- 只有数值变化时才会继续派发事件
-- 完成时固定返回 `100`
+- Integer percent `0–100`
+- Truncated from any fractional input—no rounding
+- Events fire again only when the integer changes
+- Completion always sends `100`
 
-## 日志
+## Logging
 
-框架内置了一层轻量日志，默认关闭。开启后会把关键链路输出为统一结构，适合排查扫描、连接、读数据和测试流程问题。
+Optional structured logging (off by default). Enable it to trace scan, connect, reads, and tests.
 
 ```ts
 import VeepooSDK, { type LogEntry } from '@gaozh1024/expo-veepoo-sdk';
@@ -207,13 +207,13 @@ VeepooSDK
   });
 ```
 
-可用方法：
+Methods:
 
 - `setLogEnabled(enabled: boolean): VeepooSDK`
 - `isLogEnabled(): boolean`
 - `setLogger(logger: ((entry: LogEntry) => void) | null): VeepooSDK`
 
-日志字段：
+Fields:
 
 - `timestamp`
 - `level`
@@ -225,9 +225,9 @@ VeepooSDK
 - `data`
 - `error`
 
-## 蓝牙与连接监听
+## Bluetooth and Session listeners
 
-系统蓝牙状态：
+System Bluetooth:
 
 ```ts
 VeepooSDK.on('bluetoothStateChanged', (payload) => {
@@ -235,7 +235,7 @@ VeepooSDK.on('bluetoothStateChanged', (payload) => {
 });
 ```
 
-设备断开与连接状态变化：
+Disconnect and connection changes:
 
 ```ts
 VeepooSDK.on('deviceDisconnected', ({ deviceId }) => {
@@ -251,11 +251,11 @@ VeepooSDK.on('deviceConnectStatus', ({ deviceId, status, code }) => {
 });
 ```
 
-建议同时监听这三类事件，以覆盖设备断开和系统蓝牙关闭。
+Subscribe to all three to cover device drops and Bluetooth toggling off.
 
-## 常用 API
+## Common APIs
 
-### 初始化
+### Initialization
 
 - `init(): Promise<void>`
 - `isSDKInitialized(): boolean`
@@ -265,7 +265,7 @@ VeepooSDK.on('deviceConnectStatus', ({ deviceId, status, code }) => {
 - `isLogEnabled(): boolean`
 - `setLogger(logger: ((entry: LogEntry) => void) | null): VeepooSDK`
 
-### 扫描与连接
+### Scan and Session
 
 - `startScan(options?: ScanOptions): Promise<void>`
 - `stopScan(): Promise<void>`
@@ -275,7 +275,7 @@ VeepooSDK.on('deviceConnectStatus', ({ deviceId, status, code }) => {
 - `getConnectedDeviceId(): string | null`
 - `isScanningActive(): boolean`
 
-### 设备信息
+### Band info
 
 - `verifyPassword(password?: string, is24Hour?: boolean): Promise<PasswordData>`
 - `readBattery(): Promise<BatteryInfo>`
@@ -285,7 +285,7 @@ VeepooSDK.on('deviceConnectStatus', ({ deviceId, status, code }) => {
 - `syncPersonalInfo(info: PersonalInfo): Promise<boolean>`
 - `setLanguage(language: Language): Promise<boolean>`
 
-### 数据读取
+### Data reads
 
 - `startReadOriginData(): Promise<void>`
 - `readDeviceAllData(): Promise<boolean>`
@@ -296,15 +296,15 @@ VeepooSDK.on('deviceConnectStatus', ({ deviceId, status, code }) => {
 - `readAutoMeasureSetting(): Promise<AutoMeasureSetting[]>`
 - `modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<AutoMeasureSetting[]>`
 
-历史数据进度事件示例：
+Historical read progress:
 
 ```ts
 VeepooSDK.on('readOriginProgress', ({ progress }) => {
-  console.log(progress.progress); // 0..100，整数
+  console.log(progress.progress); // 0..100, integer
 });
 ```
 
-### 健康测试
+### Health tests
 
 - `startHeartRateTest(): Promise<void>`
 - `stopHeartRateTest(): Promise<void>`
@@ -319,7 +319,7 @@ VeepooSDK.on('readOriginProgress', ({ progress }) => {
 - `startBloodGlucoseTest(): Promise<void>`
 - `stopBloodGlucoseTest(): Promise<void>`
 
-## 事件列表
+## Events
 
 - `deviceFound`
 - `deviceConnected`
@@ -347,15 +347,15 @@ VeepooSDK.on('readOriginProgress', ({ progress }) => {
 - `bloodGlucoseData`
 - `error`
 
-## 使用建议
+## Usage tips
 
-- 所有调用都从 `await VeepooSDK.init()` 开始
-- 在连接前先检查蓝牙和权限
-- 连接相关请同时监听 `deviceDisconnected`、`connectionStatusChanged`、`bluetoothStateChanged`
-- 如果业务依赖统一返回，只通过 `VeepooSDK` 调用，不直接使用 native module
-- iOS 端包含原生 frameworks，不能在 Expo Go 中运行
+- Start every flow with `await VeepooSDK.init()`
+- Verify Bluetooth and permissions before connecting
+- For Session lifecycle, listen for `deviceDisconnected`, `connectionStatusChanged`, and `bluetoothStateChanged`
+- If you depend on unified returns, call through `VeepooSDK`, not the raw native module
+- Native frameworks on iOS exclude Expo Go
 
-## 本地开发
+## Local development
 
 ```bash
 npm run typecheck
@@ -363,9 +363,7 @@ npm test -- --runInBand
 npm run build
 ```
 
-## 发布前检查
-
-建议发布前执行：
+## Pre-release checklist
 
 ```bash
 npm run typecheck
@@ -374,19 +372,19 @@ npm run build
 npm pack --dry-run
 ```
 
-如果要正式发布：
+Publishing:
 
 ```bash
 npm publish
 ```
 
-## 参考文档
+## Reference documentation
 
-Vendor SDK 文档保存在仓库内：
+Vendor SDK snapshots checked into this repo:
 
 - `docs/VeepooSDK Android Api.md`
 - `docs/VeepooSDK iOS Api.md`
 
-## 许可证
+## License
 
 MIT

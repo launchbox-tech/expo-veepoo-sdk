@@ -163,6 +163,9 @@ pnpm-lock.yaml
 .turbo/
 .cache/
 
+# Local tooling venvs (e.g. vendor_snapshot_translate.py)
+.venv-translate/
+
 # Environment files
 .env
 .env.*

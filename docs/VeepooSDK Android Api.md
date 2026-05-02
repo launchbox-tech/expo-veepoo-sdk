@@ -1,111 +1,111 @@
-# Android SDK API文档
+# VeepooSDK Android API documentation
 
-> **Offline snapshot.** The changelog table below mirrors a frozen import from the vendor wiki. For the latest API additions and wording, use the live **[Android API wiki (English)](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document)**. Maintainer drift check: compare pins in [`vendor-manifest.json`](../vendor-manifest.json) with `npm run vendor:check`; parity versus this bridge: [`vendor-parity-matrix.md`](vendor-parity-matrix.md).
+> **Offline snapshot.** Prose in this file was machine-translated from the vendor wiki snapshot to English (Google Translate via `scripts/vendor_snapshot_translate.py`). Terminology may differ slightly from the vendor’s official English wiki. For authoritative wording and API updates, use the live **[Android API wiki (English)](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document)**. The changelog table mirrors a frozen import. Maintainer drift check: compare pins in [`vendor-manifest.json`](../vendor-manifest.json) with `npm run vendor:check`; parity versus this bridge: [`vendor-parity-matrix.md`](vendor-parity-matrix.md).
 >
 > **Last manifest-aligned upstream review:** `upstreamReference.androidBleSdk.lastReviewedHeadSha` in `vendor-manifest.json` (default branch `HEAD` at time of pin).
 
-| 版本  | 修改内容                                                     | 修改日期   |
-| ----- | ------------------------------------------------------------ | ---------- |
-| 1.0.0 | SDK初版                                                      | 2023.05.15 |
-| 1.0.1 | 添加K系列的表盘与OTA文档                                     | 2023.05.26 |
-| 1.0.2 | 添加语言设置功能api                                          | 2023.05.26 |
-| 1.0.3 | 增加联系人功能                                               | 2023.06.25 |
-| 1.0.4 | 1. 新增运动枚举，新增语言枚举<br />2. 30分钟日常数据增加date返回<br />3. 联系人批量添加，手机音量控制功能<br />4. 完善ota升级相关流程说明 | 2023.09.08 |
-| 1.0.5 | 增加ota、表盘传输时电量说明                                  | 2023.09.11 |
-| 1.0.6 | 增加血糖多校准模式的读取和设置                               | 2023.09.19 |
-| 1.0.7 | 1.推特改名为X(原推特)<br />2.增加身体成分、血液成分相关功能说明<br />3.增加血液成分检测开关、尿酸/血脂单位功能设置<br />4.增加ecg上报接口 | 2023.09.27 |
-| 1.0.8 | 1.身体成分增加单位显示                                       | 2023.10.25 |
-| 1.0.9 | 读取身体成分数据接口返回增加测量时间、测量秒数等说明         | 2023.11.24 |
-| 1.1.0 | 1.增加获取血糖风险等级相关说明；<br/>2.体温读取增加05标志位判断。 | 2024.04.15 |
-| 1.1.1 | 1.同步个人信息api补充体重参数说明；<br />2.肤色多档位设置(需设备支持)。 | 2024.11.30 |
-| 1.1.2 | 1.读取运动模式数据删除需要记录包位置的相关注释               | 2024.12.12 |
-| 1.1.3 | 1.增加自动测量读取/设置接口(0xB3)说明;<br />2.增加读取手动测量数据(血压)相关接口 | 2025.06.10 |
-| 1.1.4 | 增加图文推送功能                                             | 2025.10.27 |
+| Version | Changes | Date |
+| ------- | ------- | ---- |
+| 1.0.0 | Initial SDK release | 2023.05.15 |
+| 1.0.1 | K-series watch face & OTA docs | 2023.05.26 |
+| 1.0.2 | Language settings APIs | 2023.05.26 |
+| 1.0.3 | Contacts feature | 2023.06.25 |
+| 1.0.4 | 1. New sport & language enums<br />2. 30-minute daily data adds `date`<br />3. Batch contacts, phone volume control<br />4. OTA flow clarifications | 2023.09.08 |
+| 1.0.5 | OTA & watch face transfer battery notes | 2023.09.11 |
+| 1.0.6 | Glucose multi-calibration read/write | 2023.09.19 |
+| 1.0.7 | 1. Twitter → X<br />2. Body / blood composition docs<br />3. Blood composition toggle; uric acid / lipid units<br />4. ECG reporting API | 2023.09.27 |
+| 1.0.8 | Body composition unit display | 2023.10.25 |
+| 1.0.9 | Body composition API adds measurement time and duration | 2023.11.24 |
+| 1.1.0 | 1. Glucose risk level<br/>2. Temperature read flag `05` | 2024.04.15 |
+| 1.1.1 | 1. Personal info API weight parameter<br />2. Skin tone levels (device-dependent) | 2024.11.30 |
+| 1.1.2 | Sport mode read: removed packet-position comments | 2024.12.12 |
+| 1.1.3 | 1. Auto-measure read/write (`0xB3`)<br />2. Manual BP measurement reads | 2025.06.10 |
+| 1.1.4 | Rich push (image + text) | 2025.10.27 |
 
-## 通用接口类
+## General interface class
 
-**VPOperateManager**（SDK主入口）  
-主要操作类
+**VPOperateManager** (SDK main entrance)
+Main operation categories
 
-**获取实例**
+**Get instance**
 
 ```kotlin
 VPOperateManager.getInstance()
 ```
 
-获取单例对象，SDK接口以单例形式存在
+Get the singleton object, the SDK interface exists in the form of a singleton
 
-注：**设备不支持异步操作,当多个耗时操作同时进行时,可能会导致数据异常;因此在与设备进行交互时,尽可能避免多个操作同时进行**
+Note: **The device does not support asynchronous operations. When multiple time-consuming operations are performed at the same time, data anomalies may occur; therefore, when interacting with the device, try to avoid multiple operations at the same time**
 
-## SDK初始化
+## SDK initialization
 
 ```kotlin
 init(context)
 ```
 
-| 参数名  | 类型    | 备注                        |
-| ------- | ------- | --------------------------- |
-| context | Context | 配置选项ApplicactionContext |
+| Parameter name | Type | Remarks |
+| ------- | ------- | ---------------------------- |
+| context | Context | Configuration options ApplicactionContext |
 
-注:所有接口仅在sdk初始化后才能调用,App运行期间，只需要初始化一次，无需重复初始化
+Note: All interfaces can only be called after the SDK is initialized. During the running of the App, it only needs to be initialized once and does not need to be initialized repeatedly.
 
-## 扫描
+## Scan
 
-#### 开始扫描
+#### Start scanning
 
-###### 接口
+###### API
 
 ```kotlin
 startScanDevice(searchResponse)
 ```
 
-开始蓝牙扫描,会过滤掉非本公司的设备,如需停止扫描，则调用stopScan停止扫描。
+When starting a Bluetooth scan, non-company devices will be filtered out. If you need to stop scanning, call stopScan to stop scanning.
 
-注:蓝牙关闭的情况下，扫描接口不生效
+Note: When Bluetooth is turned off, the scanning interface will not take effect.
 
-###### 参数解释
+###### Parameters
 
-| 参数名         | 类型           | 备注           |
+| Parameter name | Type | Remarks |
 | -------------- | -------------- | -------------- |
-| searchResponse | SearchResponse | 扫描结果的回调 |
+| searchResponse | SearchResponse | Callback for scan results |
 
-###### 返回数据
+###### Return data
 
-**SearchResponse**--扫描结果的回调
+**SearchResponse**--Callback for scan results
 
 ```kotlin
 /**
- * 开始扫描设备
+ * Start scanning devices
  */
 fun onSearchStarted()
 
 /**
- * 发现扫描设备
+ * Discover scanning devices
  *
- * @param device 当前发现的设备
+ * @param device currently discovered device
  */
 fun onDeviceFounded(device:SearchResult)
 
 /**
- * 停止扫描设备回调
+ * Stop scanning device callback
  */
 fun onSearchStopped()
 
 /**
- * 取消扫描设备回调
+ * Cancel scanning device callback
  */
 fun onSearchCanceled()
 ```
 
-**SearchResult**--当前发现的设备
+**SearchResult**--The currently discovered device
 
-| 变量       | 类型            | 备注                 |
-| ---------- | --------------- | -------------------- |
-| device     | BluetoothDevice | 蓝牙设备（系统）     |
-| rssi       | Int             | 蓝牙信号值rssi       |
-| scanRecord | byteArray       | 扫描到的设备广播数据 |
+| Variable | Type | Remarks |
+| ---------- | --------------- | ------------------ |
+| device | BluetoothDevice | Bluetooth device (system) |
+| rssi | Int | Bluetooth signal value rssi |
+| scanRecord | byteArray | Scanned device broadcast data |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -128,66 +128,66 @@ VPOperateManager.getInstance()
             })
 ```
 
-#### 结束扫描
+#### End scan
 
-###### 接口
+###### API
 
 ```kotlin
 stopScanDevice()
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
 VPOperateManager.getInstance().stopScanDevice()
 ```
 
-## 连接
+## Connect
 
-#### 连接设备
+#### Connect device
 
 ```kotlin
 connectDevice(mac,connectResponse,bleNotifyResponse)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型             | 备注                                                         |
-| ----------------- | ---------------- | ------------------------------------------------------------ |
-| mac               | String           | 需要连接的设备地址                                           |
-| connectResponse   | IConnectResponse | 连接状态的回调,先返回连接状态，连接成功后，会返回蓝牙通信状态的回调 |
-| bleNotifyResponse | INotifyResponse  | 蓝牙通信状态的回调,此回调在connectResponse之后被调用         |
+| Parameter name | Type | Remarks |
+| ------------------ | ---------------- | --------------------------------------------------------------- |
+| mac | String | The address of the device that needs to be connected |
+| connectResponse | IConnectResponse | The callback of the connection status, first returns the connection status, and after the connection is successful, the callback of the Bluetooth communication status will be returned |
+| bleNotifyResponse | INotifyResponse | Bluetooth communication status callback, this callback is called after connectResponse |
 
-###### 返回数据
+###### Return data
 
-**IConnectResponse** -- 连接状态的回调
+**IConnectResponse** -- callback for connection status
 
 ```kotlin
 /**
- * 连接状态的返回
+ * Return of connection status
  *
- * @param code       连接状态，只有当值为Code.REQUEST_SUCCESS表示连接成功
- * @param profile    设备的蓝牙属性
- * @param isOadModel 设备包含两种模式[正常模式/固件升级模式]，大多情况下是正常模式，只有当设备进行固件升级操作失败时，才会进入固件升级模式
+ * @param code connection status, only when the value is Code.REQUEST_SUCCESS, the connection is successful
+ * @param profile Bluetooth properties of the device
+ * @param isOadModel The device contains two modes [normal mode/firmware upgrade mode]. In most cases, it is the normal mode. Only when the device fails to upgrade the firmware, it will enter the firmware upgrade mode.
  */
 fun connectState(code:Int, profile:BleGattProfile, isOadModel:boolean);
 ```
 
-**INotifyResponse** - 设置数据监听的回调
+**INotifyResponse** - Set the callback for data monitoring
 
 ```kotlin
 /**
- * 设置数据监听的返回
+ * Set the return of data monitoring
  *
- * @param state 只有值等于Code.REQUEST_SUCCESS时才成功
+ * @param state Only succeeds if the value is equal to Code.REQUEST_SUCCESS
  */
 fun notifyState(state:Int);
 ```
 
-#### 验证密码操作
+#### Verify password operation
 
-###### 接口
+###### API
 
 ```kotlin
 confirmDevicePwd(bleWriteResponse,pwdDataListener,deviceFuctionDataListener，socialMsgDataListener，customSettingDataListener，pwd，mModelIs24)  
@@ -197,135 +197,135 @@ confirmDevicePwd(bleWriteResponse,pwdDataListener,deviceFuctionDataListener，so
 confirmDevicePwd(bleWriteResponse,pwdDataListener,deviceFuctionDataListener，socialMsgDataListener，customSettingDataListener，pwd，mModelIs24,deviceTimeSetting)
 ```
 
-注：**连接成功后第一步就要执行的操作，需要在[连接成功]并且[可以进行蓝牙通信]的情况下才可以进行其他蓝牙操作**
+Note: **The first step to be performed after the connection is successful. Other Bluetooth operations can only be performed after [Connection is successful] and [Bluetooth communication is possible]**
 
-###### 参数解释
+###### Parameters
 
-| 参数名                    | 类型                       | 备注                                                         |
-| ------------------------- | -------------------------- | ------------------------------------------------------------ |
-| bleWriteResponse          | IBleWriteResponse          | code 返回Code.REQUEST_SUCCESS表示向设备发送命令成功，但是发送命令成功不一定会有数据返回，返回成功只能说明设备接收到了命令，如果设备处理不了命令，则有可能没有数据返回，此接口用于开发人员查找问题 |
-| pwdDataListener           | IPwdDataListener           | 密码操作的数据返回监听，此处返回的数据包含:设备号，设备发布版本号，设备测试版本号，饮酒数据状态，翻腕亮屏状态，查找手机功能状态，佩戴检测功能状态 |
-| deviceFuctionDataListener | IDeviceFuctionDataListener | 设备包含的功能的返回监听，此处返回的数据包含: 各个设备功能状态[是否支持]：血压、饮酒、久坐、心率过高提醒、微信运动、摇-摇拍照、疲劳度、血氧 |
-| socialMsgDataListener     | ISocialMsgDataListener     | 电话、短信、社交软件消息的返回监听，此处返回的数据包含:是否支持接收社交软件的提醒，是否打开电话、短信、社交软件的提醒 |
-| customSettingDataListener | ICustomSettingDataListener | 个性化设置操作的监听                                         |
-| pwd                       | String                     | 密码长度为4，初使值为0000，传入密码前，请先确保是4位的数字   |
-| mModelIs24                | boolean                    | 时间制式，若是选择显示24小时制则传入true,选择12小时制则传入false |
-| deviceTimeSetting         | DeviceTimeSetting          | 默认为手机系统时间，可自定义时间，精确到秒                   |
+| Parameter name | Type | Remarks |
+| ------------------------------ | -------------------------- | --------------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | code Returning Code.REQUEST_SUCCESS indicates that the command is sent to the device successfully, but data may not be returned if the command is sent successfully. A successful return can only indicate that the device has received the command. If the device cannot process the command, there may be no data returned. This interface is used by developers to find problems |
+| pwdDataListener | IPwdDataListener | Password operation data return monitoring, the data returned here includes: device number, device release version number, device test version number, drinking data status, turning the wrist to turn on the screen status, finding mobile phone function status, wear detection function status |
+| deviceFuctionDataListener | IDeviceFuctionDataListener | Return monitoring of the functions contained in the device. The data returned here includes: Function status of each device [supported or not]: blood pressure, drinking, sedentary, high heart rate reminder, WeChat exercise, shake-shake photo, fatigue, blood oxygen |
+| socialMsgDataListener | ISocialMsgDataListener | Return monitoring of phone calls, text messages, and social software messages. The data returned here includes: whether to support receiving reminders from social software, and whether to turn on reminders for phone calls, text messages, and social software |
+| customSettingDataListener | ICustomSettingDataListener | Monitoring of personalized setting operations |
+| pwd | String | The password length is 4, and the initial value is 0000. Before passing in the password, please make sure it is a 4-digit number |
+| mModelIs24 | boolean | Time format, if you choose to display the 24-hour format, pass in true, if you choose the 12-hour format, pass in false |
+| deviceTimeSetting | DeviceTimeSetting | The default is the mobile phone system time, the time can be customized, accurate to the second |
 
-###### 数据返回
+###### Data return
 
-**IPwdDataListener** -- 密码操作的数据返回监听
+**IPwdDataListener** -- Data return monitoring for password operations
 
 ```kotlin
 /**
- * 返回密码操作的数据
- * @param pwdData 密码操作的数据
+ * Returns data for the password operation
+ * @param pwdData data for the password operation
  */
 fun onPwdDataChange(pwdData:PwdData);
 ```
 
-**PwdData** -- 密码操作的数据
+**PwdData** -- Data for password operations
 
-| 变量                  | 类型            | 备注                                                         |
-| --------------------- | --------------- | ------------------------------------------------------------ |
-| mStatus               | EPwdStatus      | 返回当前密码操作的状态                                       |
-| pwd                   | String          | 当前密码                                                     |
-| deviceNumber          | Int             | 设备编号                                                     |
-| deviceVersion         | String          | 设备正式版本，正式版本号仅于APP上显示                        |
-| deviceTestVersion     | String          | 设备测试版本，测试版本号将用于固件升级，固件升级要用到设备号跟测试版本号 |
-| isHaveDrinkData       | Boolean         | 是否有饮酒数据                                               |
-| isOpenNightTurnWriste | EFunctionStatus | 夜间抬腕亮屏功能，支持/不支持/开启/关闭/未知                 |
-| findPhoneFunction     | EFunctionStatus | 查找手机功能,支持/不支持/开启/关闭/未知                      |
-| wearDetectFunction    | EFunctionStatus | 佩戴监测功能,支持/不支持/开启/关闭/未知                      |
+| Variable | Type | Remarks |
+| -------------------------- | --------------- | --------------------------------------------------------------- |
+| mStatus | EPwdStatus | Returns the status of the current password operation |
+| pwd | String | Current password |
+| deviceNumber | Int | device number |
+| deviceVersion | String | The official version of the device, the official version number is only displayed on the APP |
+| deviceTestVersion | String | Device test version, the test version number will be used for firmware upgrade, the firmware upgrade requires the device number and test version number |
+| isHaveDrinkData | Boolean | Whether there is drinking data |
+| isOpenNightTurnWriste | EFunctionStatus | Raise your wrist to turn on the screen at night, supported/unsupported/on/off/unknown |
+| findPhoneFunction | EFunctionStatus | Find phone functions, supported/unsupported/on/off/unknown |
+| wearDetectFunction | EFunctionStatus | Wear detection function, supported/unsupported/on/off/unknown |
 
-**EFunctionStatus** -- 功能状态
+**EFunctionStatus** -- function status
 
-| 变量          | 备注   |
+| Variables | Remarks |
 | ------------- | ------ |
-| UNSUPPORT     | 不支持 |
-| SUPPORT       | 支持   |
-| SUPPORT_OPEN  | 开启   |
-| SUPPORT_CLOSE | 关闭   |
-| UNKONW        | 未知   |
+| UNSUPPORT | Not supported |
+| SUPPORT | Support |
+| SUPPORT_OPEN | Open |
+| SUPPORT_CLOSE | Close |
+| UNKONW | Unknown |
 
-**IDeviceFuctionDataListener** -- 设备功能状态监听,监听一次,可能会被回调2次,依设备而定
+**IDeviceFuctionDataListener** -- Device function status monitoring, monitoring once, may be called back twice, depending on the device
 
 ```kotlin
 /**
- * 返回设备功能状态
+ * Return device function status
  *
  * @param functionSupport
  */
 fun onFunctionSupportDataChange(functionSupport:FunctionDeviceSupportData)
 ```
 
-**FunctionDeviceSupportData** -- 各个设备功能状态[是否支持]
+**FunctionDeviceSupportData** -- Function status of each device [whether supported]
 
-| 变量                  | 类型            | 备注                     |
-| --------------------- | --------------- | ------------------------ |
-| Bp                    | EFunctionStatus | 血压功能状态             |
-| Drink                 | EFunctionStatus | 饮酒功能状态             |
-| Longseat              | EFunctionStatus | 久坐功能状态             |
-| HeartWaring           | EFunctionStatus | 心率警告功能状态         |
-| WeChatSport           | EFunctionStatus | 微信运动功能状态         |
-| Camera                | EFunctionStatus | 拍照功能状态             |
-| Fatigue               | EFunctionStatus | 疲劳度功能状态           |
-| SpoH                  | EFunctionStatus | 血氧功能状态             |
-| SpoHAdjuster          | EFunctionStatus | 血氧校准功能状态         |
-| SpoHBreathBreak       | EFunctionStatus | 血氧呼吸暂停提醒功能状态 |
-| Woman                 | EFunctionStatus | 女性功能状态             |
-| Alarm2                | EFunctionStatus | 新闹钟功能状态           |
-| newCalcSport          | EFunctionStatus | 计步计算使用新功能       |
-| CountDown             | EFunctionStatus | 倒计时功能状态           |
-| AngioAdjuster         | EFunctionStatus | 动态血压调整功能状态     |
-| SreenLight            | EFunctionStatus | 屏幕亮度调节功能状态     |
-| HeartDetect           | EFunctionStatus | 心率检测功能状态，默认有 |
-| SportModel            | EFunctionStatus | 运动模式功能状态         |
-| NightTurnSetting      | EFunctionStatus | 翻腕亮屏设置功能状态     |
-| hidFuction            | EFunctionStatus | HID功能状态              |
-| screenStyleFunction   | EFunctionStatus | 屏幕样式功能             |
-| beathFunction         | EFunctionStatus | 呼吸率功能               |
-| hrvFunction           | EFunctionStatus | HRV功能状态              |
-| weatherFunction       | EFunctionStatus | 天气功能状态             |
-| screenLightTime       | EFunctionStatus | 亮屏时长功能状态         |
-| precisionSleep        | EFunctionStatus | 精准睡眠功能状态         |
-| resetData             | EFunctionStatus | 重置设备/数据功能状态    |
-| ecg                   | EFunctionStatus | ECG功能状态              |
-| multSportModel        | EFunctionStatus | 多运动功能状态           |
-| lowPower              | EFunctionStatus | 低功耗功能状态           |
-| findDeviceByPhone     | EFunctionStatus | 手机查找设备功能状态     |
-| agps                  | EFunctionStatus | AGPS功能状态             |
-| temperatureFunction   | EFunctionStatus | 体温功能状态             |
-| textAlarm             | EFunctionStatus | 文字闹钟功能状态         |
-| bloodGlucose          | EFunctionStatus | 血糖功能状态             |
-| bloodGlucoseAdjusting | EFunctionStatus | 血糖校准功能             |
-| sleepTag              | Int             | 睡眠标志位               |
-| musicStyle            | Int             | 音乐带信息0x99，值为1    |
-| WathcDay              | Int             | 手表保存的最大天数       |
-| contactMsgLength      | Int             | 联系人消息长度           |
-| allMsgLength          | Int             | 消息提醒最大包数         |
-| sportmodelday         | Int             | 运动模式的最大天数       |
-| screenstyle           | Int             | 屏幕样式的选择           |
-| weatherStyle          | Int             | 天气的类型               |
-| originProtcolVersion  | Int             | 原始数据的协议版本       |
-| bitDataTranType       | Int             | 大块数据传输类型         |
-| watchUiServerCount    | Int             | 表盘市场的个数           |
-| watchUiCoustomCount   | Int             | 自定义表盘个数           |
-| temptureType          | Int             | 温度类型                 |
-| cpuType               | Int             | cpu类型                  |
-| ecgType               | Int             | ecg类型                  |
+| Variable | Type | Remarks |
+| -------------------------- | --------------- | -------------------------- |
+| Bp | EFunctionStatus | Blood pressure functional status |
+| Drink | EFunctionStatus | Drinking function status |
+| Longseat | EFunctionStatus | Sedentary function status |
+| HeartWaring | EFunctionStatus | Heart rate warning function status |
+| WeChatSport | EFunctionStatus | WeChat sports function status |
+| Camera | EFunctionStatus | Camera function status |
+| Fatigue | EFunctionStatus | Fatigue function status |
+| SpoH | EFunctionStatus | Blood oxygen function status |
+| SpoHAdjuster | EFunctionStatus | Blood oxygen calibration function status |
+| SpoHBreathBreak | EFunctionStatus | Blood oxygen apnea reminder function status |
+| Woman | EFunctionStatus | Female function status |
+| Alarm2 | EFunctionStatus | New alarm function status |
+| newCalcSport | EFunctionStatus | New features for step counting |
+| CountDown | EFunctionStatus | Countdown function status |
+| AngioAdjuster | EFunctionStatus | Dynamic blood pressure adjustment function status |
+| SreenLight | EFunctionStatus | Screen brightness adjustment function status |
+| HeartDetect | EFunctionStatus | Heart rate detection function status, default is |
+| SportModel | EFunctionStatus | Sport mode function status |
+| NightTurnSetting | EFunctionStatus | Turn your wrist to brighten the screen and set the function status |
+| hidFuction | EFunctionStatus | HID function status |
+| screenStyleFunction | EFunctionStatus | screen style function |
+| beathFunction | EFunctionStatus | Breathing rate function |
+| hrvFunction | EFunctionStatus | HRV function status |
+| weatherFunction | EFunctionStatus | Weather function status |
+| screenLightTime | EFunctionStatus | Bright screen duration function status |
+| precisionSleep | EFunctionStatus | Precision sleep function status |
+| resetData | EFunctionStatus | Reset device/data function status |
+| ecg | EFunctionStatus | ECG function status |
+| multSportModel | EFunctionStatus | Multi-sport function status |
+| lowPower | EFunctionStatus | Low power function status |
+| findDeviceByPhone | EFunctionStatus | Mobile phone find device function status |
+| agps | EFunctionStatus | AGPS function status |
+| temperatureFunction | EFunctionStatus | Body temperature function status |
+| textAlarm | EFunctionStatus | Text alarm function status |
+| bloodGlucose | EFunctionStatus | blood glucose function status |
+| bloodGlucoseAdjusting | EFunctionStatus | Blood Glucose Calibration Function |
+| sleepTag | Int | sleep flag |
+| musicStyle | Int | Music band information 0x99, value is 1 |
+| WathcDay | Int | The maximum number of days the watch can be saved |
+| contactMsgLength | Int | Contact message length |
+| allMsgLength | Int | Maximum number of message reminder packets |
+| sportmodelday | Int | Maximum number of days in sport mode |
+| screenstyle | Int | Screen style selection |
+| weatherStyle | Int | Type of weather |
+| originProtcolVersion | Int | The protocol version of the original data |
+| bitDataTranType | Int | Large block data transfer type |
+| watchUiServerCount | Int | Number of watch face markets |
+| watchUiCoustomCount | Int | Number of custom watch faces |
+| temperatureType | Int | temperature type |
+| cpuType | Int | cpu type |
+| ecgType | Int | ecg type |
 
-**ISocialMsgDataListener** --消息通知开关状的回调监听 具体返回查看【[消息通知](#消息通知)】
+**ISocialMsgDataListener** --Message notification switch-like callback listening. For details, please return to [[Message Notification](#Message Notification)]
 
-**ICustomSettingDataListener** -- 个性化设置的回调监听 具体查看【[个性化设置](#个性化设置)】
+**ICustomSettingDataListener** -- Personalized setting callback listening, please view [[Personalized Settings](#Personalized Settings)] for details
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 // kotlin code
 VPOperateManager.getInstance()
     .confirmDevicePwd({
-        //                连接失败
+        //Connection failed
         if (it != Code.REQUEST_SUCCESS) {
             Log.e("TAG", "confirmDevicePwd fail:check fail")
         }
@@ -362,21 +362,21 @@ VPOperateManager.getInstance()
     )
 ```
 
-## 断开连接
+## Disconnect
 
-###### 接口
+###### API
 
 ```
 disconnectWatch(bleWriteResponse)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型              | 备注           |
-| ---------------- | ----------------- | -------------- |
-| bleWriteResponse | IBleWriteResponse | 写入操作的监听 |
+| Parameter name | Type | Remarks |
+|---------------- | ----------------- | --------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -385,49 +385,49 @@ VPOperateManager.getInstance().disconnectWatch {
 }
 ```
 
-## 同步个人信息
+## Synchronize personal information
 
-身高体重的设置，会影响卡路里的计算结果
+Height and weight settings will affect calorie calculation results
 
-###### 接口
+###### API
 
 ```kotlin
 syncPersonInfo(bleWriteResponse, personInfoDataListener, personInfoData)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                 | 类型                    | 备注                                           |
-| ---------------------- | ----------------------- | ---------------------------------------------- |
-| bleWriteResponse       | IBleWriteResponse       | 写入操作的监听                                 |
-| personInfoDataListener | IPersonInfoDataListener | 个人信息操作的回调，返回的数据只包含操作的状态 |
-| personInfoData         | PersonInfoData          | 个人信息数据                                   |
+| Parameter name | Type | Remarks |
+| ----------------------- | ----------------------- | ----------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| personInfoDataListener | IPersonInfoDataListener | Callback for personal information operations, the returned data only contains the status of the operation |
+| personInfoData | PersonInfoData | personal information data |
 
-**PersonInfoData** -- 个人信息数据
+**PersonInfoData** -- Personal information data
 
-| 参数名   | 类型 | 备注                 |
+| Parameter name | Type | Remarks |
 | -------- | ---- | -------------------- |
-| ESex     | ESex | 性别                 |
-| height   | Int  | 身高                 |
-| weight   | Int  | 体重                 |
-| age      | Int  | 年龄                 |
-| stepAim  | Int  | 目标步数             |
-| sleepAim | Int  | 目标睡眠时间（分钟） |
+| ESex | ESex | Gender |
+| height | Int | height |
+| weight | Int | weight |
+| age | Int | age |
+| stepAim | Int | Target number of steps |
+| sleepAim | Int | Target sleep time (minutes) |
 
-###### 返回数据
+###### Return data
 
-**IPersonInfoDataListener** -- 个人信息操作的回调
+**IPersonInfoDataListener** -- callback for personal information operations
 
 ```kotlin
 /**
- * 返回操作的状态
+ * Return the status of the operation
  *
- * @param EOprateStauts:OPRATE_SUCCESS:操作成功，OPRATE_FAIL:操作失败,UNKNOW:未知
+ * @param EOprateStauts: OPRATE_SUCCESS: Operation successful, OPRATE_FAIL: Operation failed, UNKNOW: Unknown
  */
 fun OnPersoninfoDataChange(eOprateStauts:EOprateStauts)
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -439,129 +439,129 @@ VPOperateManager.getInstance().syncPersonInfo(writeResponse,
 )
 ```
 
-## 语言设置功能
+## Language setting function
 
-###### 接口
+###### API
 
 ```kotlin
 settingDeviceLanguage(bleWriteResponse, languageDataListener, language)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名               | 类型                  | 备注           |
-| -------------------- | --------------------- | -------------- |
-| bleWriteResponse     | IBleWriteResponse     | 写入操作的监听 |
-| languageDataListener | ILanguageDataListener | 设置语言回调   |
-| language             | ELanguage             | 语言的种类     |
+| Parameter name | Type | Remarks |
+| -------------------------- | -------------------------- | ------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| languageDataListener | ILanguageDataListener | Set language callback |
+| language | ELanguage | Types of languages |
 
-**ELanguage** 语言种类枚举
+**ELanguage** Language type enumeration
 
-| 变量              | 备注       |
-| ----------------- | ---------- |
-| CHINA             | 中文简体   |
-| CHINA_TRADITIONAL | 中文繁体   |
-| ENGLISH           | 英语       |
-| JAPAN             | 日语       |
-| KOREA             | 韩语       |
-| DEUTSCH           | 德语       |
-| RUSSIA            | 俄语       |
-| SPANISH           | 西班牙语   |
-| ITALIA            | 意大利语   |
-| FRENCH            | 法语       |
-| VIETNAM           | 越南语     |
-| PORTUGUESA        | 葡萄牙语   |
-| THAI              | 泰语       |
-| POLISH            | 波兰语     |
-| SWEDISH           | 瑞典语     |
-| TURKISH           | 土耳其语   |
-| DUTCH             | 荷兰语     |
-| CZECH             | 捷克语     |
-| ARABIC            | 阿拉伯语   |
-| HUNGARY           | 匈牙利语   |
-| GREEK             | 希腊语     |
-| ROMANIAN          | 罗马尼亚   |
-| SLOVAK            | 斯洛伐克语 |
-| INDONESIAN        | 印尼语     |
-| BRAZIL_PORTUGAL   | 巴西葡萄牙 |
-| CROATIAN          | 克罗地亚语 |
-| LITHUANIAN        | 立陶宛语   |
-| UKRAINE           | 乌克兰     |
-| HINDI             | 印地语     |
-| HEBREW            | 希伯来语   |
-| DANISH            | 丹麦语     |
-| PERSIAN           | 波斯语     |
-| FINNISH           | 芬兰语     |
-| MALAY             | 马来语     |
-| UNKONW            | 未知       |
+| Variables | Remarks |
+| ------------------ | ---------- |
+| CHINA | Chinese Simplified |
+| CHINA_TRADITIONAL | Chinese Traditional |
+| ENGLISH | English |
+| JAPAN | Japanese |
+| KOREA | Korean |
+| DEUTSCH | German |
+| RUSSIA | Russian |
+| SPANISH | Spanish |
+| ITALIA | ITALIAN |
+| FRENCH | FRENCH |
+| VIETNAM | Vietnamese |
+| PORTUGUESA | PORTUGUESE |
+| THAI | Thai |
+| POLISH | Polish |
+| SWEDISH | Swedish |
+| TURKISH | Turkish |
+| DUTCH | Dutch |
+| CZECH | Czech |
+| ARABIC | Arabic |
+| HUNGARY | Hungarian |
+| GREEK | Greek |
+| ROMANIAN | Romania |
+| SLOVAK | Slovak |
+| INDONESIAN | Indonesian |
+| BRAZIL_PORTUGAL | BRAZIL PORTUGAL |
+| CROATIAN | Croatian |
+| LITHUANIAN | Lithuanian |
+| UKRAINE | Ukraine |
+| HINDI | Hindi |
+| HEBREW | Hebrew |
+| DANISH | Danish |
+| PERSIAN | Persian |
+| FINNISH | Finnish |
+| MALAY | Malay |
+| UNKONW | Unknown |
 
-###### 返回数据
+###### Return data
 
-**ILanguageDataListener** --设置语言回调
+**ILanguageDataListener** --Set language callback
 
 ```kotlin
 /**
- * 返回语言的状态
+ * Returns the status of the language
  *
- * @param languageData 语言数据
+ * @param languageData language data
  */
 fun onLanguageDataChange( languageData:LanguageData)
 ```
 
-**languageData** -- 语言数据
+**languageData** -- language data
 
-| 变量名   | 类型          | 备注               |
+| Variable name | Type | Remarks |
 | -------- | ------------- | ------------------ |
-| stauts   | EOprateStauts | 操作的状态         |
-| language | ELanguage     | 获取当前设备的语言 |
+| stauts | EOprateStauts | Status of the operation |
+| language | ELanguage | Get the language of the current device |
 
-**注意：**
+**Note:**
 
-[系统语言]&&[女性功能的提示语言]在设备上并不是一致的，女性功能支持多国语言，而系统语言只有中英文。所以可能出现以下正常情况（在[系统语言]只支持设置中英文的设备，进行设置日语，设备会提示设置日语成功，而[系统语言]依然显示为英文，但[女性功能提示语言]为日语）
+[System language]&&[Prompt language for female functions] are not consistent across devices. The female function supports multiple languages, while the system language is only Chinese and English. Therefore, the following normal situation may occur ([System Language] only supports devices with Chinese and English settings, and if you set Japanese, the device will prompt that the Japanese setting is successful, and [System Language] is still displayed as English, but [Female Function Prompt Language] is Japanese)
 
-## 读取当前计步
+## Read the current step count
 
-读取当前计步,计步的功能涉及到距离及卡路里的计算,而这两者的计算与身高有关系，所以在读取计步前应该先调用【[同步个人信息](#同步个人信息)】来设置个人信息
+Read the current step count. The step count function involves the calculation of distance and calories, and the calculation of these two is related to the height. Therefore, before reading the step count, you should first call [[Sync Personal Information] (#Sync Personal Information)] to set personal information.
 
-**注**：指的是设备的计步、距离和卡路里，本接口返回的数据是实时的，与日常数据中的步数有差别，日常数据中的步数是每5分钟的汇总体现，存在滞后性。如果应用层需要同步获取设备端的步数，需要固定频率调用本接口获取数据。
+**Note**: Refers to the device's step count, distance and calories. The data returned by this interface is real-time and is different from the number of steps in daily data. The number of steps in daily data is a summary of every 5 minutes, and there is a lag. If the application layer needs to obtain the number of steps on the device synchronously, it needs to call this interface at a fixed frequency to obtain the data.
 
-###### 接口
+###### API
 
 ```kotlin
 readSportStep(bleWriteResponse, sportDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型               | 备注             |
-| ----------------- | ------------------ | ---------------- |
-| bleWriteResponse  | IBleWriteResponse  | 写入操作的监听   |
-| sportDataListener | ISportDataListener | 读取运动数据监听 |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | ---------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| sportDataListener | ISportDataListener | Read sports data listening |
 
-###### 返回数据
+###### Return data
 
-**ISportDataListener** -- 读取运动数据监听
+**ISportDataListener** -- Read sports data listening
 
 ```kotlin
 /**
- * 返回计步的数据
+ * Return step counting data
  *
- * @param sportData 当前的运动数据
+ * @param sportData current sports data
  */
 fun onSportDataChange(sportData:SportData)
 ```
 
-**SportData** -- 当前的运动数据
+**SportData** -- Current sports data
 
-| 变量                            | 类型   | 备注                                                         |
-| ------------------------------- | ------ | ------------------------------------------------------------ |
-| step                            | Int    | 当前的计步数                                                 |
-| dis                             | Double | 当前的距离km                                                 |
-| kcal                            | Double | 当前的卡路里kcal                                             |
-| calcType                        | Int    | 计算方式， 0 表示传统算法，1 表示新算法公式，2表示运动模式表的表 |
-| triaxialX, triaxialY, triaxialZ | Int    | 三轴位置                                                     |
+| Variable | Type | Remarks |
+| ---------------------------------- | ------ | --------------------------------------------------------------- |
+| step | Int | Current step count |
+| dis | Double | Current distance km |
+| kcal | Double | Current calories kcal |
+| calcType | Int | Calculation method, 0 represents the traditional algorithm, 1 represents the new algorithm formula, 2 represents the table of motion mode tables |
+| triaxialX, triaxialY, triaxialZ | Int | Triaxial position |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -572,53 +572,53 @@ VPOperateManager.getInstance().readSportStep({
 }) { sportData ->  }
 ```
 
-## 读取设备电量
+## Read device power
 
-1.特别注意⚠️：表盘传输和OTA过程会有较大功耗，需要增加电量限制。手表电量很低时，如果发起表盘传输，在传输过程中手表可能会因低电关机，重新充电后，表盘会变黑。 建议每次传输前，先读取一遍手表当前电量，如果电量状态为低电，则禁止传输。
+1. Special attention⚠️: The dial transmission and OTA processes will consume a lot of power, and the power limit needs to be increased. When the power of the watch is very low, if you initiate dial transmission, the watch may shut down due to low power during the transmission process. After recharging, the dial will turn black. It is recommended to read the current battery level of the watch before each transmission. If the battery status is low, transmission is prohibited.
 
-OTA过程较长，建议电池电量在30%以上，才允许升级。
+The OTA process is long, and it is recommended that the battery power be above 30% before the upgrade is allowed.
 
-###### 前提
+###### Prerequisites
 
-设备已连接
+Device is connected
 
-###### 接口
+###### API
 
 ```kotlin
 readBattery(bleWriteResponse, batteryDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名              | 类型                 | 备注           |
-| ------------------- | -------------------- | -------------- |
-| bleWriteResponse    | IBleWriteResponse    | 写入操作的监听 |
-| batteryDataListener | IBatteryDataListener | 读取电量监听   |
+| Parameter name | Type | Remarks |
+| ------------------- | ------------------ | --------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| batteryDataListener | IBatteryDataListener | Read battery monitoring |
 
-###### 返回数据
+###### Return data
 
-**IBatteryDataListener** -- 读取电量监听
+**IBatteryDataListener** -- Read power monitoring
 
 ```kotlin
 /**
- * 返回电量的数据
+ * Return battery power data
  */
 fun onDataChange(batteryData:BatteryData)
 ```
 
-**BatteryData** -- 电量数据
+**BatteryData** -- battery data
 
-| 参数名         | 类型    | 备注                                                         |
-| -------------- | ------- | ------------------------------------------------------------ |
-| batteryLevel   | Int     | 设备当前的电量[1-4],4表示满电                                |
-| batteryPercent | Int     | 电量百分比[1-100]                                            |
-| powerModel     | Int     | 电源模式：0x00 正常 ，0x01 充电状态，0x02 低压状态，0x03 充满状态 |
-| state          | Int     | 睡眠状态：0清醒  1睡眠                                       |
-| bat            | Byte    | BAT当前电量                                                  |
-| isLowBattery   | Boolean | 是否低电： 0x01表示正常，0x02表示低电                        |
-| isPercent      | Boolean | 是否可以显示电量百分比，true表示电量用batteryPercent表示，false表示电量用batteryLevel显示 |
+| Parameter name | Type | Remarks |
+| -------------- | ------- | --------------------------------------------------------------- |
+| batteryLevel | Int | The current battery level of the device [1-4], 4 means full power |
+| batteryPercent | Int | Battery percentage [1-100] |
+| powerModel | Int | Power mode: 0x00 normal, 0x01 charging state, 0x02 low voltage state, 0x03 full state |
+| state | Int | Sleep state: 0 awake 1 sleeping |
+| bat | Byte | BAT current battery level |
+| isLowBattery | Boolean | Whether the battery is low: 0x01 means normal, 0x02 means low battery |
+| isPercent | Boolean | Whether the battery percentage can be displayed, true means the battery is expressed in batteryPercent, false means the battery is displayed in batteryLevel |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -631,150 +631,148 @@ VPOperateManager.getInstance().readBattery({
 })
 ```
 
-## 读取日常数据功能
+## Read daily data function
 
-#### 读取健康数据（睡眠数据+5分钟原始数据)
+#### Read health data (sleep data + 5 minutes of raw data)
 
-###### 接口
+###### API
 
-假如手表存储的数据是3天 读取所有的健康数据,读取的顺序为 [睡眠数据（今天-昨天-前天）]-[5分钟原始数据(今天-昨天-前天)],便针对原始数据可以进行自定义天的位置，以及条数的位置 ,比如传入[昨天，150]，那么读取顺序为 [睡眠数据（今天-昨天-前天）]-[5分钟原始数据(昨天（150）-前天)]
+If the data stored in the watch is for 3 days and all health data is read, the reading order is [sleep data (today-yesterday-the day before yesterday)]-[5 minutes of raw data (today-yesterday-the day before yesterday)], and the position of the day and the number of items can be customized for the raw data. For example, if [yesterday, 150] is passed in, then the reading order is [sleep data (today-yesterday-the day before yesterday)]-[5-minute raw data (yesterday (150)-the day before yesterday)]
 
 ```
 readAllHealthDataBySettingOrigin(allHealthDataListener,day,position,watchday)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                | 类型                   | 备注                                                         |
-| --------------------- | ---------------------- | ------------------------------------------------------------ |
-| allHealthDataListener | IAllHealthDataListener | 读取所有数据的回调，返回读取的进度以及健康数据：睡眠数据，计步数据[5分钟、30分钟]，心率数据[5分钟、30分钟]，血压数据[5分钟、30分钟] |
-| watchday              | Int                    | 手表可存储的数据容量(单位:天),依设备而定,验证密码后,在IDeviceFuctionDataListener回调数据FunctionDeviceSupportData中,可通过getWatchday()获取返回值 |
-| day                   | Int                    | 读取哪天，0表示今天，1表示昨天，2表示前天，以此类推。        |
-| position              | Int                    | 读取条数的位置，一天最多288(5分钟每条)条，你可以定义读取的条数位置，此参数的值必须大于等于1 |
+| Parameter name | Type | Remarks |
+| -------------------------- | -------------------------- | --------------------------------------------------------------- |
+| allHealthDataListener | IAllHealthDataListener | Callback for reading all data, returning reading progress and health data: sleep data, pedometer data [5 minutes, 30 minutes], heart rate data [5 minutes, 30 minutes], blood pressure data [5 minutes, 30 minutes] |
+| watchday | Int | The data capacity that the watch can store (unit: day), depends on the device. After verifying the password, in the IDeviceFuctionDataListener callback data FunctionDeviceSupportData, the return value can be obtained through getWatchday() |
+| day | Int | Which day to read, 0 means today, 1 means yesterday, 2 means the day before yesterday, and so on.        |
+| position | Int | The position of the number of items to be read, up to 288 items per day (every 5 minutes). You can define the position of the number of items to be read. The value of this parameter must be greater than or equal to 1 |
 
-###### 返回数据
+###### Return data
 
 IAllHealthDataListener
 
 ```kotlin
 /**
- * 读取的进度回调
+ * Reading progress callback
  *
- * @param progress 进度值，范围[0-1]
+ * @param progress progress value, range [0-1]
  */
 void onProgress(float progress);
 
 /**
- * 返回睡眠的数据
+ * Return sleep data
  *
- * @param day       表示正在读取第几天的数据 0：今天，1：昨天，2：前天。
- * @param sleepData 睡眠的数据
+ * @param day indicates the day's data being read. 0: today, 1: yesterday, 2: the day before yesterday.
+ * @param sleepData sleep data
  */
 void onSleepDataChange(String day, SleepData sleepData);
 
 /**
- * 读取睡眠结束的回调
+ * Read the callback for the end of sleep
  */
 void onReadSleepComplete();
 
 /**
- * 读取5分钟原始数据的回调
+ * Callback for reading 5 minutes of raw data
  *
- * @param originData 5分钟的原始数据
+ * @param originData 5 minutes of original data
  */
 void onOringinFiveMinuteDataChange(OriginData originData);
 
 /**
- * 30分钟原始数据的回调,来自5分钟的原始数据，只是在内部进行了数据处理
+ * Callback of 30 minutes of raw data, from 5 minutes of raw data, only data processing is performed internally
  *
  * @param originHalfHourData
  */
 void onOringinHalfHourDataChange(OriginHalfHourData originHalfHourData);
 
 /**
- * 读取所有数据结束
+ * End of reading all data
  */
 void onReadOriginComplete();
 ```
 
-**SleepData** -- 睡眠数据
+**SleepData** -- sleep data
 
-| 变量          | 类型     | 备注                                                         |
-| ------------- | -------- | ------------------------------------------------------------ |
-| Date          | String   | 睡眠日期                                                     |
-| cali_flag     | Int      | 睡眠定标值，目前这个值没有什么用                             |
-| sleepQulity   | Int      | 睡眠质量                                                     |
-| wakeCount     | Int      | 睡眠中起床的次数                                             |
-| deepSleepTime | Int      | 深睡时长(单位min)                                            |
-| lowSleepTime  | Int      | 浅睡时长(单位min)                                            |
-| allSleepTime  | Int      | 睡眠总时长                                                   |
-| sleepLine     | String   | 睡眠曲线，主要用于更具象化的UI来显示睡眠状态，如果您睡眠界面对UI没有特殊要求，可不理会,睡眠曲线分为普通睡眠和精准睡眠，普通睡眠是一组由0,1,2组成的字符串，每一个字符代表时长为5分钟，其中0表示浅睡，1表示深睡，2表示苏醒,比如“201112”，长度为6，表示睡眠阶段共30分钟，头尾各苏醒5分钟，中间浅睡5分钟，深睡15分钟;若是精准睡眠，睡眠曲线是一组由0,1,2，3,4组成的字符串，每一个字符代表时长为1分钟，其中0表示深睡，1表示浅睡，2表示快速眼动,3表示失眠,4表示苏醒 |
-| sleepDown     | TimeData | 入睡时间                                                     |
-| sleepUp       | TimeData | 起床时间                                                     |
+| Variable | Type | Remarks |
+| ------------- | -------- | --------------------------------------------------------------- |
+| Date | String | Sleep date |
+| cali_flag | Int | Sleep scaling value, currently this value is of no use |
+| sleepQuality | Int | sleep quality |
+| wakeCount | Int | The number of times you wake up during sleep |
+| deepSleepTime | Int | Deep sleep duration (unit min) |
+| lowSleepTime | Int | Light sleep duration (unit min) |
+| allSleepTime | Int | Total sleep time |
+| sleepLine | String | Sleep curve is mainly used for a more concrete UI to display sleep status. If your sleep interface has no special requirements for the UI, you can ignore it. The sleep curve is divided into normal sleep and precision sleep. Normal sleep is a set of strings composed of 0, 1, 2. Each character represents a duration of 5 minutes, where 0 means light sleep, 1 means deep sleep, and 2 means wake up, such as "2011" 12", with a length of 6, indicating a total of 30 minutes of sleep stages, with 5 minutes of awakening at the beginning and end, 5 minutes of light sleep in the middle, and 15 minutes of deep sleep; if it is precision sleep, the sleep curve is a set of strings composed of 0,1,2,3,4, each character represents a duration of 1 minute, where 0 means deep sleep, 1 means light sleep, 2 means rapid eye movement, 3 means insomnia, and 4 means awakening |
+| sleepDown | TimeData | Sleep time |
+| sleepUp | TimeData | Wake up time |
 
-**OriginData** -- 5分钟的原始数据
+**OriginData** -- 5 minutes of original data
 
-| 变量            | 类型     | 备注                                                         |
-| --------------- | -------- | ------------------------------------------------------------ |
-| date            | String   | 睡眠日期                                                     |
-| allPackage      | Int      | 当天数据的总包数                                             |
-| packageNumber   | Int      | 此数据在当天的位置                                           |
-| mTime           | TimeData | 精准时间                                                     |
-| rateValue       | Int      | 心率值，范围[30-200]                                         |
-| sportValue      | Int      | 运动量值[0-65536],值越大代表运动越剧烈共分为5个等级，分别是[0-220],[201-700],[701-1400],[1401-3200],[3201-65535] |
-| stepValue       | Int      | 计步值                                                       |
-| highValue       | Int      | 高压值，范围[60-300]                                         |
-| lowValue        | Int      | 低压值，范围[20-200]                                         |
-| wear            | Int      | 佩戴标志位                                                   |
-| tempOne         | Int      | 预留值                                                       |
-| tempTwo         | Int      | 预留值                                                       |
-| calValue        | Double   | 消耗的卡路里值                                               |
-| disValue        | Double   | 运动的总距离km                                               |
-| calcType        | Int      | 计算方式：0 表示传统算法，1 表示新算法公式，2表示运动模式的设备 |
-| drankPartOne    | String   | 暂预留                                                       |
-| baseTemperature | Double   | 体表温度，当VpSpGetUtil.isSupportReadTempture && VpSpGetUtil.getTemperatureType == 时值有效 |
-| temperature     | Double   | 体温，当VpSpGetUtil.isSupportReadTempture && VpSpGetUtil.getTemperatureType == 时值有效 |
+| Variable | Type | Remarks |
+| --------------- | -------- | --------------------------------------------------------------- |
+| date | String | sleep date |
+| allPackage | Int | The total number of packages of data for the day |
+| packageNumber | Int | The position of this data on the current day |
+| mTime | TimeData | Precise time |
+| rateValue | Int | Heart rate value, range [30-200] |
+| sportValue | Int | Exercise value [0-65536], the larger the value, the more intense the exercise. It is divided into 5 levels, namely [0-220], [201-700], [701-1400], [1401-3200], [3201-65535] |
+| stepValue | Int | step count value |
+| highValue | Int | High voltage value, range [60-300] |
+| lowValue | Int | Low voltage value, range [20-200] |
+| wear | Int | wear flag |
+| tempOne | Int | Reserved value |
+| tempTwo | Int | Reserved value |
+| calValue | Double | Calories consumed |
+| disValue | Double | Total distance traveled km |
+| calcType | Int | Calculation method: 0 represents the traditional algorithm, 1 represents the new algorithm formula, 2 represents the sports mode device |
+| drankPartOne | String | Reserved |
+| baseTemperature | Double | Body surface temperature, the value is valid when VpSpGetUtil.isSupportReadTempture && VpSpGetUtil.getTemperatureType == |
+| temperature | Double | Body temperature, the value is valid when VpSpGetUtil.isSupportReadTempture && VpSpGetUtil.getTemperatureType == |
 
-**OriginHalfHourData** -- 30分钟数据
+**OriginHalfHourData** -- 30 minutes of data
 
-| 变量               | 类型                    | 备注                                          |
-| ------------------ | ----------------------- | --------------------------------------------- |
-| halfHourRateDatas  | List<HalfHourRateData>  | 30分钟的心率数据                              |
-| halfHourBps        | List<HalfHourBpData>    | 30分钟的血压数据                              |
-| halfHourSportDatas | List<HalfHourSportData> | 30分钟的运动数据                              |
-| allStep            | Int                     | 当前读取到的30分钟内（5*6）原始数据的总计步数 |
-| date               | String                  | 日期（"yyyy-MM-dd HH:mm:ss）                  |
+| Variable | Type | Remarks |
+| ------------------ | ----------------------- | ----------------------------------------------- |
+| halfHourRateDatas | List<HalfHourRateData> | 30 minutes of heart rate data |
+| halfHourBps | List<HalfHourBpData> | 30 minutes of blood pressure data |
+| halfHourSportDatas | List<HalfHourSportData> | 30 minutes of sports data |
+| allStep | Int | The total number of steps in the currently read raw data within 30 minutes (5*6) |
+| date | String | Date ("yyyy-MM-dd HH:mm:ss) |
 
-**HalfHourRateData** -- 30分钟的心率数据
+**HalfHourRateData** -- 30 minutes of heart rate data
 
-| 变量      | 类型     | 备注                                                         |
-| --------- | -------- | ------------------------------------------------------------ |
-| date      | String   | 所属日期                                                     |
-| time      | TimeData | 具体的时间，最多的可以准确到分钟,如10:00表示的是10:00-10:30这段区间的均值 |
-| rateValue | Int      | 心率值                                                       |
-| ecgCount  | Int      | ecg总数                                                      |
-| ppgCount  | Int      | ppg总数                                                      |
+| Variable | Type | Remarks |
+| --------- | -------- | --------------------------------------------------------------- |
+| date | String | Belonging date |
+| time | TimeData | The specific time can be accurate to the minute. For example, 10:00 represents the average value of the interval from 10:00 to 10:30 |
+| rateValue | Int | Heart rate value |
+| ecgCount | Int | Total number of ecg |
+| ppgCount | Int | Total ppg |
 
-**HalfHourBpData**-- 30分钟血压数据
+**HalfHourBpData**--30 minutes blood pressure data
 
-| 变量      | 类型     | 备注                                                         |
-| --------- | -------- | ------------------------------------------------------------ |
-| date      | String   | 所属日期                                                     |
-| time      | TimeData | 具体的时间，最多的可以准确到分钟,如10:00表示的是10:00-10:30这段区间的均值 |
-| highValue | Int      | 血压最高值                                                   |
-| lowValue  | Int      | 血压最低值                                                   |
+| Variable | Type | Remarks |
+| --------- | -------- | --------------------------------------------------------------- |
+| date | String | Belonging date |
+| time | TimeData | The specific time can be accurate to the minute. For example, 10:00 represents the average value of the interval from 10:00 to 10:30 |
+| highValue | Int | Highest value of blood pressure |
+| lowValue | Int | The lowest value of blood pressure |
 
-**HalfHourSportData** -- 30分钟的运动数据
+**HalfHourSportData** -- 30 minutes of sports data| Variable | Type | Remarks |
+| ---------- | -------- | --------------------------------------------------------------- |
+| date | String | Belonging date |
+| time | TimeData | The specific time can be accurate to the minute. For example, 10:00 represents the average value of the interval from 10:00 to 10:30 |
+| sportValue | Int | Total amount of exercise in 30 minutes |
+| disValue | Double | Total distance in 30 minutes |
+| calValue | Double | Total calories in 30 minutes |
 
-| 变量       | 类型     | 备注                                                         |
-| ---------- | -------- | ------------------------------------------------------------ |
-| date       | String   | 所属日期                                                     |
-| time       | TimeData | 具体的时间，最多的可以准确到分钟,如10:00表示的是10:00-10:30这段区间的均值 |
-| sportValue | Int      | 30分钟内的总运动量                                           |
-| disValue   | Double   | 30分钟内的总距离                                             |
-| calValue   | Double   | 30分钟内的总卡路里                                           |
-
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -806,174 +804,174 @@ VPOperateManager.getInstance().readAllHealthData(object :IAllHealthDataListener{
 },3)
 ```
 
-#### 读取日常数据(5分钟原始数据)
+#### Read daily data (5 minutes of raw data)
 
-###### 接口
+###### API
 
-假如手表存储的数据是3天 读取原始数据，每5分钟一条，数据包含计步，心率，血压，运动量，读取顺序为 今天-昨天-前天，理论上一天的数据共288条
+If the watch stores data for 3 days, read the original data, one piece every 5 minutes. The data includes step count, heart rate, blood pressure, and amount of exercise. The reading order is today-yesterday-the day before yesterday. Theoretically, there are 288 pieces of data in one day.
 
 ```kotlin
 readOriginData(bleWriteResponse, originDataListener, watchday)
 ```
 
-读取原始数据，此方法可以自定义要读取的哪天以及从当天第几条开始读取，是否只读当天
+Read the original data. This method can customize which day to read and which item of the day to start reading. Whether to read only the current day.
 
 ```
 readOriginDataBySetting(bleWriteResponse, originDataListener,readOriginSetting)
 ```
 
-读取原始数据，此方法可以自定义要读取的哪天以及从当天第几条开始读取，避免重复读取 ,比如设置了[昨天,150],那么读取顺序为[昨天{150}-昨天结束-前天]
+Read the original data. This method can customize the day to be read and the number of items to be read from that day to avoid repeated reading. For example, if [yesterday, 150] is set, the reading order is [yesterday {150} - end of yesterday - day before yesterday]
 
 ```kotlin
 readOriginDataFromDay(bleWriteResponse, originDataListener, day, position, watchday)
 ```
 
-读取单天原始数据，此方法可以自定义要读取的哪天以及从当天第几条开始读取，并只读当天 ,比如设置了[昨天,150],那么读取顺序为[昨天{150}-昨天结束]
+Read the raw data of a single day. This method can customize which day to read and which item of the day to start reading, and only read the current day. For example, if [yesterday, 150] is set, then the reading order is [yesterday{150}-end of yesterday]
 
 ```kotlin
 readOriginDataSingleDay(bleWriteResponse, originDataListener, day, position, watchday)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名             | 类型                                     | 备注                                                         |
-| ------------------ | ---------------------------------------- | ------------------------------------------------------------ |
-| bleWriteResponse   | IBleWriteResponse                        | 写入操作的监听                                               |
-| originDataListener | IOriginDataListener/IOriginData3Listener | 原始数据的回调，返回的数据包含计步，心率，血压，运动量       |
-| watchday           | Int                                      | 手表可存储的数据容量(单位:天)                                |
-| day                | Int                                      | 读取位置，0表示今天，1表示昨天，2表示前天，以此类推。 读取顺序为 今天-昨天- 前天 |
-| position           | Int                                      | 读取的条数位置,此值要求必须大于等于1                         |
-| readOriginSetting  | ReadOriginSetting                        | 读取原始数据的设置                                           |
+| Parameter name | Type | Remarks |
+| ------------------ | -------------------------------------------------- | --------------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| originDataListener | IOriginDataListener/IOriginData3Listener | Callback of original data, the returned data includes step counting, heart rate, blood pressure, and amount of exercise |
+| watchday | Int | The data capacity that the watch can store (unit: day) |
+| day | Int | Read the position, 0 means today, 1 means yesterday, 2 means the day before yesterday, and so on. The reading order is today-yesterday-the day before yesterday |
+| position | Int | The position of the number of items to be read. This value must be greater than or equal to 1 |
+| readOriginSetting | ReadOriginSetting | Read the settings of the original data |
 
-注：**读取日常数据时需做设备协议版本判断，当设备协议版本为3或5时，需传入IOriginData3Listener，其他情况使用IOriginDataListener**
+Note: **When reading daily data, you need to judge the device protocol version. When the device protocol version is 3 or 5, you need to pass in IOriginData3Listener. In other cases, use IOriginDataListener**
 
-判定条件如下：
+The judgment conditions are as follows:
 
 ```kotlin
 val originProtocolVersion = VpSpGetUtil.getVpSpVariInstance(mContext).getOriginProtocolVersion()
 if(originProtocolVersion==3 || originProtocolVersion == 5){
-    //读取日常数据使用IOriginData3Listener做数据监听
+    //Read daily data and use IOriginData3Listener for data monitoring
 }else{
-    //读取日常数据使用IOriginDataListener做数据监听
+    //Read daily data and use IOriginDataListener for data monitoring
 }
 ```
 
-**ReadOriginSetting** -- 读取原始数据的设置
+**ReadOriginSetting** -- Read the settings of the original data
 
-| 参数名         | 类型    | 备注                                                         |
-| -------------- | ------- | ------------------------------------------------------------ |
-| day            | Int     | 读取位置，0表示今天，1表示昨天，2表示前天，以此类推。 读取顺序为 今天-昨天- 前天 |
-| position       | Int     | 读取的条数位置,此值要求必须大于等于1                         |
-| onlyReadOneDay | Boolean | true表示只读今天，false表示按顺序读取                        |
-| watchday       | Int     | 手表存储的天数                                               |
+| Parameter name | Type | Remarks |
+| -------------- | ------- | --------------------------------------------------------------- |
+| day | Int | Read the position, 0 means today, 1 means yesterday, 2 means the day before yesterday, and so on. The reading order is today-yesterday-the day before yesterday |
+| position | Int | The position of the number of items to be read. This value must be greater than or equal to 1 |
+| onlyReadOneDay | Boolean | true means reading only today, false means reading sequentially |
+| watchday | Int | Number of days stored by the watch |
 
-###### 返回数据
+###### Return data
 
-**IOriginDataListener** -- 日常数据返回监听
+**IOriginDataListener** -- daily data return monitoring
 
 ```kotlin
 /**
- * 返回5分钟原始数据
+ * Return 5 minutes of raw data
  *
- * @param originData 5分钟一条的原始数据
+ * @param originData 5-minute original data
  */
 fun onOringinFiveMinuteDataChange(originData:OriginData)
 
 /**
- * 返回30分钟的原始数据，数据来自5分钟原始数据，只是在内部进行了处理后返回
+ * Returns 30 minutes of raw data. The data comes from 5 minutes of raw data, but is returned after internal processing.
  *
- * @param originHalfHourData 30分钟一条的原始数据
+ * @param originHalfHourData 30-minute raw data
  */
 fun onOringinHalfHourDataChange(originHalfHourData:OriginHalfHourData )
 
 /***
- * 返回读取的细节，此包的位置需要记住，下次读取数据时，传入此包的位置，可以避免重复读取
+ * Return the reading details. The location of this package needs to be remembered. The next time you read data, pass in the location of this package to avoid repeated reading.
  *
- * @param day            数据在手表中的标志位[0=今天，1=昨天，2=前天]
- * @param date           数据的日期,格式为yyyy-mm-dd
- * @param allPackage     当天数据的总包数
- * @param currentPackage 此包的位置
+ * @param day The flag of the data in the watch [0=today, 1=yesterday, 2=the day before yesterday]
+ * @param date The date of the data, in the format of yyyy-mm-dd
+ * @param allPackage The total number of packages of data on the day
+ * @param currentPackage The location of this package
  */
-fun onReadOriginProgressDetail(day: Int,date: String?,allPackage: Int,currentPackage: Int)
+fun onReadOriginProgressDetail(day: Int, date: String?, allPackage: Int, currentPackage: Int)
 
 /**
- * 返回读取的进度
+ * Return the progress of reading
  *
- * @param progress 进度值，范围[0-1]
+ * @param progress progress value, range [0-1]
  */
 fun onReadOriginProgress(progress:Float)
 
 /**
- * 读取结束
+ * End of reading
  */
 fun onReadOriginComplete();
 ```
 
-**IOriginData3Listener** -- 日常数据返回监听（继承自IOriginDataListener）
+**IOriginData3Listener** -- daily data return monitoring (inherited from IOriginDataListener)
 
 ```kotlin
 /**
- * 该接口会在该天数据读取结束后回调。（一个OriginData3数据表示一个五分钟原始数据，一天最多24小时*60分钟/5分钟 = 288块五分钟原始数据）
- * 例如读取三天的原始数据则会依次返回今天-昨天-前天的五分钟原始数据列表，
- * 具体看读取几天的原始数据，读几天则会调用几次该接口
+ * This interface will call back after the day's data reading is completed. (One OriginData3 data represents a five-minute raw data, and a maximum of 24 hours * 60 minutes / 5 minutes = 288 pieces of five-minute raw data in a day)
+ * For example, reading three days of raw data will return the five-minute raw data list of today - yesterday - the day before yesterday.
+ * Specifically, it depends on how many days of raw data have been read. How many days will the interface be called?
  *
- * @param originDataList 返回一个5分钟数据的列表，心率值是一个数组，其对应字段的是getPpgs()，不是getRateValue()
+ * @param originDataList returns a list of 5-minute data. The heart rate value is an array, and its corresponding field is getPpgs(), not getRateValue()
  */
 fun onOriginFiveMinuteListDataChange(originDataList:List<OriginData3>)
 
 
 /**
- * 当该天原始数据读取结束后去统计五分钟原始数据局列表生产30分钟数据列表
+ * When the raw data reading of the day is completed, the five-minute raw data list will be calculated to produce a 30-minute data list.
  *
- * @param originHalfHourDataList 返回一个30分钟数据的对象
+ * @param originHalfHourDataList returns an object of 30 minutes of data
  */
 fun onOriginHalfHourDataChange(originHalfHourDataList:OriginHalfHourData)
 
 /**
- * 读取该天的原始数据结束后统计产生当天的HRV数据列表
+ * After reading the original data of the day, the HRV data list of the day is generated.
  *
- * @param originHrvDataList 返回一个hrv数据的列表
+ * @param originHrvDataList returns a list of hrv data
  */
 fun onOriginHRVOriginListDataChange(originHrvDataList:List<HRVOriginData>)
 
 /**
- * 读取该天的原始数据结束后统计产生当天的血氧数据列表
+ * After reading the original data of the day, the blood oxygen data list of the day is generated.
  *
- * @param originSpo2hDataList 返回一个血氧数据的列表
+ * @param originSpo2hDataList returns a list of blood oxygen data
  */
 fun onOriginSpo2OriginListDataChange(originSpo2hDataList:List<Spo2hOriginData>)
 ```
 
-**OriginData3** -- 5分钟日常数据(继承OriginData，原基础上增加多了一下数据返回)
+**OriginData3** -- 5 minutes of daily data (inherited from OriginData, with a little more data returned based on the original)
 
-| 变量           | 类型           | 备注                 |
+| Variable | Type | Remarks |
 | -------------- | -------------- | -------------------- |
-| gesture        | IntArray       | 佩戴姿态类型         |
-| ppgs           | IntArray       | 5分钟脉率值          |
-| ecgs           | IntArray       | 5分钟心率值          |
-| resRates       | IntArray       | 5分钟呼吸率值        |
-| sleepStates    | IntArray       | 5分钟睡眠状态值      |
-| oxygens        | IntArray       | 5分钟血氧值          |
-| apneaResults   | IntArray       | 呼吸暂停次数数组     |
-| hypoxiaTimes   | IntArray       | 缺氧时间数组         |
-| cardiacLoads   | IntArray       | 心脏负荷数组         |
-| isHypoxias     | IntArray       | 呼吸暂停结果数组     |
-| corrects       | IntArray       | 血氧矫正值字符串数组 |
-| bloodGlucose   | Int            | 血糖值               |
-| bloodComponent | BloodComponent | 血液成分             |
-|                |                |                      |
+| gesture | IntArray | Wearing gesture type |
+| ppgs | IntArray | 5-minute pulse rate value |
+| ecgs | IntArray | 5-minute heart rate value |
+| resRates | IntArray | 5-minute respiratory rate value |
+| sleepStates | IntArray | 5-minute sleep state value |
+| oxygens | IntArray | 5-minute blood oxygen value |
+| apneaResults | IntArray | Apnea count array |
+| hypoxiaTimes | IntArray | Hypoxia time array |
+| cardiacLoads | IntArray | cardiac load array |
+| isHypoxias | IntArray | Apnea result array |
+| corrects | IntArray | Blood oxygen correction value string array |
+| bloodGlucose | Int | blood glucose level |
+| bloodComponent | BloodComponent | blood component |
+| | | |
 
-**BloodComponent** --血液成分
+**BloodComponent** --blood component
 
-| 变量     | 类型  | 备注                                                         |
-| -------- | ----- | ------------------------------------------------------------ |
-| uricAcid | Float | 尿酸值：单位μmol/L，值域[90.0, 1000.0]，上报值域[900, 10000] |
-| tCHO     | Float | 总胆固醇：单位mmol/L，值域[0.01, 100.00]，上报值域[1, 10000] |
-| tAG      | Float | 甘油三酯：单位mmol/L，值域[0.01, 100.00]                     |
-| hDL      | Float | 高密度脂蛋白：单位mmol/L，值域[0.01, 100.00]                 |
-| lDL      | Float | 低密度脂蛋白：单位mmol/L，值域[0.01, 100.00]                 |
+| Variable | Type | Remarks |
+| -------- | ----- | --------------------------------------------------------------- |
+| uricAcid | Float | Uric acid value: unit μmol/L, value range [90.0, 1000.0], reporting value range [900, 10000] |
+| tCHO | Float | Total cholesterol: unit mmol/L, value range [0.01, 100.00], reporting value range [1, 10000] |
+| tAG | Float | Triglyceride: unit mmol/L, value range [0.01, 100.00] |
+| hDL | Float | High-density lipoprotein: unit mmol/L, value range [0.01, 100.00] |
+| lDL | Float | Low-density lipoprotein: unit mmol/L, value range [0.01, 100.00] |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1003,104 +1001,104 @@ VPOperateManager.getInstance().readOriginData({
 },3)
 ```
 
-## 个性化设置
+## Personalization settings
 
-#### 读取个性化设置
+#### Read personalized settings
 
-读取个性化设置,个性化设置包含公英制的功能,公英的开关状态,时间制式的状态,自动检测心率的开关状态,自动检测血压的开关状态等
+Read the personalized settings, which include the function of metric and imperial systems, the switch status of metric and British systems, the status of time format, the switch status of automatic heart rate detection, the switch status of automatic blood pressure detection, etc.
 
 ```kotlin
 readCustomSetting(bleWriteResponse,customSettingDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                    | 类型                       | 备注                                      |
-| ------------------------- | -------------------------- | ----------------------------------------- |
-| bleWriteResponse          | IBleWriteResponse          | 写入操作的监听                            |
-| customSettingDataListener | ICustomSettingDataListener | 个性化设置操作的监听,返回个性化设置的数据 |
+| Parameter name | Type | Remarks |
+|--------------------------|----------------------------------|---------------------------------------------------|
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| customSettingDataListener | ICustomSettingDataListener | Monitoring of personalized setting operations, returning personalized setting data |
 
-###### 返回数据
+###### Return data
 
 ICustomSettingDataListener
 
 ```kotlin
 /**
- * 返回个性化设置的数据
+ * Return personalized settings data
  *
- * @param customSettingData 个性化设置的数据
+ * @param customSettingData Personalized setting data
  */
 fun OnSettingDataChange(customSettingData: CustomSettingData?)
 ```
 
 **CustomSettingData**
 
-| 变量                  | 类型              | 备注                                                         |
-| --------------------- | ----------------- | ------------------------------------------------------------ |
-| status                | ECustomStatus     | 获取操作的状态                                               |
-| is24Hour              | boolean           | 时间格式是否是24小时                                         |
-| metricSystem          | EFunctionStatus   | 公英制：[SUPPORT_OPEN表示公制,SUPPORT_CLOSE表示英制,UNSOUPRT表示不支持] |
-| autoHeartDetect       | EFunctionStatus   | 心率自动测量                                                 |
-| autoBpDetect          | EFunctionStatus   | 血压自动检测                                                 |
-| sportOverRemain       | EFunctionStatus   | 运动过量提醒                                                 |
-| voiceBpHeart          | EFunctionStatus   | 血压/心率播报                                                |
-| findPhoneUi           | EFunctionStatus   | 控制查找手机UI                                               |
-| secondsWatch          | EFunctionStatus   | 秒表                                                         |
-| lowSpo2hRemain        | EFunctionStatus   | 低氧报警                                                     |
-| skin                  | EFunctionStatus   | 肤色功能                                                     |
-| autoHrv               | EFunctionStatus   | HRV自动检测                                                  |
-| autoIncall            | EFunctionStatus   | 自动接听来电                                                 |
-| disconnectRemind      | EFunctionStatus   | 断连提醒                                                     |
-| SOS                   | EFunctionStatus   | 求救                                                         |
-| ppg                   | EFunctionStatus   | ppg功能：脉率自动监测-->科学睡眠-->ppg                       |
-| musicControl          | EFunctionStatus   | 音乐控制                                                     |
-| longClickLockScreen   | EFunctionStatus   | 长按锁屏                                                     |
-| messageScreenLight    | EFunctionStatus   | 消息亮屏功能                                                 |
-| autoTemperatureDetect | EFunctionStatus   | 体温自动检测                                                 |
-| temperatureUnit       | ETemperatureUnit  | 体温单位设置                                                 |
-| ecgAlwaysOpen         | EFunctionStatus   | ecg常开                                                      |
-| bloodGlucoseDetection | EFunctionStatus   | 血糖检测                                                     |
-| METDetect             | EFunctionStatus   | 梅托检测                                                     |
-| stressDetect          | EFunctionStatus   | 压力检测                                                     |
-| bloodGlucoseUnit      | EBloodGlucoseUnit | 血糖单位                                                     |
-| skinLevel             | Int               | 肤色等级                                                     |
-| bloodComponentDetect  | EFunctionStatus   | 血液成分开关                                                 |
-| uricAcidUnit          | EUricAcidUnit     | 尿酸单位                                                     |
-| bloodFatUnit          | EBloodFatUnit     | 血脂单位                                                     |
+| Variable | Type | Remarks |
+| ------------------------ | ----------------- | --------------------------------------------------------------- |
+| status | ECustomStatus | Get the status of the operation |
+| is24Hour | boolean | Whether the time format is 24 hours |
+| metricSystem | EFunctionStatus | Metric and imperial systems: [SUPPORT_OPEN indicates metric system, SUPPORT_CLOSE indicates imperial system, UNSOUPRT indicates not supported] |
+| autoHeartDetect | EFunctionStatus | Automatic heart rate measurement |
+| autoBpDetect | EFunctionStatus | Blood pressure automatic detection |
+| sportOverRemain | EFunctionStatus | Excessive exercise reminder |
+| voiceBpHeart | EFunctionStatus | Blood pressure/heart rate broadcast |
+| findPhoneUi | EFunctionStatus | Control the search phone UI |
+| secondsWatch | EFunctionStatus | Stopwatch |
+| lowSpo2hRemain | EFunctionStatus | Low oxygen alarm |
+| skin | EFunctionStatus | skin color function |
+| autoHrv | EFunctionStatus | HRV automatic detection |
+| autoIncall | EFunctionStatus | Automatically answer incoming calls |
+| disconnectRemind | EFunctionStatus | Disconnect Reminder |
+| SOS | EFunctionStatus | Help |
+| ppg | EFunctionStatus | ppg function: automatic pulse rate monitoring --> scientific sleep --> ppg |
+| musicControl | EFunctionStatus | music control |
+| longClickLockScreen | EFunctionStatus | Long press lock screen |
+| messageScreenLight | EFunctionStatus | message light screen function |
+| autoTemperatureDetect | EFunctionStatus | Automatic body temperature detection |
+| temperatureUnit | ETemperatureUnit | Body temperature unit setting |
+| ecgAlwaysOpen | EFunctionStatus | ecgAlwaysOpen |
+| bloodGlucoseDetection | EFunctionStatus | Blood Glucose Detection |
+| METDetect | EFunctionStatus | METDetect |
+| stressDetect | EFunctionStatus | Stress Detection |
+| bloodGlucoseUnit | EBloodGlucoseUnit | Blood Glucose Unit |
+| skinLevel | Int | Skin tone level |
+| bloodComponentDetect | EFunctionStatus | Blood component switch |
+| uricAcidUnit | EUricAcidUnit | Uric acid unit |
+| bloodFatUnit | EBloodFatUnit | blood lipid unit |
 
 **EBloodGlucoseUnit**
 
-| 参数名 | 备注                       |
+| Parameter name | Remarks |
 | ------ | -------------------------- |
-| NONE   | 无单位，表示不支持单位设置 |
-| mmol_L | mmol/L                     |
-| mg_dl  | mg/dl                      |
+| NONE | No unit, indicating that unit setting is not supported |
+| mmol_L | mmol/L |
+| mg_dl | mg/dl |
 
 **EUricAcidUnit**
 
-| 参数名 | 备注                       |
+| Parameter name | Remarks |
 | ------ | -------------------------- |
-| NONE   | 无单位，表示不支持单位设置 |
-| umol_L | umol/L                     |
-| mg_dl  | mg/dl                      |
+| NONE | No unit, indicating that unit setting is not supported |
+| umol_L | umol/L |
+| mg_dl | mg/dl |
 
 **EBloodFatUnit**
 
-| 参数名 | 备注                       |
+| Parameter name | Remarks |
 | ------ | -------------------------- |
-| NONE   | 无单位，表示不支持单位设置 |
-| mmol_L | mmol/L                     |
-| mg_dl  | mg/dl                      |
+| NONE | No unit, indicating that unit setting is not supported |
+| mmol_L | mmol/L |
+| mg_dl | mg/dl |
 
 **ETemperatureUnit**
 
-| 参数名     | 备注                       |
+| Parameter name | Remarks |
 | ---------- | -------------------------- |
-| NONE       | 无单位，表示不支持单位设置 |
-| CELSIUS    | 摄氏度                     |
-| FAHRENHEIT | 华氏度                     |
+| NONE | No unit, indicating that unit setting is not supported |
+| CELSIUS | Celsius |
+| FAHRENHEIT | Fahrenheit |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -1114,64 +1112,64 @@ VPOperateManager.getInstance().readCustomSetting({
 })
 ```
 
-#### 修改个性化设置
+#### Modify personalization settings
 
-修改个性化设置,个性化设置包含公英制的功能,公英的开关状态,时间制式的状态,自动检测心率的开关状态,自动检测血压的开关状态等
+Modify the personalized settings. The personalized settings include the function of metric and imperial systems, the switch status of metric and British systems, the status of time format, the switch status of automatic heart rate detection, the switch status of automatic blood pressure detection, etc.
 
 ```kotlin
 changeCustomSetting(bleWriteResponse, customSettingDataListener, customSetting)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                    | 类型                       | 备注                                      |
-| ------------------------- | -------------------------- | ----------------------------------------- |
-| bleWriteResponse          | IBleWriteResponse          | 写入操作的监听                            |
-| customSettingDataListener | ICustomSettingDataListener | 个性化设置操作的监听,返回个性化设置的数据 |
-| customSetting             | CustomSetting              | 个性化的设置数据                          |
+| Parameter name | Type | Remarks |
+|--------------------------|----------------------------------|---------------------------------------------------|
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| customSettingDataListener | ICustomSettingDataListener | Monitoring of personalized setting operations, returning personalized setting data |
+| customSetting | CustomSetting | Personalized setting data |
 
 **CustomSetting**
 
-| 参数名                      | 类型              | 备注                                                         |
-| --------------------------- | ----------------- | ------------------------------------------------------------ |
-| isHaveMetricSystem          | boolean           | 设置公英制的功能状态，返回true表示有此功能，可以设置公英制；返回false表示无此功能，不可以设置公英制 |
-| isMetricSystem              | boolean           | 设置公英制的值，返回true表示公制，返回false表示英制,设备语言设置成[英语或繁体]才能体现英制 |
-| is24Hour                    | boolean           | 设置时间制的值，返回ture表示24小时制，false表示12小时制      |
-| isOpenAutoHeartDetect       | boolean           | 设置自动测量心率的状态，返回true表示打开了自动测量心率功能，返回false表示关闭自动测量心率功能 |
-| isOpenAutoBpDetect          | boolean           | 设置自动测量血压的状态，返回true表示打开了自动测量血压功能，返回false表示关闭自动测量血压功能 |
-| temperatureUnit             | ETemperatureUnit  | 设置温度单位                                                 |
-| isOpenSportRemain           | EFunctionStatus   | 设置运动过量的状态，SUPPORT_OPEN 表示打开了运动过量提醒功能，SUPPORT_CLOSE 表示关闭运动过量提醒功能; UNSUPPORT表示不支持 |
-| isOpenVoiceBpHeart          | EFunctionStatus   | 设置心率/血氧/血压的状态,SUPPORT_OPEN 表示打开了心率/血氧/血压播报功能，SUPPORT_CLOSE 表示关闭心率/血氧/血压播报功能; UNSUPPORT表示不支持 |
-| isOpenFindPhoneUI           | EFunctionStatus   | 设置手机查找的状态，SUPPORT_OPEN 表示打开了手机查找功能，SUPPORT_CLOSE 表示关闭手机查找功能; UNSUPPORT表示不支持 |
-| isOpenStopWatch             | EFunctionStatus   | 设置是否打开秒表功能，SUPPORT_OPEN 表示打开了秒表功能，SUPPORT_CLOSE 表示关闭秒表功能; UNSUPPORT表示不支持 |
-| isOpenSpo2hLowRemind        | EFunctionStatus   | 设置低氧提醒，SUPPORT_OPEN 表示打开了低氧提醒功能，SUPPORT_CLOSE 表示关闭低氧提醒功能; UNSUPPORT表示不支持 |
-| isOpenWearDetectSkin        | EFunctionStatus   | 设置打开肤色佩戴监测，SUPPORT_OPEN 表示偏白色肤色 ，SUPPORT_CLOSE 表示偏黑色肤色; UNSUPPORT表示不支持 |
-| skinType                    | Int               | 肤色档位设置，范围0-6，从白色肤色-偏黑色肤色逐步递增，仅VpSpGetUtil.getVpSpVariInstance(mContext).getSkinType() == 2时设置，其他肤色类型设置无效 |
-| isOpenAutoHRV               | EFunctionStatus   | 设置HRV自动检测功能                                          |
-| isOpenAutoInCall            | EFunctionStatus   | 设置自动接听来电功能                                         |
-| isOpenDisconnectRemind      | EFunctionStatus   | 设置断连提醒功能                                             |
-| isOpenSOS                   | EFunctionStatus   | 设置求救功能                                                 |
-| isOpenAutoTemperatureDetect | EFunctionStatus   | 设置体温自动检测功能                                         |
-| ecgAlwaysOpen               | EFunctionStatus   | 设置ecg常开功能                                              |
-| METDetect                   | EFunctionStatus   | 设置梅托检测功能                                             |
-| stressDetect                | EFunctionStatus   | 设置压力检测功能                                             |
-| isOpenPPG                   | EFunctionStatus   | 设置ppg功能，ppg开关也是精准睡眠开关                         |
-| isOpenMusicControl          | EFunctionStatus   | 设置音乐控制功能                                             |
-| isOpenLongClickLockScreen   | EFunctionStatus   | 设置长按锁屏                                                 |
-| isOpenMessageScreenLight    | EFunctionStatus   | 设置消息亮屏                                                 |
-| isOpenBloodGlucoseDetect    | EFunctionStatus   | 设置血糖自动检测功能                                         |
-| bloodGlucoseUnit            | EBloodGlucoseUnit | 设置血糖单位                                                 |
-| isOpenBloodComponentDetect  | EFunctionStatus   | 血液成分自动检测功能                                         |
-| uricAcidUnit                | EUricAcidUnit     | 尿酸单位设置                                                 |
-| bloodFatUnit                | EBloodFatUnit     | 血脂单位设置                                                 |
+| Parameter name | Type | Remarks |
+| --------------------------------- | ----------------- | --------------------------------------------------------------- |
+| isHaveMetricSystem | boolean | Set the function status of metric and imperial systems. Return true to indicate that this function is available and metric and imperial systems can be set; return false to indicate that there is no such function and metric and imperial systems cannot be set |
+| isMetricSystem | boolean | Set the value of metric and imperial systems, return true to indicate metric system, return false to indicate imperial system, the device language is set to [English or Traditional] to reflect the imperial system |
+| is24Hour | boolean | Set the value of the time system, return true to indicate the 24-hour system, false to indicate the 12-hour system |
+| isOpenAutoHeartDetect | boolean | Set the status of automatic heart rate measurement. Returning true means that the automatic heart rate measurement function is turned on, and returning false means that the automatic heart rate measurement function is turned off |
+| isOpenAutoBpDetect | boolean | Set the status of automatic blood pressure measurement. Returning true means that the automatic blood pressure measurement function is turned on, and returning false means that the automatic blood pressure measurement function is turned off |
+| temperatureUnit | ETemperatureUnit | Set temperature unit |
+| isOpenSportRemain | EFunctionStatus | Set the status of excessive exercise, SUPPORT_OPEN means the excessive exercise reminder function is turned on, SUPPORT_CLOSE means the excessive exercise reminder function is turned off; UNSUPPORT means it is not supported |
+| isOpenVoiceBpHeart | EFunctionStatus | Set the status of heart rate/blood oxygen/blood pressure, SUPPORT_OPEN means the heart rate/blood oxygen/blood pressure reporting function is turned on, SUPPORT_CLOSE means the heart rate/blood oxygen/blood pressure reporting function is turned off; UNSUPPORT means it is not supported |
+| isOpenFindPhoneUI | EFunctionStatus | Set the status of mobile phone search, SUPPORT_OPEN means the mobile phone search function is turned on, SUPPORT_CLOSE means the mobile phone search function is turned off; UNSUPPORT means it is not supported |
+| isOpenStopWatch | EFunctionStatus | Set whether to turn on the stopwatch function, SUPPORT_OPEN means the stopwatch function is turned on, SUPPORT_CLOSE means the stopwatch function is turned off; UNSUPPORT means it is not supported |
+| isOpenSpo2hLowRemind | EFunctionStatus | Set the low oxygen reminder, SUPPORT_OPEN means the low oxygen reminder function is turned on, SUPPORT_CLOSE means the low oxygen reminder function is turned off; UNSUPPORT means it is not supported |
+| isOpenWearDetectSkin | EFunctionStatus | Set to open skin color wearing detection, SUPPORT_OPEN means white skin color, SUPPORT_CLOSE means black skin color; UNSUPPORT means not supported |
+| skinType | Int | Skin color gear setting, range 0-6, gradually increasing from white skin color to black skin color, only set when VpSpGetUtil.getVpSpVariInstance(mContext).getSkinType() == 2, other skin color type settings are invalid |
+| isOpenAutoHRV | EFunctionStatus | Set the HRV automatic detection function |
+| isOpenAutoInCall | EFunctionStatus | Set the function of automatically answering incoming calls |
+| isOpenDisconnectRemind | EFunctionStatus | Set the disconnection reminder function |
+| isOpenSOS | EFunctionStatus | Set the help function |
+| isOpenAutoTemperatureDetect | EFunctionStatus | Set the automatic body temperature detection function |
+| ecgAlwaysOpen | EFunctionStatus | Set the ecg normally open function |
+| METDetect | EFunctionStatus | Set METDetect function |
+| stressDetect | EFunctionStatus | Set the stress detection function |
+| isOpenPPG | EFunctionStatus | Set the ppg function, the ppg switch is also a precise sleep switch |
+| isOpenMusicControl | EFunctionStatus | Set music control function |
+| isOpenLongClickLockScreen | EFunctionStatus | Set long press lock screen |
+| isOpenMessageScreenLight | EFunctionStatus | Set message light screen |
+| isOpenBloodGlucoseDetect | EFunctionStatus | Set the automatic blood glucose detection function |
+| bloodGlucoseUnit | EBloodGlucoseUnit | Set blood glucose unit |
+| isOpenBloodComponentDetect | EFunctionStatus | Blood component automatic detection function |
+| uricAcidUnit | EUricAcidUnit | Uric acid unit setting |
+| bloodFatUnit | EBloodFatUnit | Blood lipid unit setting |
 
-注意：**如果要设置某个功能的开关，需先读取个性化设置，判断该功能是否支持，如果支持才能设置开关状态，如果不支持，仍需下发不支持指令。**
+Note: **If you want to set the switch of a certain function, you need to read the personalized settings first to determine whether the function is supported. If it is supported, you can set the switch status. If it is not supported, you still need to issue a non-support command. **
 
-###### 返回数据
+###### Return data
 
-ICustomSettingDataListener  同【[读取个性化设置](#读取个性化设置-readCustomSetting)】返回数据一致
+ICustomSettingDataListener returns the same data as [[Read Personalized Settings](#Read Personalized Settings-readCustomSetting)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1185,67 +1183,67 @@ VPOperateManager.getInstance().changeCustomSetting({
 },customSetting)
 ```
 
-## 翻腕亮屏功能
+## Turn your wrist to brighten the screen function
 
-#### 前提
+#### Prerequisites
 
-设备需支持翻腕亮屏功能，判断条件如下：
+The device must support the function of turning your wrist to turn on the screen, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportNightturnSetting
 ```
 
-#### 读取翻腕亮屏
+#### Read and turn your wrist to brighten the screen
 
-设备需支持翻腕亮屏功能
+The device must support the function of turning the wrist to turn on the screen.
 
-###### 接口
+###### API
 
 ```
 readNightTurnWriste(bleWriteResponse, nightTurnWristeDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                      | 类型                         | 备注             |
-| --------------------------- | ---------------------------- | ---------------- |
-| bleWriteResponse            | IBleWriteResponse            | 写入操作的监听   |
-| nightTurnWristeDataListener | INightTurnWristeDataListener | 翻腕亮屏数据监听 |
+| Parameter name | Type | Remarks |
+| --------------------------- | --------------------------- | ------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| nightTurnWristeDataListener | INightTurnWristeDataListener | turn your wrist to brighten the screen data monitoring |
 
-###### 返回数据
+###### Return data
 
-**INightTurnWristeDataListener** -- 翻腕亮屏数据监听
+**INightTurnWristeDataListener** -- turning the wrist to turn on the screen data monitoring
 
 ```kotlin
 /**
- * 返回翻腕亮屏[也称抬手亮屏]的数据
+ * Returns the data of turning the wrist to turn on the screen [also called raising the hand to turn on the screen]
  *
- * @param nightTurnWristeData 抬手亮屏的数据
+ * @param nightTurnWristeData Data for raising your hand to light up the screen
  */
 fun onNightTurnWristeDataChange(nightTurnWristeData:NightTurnWristeData)
 ```
 
-**NightTurnWristeData** -- 抬手亮屏的数据
+**NightTurnWristeData** -- Data for raising your hand to brighten the screen
 
-| 变量                       | 类型                   | 备注                               |
-| -------------------------- | ---------------------- | ---------------------------------- |
-| OprateStauts               | ENightTurnWristeStatus | 操作翻腕亮屏状态                   |
-| isSupportCustomSettingTime | Boolean                | 是否支持自定义时间设置，true为支持 |
-| nightTureWirsteStatusOpen  | Boolean                | 翻腕亮屏是否打开                   |
-| startTime                  | TimeData               | 开始时间                           |
-| endTime                    | TimeData               | 结束时间                           |
-| level                      | Int                    | 敏感等级                           |
-| defaultLevel               | Int                    | 默认等级                           |
+| Variable | Type | Remarks |
+| -------------------------- | -------------------------- | ---------------------------------- |
+| OprateStauts | ENightTurnWristeStatus | Operation wrist turn to brighten the screen status |
+| isSupportCustomSettingTime | Boolean | Whether to support custom time settings, true means supported |
+| nightTureWirsteStatusOpen | Boolean | Whether to turn the wrist to brighten the screen is on |
+| startTime | TimeData | start time |
+| endTime | TimeData | end time |
+| level | Int | Sensitivity level |
+| defaultLevel | Int | Default level |
 
-**ENightTurnWristeStatus** -- 状态
+**ENightTurnWristeStatus** -- status
 
-| 变量    | 备注     |
+| Variables | Remarks |
 | ------- | -------- |
-| SUCCESS | 成功     |
-| FAIL    | 失败     |
-| UNKONW  | 未知状态 |
+| SUCCESS | Success |
+| FAIL | Failure |
+| UNKONW | Unknown status |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().readNightTurnWriste({
@@ -1257,38 +1255,38 @@ VPOperateManager.getInstance().readNightTurnWriste({
 })
 ```
 
-#### 设置翻腕亮屏
+#### Set to turn your wrist to turn on the screen
 
-需设备支持翻腕亮屏功能
+The device needs to support the function of turning the wrist to brighten the screen.
 
-###### 接口
+###### API
 
 ```
 settingNightTurnWriste(IBleWriteResponse bleWriteResponse, INightTurnWristeDataListener nightTurnWristeDataListener, NightTurnWristSetting nightTurnWristSetting)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                      | 类型                         | 备注             |
-| --------------------------- | ---------------------------- | ---------------- |
-| bleWriteResponse            | IBleWriteResponse            | 写入操作的监听   |
-| nightTurnWristeDataListener | INightTurnWristeDataListener | 翻腕亮屏数据监听 |
-| nightTurnWristSetting       | NightTurnWristSetting        | 翻腕亮屏设置     |
+| Parameter name | Type | Remarks |
+| --------------------------- | --------------------------- | ------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| nightTurnWristeDataListener | INightTurnWristeDataListener | turn your wrist to brighten the screen data monitoring |
+| nightTurnWristSetting | NightTurnWristSetting | Turn your wrist to brighten the screen setting |
 
-**NightTurnWristSetting** -- 翻腕亮屏设置
+**NightTurnWristSetting** -- turning the wrist to brighten the screen setting
 
-| 参数名    | 类型     | 备注                             |
+| Parameter name | Type | Remarks |
 | --------- | -------- | -------------------------------- |
-| isOpen    | Boolean  | 是否打开                         |
-| startTime | TimeData | 开始时间                         |
-| endTime   | TimeData | 结束时间                         |
-| level     | Int      | 翻腕等级：范围【1-10.】，默认是5 |
+| isOpen | Boolean | Whether to open |
+| startTime | TimeData | start time |
+| endTime | TimeData | end time |
+| level | Int | Wrist turning level: range [1-10.], default is 5 |
 
-###### 返回数据
+###### Return data
 
-同【[读取夜间翻腕](#读取夜间翻腕)】返回数据一致
+Same as the data returned by [[Read Night-time Wrist Turn](#Read Night-time Wrist Turn)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1306,180 +1304,180 @@ VPOperateManager.getInstance().settingNightTurnWriste({
 }, nightTurnWristSetting)
 ```
 
-## 屏幕调节功能
+## Screen adjustment function
 
-#### 前提
+#### Prerequisites
 
-需设备支持屏幕调节功能，判断条件如下：
+The device needs to support the screen adjustment function, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportScreenlight
 ```
 
-#### 读取屏幕调节数据
+#### Read screen adjustment data
 
-需支持屏幕调节功能
+Need to support screen adjustment function
 
-###### 接口
+###### API
 
 ```kotlin
 readScreenLight(bleWriteResponse, screenLightListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名              | 类型                 | 备注             |
-| ------------------- | -------------------- | ---------------- |
-| bleWriteResponse    | IBleWriteResponse    | 写入操作的监听   |
-| screenLightListener | IScreenLightListener | 屏幕调节数据监听 |
+| Parameter name | Type | Remarks |
+| ------------------- | ------------------ | ------------------ |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| screenLightListener | IScreenLightListener | Screen adjustment data monitoring |
 
-###### 返回数据
+###### Return data
 
-**IScreenLightListener** -- 屏幕调节数据监听
+**IScreenLightListener** -- Screen adjustment data monitoring
 
 ```kotlin
 /**
- * 屏幕亮度调节的回调
+ * Callback for screen brightness adjustment
  *
  * @param screenLightData
  */
 fun onScreenLightDataChange(screenLightData:ScreenLightData);
 ```
 
-**ScreenLightData** -- 屏幕调节数据
+**ScreenLightData** -- screen adjustment data
 
-| 变量          | 类型          | 备注         |
+| Variable | Type | Remarks |
 | ------------- | ------------- | ------------ |
-| status        | EScreenLight  | 操作状态     |
-| screenSetting | ScreenSetting | 屏幕亮度设置 |
+| status | EScreenLight | Operation status |
+| screenSetting | ScreenSetting | Screen brightness setting |
 
-**EScreenLight** -- 操作状态
+**EScreenLight** -- Operation status
 
-| 变量            | 备注     |
+| Variables | Remarks |
 | --------------- | -------- |
-| SETTING_SUCCESS | 设置成功 |
-| SETTING_FAIL    | 设置失败 |
-| READ_SUCCESS    | 读取成功 |
-| READ_FAIL       | 读取失败 |
-| UNKONW          | 未知状态 |
+| SETTING_SUCCESS | Setting successful |
+| SETTING_FAIL | Setting failed |
+| READ_SUCCESS | Read successfully |
+| READ_FAIL | Read failed |
+| UNKONW | Unknown status |
 
-**ScreenSetting** -- 屏幕设置
+**ScreenSetting** -- screen settings
 
-| 变量        | 类型 | 备注                          |
+| Variable | Type | Remarks |
 | ----------- | ---- | ----------------------------- |
-| startHour   | Int  | 第一个档位作用开始小时        |
-| startMinute | Int  | 第一个档位作用开始分钟        |
-| endHour     | Int  | 第一个档位作用结束小时        |
-| endMinute   | Int  | 第一个档位作用结束分钟        |
-| level       | Int  | 设置时间段的第一个档位        |
-| otherLeverl | Int  | 其他时间段亮度档位            |
-| auto        | Int  | 自动调节：1自动 2手动 0旧协议 |
-| maxLevel    | Int  | 最大的亮度调节档位            |
+| startHour | Int | The first gear start hour |
+| startMinute | Int | The first gear start minute |
+| endHour | Int | The end hour of the first gear |
+| endMinute | Int | The end minute of the first gear |
+| level | Int | Set the first level of the time period |
+| otherLeverl | Int | Brightness level in other time periods |
+| auto | Int | Automatic adjustment: 1 automatic 2 manual 0 old protocol |
+| maxLevel | Int | Maximum brightness adjustment level |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().readScreenLight(
     writeResponse
 ) { screenLightData ->
-    val message = "屏幕调节数据-读取:$screenLightData"
+    val message = "Screen adjustment data-read: $screenLightData"
 }
 ```
 
-#### 设置屏幕调节数据
+#### Set screen adjustment data
 
-需设备支持屏幕调节
+The device needs to support screen adjustment
 
-###### 接口
+###### API
 
 ```kotlin
 settingScreenLight(bleWriteResponse, screenLightListener, screensetting)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名              | 类型                 | 备注             |
-| ------------------- | -------------------- | ---------------- |
-| bleWriteResponse    | IBleWriteResponse    | 写入操作的监听   |
-| screenLightListener | IScreenLightListener | 屏幕调节数据监听 |
-| screensetting       | ScreenSetting        | 屏幕设置参数     |
+| Parameter name | Type | Remarks |
+| ------------------- | ------------------ | ------------------ |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| screenLightListener | IScreenLightListener | Screen adjustment data monitoring |
+| screensetting | ScreenSetting | screen setting parameters |
 
-###### 返回数据
+###### Return data
 
-同【[读取屏幕调节数据](#读取屏幕调节数据)】返回的数据一致
+Same as the data returned by [[Read screen adjustment data](#Read screen adjustment data)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-//默认的是【22:00-07:00】设置成2档，其他时间设置成4档，用户可以自定义
+//The default is [22:00-07:00] set to level 2, other times set to level 4, users can customize
 VPOperateManager.getInstance().settingScreenLight(writeResponse,
     { screenLightData ->
-        val message = "屏幕调节数据-设置:$screenLightData"
+        val message = "Screen adjustment data-setting:$screenLightData"
     }, ScreenSetting(22, 0, 7, 0, 2, 4)
 )
 ```
 
-## 屏幕亮度时长功能
+## Screen brightness duration function
 
-#### 前提
+#### Prerequisites
 
-需设备支持屏幕亮度时长调节功能，判断代码如下：
+The device needs to support the screen brightness adjustment function. The judgment code is as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportScreenlightTime
 ```
 
-#### 读取屏幕亮屏时长
+#### Read the screen on time
 
-设备需支持屏幕亮屏时长调节功能
+The device needs to support the screen brightness adjustment function
 
-###### 接口
+###### API
 
 ```kotlin
 readScreenLightTime(bleWriteResponse, screenLightTimeListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                  | 类型                     | 备注             |
-| ----------------------- | ------------------------ | ---------------- |
-| bleWriteResponse        | IBleWriteResponse        | 写入操作的监听   |
-| screenLightTimeListener | IScreenLightTimeListener | 屏幕亮屏时长监听 |
+| Parameter name | Type | Remarks |
+| ----------------------- | ----------------------- | --------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| screenLightTimeListener | IScreenLightTimeListener | Screen light time monitoring |
 
-###### 返回数据
+###### Return data
 
-**IScreenLightTimeListener** -- 屏幕亮屏时长监听
+**IScreenLightTimeListener** -- monitor the screen brightness time
 
 ```kotlin
 /**
- * 屏幕亮屏时长的回调
+ * Callback for screen on duration
  *
  * @param screenLightTimeData
  */
 fun onScreenLightTimeDataChange(screenLightTimeData:ScreenLightTimeData)
 ```
 
-**screenLightTimeData** -- 屏幕亮屏时长数据
+**screenLightTimeData** -- screen light time data
 
-| 变量              | 类型             | 备注     |
-| ----------------- | ---------------- | -------- |
-| screenLightState  | EScreenLightTime | 回调状态 |
-| currentDuration   | Int              | 当前时长 |
-| recommendDuration | Int              | 推荐时长 |
-| maxDuration       | Int              | 最大时长 |
-| minDuration       | Int              | 最小时长 |
+| Variable | Type | Remarks |
+| ------------------ | ---------------- | -------- |
+| screenLightState | EScreenLightTime | callback state |
+| currentDuration | Int | Current duration |
+| recommendDuration | Int | Recommended duration |
+| maxDuration | Int | Maximum duration |
+| minDuration | Int | Minimum duration |
 
-**EScreenLightTime** -- 回调状态
+**EScreenLightTime** -- callback status
 
-| 变量            | 备注     |
+| Variables | Remarks |
 | --------------- | -------- |
-| SETTING_SUCCESS | 设置成功 |
-| SETTING_FAIL    | 设置失败 |
-| READ_SUCCESS    | 读取成功 |
-| READ_FAIL       | 读取失败 |
-| UNKONW          | 未知状态 |
+| SETTING_SUCCESS | Setting successful |
+| SETTING_FAIL | Setting failed |
+| READ_SUCCESS | Read successfully |
+| READ_FAIL | Read failed |
+| UNKONW | Unknown status |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1492,29 +1490,29 @@ VPOperateManager.getInstance()
     )
 ```
 
-#### 设置屏幕亮屏时长
+#### Set the screen on duration
 
-需设备支持屏幕亮度时长调节功能
+The device needs to support the screen brightness adjustment function
 
-###### 接口
+###### API
 
 ```kotlin
 setScreenLightTime(IBleWriteResponse bleWriteResponse, IScreenLightTimeListener screenLightTimeListener, int time) 
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                  | 类型                     | 备注               |
-| ----------------------- | ------------------------ | ------------------ |
-| bleWriteResponse        | IBleWriteResponse        | 写入操作的监听     |
-| screenLightTimeListener | IScreenLightTimeListener | 屏幕亮屏时长监听   |
-| time                    | Int                      | 亮屏时长，单位：秒 |
+| Parameter name | Type | Remarks |
+| ----------------------- | ---------------------------- | ------------------ |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| screenLightTimeListener | IScreenLightTimeListener | Screen light time monitoring |
+| time | Int | Screen on duration, unit: seconds |
 
-###### 返回数据
+###### Return data
 
-同【[读取屏幕亮屏时长](#读取屏幕亮屏时长)】返回数据一致
+The data returned is consistent with [[Read screen on screen duration](#Read screen on screen duration)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1528,94 +1526,94 @@ VPOperateManager.getInstance()
     )
 ```
 
-## 健康提醒
+## Health reminder
 
-#### 读取健康提醒
+#### Read health reminders
 
-###### 接口
+###### API
 
 ```kotlin
 readHealthRemind(healthRemindType, listener, bleWriteResponse)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                  | 备注             |
-| ---------------- | --------------------- | ---------------- |
-| healthRemindType | HealthRemindType      | 健康提醒类型     |
-| listener         | IHealthRemindListener | 健康提醒数据监听 |
-| bleWriteResponse | IBleWriteResponse     | 写入操作监听     |
+| Parameter name | Type | Remarks |
+|----------------|-----------------------------|----------------|
+| healthRemindType | HealthRemindType | Health reminder type |
+| listener | IHealthRemindListener | Health reminder data listening |
+| bleWriteResponse | IBleWriteResponse | Write operation monitoring |
 
-**HealthRemindType** --- 健康提醒类型
+**HealthRemindType** --- Health reminder type
 
-| 参数名        | 备注     |
+| Parameter name | Remarks |
 | ------------- | -------- |
-| ALL           | 所有提醒 |
-| SEDENTARY     | 久坐     |
-| DRINK_WATER   | 喝水     |
-| OVERLOOK      | 远眺     |
-| SPORTS        | 运动     |
-| TAKE_MEDICINE | 吃药     |
-| READING       | 看书     |
-| GOING_OUT     | 出行     |
-| WASH          | 洗手     |
+| ALL | All Reminders |
+| SEDENTARY | Sedentary |
+| DRINK_WATER | drink water |
+| OVERLOOK | OVERLOOK |
+| SPORTS | Sports |
+| TAKE_MEDICINE | Take medicine |
+| READING | Reading books |
+| GOING_OUT | GOING |
+| WASH | Hand washing |
 
-###### 返回数据
+###### Return data
 
-**IHealthRemindListener** -- 健康提醒数据监听
+**IHealthRemindListener** -- Health reminder data listening
 
 ```kotlin
 /**
- * 该功能不支持
+ * This function is not supported
  */
 fun functionNotSupport()
 
 /**
- * 健康提醒读取回调
- * @param healthRemind 健康提醒
+ * Health reminder reading callback
+ * @param healthRemind health reminder
  */
 fun onHealthRemindRead(healthRemind: HealthRemind)
 
 /**
- * 健康提醒读取失败
+ * Failed to read health reminder
  */
 fun onHealthRemindReadFailed()
 
 /**
- * 健康提醒主动上报回调
- * @param healthRemind 健康提醒
+ * Health reminder proactively reports callbacks
+ * @param healthRemind health reminder
  */
 fun onHealthRemindReport(healthRemind: HealthRemind)
 
 /**
- * 健康提醒主动上报失败
+ * Failed to proactively report health reminders
  */
 fun onHealthRemindReportFailed()
 
 /**
- * 健康提醒设置成功
- * @param healthRemind 健康提醒
+ * Health reminder set successfully
+ * @param healthRemind health reminder
  */
 fun onHealthRemindSettingSuccess(healthRemind: HealthRemind)
 
 /**
- * 健康提醒设置失败
- * @param healthRemindType 设置失败的健康提醒类型
+ * Health reminder setting failed
+ * @param healthRemindType health reminder type that failed to set
  */
 fun onHealthRemindSettingFailed(healthRemindType: HealthRemindType)
 ```
 
-**HealthRemind** -- 健康提醒
+**HealthRemind** -- Health Reminder
 
-| 参数名     | 类型             | 备注         |
-| ---------- | ---------------- | ------------ |
-| remindtype | HealthRemindType | 健康提醒类型 |
-| startTime  | TimeData         | 提醒开始时间 |
-| endTime    | TimeData         | 提醒结束时间 |
-| interval   | Int              | 提醒间隔     |
-| status     | Boolean          | 状态         |
+| Parameter name | Type | Remarks |
+| ---------- | ---------------- | ---------- |
+| remindertype | HealthRemindType | Health reminder type |
+| startTime | TimeData | Reminder start time |
+| endTime | TimeData | Reminder end time |
+| interval | Int | reminder interval |
+| status | Boolean | status |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1647,27 +1645,27 @@ VPOperateManager.getInstance()
     })
 ```
 
-#### 设置健康提醒
+#### Set health reminders
 
-###### 接口
+###### API
 
 ```kotlin
 settingHealthRemind(healthRemind, listener, bleWriteResponse)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                  | 备注             |
-| ---------------- | --------------------- | ---------------- |
-| healthRemind     | HealthRemind          | 健康提醒         |
-| listener         | IHealthRemindListener | 健康提醒数据监听 |
-| bleWriteResponse | IBleWriteResponse     | 写入操作监听     |
+| Parameter name | Type | Remarks |
+|----------------|-----------------------------|----------------|
+| healthRemind | HealthRemind | Health Reminder |
+| listener | IHealthRemindListener | Health reminder data listening |
+| bleWriteResponse | IBleWriteResponse | Write operation monitoring |
 
-###### 返回数据
+###### Return data
 
-**IHealthRemindListener** 同【[读取健康提醒](#读取健康提醒)】返回数据一致
+**IHealthRemindListener** is consistent with the data returned by [[Read Health Reminder](#Read Health Reminder)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1701,52 +1699,52 @@ VPOperateManager.getInstance()
     }
 ```
 
-## 心率功能
+## Heart rate function
 
-#### 开始手动测量心率-startDetectHeart
+#### Start manually measuring heart rate-startDetectHeart
 
 ```kotlin
 startDetectHeart(bleWriteResponse,heartDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型               | 备注               |
-| ----------------- | ------------------ | ------------------ |
-| bleWriteResponse  | IBleWriteResponse  | 写入操作的监听     |
-| heartDataListener | IHeartDataListener | 心率数据返回的监听 |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | ------------------ |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| heartDataListener | IHeartDataListener | Monitoring of heart rate data return |
 
-###### 返回数据
+###### Return data
 
 **IHeartDataListener**
 
 ```kotlin
 /**
- * 返回心率数据
+ * Return heart rate data
  *
- * @param heartData 心率数据
+ * @param heartData heart rate data
  */
 fun onDataChange(heartData:HeartData);
 ```
 
 **HeartData**
 
-| 变量        | 类型         | 备注                           |
-| ----------- | ------------ | ------------------------------ |
-| data        | Int          | 获取心率值,范围[20-300]        |
-| heartStatus | EHeartStatus | 测量心率时，设备可能返回的状态 |
+| Variable | Type | Remarks |
+| ---------- | ---------- | ------------------------------- |
+| data | Int | Get heart rate value, range [20-300] |
+| heartStatus | EHeartStatus | The status that the device may return when measuring heart rate |
 
 **EHeartStatus**
 
-| 变量                   | 备注               |
-| ---------------------- | ------------------ |
-| STATE_INIT             | 初使化             |
-| STATE_HEART_BUSY       | 设备正忙           |
-| STATE_HEART_DETECT     | 设备正在检测       |
-| STATE_HEART_WEAR_ERROR | 检测中，但佩戴有误 |
-| STATE_HEART_NORMAL     | 检测中             |
+| Variables | Remarks |
+| ----------------------- | ------------------ |
+| STATE_INIT | Initialization |
+| STATE_HEART_BUSY | Device is busy |
+| STATE_HEART_DETECT | Device being detected |
+| STATE_HEART_WEAR_ERROR | Detecting, but wearing incorrectly |
+| STATE_HEART_NORMAL | Detecting |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1760,23 +1758,23 @@ VPOperateManager.getInstance().startDetectHeart({
 })
 ```
 
-#### 结束手动测量心率-stopDetectHeart
+#### End manual heart rate measurement-stopDetectHeart
 
 ```
 stopDetectHeart(bleWriteResponse)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型              | 备注           |
-| ---------------- | ----------------- | -------------- |
-| bleWriteResponse | IBleWriteResponse | 写入操作的监听 |
+| Parameter name | Type | Remarks |
+|---------------- | ----------------- | --------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
 
-###### 返回数据
+###### Return data
 
-无
+None
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -1785,62 +1783,62 @@ VPOperateManager.getInstance().stopDetectHeart(){
 }
 ```
 
-#### 设置心率报警-settingHeartWarning
+#### Set heart rate alarm-settingHeartWarning
 
 ```kotlin
 settingHeartWarning(bleWriteResponse, heartWaringDataListener, heartWaringSetting)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                  | 类型                     | 备注           |
-| ----------------------- | ------------------------ | -------------- |
-| bleWriteResponse        | IBleWriteResponse        | 写入操作的监听 |
-| heartWaringDataListener | IHeartWaringDataListener | 心率报警的回调 |
-| heartWaringSetting      | HeartWaringSetting       | 心率报警的设置 |
+| Parameter name | Type | Remarks |
+| ----------------------- | ---------------------------- | --------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| heartWaringDataListener | IHeartWaringDataListener | Heart rate alarm callback |
+| heartWaringSetting | HeartWaringSetting | Heart rate alarm settings |
 
 **HeartWaringSetting**
 
-| 参数名    | 类型    | 备注                        |
-| --------- | ------- | --------------------------- |
-| heartHigh | Int     | 心率报警的上限              |
-| heartLow  | Int     | 心率报警的下限              |
-| isOpen    | boolean | true表示打开，false表示关闭 |
+| Parameter name | Type | Remarks |
+| --------- | ------- | ---------------------------- |
+| heartHigh | Int | Upper limit of heart rate alarm |
+| heartLow | Int | Lower limit of heart rate alarm |
+| isOpen | boolean | true means open, false means closed |
 
-###### 返回数据
+###### Return data
 
 IHeartWaringDataListener
 
 ```kotlin
 /**
- * 返回心率报警的数据
+ * Return heart rate alarm data
  *
- * @param heartWaringData 心率报警的数据
+ * @param heartWaringData heart rate alarm data
  */
 fun onHeartWaringDataChange(heartWaringData:HeartWaringData);
 ```
 
 **HeartWaringData**
 
-| 变量   | 类型               | 备注                                 |
-| ------ | ------------------ | ------------------------------------ |
-| status | EHeartWaringStatus | 心率报警的上限                       |
-| ...    | --                 | 其它参数与**HeartWaringSetting**相同 |
+| Variable | Type | Remarks |
+| ------ | ------------------ | ---------------------------------- |
+| status | EHeartWaringStatus | Upper limit of heart rate alarm |
+| ... | -- | Other parameters are the same as **HeartWaringSetting** |
 
 **EHeartWaringStatus**
 
-| 变量          | 备注     |
+| Variables | Remarks |
 | ------------- | -------- |
-| OPEN_SUCCESS  | 打开成功 |
-| OPEN_FAIL     | 打开失败 |
-| CLOSE_SUCCESS | 关闭成功 |
-| CLOSE_FAIL    | 关闭失败 |
-| READ_SUCCESS  | 读取成功 |
-| READ_FAIL     | 读取失败 |
-| UNSUPPORT     | 不支持   |
-| UNKONW        | 未知     |
+| OPEN_SUCCESS | Open successfully |
+| OPEN_FAIL | Open failed |
+| CLOSE_SUCCESS | Closed successfully |
+| CLOSE_FAIL | Close failed |
+| READ_SUCCESS | Read successfully |
+| READ_FAIL | Read failed |
+| UNSUPPORT | Not supported |
+| UNKONW | Unknown |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 // kotlin code
@@ -1855,24 +1853,24 @@ VPOperateManager.getInstance().settingHeartWarning({
 },heartWaringSetting)
 ```
 
-#### 读取心率报警-readHeartWarning
+#### Read heart rate alarm-readHeartWarning
 
 ```kotlin
 readHeartWarning(bleWriteResponse,heartWaringDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                  | 类型                     | 备注           |
-| ----------------------- | ------------------------ | -------------- |
-| bleWriteResponse        | IBleWriteResponse        | 写入操作的监听 |
-| heartWaringDataListener | IHeartWaringDataListener | 心率报警的回调 |
+| Parameter name | Type | Remarks |
+| ----------------------- | ---------------------------- | --------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| heartWaringDataListener | IHeartWaringDataListener | Heart rate alarm callback |
 
-###### 返回数据
+###### Return data
 
-IHeartWaringDataListener  与[设置心率报警-settingHeartWarning](#设置心率报警-settingHeartWarning)相同
+IHeartWaringDataListener is the same as [setting heart rate alarm-settingHeartWarning](#settingheart rate alarm-settingHeartWarning)
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 // kotlin code
@@ -1886,74 +1884,74 @@ VPOperateManager.getInstance().readHeartWarning({
 })
 ```
 
-#### 心率日常数据读取
+#### Reading daily heart rate data
 
-在[读取日常数据功能](#读取日常数据功能)中，会返回心率日常数据。
+In [Read Daily Data Function] (#Read Daily Data Function), daily heart rate data will be returned.
 
-#### 心率检测开关
+#### Heart rate detection switch
 
-在[修改个性化设置](#修改个性化设置-changeCustomSetting)中，可以设置心率检测的开关。
+In [Modify Personalized Settings](#Modify Personalized Settings-changeCustomSetting), you can set the switch of heart rate detection.
 
-## 体温功能
+## Body temperature function
 
-#### 前提
+#### Prerequisites
 
-在使用体温功能之前，需判断设备是否支持体温功能，在确认设置支持体温功能后方可使用体温功能相关接口
+Before using the body temperature function, you need to determine whether the device supports the body temperature function. Only after confirming that the settings support the body temperature function can you use the body temperature function related interfaces.
 
-判断条件：
+Judgment conditions:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportReadTempture
 ```
 
-#### 开始手动测量温度
+#### Start measuring temperature manually
 
-###### 前提
+###### Prerequisites
 
-1.需设备支持体温；
-2.设备支持体温测量。
+1. Equipment is required to support body temperature;
+2. The device supports body temperature measurement.
 
 ```kotlin
 1.VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportReadTempture 2.VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportCheckTemptureByApp
 ```
 
-###### 接口
+###### API
 
 ```kotlin
 startDetectTempture(bleWriteResponse, responseListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                        | 备注               |
-| ---------------- | --------------------------- | ------------------ |
-| bleWriteResponse | IBleWriteResponse           | 写入操作的监听     |
-| responseListener | ITemptureDetectDataListener | 温度数据的返回监听 |
+| Parameter name | Type | Remarks |
+|---------------- | --------------------------- | ------------------ |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| responseListener | ITemptureDetectDataListener | Temperature data return monitoring |
 
-###### 返回数据
+###### Return data
 
 **ITemptureDetectDataListener**
 
 ```kotlin
 /**
- * 返回温度数据
+ * Return temperature data
  *
- * @param temptureDetectData 温度数据
+ * @param temperatureDetectData temperature data
  */
 fun onDataChange(temptureDetectData:TemptureDetectData)
 ```
 
 **TemptureDetectData**
 
-| 变量         | 类型  | 备注                                                         |
-| ------------ | ----- | ------------------------------------------------------------ |
-| oprate       | Int   | 0x00 不支持此功能，0x01 开启，0x02关闭                       |
-| deviceState  | Int   | 0x00 可用，0x01-0x07 设备正忙，0x08 设备低电，0x09 传感器异常 |
-| progress     | Int   | 读取进度                                                     |
-| tempture     | Float | 体温值                                                       |
-| temptureBase | Float | 体温原始值,基准值                                            |
+| Variable | Type | Remarks |
+| ------------ | ----- | --------------------------------------------------------------- |
+| oprate | Int | 0x00 does not support this function, 0x01 turns it on, 0x02 turns it off |
+| deviceState | Int | 0x00 available, 0x01-0x07 device is busy, 0x08 device low power, 0x09 sensor abnormal |
+| progress | Int | Reading progress |
+| temperature | Float | body temperature |
+| temperatureBase | Float | Original value of body temperature, baseline value |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -1966,30 +1964,30 @@ fun onDataChange(temptureDetectData:TemptureDetectData)
         })
 ```
 
-#### 结束手动测量温度
+#### End manual temperature measurement
 
-###### 前提
+###### Prerequisites
 
-需设备支持温度且支持体温测量且已经开启手动测量温度
+The device needs to support temperature and body temperature measurement and have manual temperature measurement enabled.
 
-###### 接口
+###### API
 
 ```
 stopDetectTempture(bleWriteResponse, responseListener) 
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                        | 备注                               |
-| ---------------- | --------------------------- | ---------------------------------- |
-| bleWriteResponse | IBleWriteResponse           | 写入操作的监听                     |
-| responseListener | ITemptureDetectDataListener | 温度数据的返回监听，此接口可传null |
+| Parameter name | Type | Remarks |
+|---------------- | --------------------------- | ---------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| responseListener | ITemptureDetectDataListener | Temperature data return monitoring, this interface can pass null |
 
-###### 返回数据
+###### Return data
 
-无
+None
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -1998,88 +1996,86 @@ VPOperateManager.getInstance().stopDetectTempture({
 },null)
 ```
 
-#### 日常体温数据读取
+#### Daily body temperature data reading
 
-###### 前提
+###### Prerequisites
 
-设备需支持体温，且需打开体温自动检测功能才会有数据返回（通过[个性化设置](#修改个性化设置-changeCustomSetting)打开）
+The device must support body temperature, and the automatic body temperature detection function must be turned on before data can be returned (open through [Personalized Settings](#Modify Personalized Settings-changeCustomSetting))
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(requireContext()).isSupportReadTempture
 ```
 
-**注意：**当设备支持体温读取，且设备体温类型为5时，设备通过[读取日常数据功能](#读取日常数据功能)获取，无需调用以下readTemptureDataBySetting接口，判断如下：
+**Note:** When the device supports body temperature reading and the device body temperature type is 5, the device obtains it through [Read Daily Data Function] (#Read Daily Data Function) without calling the following readTemptureDataBySetting interface. The judgment is as follows:
 
 ```
 VpSpGetUtil.getVpSpVariInstance(requireContext()).isSupportReadTempture && VpSpGetUtil.getVpSpVariInstance(requireContext()).getTemperatureType == 5
 ```
 
-###### 接口
+###### API
 
 ```kotlin
 readTemptureDataBySetting(bleWriteResponse, temptureDataListener, readOriginSetting)
-```
+```If the data stored in the watch is 3 days, read all the temperature data. The order of reading is [temperature data (today - yesterday - the day before yesterday)]. For the temperature data, you can customize the position of the day and the position of the number.
 
-假如手表存储的数据是3天，读取所有的温度数据,读取的顺序为 [温度数据（今天-昨天-前天）],针对温度数据可以进行自定义天的位置,以及条数的位置
+###### Parameters
 
-###### 参数解释
+| Parameter name | Type | Remarks |
+| -------------------- | ------------------------ | -------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| temperatureDataListener | ITemptureDataListener | A callback for reading temperature data, returning the read progress temperature data |
+| readOriginSetting | ReadOriginSetting | Read daily data settings |
 
-| 参数名               | 类型                  | 备注                                      |
-| -------------------- | --------------------- | ----------------------------------------- |
-| bleWriteResponse     | IBleWriteResponse     | 写入操作的监听                            |
-| temptureDataListener | ITemptureDataListener | 读取温度数据的回调,返回读取的进度温度数据 |
-| readOriginSetting    | ReadOriginSetting     | 读取日常数据设置                          |
+**ReadOriginSetting** Same as [Read Daily Data](#Interface-Read original health data (5 minutes of original data) readOriginDataBySetting) parameters
 
-**ReadOriginSetting** 同[读取日常数据](#接口-读取原始健康数据(5分钟原始数据)readOriginDataBySetting)参数一样
-
-###### 返回数据
+###### Return data
 
 **ITemptureDataListener**
 
 ```kotlin
 //kotlin code
 /**
- * 读取温度日常数据回调
- * 
- * @param temptureDataList 温度数据列表
+ * Read temperature daily data callback
+ *
+ * @param temperatureDataList Temperature data list
  */
 fun onTemptureDataListDataChange(temptureDataList:List<TemptureData>)
 
 /***
- * 返回读取的细节，此包的位置需要记住，下次读取数据时，传入此包的位置，可以避免重复读取
+ * Return the reading details. The location of this package needs to be remembered. The next time you read data, pass in the location of this package to avoid repeated reading.
  *
- * @param day            数据在手表中的标志位[0=今天，1=昨天，2=前天]
- * @param date           数据的日期,格式为yyyy-mm-dd
- * @param allPackage     当天数据的总包数
- * @param currentPackage 此包的位置
+ * @param day The flag of the data in the watch [0=today, 1=yesterday, 2=the day before yesterday]
+ * @param date The date of the data, in the format of yyyy-mm-dd
+ * @param allPackage The total number of packages of data on the day
+ * @param currentPackage The location of this package
  */
-fun onReadOriginProgressDetail(day:Int, date:String, allPackage:Int, currentPackage：Int)
+fun onReadOriginProgressDetail(day:Int, date:String, allPackage:Int, currentPackage:Int)
 
 /**
- * 返回读取的进度
+ * Return the progress of reading
  *
- * @param progress 进度值，范围[0-1]
+ * @param progress progress value, range [0-1]
  */
 fun onReadOriginProgress(progress:Float)
 
 /**
- * 读取结束
+ * End of reading
  */
 fun onReadOriginComplete()
 ```
 
 **TemptureData**
 
-| 变量          | 类型     | 备注              |
-| ------------- | -------- | ----------------- |
-| allPackage    | Int      | 总的包数          |
-| packageNumber | Int      | 当前包数          |
-| mTime         | TimeData | 时间              |
-| isFromHandler | Boolean  | 是否是手动测量    |
-| tempture      | Float    | 温度值            |
-| baseTempture  | Float    | 温度原始值,基准值 |
+| Variable | Type | Remarks |
+| ------------- | -------- | ------------------ |
+| allPackage | Int | Total number of packages |
+| packageNumber | Int | Current package number |
+| mTime | TimeData | time |
+| isFromHandler | Boolean | Whether it is manual measurement |
+| temperature | Float | Temperature value |
+| baseTempture | Float | temperature original value, base value |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -2109,78 +2105,78 @@ VPOperateManager.getInstance().readTemptureDataBySetting({
 }, readOriginSetting)
 ```
 
-#### 体温检测开关
+#### Body temperature detection switch
 
-在[修改个性化设置](#修改个性化设置-changeCustomSetting)中，可以设置体温检测的开关。
+In [Modify Personalized Settings](#Modify Personalized Settings-changeCustomSetting), you can set the switch for body temperature detection.
 
-## ECG功能
+## ECG function
 
-#### 前提
+#### Prerequisites
 
-需设备支持ECG功能，且设备处于空闲，判断条件如下：
+The device needs to support the ECG function and the device is idle. The judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportECG
 ```
 
-以下所有的接口均在设备支持ECG功能的前提下调用。
+All the following interfaces are called on the premise that the device supports the ECG function.
 
-#### 开始手动测量ECG
+#### Start manual ECG measurement
 
-###### 前提
+###### Prerequisites
 
-设备支持ECG功能
+The device supports ECG function
 
-###### 接口
+###### API
 
 ```kotlin
 startDetectECG(bleWriteResponse, isNeedCurve, ecgDetectListener) 
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型               | 备注               |
-| ----------------- | ------------------ | ------------------ |
-| bleWriteResponse  | IBleWriteResponse  | 写入操作的监听     |
-| isNeedCurve       | Boolean            | 是否要返回曲线数据 |
-| ecgDetectListener | IECGDetectListener | ecg测量的回调      |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | ------------------ |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| isNeedCurve | Boolean | Whether to return curve data |
+| ecgDetectListener | IECGDetectListener | ecg measurement callback |
 
-###### 返回数据
+###### Return data
 
 **IECGDetectListener**
 
 ```kotlin
 /**
- * ECG测量基本信息(波形频率,采样频率)
+ * Basic information of ECG measurement (waveform frequency, sampling frequency)
  *
  * @param ecgDetectInfo
  */
 fun onEcgDetectInfoChange(ecgDetectInfo: EcgDetectInfo?)
 
 /**
- * ECG测量过程中的状态
+ *Status during ECG measurement
  *
  * @param ecgDetectState
  */
 fun onEcgDetectStateChange(ecgDetectState: EcgDetectState?)
 
 /**
- * ECG测量的最终结果,异常时,即存在疾病,才会出值
+ * The final result of ECG measurement will only be output when it is abnormal, that is, there is a disease.
  *
  * @param ecgDetectResult
  */
 fun onEcgDetectResultChange(ecgDetectResult: EcgDetectResult?)
 
 /**
- * ECG的波形数据
+ * ECG waveform data
  *
  * @param data
  *
- *  * 界面上绘制ecg波形图使用该数据进行绘制，绘制时需要将#data转换成电压值,
- * 转换方法参考[com.veepoo.protocol.util.EcgUtil.convertToMvWithValue]
- * 如果数组data没有值则表示还没有生成合理的波形数据，测量ecg时会不停的谁更新数据，
- * 当数据为Int.MAX_VALUE 即2147483647 （16进制为0x7FFFFFFF）时需要过滤不画该点
- *  * 疲劳度操作的回调,返回疲劳度的数据:是否支持,开/关状态,进度,疲劳度值
+ * * Use this data to draw the ecg waveform diagram on the interface. When drawing, #data needs to be converted into a voltage value.
+ * Conversion method reference [com.veepoo.protocol.util.EcgUtil.convertToMvWithValue]
+ * If the array data has no value, it means that reasonable waveform data has not been generated. When measuring ecg, the data will be updated continuously.
+ * When the data is Int.MAX_VALUE, which is 2147483647 (0x7FFFFFFF in hexadecimal), it needs to be filtered and the point is not drawn.
+ * * Callback of fatigue degree operation, returns fatigue degree data: whether supported, on/off status, progress, fatigue degree value
  *
  */
 fun onEcgADCChange(data: IntArray?)
@@ -2188,75 +2184,75 @@ fun onEcgADCChange(data: IntArray?)
 
 **EcgDetectInfo**
 
-| 变量          | 类型 | 备注     |
+| Variable | Type | Remarks |
 | ------------- | ---- | -------- |
-| frequency     | Int  | 采样频率 |
-| drawFrequency | Int  | 波形频率 |
+| frequency | Int | sampling frequency |
+| drawFrequency | Int | Waveform frequency |
 
 **EcgDetectState**
 
-| 变量        | 类型          | 备注                                                         |
-| ----------- | ------------- | ------------------------------------------------------------ |
-| ecgType     | Int           | ECG测量类型,通过VpSpGetUtil.getVpSpVariInstance(applicationContext).ecgType获取 |
-| con         | Int           | ECG操作值                                                    |
-| dataType    | Int           | 数据类型(0-采样频率)(1-设备实时状态)(2-诊断结果)(3-测试失败)(4-测试正常结束),这时只会出现1 |
-| deviceState | EDeviceStatus | 设备状态                                                     |
-| hr1         | Int           | 每秒心率                                                     |
-| hr2         | Int           | 每秒 平均心率                                                |
-| hrv         | Int           | hrv值，其中255为无效值,无需显示                              |
-| rr1         | Int           | 每秒RR值                                                     |
-| rr2         | Int           | 每6秒平均RR值                                                |
-| br1         | Int           | 每秒呼吸率值                                                 |
-| br2         | Int           | 每分钟平均呼吸率值                                           |
-| wear        | Int           | 导联佩戴值,0表示佩戴通过,1表示佩戴不通过,若佩戴不通过，app应当关闭测量 |
-| mid         | Int           | mid值                                                        |
-| qtc         | Int           | qtc值                                                        |
-| progress    | Int           | 进度                                                         |
+| Variable | Type | Remarks |
+| ----------- | ------------- | --------------------------------------------------------------- |
+| ecgType | Int | ECG measurement type, obtained through VpSpGetUtil.getVpSpVariInstance(applicationContext).ecgType |
+| con | Int | ECG operation value |
+| dataType | Int | Data type (0-sampling frequency) (1-real-time status of the device) (2-diagnosis result) (3-test failure) (4-test ends normally), only 1 will appear at this time |
+| deviceState | EDeviceStatus | device status |
+| hr1 | Int | Heart rate per second |
+| hr2 | Int | Average heart rate per second |
+| hrv | Int | hrv value, 255 is an invalid value and does not need to be displayed |
+| rr1 | Int | RR value per second |
+| rr2 | Int | Average RR value every 6 seconds |
+| br1 | Int | Respiration rate value per second |
+| br2 | Int | Average respiratory rate per minute value |
+| wear | Int | Lead wearing value, 0 means the wearing is passed, 1 means the wearing is not passed, if the wearing is not passed, the app should close the measurement |
+| mid | Int | mid value |
+| qtc | Int | qtc value |
+| progress | Int | progress |
 
 **EDeviceStatus**
 
-| 变量             | 备注                            |
-| ---------------- | ------------------------------- |
-| FREE             | 设备空闲                        |
-| BUSY             | 设备正忙                        |
-| DETECT_BP        | 设备正忙，正在测量血压          |
-| DETECT_HEART     | 设备正忙，正在测量心率          |
-| DETECT_AUTO_FIVE | 设备正忙，正在自动测量5分钟数据 |
-| DETECT_SP        | 设备正忙，正在测量血氧          |
-| DETECT_FTG       | 设备正忙，正在测量疲劳度        |
-| DETECT_PPG       | 设备正忙，正在测脉率            |
-| CHARGING         | 设备正在充电                    |
-| CHARG_LOW        | 设备低电                        |
-| UNPASS_WEAR      | 设备佩戴不通过                  |
-| UNKONW           | 未知                            |
+| Variables | Remarks |
+|---------------- | ---------------------------------- |
+| FREE | Device idle |
+| BUSY | The device is busy |
+| DETECT_BP | The device is busy, measuring blood pressure |
+| DETECT_HEART | Device is busy, measuring heart rate |
+| DETECT_AUTO_FIVE | The device is busy and is automatically measuring 5 minutes of data |
+| DETECT_SP | The device is busy, measuring blood oxygen |
+| DETECT_FTG | The device is busy, measuring fatigue |
+| DETECT_PPG | The device is busy, measuring pulse rate |
+| CHARGING | Device is charging |
+| CHARG_LOW | Device low battery |
+| UNPASS_WEAR | The device cannot be worn |
+| UNKONW | Unknown |
 
 **EcgDetectResult**
 
-| 变量                | 类型           | 备注               |
-| ------------------- | -------------- | ------------------ |
-| isSuccess           | Boolean        | 是否测量成功       |
-| type                | EECGResultType | ECG结果的数据来向  |
-| timeBean            | TimeData       | 测量日期           |
-| frequency           | Int            | 采样频率           |
-| drawfrequency       | Int            | 波形频率           |
-| duration            | Int            | 总的秒数           |
-| leadSign            | Int            | 导联信号           |
-| originSign          | IntArray       | 原始信号           |
-| powers              | IntArray       | 原始信号对应的增益 |
-| filterSignals       | IntArray       | 原始信号           |
-| result8             | IntArray       | 8个诊断数据        |
-| diseaseResult       | IntArray       | 诊断结果           |
-| aveHeart            | Int            | 平均心率           |
-| aveResRate          | Int            | 平均呼吸率         |
-| aveHrv              | Int            | 平均HRV            |
-| aveQT               | Int            | 平均QT             |
-| progress            | Int            | 进度               |
-| detectHeartIntArray | IntArray       | 测量的心率数据     |
-| detectBreath        | IntArray       | 呼吸率数据         |
-| detectHrv           | IntArray       | HRV数据            |
-| detectQT            | IntArray       | 测量的QT值数组     |
+| Variable | Type | Remarks |
+| ------------------- | ------------------ | ------------------ |
+| isSuccess | Boolean | Whether the measurement was successful |
+| type | EECGResultType | Data source of ECG results |
+| timeBean | TimeData | Measurement date |
+| frequency | Int | sampling frequency |
+| drawfrequency | Int | waveform frequency |
+| duration | Int | Total number of seconds |
+| leadSign | Int | lead signal |
+| originSign | IntArray | original signal |
+| powers | IntArray | Gain corresponding to the original signal |
+| filterSignals | IntArray | original signal |
+| result8 | IntArray | 8 diagnostic data |
+| diseaseResult | IntArray | Diagnosis result |
+| aveHeart | Int | average heart rate |
+| aveResRate | Int | Average respiration rate |
+| aveHrv | Int | Average HRV |
+| aveQT | Int | average QT |
+| progress | Int | progress |
+| detectHeartIntArray | IntArray | Measured heart rate data |
+| detectBreath | IntArray | Respiration rate data |
+| detectHrv | IntArray | HRV data |
+| detectQT | IntArray | Array of measured QT values |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -2280,29 +2276,29 @@ VPOperateManager.getInstance().startDetectECG({
 })
 ```
 
-#### 结束手动测量ECG
+#### End manual ECG measurement
 
-###### 前提
+###### Prerequisites
 
-1.设备支持ecg
-2.设备空闲
-3.设备已经开始手动测量ECG
+1. The device supports ecg
+2. The device is idle
+3. The device has started measuring ECG manually
 
-###### 接口
+###### API
 
 ```kotlin
 stopDetectECG(bleWriteResponse, isNeedCurve, ecgDetectListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-所需参数与[开始手动测量ECG-startDetectECG](#开始手动测量ECG-startDetectECG)相同
+The required parameters are the same as [Start manual measurement of ECG-startDetectECG](#Start manual measurement of ECG-startDetectECG)
 
-###### 返回数据
+###### Return data
 
-返回数据与[开始手动测量ECG-startDetectECG](#开始手动测量ECG-startDetectECG)相同
+The returned data is the same as [Start manual measurement of ECG-startDetectECG](#Start manual measurement of ECG-startDetectECG)
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -2310,94 +2306,94 @@ VPOperateManager.getInstance()
     .stopDetectECG(bleWriteResponse, isNeedCurve, ecgDetectListener)
 ```
 
-#### ECG新数据上报监听
+#### ECG new data reporting and monitoring
 
-###### 前提
+###### Prerequisites
 
-设备支持ecg功能
+The device supports ecg function
 
-###### 接口
+###### API
 
 ```
 setNewEcgDataReportListener(listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名   | 类型                      | 备注              |
-| -------- | ------------------------- | ----------------- |
-| listener | INewECGDataReportListener | 新ecg数据上报回调 |
+| Parameter name | Type | Remarks |
+| -------- | ------------------------ | ------------------ |
+| listener | INewECGDataReportListener | New ecg data reporting callback |
 
-###### 返回数据
+###### Return data
 
-**INewECGDataReportListener** -- 新ecg数据上报回调
+**INewECGDataReportListener** -- New ecg data reporting callback
 
 ```java
 /**
- * 新的ECG测量数据 上报数据监听接口
- * 只要设备端有新的测量数据诞生时触发，触发时通过{@link VPOperateManager#readECGData(BleWriteResponse bleWriteResponse, TimeData timeData, EEcgDataType eEcgDataType, IECGReadDataListener onReadDataIdFinishCallBack)}接口读取ecg数据详情
+ * New ECG measurement data reporting data monitoring interface
+ * Triggered when new measurement data is generated on the device side. When triggered, the ecg data details are read through the {@link VPOperateManager#readECGData(BleWriteResponse bleWriteResponse, TimeData timeData, EEcgDataType eEcgDataType, IECGReadDataListener onReadDataIdFinishCallBack)} interface.
  */
 void onNewECGDetectDataReport();
 ```
 
-###### 示例代码
+###### Sample code
 
 ```java
 VPOperateManager.getInstance().setNewEcgDataReportListener(new INewECGDataReportListener() {
                 @Override
                 public void onNewECGDetectDataReport() {
-                    showToast("监听到设备有新的ecg测量数据上报，请读取ECG数据获取详细信息");
+                    showToast("We heard that the device has reported new ecg measurement data, please read the ECG data to obtain detailed information");
                 }
             });
 ```
 
-#### ECG数据读取
+#### ECG data reading
 
-###### 前提
+###### Prerequisites
 
-1.设备支持ecg
+1. The device supports ecg
 
-###### 接口
+###### API
 
 ```kotlin
 readECGData(bleWriteResponse, timeData, eEcgDataType, onReadDataIdFinishCallBack)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                     | 类型                 | 备注                                                         |
-| -------------------------- | -------------------- | ------------------------------------------------------------ |
-| bleWriteResponse           | IBleWriteResponse    | 写入操作的监听                                               |
-| timeData                   | TimeData             | 数据开始读取的时间,当eEcgDataType==ALL的时候,年月日时分秒传0 |
-| eEcgDataType               | EEcgDataType         | ECG数据的类型                                                |
-| onReadDataIdFinishCallBack | IECGReadDataListener | 读取ECG数据的数据回调                                        |
+| Parameter name | Type | Remarks |
+| -------------------------- | -------------------- | --------------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| timeData | TimeData | The time when the data starts to be read. When eEcgDataType==ALL, the year, month, day, hour, minute and second are passed 0 |
+| eEcgDataType | EEcgDataType | Type of ECG data |
+| onReadDataIdFinishCallBack | IECGReadDataListener | Data callback for reading ECG data |
 
 **EEcgDataTypeEEcgDataType**
 
-| 参数名   | 备注              |
-| -------- | ----------------- |
-| MANUALLY | 设备手动测量      |
-| AUTO     | 设备主动测量      |
-| ALL      | 设备手动+设备主动 |
+| Parameter name | Remarks |
+| -------- | ------------------ |
+| MANUALLY | Equipment manual measurement |
+| AUTO | Device active measurement |
+| ALL | Equipment manual + equipment active |
 
-###### 返回数据
+###### Return data
 
 **IECGReadDataListener**
 
 ```kotlin
 /**
- * 数据读取完毕
+ * Data reading completed
  *
- * @param resultList ecg测量数组
+ * @param resultList ecg measurement array
  */
 fun readDataFinish(resultList:List<EcgDetectResult>)
 ```
 
 **EcgDetectResult**
 
-同[开始手动测量ECG-startDetectECG](#开始手动测量ECG-startDetectECG)返回的EcgDetectResult一样
+The same as the EcgDetectResult returned by [Start manual measurement of ECG-startDetectECG](#Start manual measurement of ECG-startDetectECG)
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -2415,40 +2411,40 @@ VPOperateManager.getInstance().readECGData({
 })
 ```
 
-#### 读取ECG数据的ID
+#### Read the ID of ECG data
 
-###### 前提
+###### Prerequisites
 
-1.设备支持ecg
+1. The device supports ecg
 
-###### 接口
+###### API
 
 ```kotlin
 readECGId(bleWriteResponse, timeData, eEcgDataType, onReadIdFinishCallBack)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                 | 类型               | 备注                                                         |
-| ---------------------- | ------------------ | ------------------------------------------------------------ |
-| bleWriteResponse       | IBleWriteResponse  | 写入操作的监听                                               |
-| timeData               | TimeData           | 数据开始读取的时间,当eEcgDataType==ALL的时候,年月日时分秒传0 |
-| eEcgDataType           | EEcgDataType       | ECG数据的类型                                                |
-| onReadIdFinishCallBack | IECGReadIdListener | 读取数据ID结束的回调                                         |
+| Parameter name | Type | Remarks |
+| ----------------------- | ------------------ | --------------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| timeData | TimeData | The time when the data starts to be read. When eEcgDataType==ALL, the year, month, day, hour, minute and second are passed 0 |
+| eEcgDataType | EEcgDataType | Type of ECG data |
+| onReadIdFinishCallBack | IECGReadIdListener | Callback when reading data ID ends |
 
-###### 返回数据
+###### Return data
 
 IECGReadIdListener
 
 ```kotlin
 /**
- * 读取数据ID结束的回调
- * @param ids ecg数据id列表
+ * Callback after reading the data ID
+ * @param ids ecg data id list
  */
 fun readIdFinish(ids:IntArray?)
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -2465,39 +2461,39 @@ VPOperateManager.getInstance().readECGId({
 })
 ```
 
-#### ECG胸口功能读取
+#### ECG chest function reading
 
-###### 前提
+###### Prerequisites
 
-1.设备支持ecg
+1. The device supports ecg
 
-###### 接口
+###### API
 
 ```
 readECGSwitchStatus(bleWriteResponse, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型               | 备注           |
-| ---------------- | ------------------ | -------------- |
-| bleWriteResponse | IBleWriteResponse  | 写入操作的监听 |
-| listener         | IECGSwitchListener | ECG开关监听    |
+| Parameter name | Type | Remarks |
+|---------------- | ------------------ | --------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| listener | IECGSwitchListener | ECG switch listening |
 
-###### 返回数据
+###### Return data
 
-**IECGSwitchListener**
+**IECGswitchListener**
 
 ```kotlin
 /**
- * ECG开关状态改变
+ * ECG switch status changes
  *
- * @param ecgFunctionStatus ecg的功能状态:UNSUPPORT不支持，SUPPORT支持，SUPPORT_OPEN开，SUPPORT_CLOSE关，UNKONW未知
+ * @param ecgFunctionStatus Function status of ecg: UNSUPPORT is not supported, SUPPORT is supported, SUPPORT_OPEN is on, SUPPORT_CLOSE is off, UNKONW is unknown
  */
 fun onECGSwitchStatusChanged(ecgFunctionStatus:EFunctionStatus)
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -2513,28 +2509,28 @@ VPOperateManager.getInstance().readECGSwitchStatus({
 })
 ```
 
-#### 打开ECG胸口功能
+#### Turn on ECG chest function
 
-###### 前提
+###### Prerequisites
 
-1.设备支持ecg
-2.设备支持胸口功能：通过【[读取ECG胸口功能](#ECG胸口功能读取-readECGSwitchStatus)】判断是否支持
+1. The device supports ecg
+2. The device supports chest function: Determine whether it is supported by [[Read ECG chest function](#ECGchest function reading-readECGSwitchStatus)]
 
-###### 接口
+###### API
 
 ```
 openECGSwitch(bleWriteResponse, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-同【[读取ECG胸口功能](#ECG胸口功能读取-readECGSwitchStatus)】参数一致
+Same parameters as [[Read ECG chest function](#ECG chest function read-readECGSwitchStatus)]
 
-###### 返回数据
+###### Return data
 
-同【[读取ECG胸口功能](#ECG胸口功能读取-readECGSwitchStatus)】返回数据一致
+Same as the data returned by [[Read ECG chest function](#ECG chest function read-readECGSwitchStatus)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -2550,28 +2546,28 @@ VPOperateManager.getInstance().openECGSwitch({
 })
 ```
 
-#### 关闭ECG胸口功能
+#### Turn off ECG chest function
 
-###### 前提
+###### Prerequisites
 
-1.设备支持ecg
-2.设备支持胸口功能：通过【[读取ECG胸口功能](#ECG胸口功能读取-readECGSwitchStatus)】判断是否支持
+1. The device supports ecg
+2. The device supports chest function: Determine whether it is supported by [[Read ECG chest function](#ECGchest function reading-readECGSwitchStatus)]
 
-###### 接口
+###### API
 
 ```
 openECGSwitch(bleWriteResponse, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-同【[读取ECG胸口功能](#ECG胸口功能读取-readECGSwitchStatus)】参数一致
+Same parameters as [[Read ECG chest function](#ECG chest function read-readECGSwitchStatus)]
 
-###### 返回数据
+###### Return data
 
-同【[读取ECG胸口功能](#ECG胸口功能读取-readECGSwitchStatus)】返回数据一致
+Same as the data returned by [[Read ECG chest function](#ECG chest function read-readECGSwitchStatus)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -2587,29 +2583,29 @@ VPOperateManager.getInstance().closeECGSwitch({
 })
 ```
 
-#### 开始读取PTT数据
+#### Start reading PTT data
 
-###### 前提
+###### Prerequisites
 
-1.设备支持ecg；
-2.设备支持ECG胸口功能；
-3.设备已打开ECG胸口功能。
+1. The device supports ecg;
+2. The device supports ECG chest function;
+3. The device has turned on the ECG chest function.
 
-###### 接口
+###### API
 
 ```
 startReadPttSignData(bleWriteResponse, isNeedCurve, ecgDetectListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-同【[开始手动测量ECG-startDetectECG](#开始手动测量ECG-startDetectECG)】参数一致
+Same as [[Start manual measurement of ECG-startDetectECG](#Start manual measurement of ECG-startDetectECG)] parameters
 
-###### 返回数据
+###### Return data
 
-同【[开始手动测量ECG-startDetectECG](#开始手动测量ECG-startDetectECG)】返回数据一致
+The data returned is consistent with [[Start manual measurement of ECG-startDetectECG](#Start manual measurement of ECG-startDetectECG)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -2633,30 +2629,30 @@ VPOperateManager.getInstance().startReadPttSignData({
 })
 ```
 
-#### 结束读取PTT数据-stopReadPttSignData
+#### End reading PTT data-stopReadPttSignData
 
-###### 前提
+###### Prerequisites
 
-1.设备支持ecg；
-2.设备支持ECG胸口功能；
-3.设备已打开ECG胸口功能;
-4.设备已经开始读取PTT数据。
+1. The device supports ecg;
+2. The device supports ECG chest function;
+3. The device has turned on the ECG chest function;
+4. The device has started reading PTT data.
 
-###### 接口
+###### API
 
 ```
 stopReadPttSignData(bleWriteResponse, isNeedCurve, ecgDetectListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-同【[结束手动测量ECG-stopDetectECG](#结束手动测量ECG-stopDetectECG)】参数一致
+Same parameters as [[End Manual Measurement ECG-stopDetectECG](#End Manual Measurement ECG-stopDetectECG)]
 
-###### 返回数据
+###### Return data
 
-同【[结束手动测量ECG-stopDetectECG](#结束手动测量ECG-stopDetectECG)】返回数据一致
+The data returned is consistent with [[End Manual Measurement ECG-stopDetectECG](#End Manual Measurement ECG-stopDetectECG)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 if (!VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportECG){
@@ -2679,124 +2675,124 @@ VPOperateManager.getInstance().stopReadPttSignData({
 })
 ```
 
-## HRV功能
+## HRV function
 
-#### 前提
+#### Prerequisites
 
-需设备支持HRV功能，且设备处于空闲，判断条件如下：
+The device needs to support the HRV function and the device is idle. The judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportHRV
 ```
 
-以下所有的接口均在设备支持HRV功能的前提下调用。
+All the following interfaces are called on the premise that the device supports the HRV function.
 
-#### 读取HRV日常数据
+#### Read HRV daily data
 
-HRV日常数据通过【[读取日常数据功能](#读取日常数据功能)】获取
+HRV daily data is obtained through [[Read Daily Data Function](#Read Daily Data Function)]
 
-## 睡眠功能
+## Sleep function
 
-#### 读取睡眠数据
+#### Read sleep data
 
-###### 接口
+###### API
 
-读取睡眠数据,从头开始读取,一直读取到结束
+Read sleep data, starting from the beginning and reading to the end
 
 ```kotlin
 readSleepData(bleWriteResponse, sleepReadDatalistener, watchday)
 ```
 
-读取睡眠数据,此方法表示可以定义你的读取位置,并按读取的顺序往下读
+Read sleep data. This method means that you can define your reading position and read down in the order of reading.
 
 ```kotlin
 readSleepDataFromDay(bleWriteResponse, sleepReadDatalistener, day, watchday)
 ```
 
-读取睡眠数据,此方法表示可以定义你的读取位置,并只读当天
+Read sleep data. This method means you can define your reading position and read only the current day.
 
 ```kotlin
 readSleepDataSingleDay(bleWriteResponse, sleepReadDatalistener, day, watchday)
 ```
 
-读取睡眠数据,此方法表示可以设置你的读取位置以及是否只读当天
+Read sleep data, this method means you can set your reading position and whether to read only the current day
 
 ```kotlin
 readSleepDataBySetting(bleWriteResponse, sleepReadDatalistener, readSleepSetting)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                | 类型                 | 备注                                                 |
-| --------------------- | -------------------- | ---------------------------------------------------- |
-| bleWriteResponse      | IBleWriteResponseInt | 写入操作的监听                                       |
-| sleepReadDatalistener | ISleepDataListener   | 睡眠数据的监听,返回睡眠读取的进度,以及相应的睡眠数据 |
-| day                   | Int                  | 读取哪天,0表示今天,1表示昨天,2表示前天,以此类推      |
-| watchday              | Int                  | 手表存储的天数                                       |
-| readSleepSetting      | ReadSleepSetting     | 睡眠的读取设置                                       |
+| Parameter name | Type | Remarks |
+| -------------------------- | -------------------- | -------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponseInt | Monitoring of write operations |
+| sleepReadDatalistener | ISleepDataListener | Monitors sleep data, returns the progress of sleep reading, and the corresponding sleep data |
+| day | Int | Read the day, 0 means today, 1 means yesterday, 2 means the day before yesterday, and so on |
+| watchday | Int | Number of days stored by the watch |
+| readSleepSetting | ReadSleepSetting | Sleep read settings |
 
 **ReadSleepSetting**
 
-| 参数名         | 类型    | 备注                                            |
+| Parameter name | Type | Remarks |
 | -------------- | ------- | ----------------------------------------------- |
-| dayInt         | Int     | 读取哪天,0表示今天,1表示昨天,2表示前天,以此类推 |
-| watchDataDay   | Int     | 手表存储的天数                                  |
-| onlyReadOneDay | Boolean | true表示只读今天，false表示按顺序读取           |
+| dayInt | Int | Read the day, 0 means today, 1 means yesterday, 2 means the day before yesterday, and so on |
+| watchDataDay | Int | Number of days stored by the watch |
+| onlyReadOneDay | Boolean | true means reading only today, false means reading sequentially |
 
-###### 返回数据
+###### Return data
 
 **ISleepDataListener**
 
 ```kotlin
 /**
- * 返回数据,睡眠可能是普通睡眠，也可能是精准睡眠，
- * 若为精准睡眠的则需要强制转换为SleepPrecisionData
- * 判断的方式有两种:
- * 1.根据密码通过后的功能标志位;
- * 2.根据instanceof关键字,if(sleepData instanceof SleepPrecisionData)
+ * Return data. Sleep may be normal sleep or precise sleep.
+ * If it is precision sleep, it needs to be forced to SleepPrecisionData.
+ * There are two ways to judge:
+ * 1. According to the function flag after passing the password;
+ * 2. According to the instanceof keyword, if (sleepData instanceof SleepPrecisionData)
  *
- * @param day       表示正在读取第几天的数据 0：今天，1：昨天，2：前天。
- * @param sleepData 睡眠数据
+ * @param day indicates the day's data being read. 0: today, 1: yesterday, 2: the day before yesterday.
+ * @param sleepData sleep data
  */
 fun onSleepDataChange(day: String?, sleepData: SleepData?)
 
 /**
- * 返回睡眠读取的进度,范围[0-1]
+ * Returns the progress of sleep reading, range [0-1]
  *
- * @param progress 进度
+ * @param progress progress
  */
 fun onSleepProgress(progress: Float)
 
 /**
- * 返回读取睡眠的细节，此接口仅用于测试，方便开发人员查看读取进度
+ * Returns the details of reading sleep. This interface is only used for testing to facilitate developers to check the reading progress.
  *
- * @param day           表示正在读取第几天的数据，一天三天的数据，读取的顺序是今天-昨天-前天
- * @param packagenumber 表示第几包，一天的数据返回从最大包开始，依次递减
+ * @param day means that the data of what day is being read, the data of three days in one day, the order of reading is today-yesterday-the day before yesterday
+ * @param packagenumber indicates the number of packages. The data returned for one day starts from the largest package and decreases in sequence.
  */
 fun onSleepProgressDetail(day: String?, packagenumber: Int)
 
 /**
- * 睡眠读取结束
+ * End of sleep reading
  */
 fun onReadSleepComplete()
 ```
 
 **SleepData**
 
-| 变量          | 类型     | 备注                                                         |
-| ------------- | -------- | ------------------------------------------------------------ |
-| Date          | String   | 睡眠日期                                                     |
-| cali_flag     | Int      | 睡眠定标值，目前这个值没有什么用                             |
-| sleepQulity   | Int      | 睡眠质量                                                     |
-| wakeCount     | Int      | 睡眠中起床的次数                                             |
-| deepSleepTime | Int      | 深睡时长(单位min)                                            |
-| lowSleepTime  | Int      | 浅睡时长(单位min)                                            |
-| allSleepTime  | Int      | 睡眠总时长                                                   |
-| sleepLine     | String   | 睡眠曲线，主要用于更具象化的UI来显示睡眠状态，如果您睡眠界面对UI没有特殊要求，可不理会,睡眠曲线分为普通睡眠和精准睡眠，普通睡眠是一组由0,1,2组成的字符串，每一个字符代表时长为5分钟，其中0表示浅睡，1表示深睡，2表示苏醒,比如“201112”，长度为6，表示睡眠阶段共30分钟，头尾各苏醒5分钟，中间浅睡5分钟，深睡15分钟;若是精准睡眠，睡眠曲线是一组由0,1,2，3,4组成的字符串，每一个字符代表时长为1分钟，其中0表示深睡，1表示浅睡，2表示快速眼动,3表示失眠,4表示苏醒 |
-| sleepDown     | TimeData | 入睡时间                                                     |
-| sleepUp       | TimeData | 起床时间                                                     |
+| Variable | Type | Remarks |
+| ------------- | -------- | --------------------------------------------------------------- |
+| Date | String | Sleep date |
+| cali_flag | Int | Sleep scaling value, currently this value is of no use |
+| sleepQuality | Int | sleep quality |
+| wakeCount | Int | The number of times you wake up during sleep |
+| deepSleepTime | Int | Deep sleep duration (unit min) |
+| lowSleepTime | Int | Light sleep duration (unit min) |
+| allSleepTime | Int | Total sleep time |
+| sleepLine | String | Sleep curve is mainly used for a more concrete UI to display sleep status. If your sleep interface has no special requirements for the UI, you can ignore it. The sleep curve is divided into normal sleep and precision sleep. Normal sleep is a set of strings composed of 0, 1, 2. Each character represents a duration of 5 minutes, where 0 means light sleep, 1 means deep sleep, and 2 means wake up, such as "2011" 12", with a length of 6, indicating a total of 30 minutes of sleep stages, with 5 minutes of awakening at the beginning and end, 5 minutes of light sleep in the middle, and 15 minutes of deep sleep; if it is precision sleep, the sleep curve is a set of strings composed of 0,1,2,3,4, each character represents a duration of 1 minute, where 0 means deep sleep, 1 means light sleep, 2 means rapid eye movement, 3 means insomnia, and 4 means awakening |
+| sleepDown | TimeData | Sleep time |
+| sleepUp | TimeData | Wake up time |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -2818,31 +2814,31 @@ VPOperateManager.getInstance().readSleepData({
 },3)
 ```
 
-## 杰理设备认证
+## Jerry Equipment Certification
 
-#### 前提
+#### Prerequisites
 
-需为杰理设备，判断条件如下：
+It needs to be Jerry equipment, and the judgment conditions are as follows:
 
 ```java
 VpSpGetUtil.getVpSpVariInstance(mContext).isJieLiDevice()
-或者
+or
 VPOperateManager.getInstance().isJLDevice()
 ```
 
-当设备芯片平台为杰理时，有以下功能需要通过杰理SDK实现（维亿魄手表SDK也集成了杰理SDK）：
+When the device chip platform is Jerry, the following functions need to be implemented through Jerry SDK (Weiyipo watch SDK also integrates Jerry SDK):
 
-1. 照片表盘传输（只传输表盘照片和预览照片，不包含表盘元素设置）
-2. 市场表盘传输
-3. OTA升级
+1. Photo dial transfer (only dial photos and preview photos are transferred, dial element settings are not included)
+2. Market dial transmission
+3. OTA upgrade
 
-注：**操作这些功能的前提是需先进行杰理设备认证，App启动后，只需完成一次杰理设备认证即可。**
+Note: **The prerequisite for operating these functions is the Jerry device certification. After the App is launched, you only need to complete the Jerry device certification once. **
 
-完成杰理设备认证需先打开杰理服务通知，再进行设备认证。
+To complete the Jerry device certification, you need to open the Jerry service notification first, and then proceed with the device certification.
 
-#### 打开杰理服务通知
+#### Open Jerry service notification
 
-###### 示例代码
+###### Sample code
 
 ```java
 private void openJLNotify() {
@@ -2854,7 +2850,7 @@ private void openJLNotify() {
 
         @Override
         public void onResponse(int code) {
-            tvOpenInfo.setText("已开启通知");
+            tvOpenInfo.setText("Notification turned on");
             VPOperateManager.getInstance().changeMTU(247, new IMtuChangeListener() {
                 @Override
                 public void onChangeMtuLength(int cmdLength) {
@@ -2867,9 +2863,9 @@ private void openJLNotify() {
 }
 ```
 
-#### 开始杰理设备认证
+#### Start Jerry Equipment Certification
 
-###### 示例代码
+###### Sample code
 
 ```java
 private void startDeviceAuth() {
@@ -2880,7 +2876,7 @@ private void startDeviceAuth() {
                 @Override
                 public void run() {
                     loadingDialog.showNoTips();
-                    tvAuthInfo.setText("开始设备认证");
+                    tvAuthInfo.setText("Start device authentication");
                 }
             });
         }
@@ -2891,7 +2887,7 @@ private void startDeviceAuth() {
                 @Override
                 public void run() {
                     loadingDialog.disMissDialog();
-                    tvAuthInfo.setText("设备认证已通过");
+                    tvAuthInfo.setText("Device authentication passed");
                 }
             });
         }
@@ -2902,7 +2898,7 @@ private void startDeviceAuth() {
                 @Override
                 public void run() {
                     loadingDialog.disMissDialog();
-                    tvAuthInfo.setText("设备认证未通过");
+                    tvAuthInfo.setText("Device authentication failed");
                 }
             });
         }
@@ -2910,113 +2906,113 @@ private void startDeviceAuth() {
 }
 ```
 
-## 打开杰理文件系统
+## Open Jerry file system
 
-当设备芯片平台为杰理时，**每次操作以下功能实现之前需先操作打开杰理文件系统**：
+When the device chip platform is Jerry, **You need to open the Jerry file system before each operation to implement the following functions**:
 
-1. 照片表盘传输（只传输表盘照片和预览照片，不包含表盘元素设置）
-2. 市场表盘传输
-3. OTA升级
+1. Photo dial transfer (only dial photos and preview photos are transferred, dial element settings are not included)
+2. Market dial transmission
+3. OTA upgrade
 
-#### 前提
+#### Prerequisites
 
-需先完成【[杰理设备认证](#杰理设备认证)】，完成认证后，方可打开杰理文件系统
+You need to complete [[Jieli Equipment Certification](#jellyequipmentcertification)] first. After completing the certification, you can open the Jerry file system.
 
-###### 示例代码
+###### Sample code
 
 ```java
 private void getJLFileSystem() {
-        //杰理文件系统
+        //Jerry file system
         VPOperateManager.getInstance().listJLWatchList(new JLWatchFaceManager.OnWatchDialInfoGetListener() {
             @Override
             public void onGettingWatchDialInfo() {
-                //获取表盘信息中... 此时请勿做其他蓝牙操作
-                loadingDialog.showNoTips();//弹出加载框，如需要用户自己实现
+                //Getting dial information... Please do not perform other Bluetooth operations at this time
+                loadingDialog.showNoTips();//Pop up the loading box, if the user needs to implement it by himself
             }
 
             @Override
             public void onWatchDialInfoGetStart() {
-                //开始获取手表表盘信息
-                loadingDialog.showNoTips();//弹出加载框，如需要用户自己实现
+                //Start to obtain watch face information
+                loadingDialog.showNoTips();//Pop up the loading box, if the user needs to implement it by himself
             }
 
             @Override
             public void onWatchDialInfoGetComplete() {
-                //获取表盘信息流程完成
-                loadingDialog.disMissDialog();//关闭加载框，如需要用户自己实现
+                //The process of obtaining dial information is completed
+                loadingDialog.disMissDialog();//Close the loading box, if the user needs to implement it himself
             }
 
             @Override
             public void onWatchDialInfoGetSuccess(List<FatFile> systemFatFiles, List<FatFile> serverFatFiles, FatFile picFatFile) {
-                //获取杰理平台的表盘信息成功
-                StringBuilder sb = new StringBuilder("杰理表盘系统更新=============================Start");
-                sb.append("\t\t\t\n").append("[照片表盘] picFatFile = ").append(picFatFile == null ? "NULL" : picFatFile.getPath());
+                //Get the dial information of Jerry platform successfully
+                StringBuilder sb = new StringBuilder("Jerry Dial System Update==============================Start");
+                sb.append("\t\t\t\n").append("[Photo dial] picFatFile = ").append(picFatFile == null ? "NULL" : picFatFile.getPath());
                 for (FatFile serverFatFile : serverFatFiles) {
-                    sb.append("\t\t\t\n").append("[服务器表盘] serverFatFile = ").append(serverFatFile == null ? "NULL" : serverFatFile.getPath());
+                    sb.append("\t\t\t\n").append("[server dial] serverFatFile = ").append(serverFatFile == null ? "NULL" : serverFatFile.getPath());
                 }
                 for (FatFile systemFatFile : systemFatFiles) {
-                    sb.append("\t\t\t\n").append("[系统表盘] systemFatFile = ")
+                    sb.append("\t\t\t\n").append("[System Dial] systemFatFile = ")
                             .append(systemFatFile == null ? "NULL" : systemFatFile.getPath());
                 }
-                sb.append("\t\t\t\n").append("[当前的服务器表盘] serverFatFile = ")
-                        .append(serverFatFiles.isEmpty() ? "【还未设置】" : serverFatFiles.get(0).getPath())
+                sb.append("\t\t\t\n").append("[current server dial] serverFatFile = ")
+                        .append(serverFatFiles.isEmpty() ? "[Not set yet]" : serverFatFiles.get(0).getPath())
                         .append("\n")
-                        .append("杰理表盘系统更新=============================End");
+                        .append("Jerry Dial System Update==============================End");
                 Log.e(TAG, sb.toString());
                 tvFileSystemInfo.setText(sb.toString());
                 for (FatFile systemFatFile : systemFatFiles) {
-                    Logger.t(TAG).e("系统表盘--->" + systemFatFile.toString());
+                    Logger.t(TAG).e("System dial--->" + systemFatFile.toString());
 
                 }
                 for (FatFile serverFatFile : serverFatFiles) {
-                    Logger.t(TAG).e("服务器表盘--->" + serverFatFile.toString());
+                    Logger.t(TAG).e("Server dial--->" + serverFatFile.toString());
                 }
-                Logger.t(TAG).e("照片表盘--->" + picFatFile.toString());
+                Logger.t(TAG).e("Photo dial --->" + picFatFile.toString());
                 loadingDialog.disMissDialog();
             }
 
             @Override
             public void onWatchDialInfoGetFailed(BaseError error) {
-                //获取表盘信息失败
-                tvFileSystemInfo.setText("获取文件系统列表-失败:\n" + error.toString());
+                //Failed to obtain dial information
+                tvFileSystemInfo.setText("Get file system list - failed:\n" + error.toString());
                 loadingDialog.disMissDialog();
             }
         });
     }
 ```
 
-文件系统获取监听
+File system acquisition monitoring
 
 ```java
 public interface OnWatchDialInfoGetListener {
 
     /**
-     * 正在获取表盘信息
-     * （一般在还未获取完成时再次调用则会回调该方法）
+     * Obtaining dial information
+     * (Generally, this method will be called back if called again before the acquisition is completed)
      */
     void onGettingWatchDialInfo();
 
     /**
-     * 开始获取表盘信息
+     * Start getting watch face information
      */
     void onWatchDialInfoGetStart();
 
     /**
-     * 获取表盘信息完成
+     * Obtaining dial information completed
      */
     void onWatchDialInfoGetComplete();
 
     /**
-     * 获取手表表盘信息成功
+     * Obtain watch face information successfully
      *
-     * @param systemFatFiles 系统表盘
-     * @param serverFatFiles 服务器表盘
-     * @param picFatFile     照片表盘
+     * @param systemFatFiles system dial
+     * @param serverFatFiles server dial
+     * @param picFatFile photo dial
      */
     void onWatchDialInfoGetSuccess(List<FatFile> systemFatFiles, List<FatFile> serverFatFiles, FatFile picFatFile);
 
     /**
-     * 获取表盘失败
+     * Failed to obtain dial
      */
     void onWatchDialInfoGetFailed(BaseError error);
 }
@@ -3024,67 +3020,67 @@ public interface OnWatchDialInfoGetListener {
 
 ###
 
-## 表盘功能
+## Dial function
 
-#### 前提
+#### Prerequisites
 
-设备需支持屏幕样式读取
+The device needs to support screen style reading
 
 ```
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportScreenStyle
 ```
 
-表盘所有指令均需设备支持屏幕样式读取之后才可下发
+All instructions on the watch face can only be issued after the device supports screen style reading.
 
-#### 读取屏幕样式-readScreenStyle
+#### Read screen style-readScreenStyle
 
-获取当前屏幕的表盘风格和表盘下标。
+Get the dial style and dial subscript of the current screen.
 
-###### 接口
+###### API
 
 ```
 readScreenStyle(bleWriteResponse, screenStyleListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名              | 类型                 | 备注                          |
-| ------------------- | -------------------- | ----------------------------- |
-| bleWriteResponse    | IBleWriteResponse    | 写入操作的监听                |
-| screenStyleListener | IScreenStyleListener | 屏幕样式的监听,返回操作的状态 |
+| Parameter name | Type | Remarks |
+| ------------------- | ------------------- | ----------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| screenStyleListener | IScreenStyleListener | Screen style monitoring, returning the status of the operation |
 
-###### 返回数据
+###### Return data
 
 **IScreenStyleListener**
 
 ```kotlin
 /**
- * 屏幕样式设置的回调
+ * Callback for screen style setting
  *
- * @param screenStyleData 屏幕样式的数据
+ * @param screenStyleData screen style data
  */
 fun onScreenStyleDataChange(screenStyleData:ScreenStyleData);
 ```
 
 **ScreenStyleData**
 
-| 变量        | 类型         | 备注                                                         |
-| ----------- | ------------ | ------------------------------------------------------------ |
-| status      | EScreenStyle | 操作状态                                                     |
-| screenIndex | Int          | 表盘下标  默认表盘从0开始,最多七个默认表盘。 表盘市场以及自定义表盘都是从1开始 |
-| screenType  | EUIFromType  | *表盘风格* 0x00 设备默认表盘 *0x01 表盘市场(需设备支持)* 0x02 自定义表盘(需设备支持) |
+| Variable | Type | Remarks |
+| ----------- | ---------- | --------------------------------------------------------------- |
+| status | EScreenStyle | Operation status |
+| screenIndex | Int | Dial subscript The default dial starts from 0, and there are up to seven default dials. The watch face market and custom watch faces all start from 1 |
+| screenType | EUIFromType | *Dial style* 0x00 Device default dial *0x01 Dial market (requires device support)* 0x02 Custom dial (requires device support) |
 
 **EScreenStyle**
 
-| 变量            | 备注     |
+| Variables | Remarks |
 | --------------- | -------- |
-| SETTING_SUCCESS | 设置成功 |
-| SETTING_FAIL    | 设置失败 |
-| READ_SUCCESS    | 读取成功 |
-| READ_FAIL       | 读取失败 |
-| UNKONW          | 未知状态 |
+| SETTING_SUCCESS | Setting successful |
+| SETTING_FAIL | Setting failed |
+| READ_SUCCESS | Read successfully |
+| READ_FAIL | Read failed |
+| UNKONW | Unknown status |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -3098,47 +3094,47 @@ VPOperateManager.getInstance().readScreenStyle({
 )
 ```
 
-#### 设置屏幕样式-settingScreenStyle
+#### Set screen style-settingScreenStyle
 
-设置当前设备屏幕的表盘风格和表盘下标。
+Set the dial style and dial subscript of the current device screen.
 
-###### 接口
+###### API
 
-设置默认表盘的下标
+Set the subscript of the default watch face
 
 ```kotlin
 settingScreenStyle(IBleWriteResponse bleWriteResponse, IScreenStyleListener screenStyleListener, int style)
 ```
 
-  设置当前设备屏幕的表盘风格和表盘下标
+Set the dial style and dial subscript of the current device screen
 
 ```
 settingScreenStyle(IBleWriteResponse bleWriteResponse, IScreenStyleListener screenStyleListener, int style, EUIFromType uiFromType)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名              | 类型                 | 备注                          |
-| ------------------- | -------------------- | ----------------------------- |
-| bleWriteResponse    | IBleWriteResponse    | 写入操作的监听                |
-| screenStyleListener | IScreenStyleListener | 屏幕样式的监听,返回操作的状态 |
-| style               | Int                  | 表盘的下标                    |
-| uiFromType          | EUIFromType          | 表盘类型                      |
+| Parameter name | Type | Remarks |
+| ------------------- | ------------------- | ----------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| screenStyleListener | IScreenStyleListener | Screen style monitoring, returning the status of the operation |
+| style | Int | subscript of the dial |
+| uiFromType | EUIFromType | Dial type |
 
 **EUIFromType**
 
-| 参数名  | 备注               |
+| Parameter name | Remarks |
 | ------- | ------------------ |
-| DEFAULT | 手表自带的表盘     |
-| CUSTOM  | 自定义可编辑的表盘 |
-| SERVER  | 服务器的表盘       |
-| ...     | 其余类型无需关注   |
+| DEFAULT | The dial that comes with the watch |
+| CUSTOM | Custom editable watch face |
+| SERVER | Server's dial |
+| ... | No need to pay attention to other types |
 
-###### 返回数据
+###### Return data
 
-**IScreenStyleListener**  同【[读取屏幕样式-readScreenStyle](#读取屏幕样式-readScreenStyle)】返回数据一致
+**IScreenStyleListener** is consistent with the data returned by [[Read Screen Style-readScreenStyle](#Read Screen Style-readScreenStyle)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -3153,23 +3149,23 @@ VPOperateManager.getInstance().settingScreenStyle(
 )
 ```
 
-### 本地表盘
+### Local watch face
 
-###### 前提
+###### Prerequisites
 
-先获取本地表盘数量，本地表盘数量获取方式
+First get the number of local dials, how to get the number of local dials
 
 ```
 val defaultUiCount = SpUtil.getInt(applicationContext, SputilVari.COUNT_SCREEN_STYLE_TYPE, 1)
 ```
 
-defaultUiCount>1才可以设置本地表盘
+Only defaultUiCount>1 can set the local dial
 
-###### 接口
+###### API
 
-调用【[设置屏幕样式-settingScreenStyle](#设置屏幕样式-settingScreenStyle)】方法设置，uiFromType = EUIFromType.DEFAULT，style = 0 -（defaultUiCount - 1）
+Call the [[set screen style-settingScreenStyle](#set screen style-settingScreenStyle)] method to set, uiFromType = EUIFromType.DEFAULT, style = 0 - (defaultUiCount - 1)
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -3184,12 +3180,12 @@ VPOperateManager.getInstance().settingScreenStyle(
 )
 ```
 
-### 服务器表盘
+### Server dial
 
-#### 前提
+#### Prerequisites
 
-1.设备UI传输方式为2；
-2.服务器表盘数量大于0.
+1. The device UI transmission mode is 2;
+2. The number of server dials is greater than 0.
 
 ```kotlin
 val bigTranType = VpSpGetUtil.getVpSpVariInstance(applicactionContext).bigTranType
@@ -3197,134 +3193,134 @@ val serverUICount = VpSpGetUtil.getVpSpVariInstance(applicactionContext).watchui
 var isSupport = (bigTranType == 2 && serverUICount > 0)
 ```
 
-**注意⚠️**：表盘传输需要增加一个异常保护场景：手表电量很低时，如果发起表盘传输，在传输过程中手表可能会因低电关机，重新充电后，表盘会变黑。 我们建议每次传输前，先读取一遍手表当前电量，如果电量状态为低电，则禁止传输。
+**Note⚠️**: Dial transmission needs to add an exception protection scenario: when the watch power is very low, if you initiate a dial transmission, the watch may shut down due to low power during the transmission process. After recharging, the dial will turn black. We recommend reading the current battery level of the watch before each transmission. If the battery status is low, transmission is prohibited.
 
-#### 流程
+#### Process
 
-设置来自服务器表盘UI的步骤大致分为以下几步:
+The steps to set up the server dial UI are roughly divided into the following steps:
 
->第1步.判断是否支持表盘市场
->第2步.获取基本信息
->第3步.获取支持的服务器UI列表
->第4步.下载对应的UI文件
->第5步.设置UI
+>Step 1. Determine whether the dial market is supported
+>Step 2. Get basic information
+> Step 3. Get list of supported server UIs
+>Step 4. Download the corresponding UI file
+>Step 5. Set up UI
 
-#### 类名
+#### Class
 
-注：**该功能操作使用的类名与前面类名不一样**
+Note: **The class name used for this function operation is different from the previous class name**
 
 ```kotlin
 val mUiUpdateUtil = UiUpdateUtil.getInstance();
 val uiUpdateCheckOprate = UiServerHttpUtil();
 ```
 
-#### 第1步.判断是否支持表盘市场
+#### Step 1. Determine whether the dial market is supported
 
 ```kotlin
-//支持服务器表盘
+//Support server dial
 if (mUiUpdateUtil.isSupportChangeServerUi()) {
     mUiUpdateUtil.init(context)
 } else {
-//不支持服务器表盘
+//Does not support server dials
     
 }
 ```
 
-#### 第2步.获取基本信息
+#### Step 2. Obtain basic information
 
-###### 类名
+###### Class
 
 UiUpdateUtil
 
-###### 接口
+###### API
 
 ```
 getServerWatchUiInfo(uiBaseInfoFormServerListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                       | 类型                          | 备注                 |
-| ---------------------------- | ----------------------------- | -------------------- |
-| uiBaseInfoFormServerListener | IUIBaseInfoFormServerListener | 获取基本的UI信息回调 |
+| Parameter name | Type | Remarks |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| uiBaseInfoFormServerListener | IUIBaseInfoFormServerListener | Get basic UI information callback |
 
-###### 返回数据
+###### Return data
 
 **IUIBaseInfoFormServerListener**
 
 ```kotlin
 /**
- * 返回ui基本信息-服务器，
+ * Return ui basic information-server,
  *
- * @param uiDataServer ui基本信息-服务器的ui
+ * @param uiDataServer ui basic information-server ui
  */
 fun onBaseUiInfoFormServer(uiDataServer:UIDataServer);
 ```
 
 **UIDataServer**
 
-| 变量               | 类型 | 备注                           |
-| ------------------ | ---- | ------------------------------ |
-| useType            | Int  | 数据使用类型                   |
-| oprateType         | Int  | 操作类型                       |
-| oprateState        | Int  | 操作状态                       |
-| dataReceiveAddress | Int  | UI数据的接收起始地址           |
-| dataCanSendLength  | Int  | 可接收的数据长度               |
-| binDataType        | Int  | 文件类型，请求服务器要传的字段 |
-| deviceAialShape    | Int  | 屏幕类型，请求服务器要传的字段 |
-| imgCrcId           | Int  | 表盘CRC校验值                  |
-| dataFileLength     | Long | 要发送的文件长度               |
-| packageIndex       | Int  | 第几包                         |
+| Variable | Type | Remarks |
+| ------------------ | ---- | ------------------------------- |
+| useType | Int | Data usage type |
+| oprateType | Int | Operation type |
+| oprateState | Int | Operation status |
+| dataReceiveAddress | Int | The starting address for receiving UI data |
+| dataCanSendLength | Int | Acceptable data length |
+| binDataType | Int | File type, fields to be transmitted by the request server |
+| deviceAialShape | Int | Screen type, fields to be transmitted by the request server |
+| imgCrcId | Int | Dial CRC check value |
+| dataFileLength | Long | The length of the file to send |
+| packageIndex | Int | Which package |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 UiUpdateUtil.getInstance().getServerWatchUiInfo { uiDataServer ->
-    //"2.服务器的表盘基本信息 uiDataServer:$uiDataServer"
+    //"2. Basic information of the server's dial uiDataServer:$uiDataServer"
 }
 ```
 
-#### 第3步.获取支持的服务器UI列表
+#### Step 3. Get the supported server UI list
 
-###### 类名
+###### Class
 
 UiServerHttpUtil
 
-###### 接口
+###### API
 
 ```kotlin
 getThemeInfo(uiDataServer, deviceNumber, deviceTestVersion, appPackName, appVersion):List<TUiTheme>
 ```
 
-注：**此接口为网络请求，不能运行在主线程中**
+Note: **This interface is a network request and cannot be run in the main thread**
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型         | 备注                 |
-| ----------------- | ------------ | -------------------- |
-| uiDataServer      | UIDataServer | 服务器的表盘基本信息 |
-| deviceNumber      | String       | 设备编号             |
-| deviceTestVersion | String       | 设备测试版本         |
-| appPackName       | String       | app包名              |
-| appVersion        | String       | app版本              |
+| Parameter name | Type | Remarks |
+| ------------------ | ---------- | ------------------ |
+| uiDataServer | UIDataServer | Server dial basic information |
+| deviceNumber | String | Device number |
+| deviceTestVersion | String | Device test version |
+| appPackName | String | app package name |
+| appVersion | String | app version |
 
-其中，deviceNumber在【[连接设备确认密码时](#验证密码操作)】会返回，返回的类名为PwdData，字段为deviceNumber，deviceTestVersion为PwdData里面的deviceTestVersion值。
+Among them, deviceNumber will be returned [[when connecting to the device to confirm the password] (#verify password operation)]. The returned class name is PwdData, the field is deviceNumber, and deviceTestVersion is the deviceTestVersion value in PwdData.
 
-###### 返回数据
+###### Return data
 
 **List<TUiTheme>**
 
 **TUiTheme**
 
-| 变量        | 类型   | 备注                 |
+| Variable | Type | Remarks |
 | ----------- | ------ | -------------------- |
-| crc         | String | 服务器表盘CRC        |
-| binProtocol | String | 固件（此处无需关注） |
-| dialShape   | String | 表盘形状             |
-| fileUrl     | String | 文件下载路径         |
-| previewUrl  | String | 表盘预览图路径       |
+| crc | String | Server dial CRC |
+| binProtocol | String | Firmware (no need to pay attention here) |
+| dialShape | String | dial shape |
+| fileUrl | String | File download path |
+| previewUrl | String | Watch face preview image path |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 Thread {
@@ -3337,51 +3333,51 @@ Thread {
         appPackName,
         appVersion
     )
-    //拿到themeInfoList 页面做展示
+    //Get the themeInfoList page for display
     
 }.start()
 ```
 
-#### 第4步.下载对应的UI文件
+#### Step 4. Download the corresponding UI file
 
-###### 类名
+###### Class
 
 UiServerHttpUtil
 
-###### 接口
+###### API
 
 ```
 downloadFile(downUrl, fileSave, onDownLoadListener)
 ```
 
-注：**此接口为网络请求，不能运行在主线程中**
+Note: **This interface is a network request and cannot be run in the main thread**
 
-###### 参数解释
+###### Parameters
 
-| 参数名             | 类型               | 备注                                     |
-| ------------------ | ------------------ | ---------------------------------------- |
-| downUrl            | String             | 下载的表盘文件链接（第3步返回的fileUrl） |
-| fileSave           | String             | 保存的本地路径                           |
-| onDownLoadListener | OnDownLoadListener | 下载回调                                 |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | -------------------------------------------------- |
+| downUrl | String | Downloaded watch face file link (fileUrl returned in step 3) |
+| fileSave | String | Saved local path |
+| onDownLoadListener | OnDownLoadListener | Download callback |
 
-###### 返回数据
+###### Return data
 
 OnDownLoadListener
 
 ```kotlin
 /**
- * 返回下载固件进度值,范围[0-1]
+ * Returns the progress value of downloading firmware, range [0-1]
  * @param progress
  */
 fun onProgress(progress:Float);
 
 /**
- * 下载结束
+ * Download ends
  */
 fun onFinish();
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 Thread {
@@ -3390,105 +3386,105 @@ Thread {
         fileSave,
         object : OnDownLoadListener {
             override fun onProgress(progress: Float) {
-                Logger.t(TAG).i("下载进度:$progress")
+                Logger.t(TAG).i("Download progress:$progress")
             }
 
             override fun onFinish() {
-                Logger.t(TAG).i("下载完成")
+                Logger.t(TAG).i("Download completed")
             }
         })
 }.start()
 ```
 
-#### 第5步.设置UI
+#### Step 5. Set up UI
 
-注：**设置服务器表盘需注意设备是什么平台，杰理平台需单独走杰理的设置UI流程**
+Note: **When setting the server dial, you need to pay attention to the platform of the device. For Jerry platform, you need to follow Jerry's setting UI process separately**
 
-##### 非杰理平台设置UI
+##### Feijieli platform setting UI
 
-###### 类名
+###### Class
 
 UiUpdateUtil
 
-###### 接口
+###### API
 
 ```
 startSetUiStream(euiFromType, inputStream, uiUpdateListener) 
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型              | 备注                                  |
-| ---------------- | ----------------- | ------------------------------------- |
-| euiFromType      | EUIFromType       | UI类型 此处默认为：EUIFromType.SERVER |
-| inputStream      | InputStream       | 表盘文件输入流                        |
-| uiUpdateListener | IUiUpdateListener | UI升级回调                            |
+| Parameter name | Type | Remarks |
+|---------------- | ----------------- | ----------------------------------------------- |
+| euiFromType | EUIFromType | UI type The default here is: EUIFromType.SERVER |
+| inputStream | InputStream | Dial file input stream |
+| uiUpdateListener | IUiUpdateListener | UI upgrade callback |
 
-###### 返回数据
+###### Return data
 
 **IUiUpdateListener**
 
 ```kotlin
 /**
- * UI升级开始回调
+ * UI upgrade start callback
  */
 fun onUiUpdateStart()
 
 /**
- * 开始UI擦除
- * @param sumCount 擦除总大小
+ * Start UI erasure
+ * @param sumCount total size of erase
  */
 fun onStartClearCache(sumCount: Int)
 
 /**
- * UI擦除进度回调
- * @param currentCount  当前擦除数
- * @param sumCount  擦除总大小
- * @param progress  擦除进度
+ * UI erasure progress callback
+ * @param currentCount current erasure number
+ * @param sumCount total size of erase
+ * @param progress Erase progress
  */
 fun onClearCacheProgress(currentCount: Int, sumCount: Int, progress: Int)
 
 /**
- * UI擦除完成
+ * UI wipe completed
  */
 fun onFinishClearCache()
 
 /**
- * UI升级进度
- * @param currentBlock 当前包
- * @param sumBlock  总包
- * @param progress  升级进度
+ * UI upgrade progress
+ * @param currentBlock current package
+ * @param sumBlock total package
+ * @param progress upgrade progress
  */
 fun onUiUpdateProgress(currentBlock: Int, sumBlock: Int, progress: Int)
 
 /**
- * UI升级成功
+ * UI upgrade successful
  */
 fun onUiUpdateSuccess()
 
 /**
- * UI升级失败
- * @param eUiUpdateError 升级失败原因
+ * UI upgrade failed
+ * @param eUiUpdateError Reason for upgrade failure
  */
 fun onUiUpdateFail(eUiUpdateError: EUiUpdateError?)
 ```
 
 **EUiUpdateError**
 
-| 变量                    | 备注                    |
+| Variables | Remarks |
 | ----------------------- | ----------------------- |
-| LISTENTER_IS_NULL       | 没有设置监听            |
-| NEED_READ_BASE_INFO     | 没有先执行读取表盘信息  |
-| FILE_UNEXIST            | 文件不存在              |
-| LOW_BATTERY             | 电量过低                |
-| INTO_UPDATE_MODE_FAIL   | 进入UI模式失败          |
-| FILE_LENGTH_NOT_4_POWER | 文件没有4字节对齐       |
-| CHECK_CRC_FAIL          | crc校验失败             |
-| APP_CRC_SAME_DEVICE_CRC | app的CRC跟设备的CRC一致 |
+| LISTENTER_IS_NULL | No listener is set |
+| NEED_READ_BASE_INFO | Reading dial information is not executed first |
+| FILE_UNEXIST | File does not exist |
+| LOW_BATTERY | The battery is too low |
+| INTO_UPDATE_MODE_FAIL | Failed to enter UI mode |
+| FILE_LENGTH_NOT_4_POWER | File is not 4-byte aligned |
+| CHECK_CRC_FAIL | crc check failed |
+| APP_CRC_SAME_DEVICE_CRC | The CRC of the app is consistent with the CRC of the device |
 
-注：当要传输的表盘CRC跟设备的CRC一致时，无需走服务器表盘传输逻辑，可以直接通过【[设置屏幕样式](#设置屏幕样式-settingScreenStyle)】接口直接设置服务器表盘。
+Note: When the CRC of the dial to be transmitted is consistent with the CRC of the device, there is no need to go through the server dial transmission logic. You can directly set the server dial through the [[SET SCREEN STYLE](#SET SCREEN STYLE-settingScreenStyle)] interface.
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 al mUritempFile = Uri.fromFile(mUpdatefile)
@@ -3496,7 +3492,7 @@ val inputStream: InputStream =
     getContentResolver().openInputStream(mUritempFile)
 
 /**
- * 升级ui步骤：开始升级-清除缓存数据-发送UI数据-结束发送
+ * Upgrade UI steps: Start upgrading - clear cache data - send UI data - end sending
  */
 UiUpdateUtil.getInstance().startSetUiStream(
     EUIFromType.SERVER,
@@ -3510,7 +3506,7 @@ UiUpdateUtil.getInstance().startSetUiStream(
         override fun onClearCacheProgress(
             currentCount: Int,
             sumCount: Int,
-            progress: Int
+            Progress: Int
         ) {
         }
 
@@ -3520,7 +3516,7 @@ UiUpdateUtil.getInstance().startSetUiStream(
         override fun onUiUpdateProgress(
             currentBlock: Int,
             sumBlock: Int,
-            progress: Int
+            Progress: Int
         ) {
         }
 
@@ -3534,138 +3530,138 @@ UiUpdateUtil.getInstance().startSetUiStream(
 )
 ```
 
-##### 杰理平台设置UI
+##### Jerry platform setting UI
 
-###### 前提
+###### Prerequisites
 
-需设备为杰理设备且已完成【[打开杰理文件系统](#打开杰理文件系统)】
+The required device is a Jerry device and has been completed [[Open Jerry File System](#Open Jerry File System)]
 
-###### 接口
+###### API
 
 ```
 VPOperateManager.getInstance().setJLWatchDial(localServerDialPath, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名              | 类型                                   | 描述                   |
-| ------------------- | -------------------------------------- | ---------------------- |
-| localServerDialPath | String                                 |                        |
-| listener            | JLWatchHolder.OnSetJLWatchDialListener | 杰理照片表盘的传输监听 |
+| Parameter name | Type | Description |
+| ------------------- | --------------------------------------- | ----------------------- |
+| localServerDialPath | String | |
+| listener | JLWatchHolder.OnSetJLWatchDialListener | Transmission monitoring of Jerry's photo dial |
 
-###### 返回数据
+###### Return data
 
-OnSetJLWatchDialListener ： 杰理服务器表盘传输监听
+OnSetJLWatchDialListener: Jerry server dial transmission monitoring
 
 ```java
 /**
-     * 传输市场表盘的监听
+     * Transmit market dial monitoring
      */
     public interface OnSetJLWatchDialListener {
         /**
-         * 开始传输表盘
+         * Start transferring watch faces
          */
         void onStart();
 
         /**
-         * 表盘传输进度
+         * Watch face transfer progress
          *
-         * @param progress 进度[0-100]
+         * @param progress progress[0-100]
          */
         void onProgress(int progress);
 
         /**
-         * 表盘传输完成
+         * Dial transfer completed
          *
-         * @param watchPath 表盘在杰理文件系统中的路径 e.g /WATCH088
+         * @param watchPath The path of the watch face in the Jerry file system e.g /WATCH088
          */
         void onComplete(String watchPath);
 
         /**
-         * 表盘传输失败
+         * Dial transfer failed
          *
-         * @param code     失败code
-         * @param errorMsg 失败原因
+         * @param code failure code
+         * @param errorMsg Failure reason
          */
         void onFiled(int code, String errorMsg);
     }
 ```
 
-### 照片表盘
+### Photo dial
 
-#### 前提
+#### Prerequisites
 
-设备需支持照片表盘
+The device needs to support photo watch faces
 
-**注意⚠️**：表盘传输需要增加一个异常保护场景：手表电量很低时，如果发起表盘传输，在传输过程中手表可能会因低电关机，重新充电后，表盘会变黑。 我们建议每次传输前，先读取一遍手表当前电量，如果电量状态为低电，则禁止传输。
+**Note⚠️**: Dial transmission needs to add an exception protection scenario: when the watch power is very low, if you initiate a dial transmission, the watch may shut down due to low power during the transmission process. After recharging, the dial will turn black. We recommend reading the current battery level of the watch before each transmission. If the battery status is low, transmission is prohibited.
 
-#### 流程
+#### Process
 
->第1步.判断是否支持照片表盘
->第2步.读取基本信息
->第3步.选中元素及元素对应的方位
->第4步.背景使用自选图片
+>Step 1. Determine whether photo dial is supported
+>Step 2. Read basic information
+>Step 3. Select the element and its corresponding position
+>Step 4. Use a custom image for the background
 
-#### 类名
+#### Class
 
 **UiUpdateUtil**
 
-#### 第1步.判断是否支持照片表盘
+#### Step 1. Determine whether photo dial is supported
 
 ```kotlin
 if (mUiUpdateUtil.isSupportChangeCustomUi()) {
-   //支持自定义表盘
+   //Support custom watch face
     mUiUpdateUtil.init(context);
 } else {
- //不支持自定义表盘
+ //Does not support custom watch faces
   
 }
 ```
 
-#### 第2步.读取基本信息
+#### Step 2. Read basic information
 
-###### 接口
+###### API
 
 ```
 getCustomWatchUiInfo( uiBaseInfoFormCustomListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                       | 类型                          | 备注                     |
-| ---------------------------- | ----------------------------- | ------------------------ |
-| uiBaseInfoFormCustomListener | IUIBaseInfoFormCustomListener | 读取照片表盘基本信息回调 |
+| Parameter name | Type | Remarks |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| uiBaseInfoFormCustomListener | IUIBaseInfoFormCustomListener | Read the basic information callback of the photo dial |
 
-###### 返回数据
+###### Return data
 
 **IUIBaseInfoFormCustomListener**
 
 ```kotlin
 /**
- * 返回ui基本信息-自定义
+ * Return to ui basic information-customization
  *
- * @param uiDataCustom ui基本信息-自定义ui
+ * @param uiDataCustom ui basic information-custom ui
  */
 fun onBaseUiInfoFormCustom(uiDataCustom:UIDataCustom);
 ```
 
 **UIDataCustom**
 
-| 变量               | 类型                    | 备注                     |
-| ------------------ | ----------------------- | ------------------------ |
-| dataReceiveAddress | Int                     | UI数据的接收起始地址     |
-| dataCanSendLength  | Int                     | 可接收的数据长度         |
-| fileLength         | Long                    | 要发送的文件长度         |
-| customUIType       | EWatchUIType            | 设备屏幕类型             |
-| isDefalutUI        | Boolean                 | 是否是自定义中的默认表盘 |
-| timePosition       | EWatchUIElementPosition | 元素的位置               |
-| upTimeType         | EWatchUIElementType     | 时间上方的元素类型       |
-| downTimeType       | EWatchUIElementType     | 时间下方的元素类型       |
-| color888           | Int                     | 字体的显示颜色           |
-| crc                | Int                     | 表盘的crc值              |
-| packageIndex       | Int                     | 第几包，从1开始          |
+| Variable | Type | Remarks |
+| ------------------ | ----------------------- | ---------------------------- |
+| dataReceiveAddress | Int | The starting address for receiving UI data |
+| dataCanSendLength | Int | Acceptable data length |
+| fileLength | Long | The length of the file to send |
+| customUIType | EWatchUIType | Device screen type |
+| isDefalutUI | Boolean | Whether it is the default watch face in customization |
+| timePosition | EWatchUIElementPosition | element position |
+| upTimeType | EWatchUIElementType | The element type above time |
+| downTimeType | EWatchUIElementType | The element type below time |
+| color888 | Int | Font display color |
+| crc | Int | crc value of the dial |
+| packageIndex | Int | Package number, starting from 1 |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 mUiUpdateUtil.getCustomWatchUiInfo(IUIBaseInfoFormCustomListener { uiDataCustom ->
@@ -3673,47 +3669,47 @@ mUiUpdateUtil.getCustomWatchUiInfo(IUIBaseInfoFormCustomListener { uiDataCustom 
 })
 ```
 
-#### 第3步.选中元素及元素对应的方位
+#### Step 3. Select the element and its corresponding position
 
-###### 接口
+###### API
 
 ```
 setCustomWacthUi(UICustomSetData uiCustomSetData, final IUIBaseInfoFormCustomListener uiBaseInfoFormCustomListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                       | 类型                          | 备注             |
-| ---------------------------- | ----------------------------- | ---------------- |
-| uiCustomSetData              | UICustomSetData               | 照片表盘设置     |
-| uiBaseInfoFormCustomListener | IUIBaseInfoFormCustomListener | 照片表盘设置回调 |
+| Parameter name | Type | Remarks |
+| ---------------------------- | ---------------------------- | ------------------ |
+| uiCustomSetData | UICustomSetData | Photo dial settings |
+| uiBaseInfoFormCustomListener | IUIBaseInfoFormCustomListener | Photo dial setting callback |
 
 **UICustomSetData**
 
-| 参数名imePosition | 类型EWatchUIElementPosition | 备注元素的位置     |
-| ----------------- | --------------------------- | ------------------ |
-| timePosition      | EWatchUIElementPosition     | 元素的位置         |
-| upTimeType        | EWatchUIElementType         | 时间上方的元素类型 |
-| downTimeType      | EWatchUIElementType         | 时间下方的元素类型 |
-| color888          | Int                         | 字体的显示颜色     |
-| isDefalutUI       | Boolean                     | 是否是默认的照片   |
+| Parameter name imePosition | Type EWatchUIElementPosition | Position of the note element |
+| ------------------ | ------------------------------- | ------------------ |
+| timePosition | EWatchUIElementPosition | element position |
+| upTimeType | EWatchUIElementType | The element type above time |
+| downTimeType | EWatchUIElementType | The element type below time |
+| color888 | Int | Font display color |
+| isDefalutUI | Boolean | Whether it is the default photo |
 
-通过查询接口返回customUIType来获取设备的WatchUIType，可以知道设备支持的元素位置、默认图片、照片比例等信息。
+Get the WatchUIType of the device by returning customUIType from the query interface. You can know the element positions, default pictures, photo proportions and other information supported by the device.
 
-###### 返回数据
+###### Return data
 
 **IUIBaseInfoFormCustomListener**
 
 ```kotlin
 /**
- * 返回ui基本信息-自定义
+ * Return to ui basic information-customization
  *
- * @param uiDataCustom ui基本信息-自定义ui
+ * @param uiDataCustom ui basic information-custom ui
  */
 fun onBaseUiInfoFormCustom(uiDataCustom:UIDataCustom);
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 val timePosition: EWatchUIElementPosition = EWatchUIElementPosition.LEFT_TOP
@@ -3722,52 +3718,52 @@ val downTimeType: EWatchUIElementType = EWatchUIElementType.STEP
 val fontColor: Int = 0xffffff
 val uiCustomSetData =
     UICustomSetData(isDefalutUI, timePosition, upTimeType, downTimeType, fontColor)
-UiUpdateUtil.getInstance().setCustomWacthUi(uiCustomSetData,
+UiUpdateUtil.getInstance().setCustomWactthUi(uiCustomSetData,
     IUIBaseInfoFormCustomListener { uiDataCustom ->
         val watchColor = uiDataCustom.color888
         val hexColor = ColorUtil.intColorToHexStr(watchColor)
         /**
-         * app上颜色跟设备的颜色虽然是同一个颜色值，但是显示上会有差别
-         * 因为App上可以显示RCG_888,设备只能显示RGB_565
-         * 所以为了显示效果，最好是自己做一个映射表，
-         * 比如app上的A1和设备上的A2颜色相近,那么在app上显示A1颜色，下发给设备的是A2颜色。
+         * Although the color on the app and the color of the device have the same color value, there will be differences in display.
+         * Because the App can display RCG_888, the device can only display RGB_565
+         * So in order to display the effect, it is best to make a mapping table yourself.
+         * For example, the color of A1 on the app is similar to the color of A2 on the device, then the color of A1 is displayed on the app and the color of A2 is sent to the device.
          */
     })
 ```
 
-#### 第4步.背景使用自选图片
+#### Step 4. Use a custom picture for the background
 
-##### 非杰理平台设置
+##### Non-Jerry platform settings
 
-###### 接口
+###### API
 
-通过查询接口返回customUIType来获取设备的WatchUIType，可以知道设备支持的元素位置、默认图片、照片宽高等信息
+Get the WatchUIType of the device by returning customUIType through the query interface. You can know the element positions, default pictures, photo width and height supported by the device, etc.
 
-注：选择的图片裁剪宽高需与设备基本信息返回的图片宽高一致。
+Note: The cropped width and height of the selected image must be consistent with the image width and height returned by the device's basic information.
 
 ```
 startSetUiStream(euiFromType, inputStream, uiUpdateListener) 
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型              | 备注                                  |
-| ---------------- | ----------------- | ------------------------------------- |
-| euiFromType      | EUIFromType       | UI类型 此处默认为：EUIFromType.CUSTOM |
-| inputStream      | InputStream       | 表盘文件输入流                        |
-| uiUpdateListener | IUiUpdateListener | UI升级回调                            |
+| Parameter name | Type | Remarks |
+|---------------- | ----------------- | ----------------------------------------------- |
+| euiFromType | EUIFromType | UI type The default here is: EUIFromType.CUSTOM |
+| inputStream | InputStream | Dial file input stream |
+| uiUpdateListener | IUiUpdateListener | UI upgrade callback |
 
-###### 返回数据
+###### Return data
 
 **IUiUpdateListener**
 
-同【[服务器表盘-设置Ui](#第5步.设置UI)】返回一致
+Returns the same as [[Server Dial-Set Ui](#Step 5.Set UI)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 inputStream = resources.assets.open(fileName)
-val bmp = BitmapFactory.decodeStream(inputStream) //原图
+val bmp = BitmapFactory.decodeStream(inputStream) //Original image
 val sendInputStream: InputStream =
     mWatchUIType.getSendInputStream(context, bmp)
 UiUpdateUtil.getInstance().startSetUiStream(
@@ -3783,7 +3779,7 @@ UiUpdateUtil.getInstance().startSetUiStream(
         override fun onClearCacheProgress(
             currentCount: Int,
             sumCount: Int,
-            progress: Int
+            Progress: Int
         ) {
         }
 
@@ -3793,7 +3789,7 @@ UiUpdateUtil.getInstance().startSetUiStream(
         override fun onUiUpdateProgress(
             currentBlock: Int,
             sumBlock: Int,
-            progress: Int
+            Progress: Int
         ) {
         }
 
@@ -3805,72 +3801,72 @@ UiUpdateUtil.getInstance().startSetUiStream(
     })
 ```
 
-##### 杰理平台设置
+##### Jerry platform settings
 
-###### 前提
+###### Prerequisites
 
-需设备为杰理设备且已完成【[打开杰理文件系统](#打开杰理文件系统)】
+The required device is a Jerry device and has been completed [[Open Jerry File System](#Open Jerry File System)]
 
-###### 接口
+###### API
 
 ```
 VPOperateManager.getInstance().setJLWatchPhotoDial(dialPhotoPath, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名        | 类型                                         | 描述                                                         |
-| ------------- | -------------------------------------------- | ------------------------------------------------------------ |
-| dialPhotoPath | String                                       | 裁剪好尺寸的照片文件路径。（建议保存在固定的文件夹目录下。且裁剪的尺寸保持和当前的表盘尺寸一致，否则将无法传输 如 240x280的表盘则改图片需要宽高为240x280的尺寸） |
-| listener      | JLWatchFaceManager.JLTransferPicDialListener | 杰理照片表盘的传输监听                                       |
+| Parameter name | Type | Description |
+| ------------- | -------------------------------------------------- | --------------------------------------------------------------- |
+| dialPhotoPath | String | The path of the cropped photo file. (It is recommended to save it in a fixed folder directory. And the cropped size should be consistent with the current dial size, otherwise it will not be transferred. For example, if the dial is 240x280, the width and height of the image need to be 240x280) |
+| listener | JLWatchFaceManager.JLTransferPicDialListener | Transmission monitoring of Jerry's photo dial |
 
-###### 返回数据
+###### Return data
 
-JLTransferPicDialListener ： 杰理照片表盘传输监听
+JLTransferPicDialListener: Jerry's photo dial transfer listener
 
 ```java
 /**
- * 杰理照片表盘传输监听
+ * Jerry photo dial transmission monitoring
  */
 public interface JLTransferPicDialListener {
     /**
-     * 开始传输照片表盘
+     * Start transferring photo dial
      */
     void onJLTransferPicDialStart();
 
     /**
-     * 表盘传输进度监听
+     * Watch face transmission progress monitoring
      *
-     * @param progress 进度[0-100]
+     * @param progress progress[0-100]
      */
     void onTransferPicDialProgress(int progress);
 
     /**
-     * 预览图传输完成,该方法可以不用关心
+     * The preview image transmission is completed, you don’t need to worry about this method.
      */
     void onScaleBGPFileTransferComplete();
 
     /**
-     * 表盘照片大图传输完成,该方法可以不用关心
+     * The large image of the watch face photo has been transferred. You don’t need to worry about this method.
      */
     void onBigBGPFileTransferComplete();
 
     /**
-     * 照片表盘传输完成【传输时会先传输预览图再传输表盘大图】
+     * Photo dial transfer completed [During the transfer, the preview image will be transferred first and then the full dial image]
      */
     void onTransferComplete();
 
     /**
-     * 照片表盘传输异常
+     * Photo dial transmission abnormality
      *
-     * @param code     异常代码
-     * @param errorMsg 错误原因
+     * @param code exception code
+     * @param errorMsg error reason
      */
     void onTransferError(int code, String errorMsg);
 }
 ```
 
-###### 示例代码
+###### Sample code
 
 ```java
 private void setPhotoDial() {
@@ -3879,94 +3875,94 @@ private void setPhotoDial() {
     VPOperateManager.getInstance().setJLWatchPhotoDial(dialPhotoPath, new JLWatchFaceManager.JLTransferPicDialListener() {
         @Override
         public void onJLTransferPicDialStart() {
-            tvDialInfo.setText("开始传输照片表盘");
-            Logger.t(TAG).e("【杰理表盘传输】onJLTransferPicDialStart--->" + Thread.currentThread().toString());
+            tvDialInfo.setText("Start transferring photo dial");
+            Logger.t(TAG).e("[Jerry Dial Transmission]onJLTransferPicDialStart--->" + Thread.currentThread().toString());
         }
 
         @Override
         public void onTransferPicDialProgress(int progress) {
-            Logger.t(TAG).e("【杰理表盘传输】--->progress = " + progress + " : Thread = " + Thread.currentThread().toString());
+            Logger.t(TAG).e("[Jerry Dial Transmission]--->progress = " + progress + " : Thread = " + Thread.currentThread().toString());
             pbPhotoDial.setProgress(progress);
             tvDialProgress.setText(progress + " %");
-            tvDialInfo.setText("表盘文件传输中");
+            tvDialInfo.setText("Dial file is being transferred");
         }
 
         @Override
         public void onScaleBGPFileTransferComplete() {
-            Logger.t(TAG).e("【杰理表盘传输】--->缩略图传输完成" + " : Thread = " + Thread.currentThread().toString());
-            tvDialInfo.setText("表盘缩略图传输完成");
+            Logger.t(TAG).e("[Jerry Dial Transfer]--->Thumbnail transfer completed" + " : Thread = " + Thread.currentThread().toString());
+            tvDialInfo.setText("Dial thumbnail transmission completed");
         }
 
         @Override
         public void onBigBGPFileTransferComplete() {
-            Logger.t(TAG).e("【杰理表盘传输】--->大图传输完成" + " : Thread = " + Thread.currentThread().toString());
-            tvDialInfo.setText("表盘大图传输完成");
+            Logger.t(TAG).e("[Jerry Dial Transmission]--->Large image transmission completed" + " : Thread = " + Thread.currentThread().toString());
+            tvDialInfo.setText("Transmission of large dial image completed");
         }
 
         @Override
         public void onTransferComplete() {
-            Logger.t(TAG).e("【杰理表盘传输】--->表盘传输完成" + " : Thread = " + Thread.currentThread().toString());
-            tvDialInfo.setText("照片表盘传输成功");
+            Logger.t(TAG).e("[Jerry dial transmission]--->Dial transmission completed" + " : Thread = " + Thread.currentThread().toString());
+            tvDialInfo.setText("Photo dial transferred successfully");
         }
 
         @Override
         public void onTransferError(int code, String errorMsg) {
-            Logger.t(TAG).e("【杰理表盘传输】--->表盘传输失败 code = " + code + ", errorMsg = " + errorMsg + " : Thread = " + Thread.currentThread().toString());
-            tvDialInfo.setText("照片表盘传输失败，code = " + code + " , errorMsg = " + errorMsg);
+            Logger.t(TAG).e("[Jerry Dial Transmission]--->Dial transmission failed code = " + code + ", errorMsg = " + errorMsg + " : Thread = " + Thread.currentThread().toString());
+            tvDialInfo.setText("Photo dial transfer failed, code = " + code + " , errorMsg = " + errorMsg);
         }
     });
 }
 ```
 
-## 查找设备功能
+## Find device functions
 
-#### 前提
+#### Prerequisites
 
-设备需支持手机查找设备功能，该功能所有接口均需设备支持才可调用，判断条件如下：
+The device needs to support the function of finding the device on the mobile phone. All interfaces of this function need to be supported by the device before it can be called. The judgment conditions are as follows:
 
 ```
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportFindDeviceByPhone
 ```
 
-#### 手机主动开始查找设备-startFindDeviceByPhone
+#### The mobile phone actively starts to find the device-startFindDeviceByPhone
 
-###### 接口
+###### API
 
 ```
 startFindDeviceByPhone(bleWriteResponse, findDevicelistener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名             | 类型                 | 备注           |
-| ------------------ | -------------------- | -------------- |
-| bleWriteResponse   | IBleWriteResponseInt | 写入操作的监听 |
-| findDevicelistener | IFindDevicelistener  | 查找设备监听   |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | --------------- |
+| bleWriteResponse | IBleWriteResponseInt | Monitoring of write operations |
+| findDevicelistener | IFindDevicelistener | Find device listeners |
 
-###### 返回数据
+###### Return data
 
 **IFindDevicelistener**
 
 ```kotlin
 /**
- * 不支持通过手机找
+ *Does not support searching via mobile phone
  */
 fun unSupportFindDeviceByPhone()
 /**
- * 设备已经被找到
+ * The device has been found
  */
-fun findedDevice()
+fun foundDevice()
 /**
- * 查找超时
+ * Search timeout
  */
 fun unFindDevice()
 /**
- * 设备正在震动亮屏，处于查找状态中
+ * The device is vibrating and the screen is on, and is in search mode.
  */
-fun findingDevice()
+funfindDevice()
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -3990,23 +3986,23 @@ fun findingDevice()
         })
 ```
 
-#### 手机停止查找设备-stopFindDeviceByPhone
+#### The phone stops finding the device-stopFindDeviceByPhone
 
-###### 接口
+###### API
 
 ```
 stopFindDeviceByPhone(bleWriteResponse, findDevicelistener)
 ```
 
-###### 参数解释
+###### Parameters
 
-同【[手机主动开始查找设备-startFindDeviceByPhone](#手机主动开始查找设备-startFindDeviceByPhone)】参数一致
+The parameters are the same as [[The mobile phone actively starts to find the device-startFindDeviceByPhone](#The mobile phone actively starts to find the device-startFindDeviceByPhone)]
 
-###### 返回数据
+###### Return data
 
-同【[手机主动开始查找设备-startFindDeviceByPhone](#手机主动开始查找设备-startFindDeviceByPhone)】返回数据
+Same as [[Mobile phone actively starts to find the device-startFindDeviceByPhone](#Mobile phone actively starts to find the device-startFindDeviceByPhone)] returns data
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -4030,187 +4026,185 @@ stopFindDeviceByPhone(bleWriteResponse, findDevicelistener)
         })
 ```
 
-## 消息通知
+## Message notification
 
-当设备调用密码校验时会触发社交消息功能状态的上报回调 请参考[验证密码操作](\#验证密码操作)
+When the device calls password verification, it will trigger the reporting callback of the status of the social messaging function. Please refer to [Verification Password Operation](\#Verification Password Operation)
 
-消息通知功能主要包括
+The message notification function mainly includes
 
-1. 消息通知开关状态的读取和设置
-2. 发送消息通知
+1. Reading and setting the message notification switch status
+2. Send message notification
 
-### 消息通知开关状态的读取和设置
+### Reading and setting of message notification switch status
 
-#### 消息通知开关状态读取
+#### Read message notification switch status
 
 ```
 VPOperateManager.getInstance().readSocialMsg(writeResponse, listener)
 ```
 
-| 参数名        | 类型                   | 备注                     |
-| ------------- | ---------------------- | ------------------------ |
-| writeResponse | IBleWriteResponse      | 写入操作的监听           |
-| listener      | ISocialMsgDataListener | 消息通知开关状的回调监听 |
+| Parameter name | Type | Remarks |
+| ------------- | ----------------------- | ---------------------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| listener | ISocialMsgDataListener | Message notification switch-like callback listening |
 
-#### 或者通过以下方法获取SDK缓存的消息开关状态
+#### Or obtain the message switch status of the SDK cache through the following method
 
 ```
 VPOperateManager.getInstance().getFunctionSocailMsgData()
 ```
 
-此方法会返回消息通知的开关状态FunctionSocailMsgData，如果此方法获取的实体为null，请调用readSocialMsg方法。
+This method will return the switch status of the message notification FunctionSocailMsgData. If the entity obtained by this method is null, please call the readSocialMsg method.
 
-#### 消息通知开关状态设置
+#### Message notification switch status setting
 
 ```
  VPOperateManager.getInstance().settingSocialMsg(writeResponse, listener, socailMsgData);
 ```
 
-| 参数名        | 类型                   | 备注                     |
-| ------------- | ---------------------- | ------------------------ |
-| writeResponse | IBleWriteResponse      | 写入操作的监听           |
-| listener      | ISocialMsgDataListener | 消息通知开关状的回调监听 |
-| socailMsgData | FunctionSocailMsgData  | 需要设置的开关状态       |
+| Parameter name | Type | Remarks |
+| ------------- | ----------------------- | ---------------------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| listener | ISocialMsgDataListener | Message notification switch-like callback listening |
+| socailMsgData | FunctionSocailMsgData | Switch status to be set |
 
-#### 开关状态和监听回调
+#### Switch status and listening callback
 
-ISocialMsgDataListener：消息通知开关状态改变监听，当读取或设置时该监听会被调用。**注意：部分手表可能支持的社交消息类型小于17种，则该方法不会被回调**
+ISocialMsgDataListener: message notification switch status change listener, which will be called when reading or setting. **Note: Some watches may support less than 17 social message types, so this method will not be called back**
 
 ```
 /**
- * 社交消息状态监听
+ * Social message status monitoring
  */
 public interface ISocialMsgDataListener extends IListener {
     /**
-     * 社交消息状态改变监听，第一包
-     * 注意：部分手表可能支持的社交消息类型小于17种，则
+     * Social message status change monitoring, the first package
+     *Note: Some watches may support less than 17 social message types, then
      *
-     * @param socailMsgData 社交消息开关
+     * @param socailMsgData social message switch
      */
     void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData);
 
     /**
-     * 社交消息状态改变监听，第一包
-     * 注意：部分手表可能支持的社交消息类型小于17种，则该方法不会被回调
+     * Social message status change monitoring, the first package
+     * Note: Some watches may support less than 17 social message types, so this method will not be called back
      *
-     * @param socailMsgData 社交消息开关
+     * @param socailMsgData social message switch
      */
     void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData);
 }
 ```
 
-FunctionSocailMsgData：消息通知状态
+**FunctionSocailMsgData:** message notification status
 
-| 成员名        | 类型            | 描述             |
-| ------------- | --------------- | ---------------- |
-| phone         | EFunctionStatus | 电话             |
-| msg           | EFunctionStatus | 短信             |
-| wechat        | EFunctionStatus | 微信             |
-| qq            | EFunctionStatus | QQ               |
-| sina          | EFunctionStatus | 新浪             |
-| facebook      | EFunctionStatus | Facebook         |
-| twitter       | EFunctionStatus | X(原推特twitter) |
-| flickr        | EFunctionStatus | Flickr           |
-| Linkin        | EFunctionStatus | 领克 Linkin      |
-| whats         | EFunctionStatus | Whats            |
-| line          | EFunctionStatus | Line             |
-| instagram     | EFunctionStatus | Instagram        |
-| snapchat      | EFunctionStatus | Snapchat         |
-| skype         | EFunctionStatus | Skype            |
-| gmail         | EFunctionStatus | Gmail            |
-| dingding      | EFunctionStatus | 钉钉 dingding    |
-| wxWork        | EFunctionStatus | 企业微信 wxWork  |
-| tikTok        | EFunctionStatus | 抖音 TikTok      |
-| telegram      | EFunctionStatus | Telegram         |
-| connected2_me | EFunctionStatus | Connected2Me     |
-| kakaoTalk     | EFunctionStatus | KakaoTalk        |
-| messenger     | EFunctionStatus | Messenger        |
-| other         | EFunctionStatus | 其他消息         |
-| shieldPolice  | EFunctionStatus | 警右             |
+| member name | type | description |
+| ------------- | --------------- | ------------- |
+| phone | EFunctionStatus | phone |
+| msg | EFunctionStatus | SMS |
+| wechat | EFunctionStatus | WeChat |
+| qq | EFunctionStatus | QQ |
+| sina | EFunctionStatus | Sina |
+| facebook | EFunctionStatus | Facebook |
+| twitter | EFunctionStatus |
+| flickr | EFunctionStatus | Flickr |
+| Linkin | EFunctionStatus | Lynk & Co Linkin |
+| whats | EFunctionStatus | Whats |
+| line | EFunctionStatus | Line |
+| instagram | EFunctionStatus | Instagram |
+| snapchat | EFunctionStatus | Snapchat |
+| skype | EFunctionStatus | Skype |
+| gmail | EFunctionStatus | Gmail |
+| dingding | EFunctionStatus | Dingding dingding |
+| wxWork | EFunctionStatus | Enterprise WeChat wxWork |
+| tikTok | EFunctionStatus | Douyin TikTok |
+| telegram | EFunctionStatus | Telegram |
+| connected2_me | EFunctionStatus | Connected2Me |
+| kakaoTalk | EFunctionStatus | KakaoTalk |
+| messenger | EFunctionStatus | Messenger |
+| other | EFunctionStatus | other messages |
+| shieldPolice | EFunctionStatus | policeright |
 
-EFunctionStatus：功能状态（枚举类型）
+EFunctionStatus: function status (enumeration type)
 
-| 类型          | 描述         |
+| Type | Description |
 | ------------- | ------------ |
-| UNSUPPORT     | 该功能不支持 |
-| SUPPORT       | 支持         |
-| SUPPORT_OPEN  | 支持且打开   |
-| SUPPORT_CLOSE | 支持且关闭   |
-| UNKONW        | 未知状态     |
+| UNSUPPORT | This feature is not supported |
+| SUPPORT | Support |
+| SUPPORT_OPEN | Supported and open |
+| SUPPORT_CLOSE | Support and close |
+| UNKONW | Unknown status |
 
-### 发送消息通知
+### Send message notification
 
-消息通知分为三类消息通知
+Message notifications are divided into three types of message notifications:
 
-1. 手机来电消息通知
-2. 手机短信消息通知
-3. 社交消息通知（各类app的通知消息如微信，QQ，X(原推特)等）
+1. Mobile phone call message notification
+2. Mobile phone SMS message notification
+3. Social message notifications (notification messages from various apps such as WeChat, QQ, X (original Twitter), etc.)
 
-#### 消息发送
+#### Message sending
 
 ```
 VPOperateManager.getInstance().sendSocialMsgContent(writeResponse, contentSetting)
 ```
 
-| 参数名         | 类型              | 描述           |
-| -------------- | ----------------- | -------------- |
-| writeResponse  | IBleWriteResponse | 写入操作的监听 |
-| contentSetting | ContentSetting    | 消息内容       |
+| Parameter name | Type | Description |
+| -------------- | -------------- | -------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| contentSetting | ContentSetting | message content |
 
-ContentSetting：消息内容 其中ESocailMsg为信息类型
+ContentSetting: message content where ESocailMsg is the information type
 
 ```
 public abstract class ContentSetting {
    /**
-    * 信息推送的枚举
+    * Enumeration of information push
     */
    private ESocailMsg eSocailMsg;
   ....
-```
-
-ESocailMsg：社交消息类型枚举
+```ESocailMsg: social message type enumeration
 
 ```
-G15MSG((byte) 0XFE), //G15项目专属，可以不用理会
+G15MSG((byte) 0XFE), //Exclusive to G15 project, you can ignore it
 
 /**
- * 电话
+ * Telephone
  */
 PHONE((byte) 0x00),
 /**
- * 短信
+ * SMS
  */
 SMS((byte) 0x01),
 /**
- * 微信
+ * WeChat
  */
 WECHAT((byte) 0x02),
 /**
- * QQ【正式版，轻聊版，国际版】
+ * QQ [official version, light chat version, international version]
  */
 QQ((byte) 0x03),
 /**
- * 新浪微博
+ * Sina Weibo
  */
 SINA((byte) 0x04),
 /**
- * facebook脸谱
+ * facebookfacebook
  */
 FACEBOOK((byte) 0x05),
 /**
- * X(原推特twitter)
+ *X(original Twitter twitter)
  */
 TWITTER((byte) 0x06),
 /**
- * filck
+ *filck
  */
 FLICKR((byte) 0x07),
 /**
- * linkin领英
+ *linkin LinkedIn
  */
 LINKIN((byte) 0x08),
 /**
- * whatapp
+ *whatapp
  */
 WHATS((byte) 0x09),
 /**
@@ -4230,20 +4224,20 @@ SNAPCHAT((byte) 0x0C),
  */
 SKYPE((byte) 0x0D),
 /**
- * gmail邮箱
+ * gmail email
  */
 GMAIL((byte) 0x0E),
 /**
- * 钉钉
+ * DingTalk
  */
 DINGDING((byte) 0x0F),
 /**
- * 企业微信
+ * Enterprise WeChat
  */
 WXWORK((byte) 0x10),
 
 /**
- * 非以上的其他通知
+ * Other notifications other than the above
  */
 OTHER((byte) 0x11),
 /**
@@ -4263,57 +4257,57 @@ CONNECTED2_ME((byte) 0x14),
  */
 KAKAO_TALK((byte) 0x15),
 /**
- * 警右
+ *Police right
  */
-SHIELD_POLICE((byte) 0x16),//专属项目不用理会
+SHIELD_POLICE((byte) 0x16),//Ignore exclusive projects
 /**
- * facebook下的Messenger
+ * Messenger under facebook
  */
 MESSENGER((byte) 0x17),
 ```
 
-#### 手机来电消息通知类型
+#### Mobile phone call message notification type
 
-手机来电消息使用的是 ContentPhoneSetting，继承自ContentSetting，如果同时传入名字跟电话，手表会显示名字，联系人姓名可以传null
+The incoming call message on the mobile phone uses ContentPhoneSetting, which is inherited from ContentSetting. If the name and phone number are passed in at the same time, the watch will display the name. The contact name can be passed null.
 ContentPhoneSetting
 
-| 成员名             | 类型   | 备注       |
+| Member name | Type | Remarks |
 | ------------------ | ------ | ---------- |
-| contactName        | String | 联系人名称 |
-| contectPhoneNumber | String | 联系人号码 |
+| contactName | String | Contact name |
+| contactPhoneNumber | String | Contact number |
 
-推荐使用以下构造方法
+It is recommended to use the following construction methods
 
 ```
-ContentPhoneSetting contentSetting = new ContentPhoneSetting(ESocailMsg.PHONE, "张三", "010-6635214");
+ContentPhoneSetting contentSetting = new ContentPhoneSetting(ESocailMsg.PHONE, "Zhang San", "010-6635214");
 ```
 
-#### 手机短信消息通知类型
+#### Mobile SMS message notification type
 
-手机短信消息使用的是 ContentSmsSetting，继承自ContentSetting，如果同时传入名字跟电话，手表会显示名字
+Mobile phone SMS messages use ContentSmsSetting, which is inherited from ContentSetting. If you pass in the name and phone number at the same time, the watch will display the name.
 ContentSmsSetting
 
-| 成员名             | 类型   | 备注       |
+| Member name | Type | Remarks |
 | ------------------ | ------ | ---------- |
-| contactName        | String | 联系人名称 |
-| contectPhoneNumber | String | 联系人号码 |
-| content            | String | 信息内容   |
+| contactName | String | Contact name |
+| contactPhoneNumber | String | Contact number |
+| content | String | Information content |
 
-推荐使用以下构造方法
+It is recommended to use the following construction methods
 
 ```
-ContentPhoneSetting contentSetting = new ContentSmsSetting(ESocailMsg.SMS, "李四", "010-6635214", "今天手气如何？");
+ContentPhoneSetting contentSetting = new ContentSmsSetting(ESocailMsg.SMS, "Alice", "010-6635214", "How are you lucky today?");
 ```
 
-#### 社交消息类型
+#### Social message type
 
-社交消息类型 使用的是 ContentSocailSetting，继承自ContentSetting
+The social message type uses ContentSocailSetting, inherited from ContentSetting
 
 ```
 /**
- * @param eSocailMsg 信息的类型
- * @param title      信息的标题
- * @param content    信息的内容
+ * @param eSocailMsg type of message
+ * @param title the title of the message
+ * @param content The content of the message
  */
 public ContentSocailSetting(ESocailMsg eSocailMsg, String title, String content) {
     super(eSocailMsg);
@@ -4322,108 +4316,108 @@ public ContentSocailSetting(ESocailMsg eSocailMsg, String title, String content)
 }
 ```
 
-## 音乐控制
+## Music Control
 
-#### 前提
+#### Prerequisites
 
-需设备支持音乐控制，判断条件如下：
+The device needs to support music control, and the judgment conditions are as follows:
 
 ```kotlin
-val musicType ==  VpSpGetUtil.getVpSpVariInstance(applicationContext).musicType
+val musicType == VpSpGetUtil.getVpSpVariInstance(applicationContext).musicType
 if(musicType == 1){
-    //设备支持音乐控制
+    //The device supports music control
 }else{
-    //设备不支持音乐控制
+    //The device does not support music control
 }
 ```
 
-#### 设置音乐数据
+#### Set music data
 
-需设备支持音乐控制
+Requires device to support music control
 
-###### 接口
+###### API
 
 ```kotlin
 settingMusicData(bleWriteResponse, musicData, iMusicControlListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                | 类型                  | 备注                   |
-| --------------------- | --------------------- | ---------------------- |
-| bleWriteResponse      | IBleWriteResponse     | 写入操作的监听         |
-| musicData             | MusicData             | 音乐数据(歌名、开关等) |
-| iMusicControlListener | IMusicControlListener | 音乐控制监听           |
+| Parameter name | Type | Remarks |
+| -------------------------- | -------------------------- | -------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| musicData | MusicData | Music data (song title, switch, etc.) |
+| iMusicControlListener | IMusicControlListener | Music control monitoring |
 
-**MusicData** -- 音乐数据
+**MusicData** -- music data
 
-| 参数名          | 类型   | 备注                       |
+| Parameter name | Type | Remarks |
 | --------------- | ------ | -------------------------- |
-| musicAppId      | String | 音乐appid                  |
-| musicAlbum      | String | 音乐专辑                   |
-| musicName       | String | 音乐名                     |
-| singerName      | String | 歌手名                     |
-| palyStatus      | Int    | 状态：1 播放状态 2暂停状态 |
-| musicVoiceLevel | Int    | 音量等级[1-100]            |
+| musicAppId | String | music appid |
+| musicAlbum | String | music album |
+| musicName | String | Music name |
+| singerName | String | singer name |
+| playStatus | Int | Status: 1 Playing status 2 Pausing status |
+| musicVoiceLevel | Int | Volume level[1-100] |
 
-###### 返回数据
+###### Return data
 
-**IMusicControlListener** -- 音乐控制数据的返回监听，音乐控制功能存在标志位
+**IMusicControlListener** -- Return monitoring of music control data, music control function exists flag bit
 
 ```kotlin
 /**
- * 下一曲,请执行相关的操作
+ * Next song, please perform related operations
  */
 fun nextMusic()
 
 /**
- * 上一曲,请执行相关的操作
+ * Previous song, please perform related operations
  */
 
 fun previousMusic()
 
 /**
- * 暂停和播放,请执行相关的操作
+ * Pause and play, please perform related operations
  */
 fun pauseAndPlayMusic()
 
 /**
- * 暂停,请执行相关的操作
+ * Pause, please perform related operations
  */
 fun pauseMusic()
 
 /**
- * 播放,请执行相关的操作
+ * Play, please perform related operations
  */
 fun playMusic()
 
 /**
- * 调高音量请执行相关的操作
+ * Please perform related operations to increase the volume.
  */
 fun voiceUp()
 
 /**
- * 音量下降请执行相关的操作
+ * Please perform relevant operations if the volume drops.
  */
 fun voiceDown()
 
 /**
- * 操作成功
+ * Operation successful
  */
 fun oprateMusicSuccess()
 
 /**
- * 操作失败
+ * Operation failed
  */
 fun oprateMusicFail()
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-val play = 1 //播放状态
-val pause = 2 //暂停状态
-val musicData = MusicData("周杰伦", "上海一九四三", "范特西", 80, play )
+val play = 1 //Playing status
+val pause = 2 //pause state
+val musicData = MusicData("Jay Chou", "Shanghai 1943", "Fantasy", 80, play )
 VPOperateManager.getInstance()
     .settingMusicData(writeResponse, musicData, object : IMusicControlListener {
         override fun oprateMusicSuccess() {
@@ -4464,103 +4458,103 @@ VPOperateManager.getInstance()
     })
 ```
 
-#### 设置设备音量
+#### Set device volume
 
-需设备支持音乐控制
+Requires device to support music control
 
-###### 接口
+###### API
 
 ```kotlin
 settingVolume(volumeLevel,bleWriteResponse,iMusicControlListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                | 类型                  | 备注                             |
-| --------------------- | --------------------- | -------------------------------- |
-| bleWriteResponse      | IBleWriteResponse     | 写入操作的监听                   |
-| volumeLevel           | Int                   | 需要设置的音量值，范围是从0到100 |
-| iMusicControlListener | IMusicControlListener | 音乐控制监听                     |
+| Parameter name | Type | Remarks |
+| -------------------------- | -------------------------- | -------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| volumeLevel | Int | The volume value to be set, ranging from 0 to 100 |
+| iMusicControlListener | IMusicControlListener | Music control monitoring |
 
-###### 返回数据
+###### Return data
 
-同【[设置音乐数据](#设置音乐数据返回)】返回数据一致
+Same as the data returned by [[Set Music Data](#Set Music Data Return)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().settingVolume(50,bleWriteResponse,iMusicControlListener)
 ```
 
-## 蓝牙通话功能
+## Bluetooth call function
 
-#### 注册设备蓝牙通话功能监听-registerBTInfoListener
+#### Register device Bluetooth call function monitoring-registerBTInfoListener
 
-###### 接口
+###### API
 
 ```
 registerBTInfoListener(iDeviceBTInfoListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                | 类型                  | 备注                 |
-| --------------------- | --------------------- | -------------------- |
-| iDeviceBTInfoListener | IDeviceBTInfoListener | 设备蓝牙通话功能监听 |
+| Parameter name | Type | Remarks |
+| -------------------------- | -------------------------- | -------------------- |
+| iDeviceBTInfoListener | IDeviceBTInfoListener | Device Bluetooth call function monitoring |
 
-###### 返回数据
+###### Return data
 
 **IDeviceBTInfoListener**
 
 ```kotlin
 /**
- * 设备不支持BT（蓝牙3.0功能）,无此回调代表设备支持BT
+ * The device does not support BT (Bluetooth 3.0 function). The absence of this callback means that the device supports BT.
  */
 fun onDeviceBTFunctionNotSupport()
 
 /**
- * 设备经典蓝牙设置回调
+ *Device classic Bluetooth setting callback
  *
- * @param btInfo       BT状态详情
+ * @param btInfo BT status details
  */
 fun onDeviceBTInfoSettingSuccess(btInfo: BTInfo)
 
 /**
- * 设备BT状态设置失败
+ * Device BT status setting failed
  */
 fun onDeviceBTInfoSettingFailed()
 
 /**
- * 设备经典蓝牙读取回调
+ * Device classic Bluetooth read callback
  *
- * @param btInfo       BT状态详情
+ * @param btInfo BT status details
  */
 fun onDeviceBTInfoReadSuccess(btInfo: BTInfo)
 
 /**
- * 读取设备BT状态失败
+ * Failed to read device BT status
  */
 fun onDeviceBTInfoReadFailed()
 
 /**
- * 设备经典蓝牙上报回调
+ * Device classic Bluetooth reporting callback
  *
- * @param btInfo       BT状态详情
+ * @param btInfo BT status details
  */
 fun onDeviceBTInfoReport(btInfo: BTInfo)
 ```
 
 **BTInfo**
 
-| 变量           | 类型    | 备注                                             |
-| -------------- | ------- | ------------------------------------------------ |
-| status         | Int     | 设备蓝牙通话状态 0：断开， 1：连接， 2：配对中。 |
-| isBTOpen       | Boolean | 设备蓝牙通话是否打开                             |
-| isAutoCon      | Boolean | 设备蓝牙通话是否会自动回连                       |
-| isAudioOpen    | Boolean | 多媒体音频是否打开                               |
-| isHavePairInfo | Boolean | 是否有配对信息                                   |
+| Variable | Type | Remarks |
+| -------------- | ------- | -------------------------------------------------- |
+| status | Int | Device Bluetooth call status 0: Disconnected, 1: Connected, 2: Pairing. |
+| isBTOpen | Boolean | Whether the device's Bluetooth call is turned on |
+| isAutoCon | Boolean | Whether the device's Bluetooth call will automatically connect back |
+| isAudioOpen | Boolean | Whether multimedia audio is open |
+| isHavePairInfo | Boolean | Whether there is pairing information |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -4586,47 +4580,47 @@ fun onDeviceBTInfoReport(btInfo: BTInfo)
         })
 ```
 
-#### 注册设备蓝牙通话连接状态监听-registerBTConnectionListener
+#### Register device Bluetooth call connection status monitoring-registerBTConnectionListener
 
-###### 接口
+###### API
 
 ```
 registerBTConnectionListener(iDeviceBTConnectionListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                      | 类型                        | 备注                     |
-| --------------------------- | --------------------------- | ------------------------ |
-| iDeviceBTConnectionListener | IDeviceBTConnectionListener | 设备蓝牙通话连接状态监听 |
+| Parameter name | Type | Remarks |
+| --------------------------- | --------------------------- | -------------------------- |
+| iDeviceBTConnectionListener | IDeviceBTConnectionListener | Device Bluetooth call connection status monitoring |
 
-###### 返回数据
+###### Return data
 
 **IDeviceBTConnectionListener**
 
 ```kotlin
 /**
- * 开始连接BT
+ * Start connecting to BT
  */
 fun onDeviceBTConnecting() {}
 
 /**
- * 设备BT已连接
+ * Device BT is connected
  */
 fun onDeviceBTConnected() {}
 
 /**
- * 设备BT已断开
+ *The device BT has been disconnected
  */
 fun onDeviceBTDisconnected() {}
 
 /**
- * 设备BT连接超时
+ * Device BT connection timeout
  */
 fun onDeviceBTConnectTimeout() {}
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -4649,30 +4643,30 @@ fun onDeviceBTConnectTimeout() {}
         })
 ```
 
-#### 手动连接BT-connectBT
+#### Manually connect BT-connectBT
 
-###### 前提
+###### Prerequisites
 
-注册设备蓝牙通话功能监听后，没有onDeviceBTFunctionNotSupport回调（即设备支持BT功能）
+After registering the device's Bluetooth call function monitoring, there is no onDeviceBTFunctionNotSupport callback (that is, the device supports the BT function)
 
-###### 接口
+###### API
 
 ```
 connectBT(mac, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名   | 类型                        | 备注                |
+| Parameter name | Type | Remarks |
 | -------- | --------------------------- | ------------------- |
-| mac      | String                      | 要连接的设备蓝牙mac |
-| listener | IDeviceBTConnectionListener | 设备连接监听回调    |
+| mac | String | The device to connect to Bluetooth mac |
+| listener | IDeviceBTConnectionListener | Device connection listening callback |
 
-###### 返回数据
+###### Return data
 
 **IDeviceBTConnectionListener**
 
-###### 代码示例
+###### Code sample
 
 ```kotlin
 //        kotlin code
@@ -4682,27 +4676,27 @@ connectBT(mac, listener)
         })
 ```
 
-#### 手动断开BT连接-disconnectBT
+#### Manually disconnect BT -disconnectBT
 
-###### 前提
+###### Prerequisites
 
-设备支持BT且已经连上了BT
+The device supports BT and is connected to BT
 
-###### 接口
+###### API
 
 ```
 disconnectBT(String mac, IDeviceBTConnectionListener listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-同【[手动连接BT-connectBT](#手动连接BT-connectBT)】参数一致
+Same parameters as [[Manual connection BT-connectBT](#Manual connection BT-connectBT)]
 
-###### 返回数据
+###### Return data
 
-同【[手动连接BT-connectBT](#手动连接BT-connectBT)】返回数据一致
+The data returned is consistent with [[Manual connection BT-connectBT](#Manual connection BT-connectBT)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -4712,24 +4706,24 @@ disconnectBT(String mac, IDeviceBTConnectionListener listener)
         })
 ```
 
-#### 读取BT信息-readBTInfo
+#### Read BT information-readBTInfo
 
 ```
 readBTInfo(bleWriteResponse, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                  | 备注             |
-| ---------------- | --------------------- | ---------------- |
-| bleWriteResponse | IBleWriteResponse     | 写入操作的监听   |
-| listener         | IDeviceBTInfoListener | 设备连接监听回调 |
+| Parameter name | Type | Remarks |
+|----------------|-----------------------------|----------------|
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| listener | IDeviceBTInfoListener | Device connection listening callback |
 
-###### 返回数据
+###### Return data
 
-同【[手动连接BT-connectBT](#手动连接BT-connectBT)】返回数据一致
+The data returned is consistent with [[Manual connection BT-connectBT](#Manual connection BT-connectBT)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //kotlin code
@@ -4742,33 +4736,33 @@ VPOperateManager.getInstance().readBTInfo(
 )
 ```
 
-#### 设置BT状态-setBTStatus
+#### Set BT status-setBTStatus
 
-###### 前提
+###### Prerequisites
 
-设备支持BT，且设备BT连接成功
+The device supports BT, and the device BT connection is successful
 
-###### 接口
+###### API
 
 ```kotlin
 setBTStatus(boolean isAutoConnect, boolean isBTOpen, boolean isAudioOpen, isClearPairInfo, bleWriteResponse)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型              | 备注                 |
-| ---------------- | ----------------- | -------------------- |
-| isAutoConnect    | Boolean           | 设备是否自动回连     |
-| isBTOpen         | Boolean           | 设备BT是否开启       |
-| isAudioOpen      | Boolean           | 多媒体开关是否打开   |
-| isClearPairInfo  | Boolean           | 是否清除设备配对信息 |
-| bleWriteResponse | IBleWriteResponse | 写入操作的监听       |
+| Parameter name | Type | Remarks |
+|---------------- | ----------------- | ------------------ |
+| isAutoConnect | Boolean | Whether the device automatically connects back |
+| isBTOpen | Boolean | Whether the device BT is open |
+| isAudioOpen | Boolean | Whether the multimedia switch is turned on |
+| isClearPairInfo | Boolean | Whether to clear device pairing information |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
 
-###### 返回数据
+###### Return data
 
-无
+None
 
-###### 代码示例
+###### Code sample
 
 ```kotlin
 //kotlin code
@@ -4779,30 +4773,30 @@ VPOperateManager.getInstance().setBTStatus(false, isBTOpen, isAudioOpen, false) 
 }
 ```
 
-#### 设置BT开关状态-setBTSwitchStatus
+#### Set BT switch status-setBTSwitchStatus
 
-###### 前提
+###### Prerequisites
 
-设备支持BT，且设备BT连接成功
+The device supports BT, and the device BT connection is successful
 
-###### 接口
+###### API
 
 ```kotlin
 setBTSwitchStatus(isBTOpen, bleWriteResponse)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型              | 备注           |
-| ---------------- | ----------------- | -------------- |
-| isBTOpen         | Boolean           | 是否打开BT     |
-| bleWriteResponse | IBleWriteResponse | 写入操作的监听 |
+| Parameter name | Type | Remarks |
+|---------------- | ----------------- | --------------- |
+| isBTOpen | Boolean | Whether to open BT |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
 
-###### 返回数据
+###### Return data
 
-无
+None
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -4811,880 +4805,879 @@ setBTSwitchStatus(isBTOpen, bleWriteResponse)
         }
 ```
 
-## 运动功能
+## Sports function
 
-#### 读取运动模式数据
+#### Read sports mode data
 
-###### 前提
+###### Prerequisites
 
-设备需支持运动模式
+The device needs to support sports mode
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportSportModel
 ```
 
-###### 接口
+###### API
 
 ```kotlin
 readSportModelOrigin(bleWriteResponse, sportModelOriginListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                   | 类型                      | 备注                 |
-| ------------------------ | ------------------------- | -------------------- |
-| bleWriteResponse         | IBleWriteResponse         | 写入操作的监听       |
-| sportModelOriginListener | ISportModelOriginListener | 读取运动模式数据监听 |
+| Parameter name | Type | Remarks |
+| -------------------------------- | -------------------------------- | -------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| sportModelOriginListener | ISportModelOriginListener | Read sports mode data listening |
 
-###### 返回数据
+###### Return data
 
 **ISportModelOriginListener**
 
 ```kotlin
 /**
- * 返回读取的进度
+ * Return the progress of reading
  *
- * @param progress 进度值，范围[0-1]
+ * @param progress progress value, range [0-1]
  */
 fun onReadOriginProgress(progress: Float)
 
 /***
- * 返回读取的细节
+ * Return read details
  *
- * @param day            数据在手表中的标志位[0=今天，1=昨天，2=前天]
- * @param date           数据的日期,格式为yyyy-mm-dd
- * @param allPackage     当天数据的总包数
- * @param currentPackage 此包的位置
+ * @param day The flag of the data in the watch [0=today, 1=yesterday, 2=the day before yesterday]
+ * @param date The date of the data, in the format of yyyy-mm-dd
+ * @param allPackage The total number of packages of data on the day
+ * @param currentPackage The location of this package
  */
 fun onReadOriginProgressDetail(day: Int, date: String?, allPackage: Int, currentPackage: Int)
 
 /**
- * 运动模式原始数据[头部信息]的回调
+ * Callback of sports mode raw data [head information]
  *
- * @param sportModelHeadData 运动模式原始数据[头部信息]
+ * @param sportModelHeadData sport mode original data [head information]
  */
 fun onHeadChangeListListener(sportModelHeadData: SportModelOriginHeadData?)
 
 /**
- * 运动模式原始数据[详细信息]的回调
+ * Callback of sports mode raw data [details]
  *
- * @param sportModelItemDatas 运动模式原始数据[详细信息]
+ * @param sportModelItemDatas sport mode raw data [details]
  */
 fun onItemChangeListListener(sportModelItemDatas: List<SportModelOriginItemData?>?)
 
 /**
- * 读取结束
+ * End of reading
  */
 fun onReadOriginComplete()
 ```
 
-**SportModelOriginHeadData**--运动模式的头部信息
+**SportModelOriginHeadData**--Head information of sports mode
 
-| 变量         | 类型     | 备注                     |
-| ------------ | -------- | ------------------------ |
-| date         | String   | 运动日期                 |
-| startTime    | TimeData | 开始时间                 |
-| stopTime     | TimeData | 停止时间                 |
-| sportTime    | Int      | 运动总时长               |
-| stepCount    | Int      | 运动总步数               |
-| sportCount   | Int      | 总运动量                 |
-| kcals        | Double   | 运动消耗的千卡           |
-| distance     | Double   | 运动距离                 |
-| recordCount  | Int      | 总记录条数               |
-| pauseCount   | Int      | 暂停次数                 |
-| pauseTime    | Int      | 暂停的时长               |
-| crc          | Int      | 数据校验码               |
-| peisu        | Int      | 配速                     |
-| oxsporttimes | Int      | 有氧运动时间             |
-| averRate     | Int      | 平均心率                 |
-| sportType    | Int      | 运动类型，详见ESportType |
+| Variable | Type | Remarks |
+| ------------ | -------- | --------------------- |
+| date | String | Sports date |
+| startTime | TimeData | start time |
+| stopTime | TimeData | stop time |
+| sportTime | Int | Total exercise time |
+| stepCount | Int | Total number of exercise steps |
+| sportCount | Int | Total amount of exercise |
+| kcals | Double | kilocalories consumed by exercise |
+| distance | Double | Movement distance |
+| recordCount | Int | Total number of records |
+| pauseCount | Int | Number of pauses |
+| pauseTime | Int | Pause duration |
+| crc | Int | Data check code |
+| peisu | Int | Pace |
+| oxsporttimes | Int | aerobics time |
+| averRate | Int | average heart rate |
+| sportType | Int | Sport type, see ESportType |
 
-**SportModelOriginItemData**--运动模式的详细信息
+**SportModelOriginItemData**--Detailed information of sports mode
 
-| 变量       | 类型     | 备注     |
+| Variable | Type | Remarks |
 | ---------- | -------- | -------- |
-| date       | String   | 运动日期 |
-| startTime  | TimeData | 开始时间 |
-| minute     | Int      | 运动分钟 |
-| allMinute  | Int      | 总分钟   |
-| rate       | Int      | 心率     |
-| stepCount  | Int      | 总步数   |
-| sportCount | Int      | 总运动量 |
-| distance   | Int      | 运动距离 |
-| kcal       | Int      | 消耗千卡 |
-| beathPause | Int      | 暂停标志 |
-| crc        | Int      | 校验码   |
+| date | String | Sports date |
+| startTime | TimeData | start time |
+| minute | Int | Sports minute |
+| allMinute | Int | Total minutes |
+| rate | Int | heart rate |
+| stepCount | Int | Total number of steps |
+| sportCount | Int | Total amount of exercise |
+| distance | Int | Movement distance |
+| kcal | Int | kilocalories consumed |
+| beathPause | Int | Pause flag |
+| crc | Int | Check code |
 
-ESportType--运动类型枚举
+ESportType--sport type enumeration
 
 ```java
 public enum ESportType {
     /**
-     * 默认的运动
+     *Default sport
      */
     NONE(0),
     /**
-     * 户外跑步
+     * Outdoor running
      */
     OUTDOOR_RUNNING(1),
     /**
-     * 户外步行
+     * Outdoor walking
      */
     OUTDOOR_WALK(2),
     /**
-     * 室内跑步
+     * Indoor running
      */
     INDOOR_RUNNING(3),
     /**
-     * 室内步行
+     * Indoor walking
      */
     INDOOR_WALK(4),
     /**
-     * 徒步
+     * Hiking
      */
     HIKE(5),
     /**
-     * 踏步机
+     * Stepper
      */
     TREADMILLS(6),
     /**
-     * 户外骑行
+     * Outdoor cycling
      */
     OUTDOOR_RIDING(7),
     /**
-     * 室内骑行
+     *Indoor cycling
      */
     INDOOR_RIDING(8),
     /**
-     * 椭圆机
+     * Elliptical machine
      */
     ELLIPTICAL(9),
     /**
-     * 划船器
+     * rowing machine
      */
     ROWING_MACHINE(10),
     /**
-     * 登山
+     *Mountain climbing
      */
     Mountaineering(11),
     /**
-     * 游泳
+     * swimming
      */
     SWIM(12),
     /**
-     * 仰卧起坐
+     * Sit-ups
      */
     Sit_Ups(13),
     /**
-     * 滑雪
+     * Skiing
      */
     SKI(14),
     /**
-     * 跳绳
+     * Skipping rope
      */
     JUMP_ROPE(15),
     /**
-     * 瑜伽
+     * Yoga
      */
     YOGA(16),
     /**
-     * 乒乓球
+     * table tennis
      */
     PING_PONG(17),
     /**
-     * 篮球
+     * Basketball
      */
     BASKETBALL(18),
     /**
-     * 排球
+     * Volleyball
      */
     VOLLEYBALL(19),
     /**
-     * 足球
+     * football
      */
     FOOTBALL(20),
     /**
-     * 羽毛球
+     * Badminton
      */
     BADMINTON(21),
     /**
-     * 网球
+     * Tennis
      */
     TENNIS(22),
     /**
-     * 爬楼梯
+     * Climb stairs
      */
     CLIMB_STAIRS(23),
     /**
-     * 健身
+     * Fitness
      */
     FITNESS(24),
     /**
-     * 举重
+     * Lifting weights
      */
     WEIGHTLIFTING(25),
     /**
-     * 潜水
+     * Diving
      */
     DIVING(26),
     /**
-     * 拳击
+     * Boxing
      */
     BOXING(27),
     /**
-     * 健身球
+     * Exercise ball
      */
     GYM_BALL(28),
     /**
-     * 深蹲训练
+     * Squat training
      */
     SQUAT_TRAINING(29),
     /**
-     * 铁人三项
+     *Triathlon
      */
     TRIATHLON(30),
     /**
-     * 舞蹈
+     * dance
      */
     DANCE(31),
     /**
-     * HIIT
+     *HIIT
      */
     HIIT(32),
     /**
-     * 攀岩
+     * rock climbing
      */
     ROCK_CLIMBING(33),
     /**
-     * 竞技
+     * Athletics
      */
     SPORTS(34),
     /**
-     * 球类
+     * Ball games
      */
     BALLS(35),
     /**
-     * 健身游戏
+     * Fitness games
      */
     FITNESS_GAME(36),
     /**
-     * 自由活动
+     * Free activities
      */
     FREE_TIME(37),
     /**
-     * 健美操
+     * aerobics
      */
     AEROBICS(38),
     /**
-     * 体操
+     *Gymnastics
      */
     GYMNASTICS(39),
     /**
-     * 自由体操
+     * floor exercise
      */
     FLOOR_EXERCISE(40),
     /**
-     * 单杠
+     *Horizontal bar
      */
     HORIZONTALBAR(41),
     /**
-     * 双杠
+     * Parallel bars
      */
     PARALLELBARS(42),
     /**
-     * 蹦床
+     * Trampoline
      */
     TRAMPOLINE(43),
     /**
-     * 田径
+     *Athletics
      */
     TRACKANDFIELD(44),
     /**
-     * 马拉松
+     * Marathon
      */
     MARATHON(45),
     /**
-     * 俯卧撑
+     * push-ups
      */
     PUSH_UPS(46),
     /**
-     * 哑铃
+     * Dumbbells
      */
     DUMBBELL(47),
     /**
-     * 橄榄球
+     * Rugby
      */
     RUGBY_FOOTBALL(48),
     /**
-     * 手球
+     *Handball
      */
     HANDBALL(49),
     /**
-     * 棒垒球
+     * Baseball and softball
      */
     BASEBALL_SOFTBALL(50),
     /**
-     * 棒球
+     * Baseball
      */
     BASEBALL(51),
     /**
-     * 曲棍球
+     * Hockey
      */
     HOCKEY(52),
     /**
-     * 高尔夫球
+     * golf ball
      */
     GOLF(53),
     /**
-     * 保龄球
+     * Bowling
      */
     BOWLING(54),
     /**
-     * 台球
+     * Billiards
      */
     BILLIARDS(55),
     /**
-     * 赛艇
+     * rowing
      */
     ROWING(56),
     /**
-     * 帆船
+     * Sailing boat
      */
     SAILBOAT(57),
     /**
-     * 滑冰
+     * skating
      */
     SKATE(58),
     /**
-     * 冰壶
+     * Curling
      */
     CURLING(59),
     /**
-     * 冰球
+     * Ice Hockey
      */
     PUCK(60),
     /**
-     * 雪橇
+     * sled
      */
     SLEIGH(61),
     /**
-     * 健走
+     * Walking
      */
     StrongWalk(62),
     /**
-     * 跑步机
+     * Treadmill
      */
     Treadmill(63),
     /**
-     * 越野跑
+     * Cross-country running
      */
     TrailRunning(64),
     /**
-     * 竞走
+     *Race walking
      */
     RaceWalking(65),
     /**
-     * 山地骑行
+     * Mountain biking
      */
     MountainBiking(66),
     /**
-     * 小轮车
+     * BMX
      */
     Bmx(67),
     /**
-     * 定向越野
+     * Orienteering
      */
     Orienteering(68),
     /**
-     * 钓鱼
+     * fishing
      */
     Fishing(69),
     /**
-     * 打猎
+     * Hunting
      */
     Hunt(70),
     /**
-     * 滑板
+     * skateboard
      */
 
     Skateboard(71),
     /**
-     * 轮滑
+     * Roller skating
      */
     RollerSkating(72),
     /**
-     * 跑酷
+     * Parkour
      */
     Parkour(73),
     /**
-     * 沙滩车
+     *ATV
      */
     Atv(74),
     /**
-     * 越野摩托
+     * Motocross
      */
     Motocross(75),
     /**
-     * 爬楼机
+     * Stair climbing machine
      */
     ClimbingMachine(76),
     /**
-     * 动感单车
+     * Spinning bike
      */
     SpinningBike(77),
     /**
-     * 室内健身
+     * Indoor fitness
      */
     IndoorFitness(78),
     /**
-     * 混合有氧
+     * Mixed aerobic
      */
     MixedAerobic(79),
     /**
-     * 交叉训练
+     * Cross training
      */
 
     CrossTraining(80),
     /**
-     * 健身操
+     * aerobics
      */
     BodybuildingExercise(81),
     /**
-     * 团体操
+     *Group exercise
      */
     GroupGymnastics(82),
     /**
-     * 搏击操
+     * Kickboxing
      */
     Kickboxing(83),
     /**
-     * 力量训练
+     *Strength training
      */
     StrengthTraining(84),
     /**
-     * 踏步训练
+     * Step training
      */
     SteppingTraining(85),
     /**
-     * 核心训练
+     * Core training
      */
     CoreTraining(86),
     /**
-     * 柔韧训练
+     * Flexibility training
      */
     FlexibilityTraining(87),
     /**
-     * 自由训练
+     * Free training
      */
     FreeTraining(88),
     /**
-     * 普拉提
+     * Pilates
      */
     Pilates(89),
     /**
-     * 战绳
+     * battle rope
      */
 
     BattleRope(90),
     /**
-     * 拉伸
+     * Stretch
      */
     Stretch(91),
     /**
-     * 广场舞
+     * Square dance
      */
     SquareDance(92),
     /**
-     * 交际舞
+     * Ballroom dancing
      */
     BallroomDancing(93),
     /**
-     * 肚皮舞
+     * Belly dance
      */
     BellyDance(94),
     /**
-     * 芭蕾舞
+     * ballet
      */
     Ballet(95),
     /**
-     * 街舞
+     * hip-hop
      */
     HipHop(96),
     /**
-     * 尊巴
+     * Zumba
      */
     Zumba(97),
     /**
-     * 拉丁舞
+     * Latin dance
      */
     LatinDance(98),
     /**
-     * 爵士舞
+     * Jazz dance
      */
     Jazz(99),
     /**
-     * 嘻哈舞
+     * hip hop dance
      */
 
     HipHopDance(100),
     /**
-     * 钢管舞
+     *Pole dancing
      */
     PoleDancing(101),
     /**
-     * 霹雳舞
+     * Breakdancing
      */
     BreakDance(102),
     /**
-     * 民族舞
+     * Folk dance
      */
     NationalDance(103),
     /**
-     * 现代舞
+     * modern dance
      */
     ModernDance(104),
     /**
-     * 迪斯科
+     * Disco
      */
     Disco(105),
     /**
-     * 踢踏舞
-     */
-    TapDance(106),
+     * tap dance
+     */TapDance(106),
     /**
-     * 摔跤
+     * Wrestling
      */
     Wrestling(107),
     /**
-     * 武术
+     * Martial arts
      */
     MartialArts(108),
     /**
-     * 太极
+     * Tai Chi
      */
     TaiChi(109),
     /**
-     * 泰拳
+     * Muay Thai
      */
 
     MuayThai(110),
     /**
-     * 柔道
+     * Judo
      */
     Judo(111),
     /**
-     * 跆拳道
+     *Taekwondo
      */
     Taekwondo(112),
     /**
-     * 空手道
+     * Karate
      */
     Karate(113),
     /**
-     * 自由搏击
+     * Kickboxing
      */
     FreeSparring(114),
     /**
-     * 剑术
+     * Swordsmanship
      */
     Swordsmanship(115),
     /**
-     * 柔术
+     *Jiu Jitsu
      */
     Jujitsu(116),
     /**
-     * 击剑
+     * Fencing
      */
     Fencing(117),
     /**
-     * 沙滩足球
+     *Beach Soccer
      */
     BeachSoccer(118),
     /**
-     * 沙滩排球
+     * Beach volleyball
      */
     BeachVolleyball(119),
     /**
-     * 垒球
+     *softball
      */
 
     Softball(120),
     /**
-     * 壁球
+     * Squash
      */
     Squash(121),
     /**
-     * 门球
+     * Goalball
      */
     Croquet(122),
     /**
-     * 板球
+     * cricket
      */
     Cricket(123),
     /**
-     * 马球
+     * Polo
      */
     Polo(124),
     /**
-     * 墙球
+     * Racquetball
      */
     Wallball(125),
     /**
-     * 藤球
+     * sepak takraw
      */
     TakrawBall(126),
     /**
-     * 躲避球
+     * dodgeball
      */
     Dodgeball(127),
     /**
-     * 水球
+     * Water polo
      */
     WaterPolo(128),
     /**
-     * 毽球
+     * Shuttlecock
      */
     Shuttlecock(129),
     /**
-     * 室内足球
+     * Indoor football
      */
 
     IndoorSoccer(130),
     /**
-     * 沙包球
+     * cornhole ball
      */
     SandbagBall(131),
     /**
-     * 地掷球
+     * Bocce ball
      */
     BocceBall(132),
     /**
-     * 回力球
+     * pelota ball
      */
     Jaileyball(133),
     /**
-     * 地板球
+     * floor ball
      */
     Floorball(134),
     /**
-     * 户外划船
+     * Outdoor boating
      */
     OutdoorBoating(135),
     /**
-     * 皮划艇
+     * Kayak
      */
     Kayak(136),
     /**
-     * 龙舟
+     * Dragon boat
      */
     DragonBoat(137),
     /**
-     * 桨板冲浪
+     * Paddle boarding
      */
     PaddleBoard(138),
     /**
-     * 室内充浪
+     * Indoor charging
      */
     IndoorFillingWaves(139),
     /**
-     * 漂流
+     * Rafting
      */
 
     Drifting(140),
     /**
-     * 滑水
+     * Water skiing
      */
     WaterSkiing(141),
     /**
-     * 双板滑雪
+     * Ski and snowboard
      */
     Snowboarding(142),
     /**
-     * 单板滑雪
+     *Snowboarding
      */
     Snowboard(143),
     /**
-     * 高山滑雪
+     *Alpine skiing
      */
     AlpineSkiing(144),
     /**
-     * 越野滑雪
+     * Cross-country skiing
      */
     CrossCountrySkiing(145),
     /**
-     * 定向滑雪
+     * Orienteering
      */
     OrienteeringSki(146),
     /**
-     * 冬季两项
+     * Biathlon
      */
     Bathlon(147),
     /**
-     * 户外滑冰
+     * Outdoor skating
      */
     OutdoorSkating(148),
     /**
-     * 室内滑冰
+     * Indoor skating
      */
     IndoorSkating(149),
     /**
-     * 雪车
+     * Snowmobile
      */
 
     SnowCar(150),
     /**
-     * 雪地摩托
+     * Snowmobile
      */
     Snowmobile(151),
     /**
-     * 雪鞋健行
+     * Snowshoeing
      */
     Snowshoeing(152),
     /**
-     * 呼啦圈
+     * hula hoop
      */
     HulaHoop(153),
     /**
-     * 飞盘
+     * Frisbee
      */
     Frisbee(154),
     /**
-     * 飞镖
+     * Darts
      */
     Dart(155),
     /**
-     * 放风筝
+     * Fly a kite
      */
     FlyAKite(156),
     /**
-     * 拔河
+     * Tug of war
      */
     TugOfWar(157),
     /**
-     * 踢毽子
+     *Shuttlecock kicking
      */
     ShuttlecockKicking(158),
     /**
-     * 电子竞技
+     * E-sports
      */
     ESports(159),
     /**
-     * 漫步机
+     * Walking machine
      */
 
     WanderingMachine(160),
     /**
-     * 秋千
+     * Swing
      */
     Swing(161),
     /**
-     * 沙狐球
+     * Shuffleboard
      */
     Shuffleboard(162),
     /**
-     * 桌上足球
+     * Foosball table
      */
     TableSoccer(163),
     /**
-     * 体感游戏
+     * Somatosensory games
      */
     SomatosensoryGame(164),
     /**
-     * 国际象棋
+     * Chess
      */
     InternationalChess(165),
     /**
-     * 国际跳棋
+     * Checkers
      */
-    Draughts(166),
+    Drafts(166),
     /**
-     * 围棋
+     * Go
      */
     Go(167),
     /**
-     * 桥牌
+     * Bridge
      */
     Bridge(168),
     /**
-     * 桌游
+     * Board games
      */
     BoardGame(169),
     /**
-     * 射箭
+     * Archery
      */
 
     Archery(170),
     /**
-     * 马术运动
+     * Equestrian sports
      */
     EquestrianSports(171),
     /**
-     * 爬楼
+     * Climb stairs
      */
     ClimbingTheStairs(172),
     /**
-     * 驾车
+     * driving
      */
     Drive(173),
     /**
-     * 坐姿推举
+     * Seated press
      */
     SeatedPush(174),
     /**
-     * 坐姿胸部推举
+     * Seated chest press
      */
     SeatedChestPress(175),
     /**
-     * 杠铃
+     * Barbell
      */
     Barbell(176),
     /**
-     * 长跑
+     * Long distance running
      */
     LongDistanceRunning(177),
     /**
-     * 全速跑
+     * Run at full speed
      */
     FullSpeedRun(178),
     /**
-     * 变速跑
+     * Variable speed running
      */
     VariableSpeedRun(179),
     /**
-     * 赛场骑行
+     * Arena cycling
      */
 
     RaceRiding(180),
     /**
-     * 军棋
+     * Military Chess
      */
     MilitaryChess(181),
     /**
-     * 麻将
+     * Mahjong
      */
     Mahjong(182),
     /**
-     * 扑克
+     *Poker
      */
     Poker(183),
     /**
-     * 五子棋
+     * Backgammon
      */
     Gobang(184),
     /**
-     * 中国象棋
+     * Chinese chess
      */
     ChineseChess(185),
     /**
-     * 跳高
+     * High jump
      */
     HighJump(186),
     /**
-     * 跳远
+     * long jump
      */
     LongJump(187),
     /**
-     * 打陀螺
+     * Play top
      */
     SpinningTop(188),
     ;
@@ -5706,7 +5699,7 @@ public enum ESportType {
 
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().readSportModelOrigin({
@@ -5744,73 +5737,73 @@ VPOperateManager.getInstance().readSportModelOrigin({
         })
 ```
 
-#### 读取运动模式状态
+#### Read sports mode status
 
-###### 前提
+###### Prerequisites
 
-设备需支持运动模式
+The device needs to support sports mode
 
-###### 接口
+###### API
 
 ```
 readSportModelState(IBleWriteResponse bleWriteResponse, ISportModelStateListener sportModelStateListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                  | 类型                     | 备注                 |
-| ----------------------- | ------------------------ | -------------------- |
-| bleWriteResponse        | IBleWriteResponse        | 写入操作的监听       |
-| sportModelStateListener | ISportModelStateListener | 读取运动模式状态监听 |
+| Parameter name | Type | Remarks |
+| ----------------------- | ---------------------------- | ---------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| sportModelStateListener | ISportModelStateListener | Read sport mode status listener |
 
-###### 返回数据
+###### Return data
 
-**ISportModelStateListener**--运动模式状态的监听
+**ISportModelStateListener**--Monitoring of sports mode status
 
 ```kotlin
 /**
- * 返回运动模式状态数据
+ * Return sports mode status data
  *
  * @param sportModelStateData
  */
 fun onSportModelStateChange(sportModelStateData:SportModelStateData)
 
 /**
- * 运动结束监听
+ * Monitoring the end of exercise
  */
 fun onSportStopped()
 ```
 
-**SportModelStateData**--运动模式状态数据
+**SportModelStateData**--Sports mode status data
 
-| 变量          | 类型                   | 备注               |
-| ------------- | ---------------------- | ------------------ |
-| oprateStauts  | ECheckWear             | 运动模式的操作状态 |
-| deviceStauts  | ESportModelStateStauts | 运动模式的设备状态 |
-| sportModeType | Int                    | 运动模式的类型     |
+| Variable | Type | Remarks |
+| ------------- | ----------------------- | ------------------ |
+| oprateStauts | ECheckWear | Operation status of sports mode |
+| deviceStauts | ESportModelStateStauts | Sports mode device status |
+| sportModeType | Int | Type of sport mode |
 
-**ECheckWear**--运动模式的操作状态
+**ECheckWear**--Operating status of sports mode
 
-| 变量          | 备注     |
+| Variables | Remarks |
 | ------------- | -------- |
-| OPEN_SUCCESS  | 打开成功 |
-| OPEN_FAIL     | 打开失败 |
-| CLOSE_SUCCESS | 关闭成功 |
-| CLOSE_FAIL    | 关闭失败 |
-| READ_SUCCESS  | 读取成功 |
-| READ_FAIL     | 读取失败 |
-| UNKONW        | 未知状态 |
+| OPEN_SUCCESS | Open successfully |
+| OPEN_FAIL | Open failed |
+| CLOSE_SUCCESS | Closed successfully |
+| CLOSE_FAIL | Close failed |
+| READ_SUCCESS | Read successfully |
+| READ_FAIL | Read failed |
+| UNKONW | Unknown status |
 
-**ESportModelStateStauts**--运动模式的设备状态
+**ESportModelStateStauts**--Sport mode device status
 
-| 变量                    | 备注       |
+| Variables | Remarks |
 | ----------------------- | ---------- |
-| DEVICE_FREE             | 设备空闲   |
-| DEVICE_BUSY             | 设备繁忙   |
-| DEVICE_HAD_START_BEFORE | 设备开启过 |
-| UNKNOW                  | 未知       |
+| DEVICE_FREE | Device is free |
+| DEVICE_BUSY | Device busy |
+| DEVICE_HAD_START_BEFORE | The device has been turned on |
+| UNKNOW | Unknown |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -5826,30 +5819,30 @@ VPOperateManager.getInstance()
     })
 ```
 
-#### 开启运动模式
+#### Turn on sports mode
 
-###### 前提
+###### Prerequisites
 
-设备需支持运动模式
+The device needs to support sports mode
 
-###### 接口
+###### API
 
 ```
 startSportModel(bleWriteResponse, sportModelStateListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                  | 类型                     | 备注                 |
-| ----------------------- | ------------------------ | -------------------- |
-| bleWriteResponse        | IBleWriteResponse        | 写入操作的监听       |
-| sportModelStateListener | ISportModelStateListener | 读取运动模式状态监听 |
+| Parameter name | Type | Remarks |
+| ----------------------- | ---------------------------- | ---------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| sportModelStateListener | ISportModelStateListener | Read sport mode status listener |
 
-###### 返回数据
+###### Return data
 
-同【[读取运动模式状态](#读取运动模式状态)】返回数据一致
+Same as the data returned by [[Read Sports Mode Status](#Read Sports Mode Status)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -5865,30 +5858,30 @@ VPOperateManager.getInstance()
     })
 ```
 
-#### 结束运动模式
+#### End sports mode
 
-###### 前提
+###### Prerequisites
 
-设备需支持运动模式且已开启运动模式
+The device must support sports mode and have sports mode turned on
 
-###### 接口
+###### API
 
 ```
 stopSportModel(bleWriteResponse, sportModelStateListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                  | 类型                     | 备注                 |
-| ----------------------- | ------------------------ | -------------------- |
-| bleWriteResponse        | IBleWriteResponse        | 写入操作的监听       |
-| sportModelStateListener | ISportModelStateListener | 读取运动模式状态监听 |
+| Parameter name | Type | Remarks |
+| ----------------------- | ---------------------------- | ---------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| sportModelStateListener | ISportModelStateListener | Read sport mode status listener |
 
-###### 返回数据
+###### Return data
 
-同【[读取运动模式状态](#读取运动模式状态)】返回数据一致
+Same as the data returned by [[Read Sports Mode Status](#Read Sports Mode Status)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -5904,33 +5897,33 @@ VPOperateManager.getInstance()
     })
 ```
 
-#### 开始多运动模式
+#### Start multi-sport mode
 
-###### 前提
+###### Prerequisites
 
-设备需支持运动模式
+The device needs to support sports mode
 
-开始多运动模式到结束多运动模式之间要超过1分钟,不足1分钟的运动是无运动数据保存的
+More than one minute must elapse between starting and ending multi-sport mode; sessions shorter than one minute are not saved as exercise data.
 
-###### 接口
+###### API
 
 ```
 startMultSportModel(bleWriteResponse, sportModelStateListener, sportType)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名                  | 类型                     | 备注                 |
-| ----------------------- | ------------------------ | -------------------- |
-| bleWriteResponse        | IBleWriteResponse        | 写入操作的监听       |
-| sportModelStateListener | ISportModelStateListener | 读取运动模式状态监听 |
-| sportType               | ESportType               | 运动类型             |
+| Parameter name | Type | Remarks |
+| ----------------------- | ---------------------------- | ---------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| sportModelStateListener | ISportModelStateListener | Read sport mode status listener |
+| sportType | ESportType | sport type |
 
-###### 返回数据
+###### Return data
 
-同【[读取运动模式状态](#读取运动模式状态)】返回数据一致
+Same as the data returned by [[Read Sports Mode Status](#Read Sports Mode Status)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -5946,156 +5939,156 @@ VPOperateManager.getInstance()
     }, ESportType.INDOOR_WALK)
 ```
 
-## 血氧功能
+## Blood oxygen function
 
-#### 前提
+#### Prerequisites
 
-需设备支持血氧功能，判断条件如下：
+Equipment is required to support blood oxygen function, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportSpo2h
 ```
 
-#### 开始测量血氧-startDetectSPO2H
+#### Start measuring blood oxygen-startDetectSPO2H
 
-需设备支持血氧功能
+Equipment is required to support blood oxygen function
 
-###### 接口
+###### API
 
 ```
 startDetectSPO2H(IBleWriteResponse bleWriteResponse, ISpo2hDataListener spo2HDataListener, ILightDataCallBack lightDataCallBack)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型               | 备注                                                    |
-| ----------------- | ------------------ | ------------------------------------------------------- |
-| bleWriteResponse  | IBleWriteResponse  | 写入操作的监听                                          |
-| spo2HDataListener | ISpo2hDataListener | 血氧操作的回调,返回血氧的数据:是否支持,开/关状态,血氧值 |
-| lightDataCallBack | ILightDataCallBack | 原始的光信号监听                                        |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | --------------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| spo2HDataListener | ISpo2hDataListener | Callback for blood oxygen operation, returns blood oxygen data: whether supported, on/off status, blood oxygen value |
+| lightDataCallBack | ILightDataCallBack | Original light signal monitoring |
 
-###### 返回数据
+###### Return data
 
-**ISpo2hDataListener**--血氧操作的回调
+**ISpo2hDataListener**--Callback for blood oxygen operation
 
 ```kotlin
 /**
- * 返回血氧操作的数据
- * @param spo2HData 血氧操作的数据
+ * Return blood oxygen operation data
+ * @param spo2HData blood oxygen operation data
  */
 fun onSpO2HADataChange(spo2HData:Spo2hData)
 ```
 
-**spo2HData**--血氧操作的数据
+**spo2HData**--blood oxygen operation data
 
-| 变量             | 类型          | 备注           |
-| ---------------- | ------------- | -------------- |
-| spState          | ESPO2HStatus  | 血氧功能状态   |
-| deviceState      | EDeviceStatus | 设备状态       |
-| value            | Int           | 血氧值         |
-| isChecking       | Boolean       | 是否正在检测中 |
-| checkingProgress | Int           | 血氧检测进度   |
-| rateValue        | Int           | 心率值         |
+| Variable | Type | Remarks |
+| ------------- | ------------- | ------------- |
+| spState | ESPO2HStatus | Blood oxygen function status |
+| deviceState | EDeviceStatus | device status |
+| value | Int | blood oxygen value |
+| isChecking | Boolean | Whether it is being checked |
+| checkingProgress | Int | Blood oxygen testing progress |
+| rateValue | Int | Heart rate value |
 
-**ESPO2HStatus**--血氧功能状态
+**ESPO2HStatus**--blood oxygen function status
 
-| 变量        | 备注         |
-| ----------- | ------------ |
-| NOT_SUPPORT | 不支持此功能 |
-| CLOSE       | 关闭状态     |
-| OPEN        | 打开状态     |
-| UNKONW      | 未知         |
+| Variables | Remarks |
+| ---------- | ---------- |
+| NOT_SUPPORT | This feature is not supported |
+| CLOSE | Closed status |
+| OPEN | Open status |
+| UNKONW | Unknown |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-//        kotlin code
+// kotlin code
 VPOperateManager.getInstance().startDetectSPO2H({
 
 }, { spo2HData ->
-        val message = "血氧-开始:\n$spo2HData"
+        val message = "Blood Oxygen-Start:\n$spo2HData"
     }) { data ->
-    val message = "血氧-光电信号:${Arrays.toString(data)}".trimIndent()
+    val message = "Blood oxygen-photoelectric signal:${Arrays.toString(data)}".trimIndent()
 }
 ```
 
-#### 结束测量血氧-stopDetectSPO2H
+#### End blood oxygen measurement-stopDetectSPO2H
 
-设备需支持血氧功能
+The device needs to support blood oxygen function
 
-###### 接口
+###### API
 
 ```kotlin
 stopDetectSPO2H(bleWriteResponse, spo2HDataListener) 
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型               | 备注                                                    |
-| ----------------- | ------------------ | ------------------------------------------------------- |
-| bleWriteResponse  | IBleWriteResponse  | 写入操作的监听                                          |
-| spo2HDataListener | ISpo2hDataListener | 血氧操作的回调,返回血氧的数据:是否支持,开/关状态,血氧值 |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | --------------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| spo2HDataListener | ISpo2hDataListener | Callback for blood oxygen operation, returns blood oxygen data: whether supported, on/off status, blood oxygen value |
 
-###### 返回数据
+###### Return data
 
-同【[开始测量血氧-startDetectSPO2H](#开始测量血氧-startDetectSPO2H)】返回数据一致
+The data returned is consistent with [[Start measuring blood oxygen-startDetectSPO2H](#Start measuring blood oxygen-startDetectSPO2H)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-//        kotlin code
+// kotlin code
 VPOperateManager.getInstance().stopDetectSPO2H({
 
 }) { spo2HData ->
-    val message = "血氧-结束:\n$spo2HData"
+    val message = "Blood Oxygen-End:\n$spo2HData"
 }
 ```
 
-#### 读取血氧自动检测开关状态
+#### Read blood oxygen automatic detection switch status
 
-需设备支持血氧功能
+Equipment is required to support blood oxygen function
 
-###### 接口
+###### API
 
 ```
 readSpo2hAutoDetect(bleWriteResponse, allSetDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名             | 类型                | 备注                   |
-| ------------------ | ------------------- | ---------------------- |
-| bleWriteResponse   | IBleWriteResponse   | 写入操作的监听         |
-| allSetDataListener | IAllSetDataListener | 血氧自动检测开关的回调 |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | ----------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| allSetDataListener | IAllSetDataListener | Callback of automatic blood oxygen detection switch |
 
-###### 返回数据
+###### Return data
 
-**IAllSetDataListener**--血氧自动检测开关的回调
+**IAllSetDataListener**--Callback of blood oxygen automatic detection switch
 
 ```kotlin
 /**
- * 返回多设置数据
+ * Return multiple setting data
  *
- * @param alarmData 多设置数据
+ * @param alarmData Multiple setting data
  */
 fun onAllSetDataChangeListener(alarmData:AllSetData);
 ```
 
-**AllSetData**--多设置数据
+**AllSetData**--Multiple setting data
 
-| 变量         | 类型          | 备注                           |
-| ------------ | ------------- | ------------------------------ |
-| type         | EAllSetType   | 设置的类型0x00代表血氧自动检测 |
-| startHour    | Int           | 开始小时                       |
-| startMinute  | Int           | 开始分钟                       |
-| endHour      | Int           | 结束小时                       |
-| endMinute    | Int           | 结束分钟                       |
-| oprate       | Int           | 操作：0设置，1读取             |
-| openState    | Int           | 开关状态：0关1开               |
-| oprateResult | EAllSetStatus | 设置状态                       |
-| isOpen       | Int           | 是否打开检测                   |
+| Variable | Type | Remarks |
+| -------------------------- | ------------- | ------------------------------- |
+| type | EAllSetType | The set type 0x00 represents automatic blood oxygen detection |
+| startHour | Int | Start hour |
+| startMinute | Int | Start minute |
+| endHour | Int | end hour |
+| endMinute | Int | end minute |
+| oprate | Int | Operation: 0 to set, 1 to read |
+| openState | Int | Switch state: 0 off, 1 on |
+| oprateResult | EAllSetStatus | Set status |
+| isOpen | Int | Whether to open detection |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 // kotlin code
@@ -6108,41 +6101,41 @@ VPOperateManager.getInstance().readSpo2hAutoDetect({
 })
 ```
 
-#### 设置血氧自动检测开关状态
+#### Set the blood oxygen automatic detection switch status
 
-需设备支持血氧功能
+Equipment is required to support blood oxygen function
 
-###### 接口
+###### API
 
 ```kotlin
 settingSpo2hAutoDetect(bleWriteResponse, allSetDataListener, allSetSetting)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名             | 类型                | 备注                   |
-| ------------------ | ------------------- | ---------------------- |
-| bleWriteResponse   | IBleWriteResponse   | 写入操作的监听         |
-| allSetDataListener | IAllSetDataListener | 血氧自动检测开关的回调 |
-| allSetSetting      | AllSetSetting       | 相关设置               |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | ----------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| allSetDataListener | IAllSetDataListener | Callback of automatic blood oxygen detection switch |
+| allSetSetting | AllSetSetting | Related settings |
 
-**AllSetSetting**--相关设置
+**AllSetSetting**--related settings
 
-| 变量        | 类型        | 备注                           |
-| ----------- | ----------- | ------------------------------ |
-| type        | EAllSetType | 设置的类型0x00代表血氧自动检测 |
-| startHour   | Int         | 开始小时                       |
-| startMinute | Int         | 开始分钟                       |
-| endHour     | Int         | 结束小时                       |
-| endMinute   | Int         | 结束分钟                       |
-| oprate      | Int         | 操作：0设置，1读取             |
-| openState   | Int         | 开关状态：0关1开               |
+| Variable | Type | Remarks |
+| ----------- | ----------- | ------------------------------- |
+| type | EAllSetType | The set type 0x00 represents automatic blood oxygen detection |
+| startHour | Int | Start hour |
+| startMinute | Int | Start minute |
+| endHour | Int | end hour |
+| endMinute | Int | end minute |
+| oprate | Int | Operation: 0 to set, 1 to read |
+| openState | Int | Switch state: 0 off, 1 on |
 
-###### 返回数据
+###### Return data
 
-同【[读取血氧自动检测开关状态](#读取血氧自动检测开关状态)】返回的数据一致。
+It is consistent with the data returned by [[Read blood oxygen automatic detection switch status](#Read blood oxygen automatic detection switch status)].
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -6162,158 +6155,157 @@ VPOperateManager.getInstance().settingSpo2hAutoDetect({
 }, allSetSetting)
 ```
 
-#### 读取血氧日常数据
+#### Read blood oxygen daily data
 
-血氧日常数据的读写在【[读取日常数据功能](#读取日常数据功能)】中返回
+The reading and writing of blood oxygen daily data is returned in [[Read Daily Data Function](#Read Daily Data Function)]
 
-## 血糖功能
+## Blood sugar function
 
-血糖功能主要包括
+Blood sugar functions mainly include
 
-1. 血糖监测开关和单位设置
-2. 日常佩戴手表产生的血糖数据读取
-3. 手动血糖测量
-4. 血糖私人校准模式读取和设置
-5. 血糖多校准模式读取和设置
+1. Blood glucose monitoring switch and unit settings
+2. Reading blood glucose data generated by daily wearing of the watch
+3. Manual blood glucose measurement
+4. Blood glucose private calibration mode reading and setting
+5. Blood glucose multi-calibration mode reading and setting
 
-#### 血糖监测开关和单位设置
+#### Blood glucose monitoring switch and unit settings
 
-###### 血糖开关和单位设置
+###### Blood glucose switch and unit settings
 
 ```
 VPOperateManager.getInstance().changeCustomSetting(writeResponse, ICustomSettingDataListener, customSetting)
 ```
 
-###### 血糖单位开关状态和单位读取
+###### Blood glucose unit switch status and unit reading
 
 ```
 VPOperateManager.getInstance().readCustomSetting(writeResponse,ICustomSettingDataListener);
 ```
 
-| 参数名                     | 类型                       | 描述                 |
+| Parameter name | Type | Description |
 | -------------------------- | -------------------------- | -------------------- |
-| writeResponse              | IBleWriteResponse          | 命令写入回调         |
-| ICustomSettingDataListener | ICustomSettingDataListener | 设置成功或失败的回调 |
-| customSetting              | CustomSetting              | 相关功能的开关设置   |
+| writeResponse | IBleWriteResponse | Command write callback |
+| ICustomSettingDataListener | ICustomSettingDataListener | Set success or failure callback |
+| customSetting | CustomSetting | Switch settings for related functions |
 
-个性化设置回调 ICustomSettingDataListener，
+Personalized setting callback ICustomSettingDataListener,
 
-当设置改变的时候OnSettingDataChange方法会被回调，将返回当前手表的所有参数设置状态，具体包含那些查看customSettingData中各个开关状态。
+When the settings change, the OnSettingDataChange method will be called back and will return all parameter setting status of the current watch, specifically including the status of each switch in customSettingData.
 
 ```
 public interface ICustomSettingDataListener extends IListener {
     /**
-     * 返回个性化设置的数据
+     * Return personalized settings data
      *
-     * @param customSettingData 个性化设置的数据
+     * @param customSettingData Personalized setting data
      */
     void OnSettingDataChange(CustomSettingData customSettingData);
 }
 ```
 
-CustomSetting
+**CustomSetting**
 
-| 属性名                | 类型              | 描述                               |
+| Attribute name | Type | Description |
 | :-------------------- | ----------------- | ---------------------------------- |
-| bloodGlucoseDetection | EFunctionStatus   | 血糖功能状态：是否支持，是否打开。 |
-| bloodGlucoseUnit      | EBloodGlucoseUnit | 血糖单位：默认mmol/L , 或者mgdl    |
+| bloodGlucoseDetection | EFunctionStatus | Blood glucose function status: whether it is supported and whether it is turned on. |
+| bloodGlucoseUnit | EBloodGlucoseUnit | Blood glucose unit: default mmol/L, or mgdl |
 
-#### 日常血糖数据读取
+#### Daily blood glucose data reading
 
-血糖日常数据读取在日常数据读取接口中以下四个接口均可获取日常产生的血糖数据，在血糖监测开关开启且佩戴的情况下最多可以读取三天的日常血糖数据。血糖数据在接口IOriginData3Listener.onOriginFiveMinuteListDataChange(originDataList)中获取
+Blood glucose daily data reading In the daily data reading interface, the following four interfaces can obtain daily blood glucose data. When the blood glucose monitoring switch is turned on and worn, daily blood glucose data can be read for up to three days. Blood glucose data is obtained in the interface IOriginData3Listener.onOriginFiveMinuteListDataChange(originDataList)
 
-1. 读取多少(入参 watchday)天的日常数据
+1. How many days of daily data are read (input parameter watchday)
 
-   ```
+```
     /***
-        * 假如手表存储的数据是3天
-        * 读取原始数据,每5分钟一条,数据包含计步,心率,血压,运动量,读取顺序为 今天-昨天-前天,理论上一天的数据共288条
+        * If the data stored in the watch is 3 days
+        * Read raw data, one piece every 5 minutes. The data includes step counting, heart rate, blood pressure, and exercise volume. The reading order is today-yesterday-the day before yesterday. Theoretically, there are 288 pieces of data in one day.
         *
-        * @param bleWriteResponse   写入操作的监听
-        * @param originDataListener 原始数据的回调,返回的数据包含计步,心率,血压,运动量
-        * @param watchday           手表可存储的数据容量(单位:天),依设备而定,密码验证后,在onFunctionSupportDataChange回调中,可通过getWatchday()获取返回值
+        * @param bleWriteResponse monitoring of write operations
+        * @param originDataListener callback of original data. The returned data includes step counting, heart rate, blood pressure, and amount of exercise.
+        * @param watchday The data capacity that the watch can store (unit: day), depends on the device. After password verification, in the onFunctionSupportDataChange callback, the return value can be obtained through getWatchday()
         */
        public void readOriginData(IBleWriteResponse bleWriteResponse, IOriginData3Listener originDataListener, int watchday)
-   ```
+   
 
-2. 自定义差异化读取日常数据
+```2. Customized and differentiated reading of daily data
 
-   ```
+```
     /**
-        * 读取原始数据,此方法可以自定义要读取的哪天以及从当天第几条开始读取,避免重复读取
-        * ,比如设置了[昨天,150],那么读取顺序为[昨天{150}-昨天结束-前天]
+        * Read the original data. This method can customize the day to be read and the number of items to be read from that day to avoid repeated reading.
+        *, for example, if [yesterday, 150] is set, then the reading order is [yesterday{150}-end of yesterday-day before yesterday]
         *
-        * @param bleWriteResponse   写入操作的监听
-        * @param originDataListener 原始数据的回调,返回的数据包含计步,心率,血压,运动量
-        * @param day                读取哪天,0表示今天,1表示昨天,2表示前天,以此类推。如果传入的值为昨天,那么读取顺序为 昨天-前天-...,
-        * @param position           读取条数的位置,一天最多288(5分钟每条)条,你可以定义读取的条数位置,此参数的值必须大于等于1
-        * @param watchday           手表可存储的数据容量(单位:天),依设备而定,密码验证后,在onFunctionSupportDataChange回调中,可通过getWatchday()获取返回值
+        * @param bleWriteResponse monitoring of write operations
+        * @param originDataListener callback of original data. The returned data includes step counting, heart rate, blood pressure, and amount of exercise.
+        * @param day Which day to read, 0 means today, 1 means yesterday, 2 means the day before yesterday, and so on. If the value passed in is yesterday, then the reading order is yesterday - the day before yesterday -...,
+        * @param position The position of the number of items to be read, up to 288 items per day (5 minutes per item), you can define the position of the number of items to be read, the value of this parameter must be greater than or equal to 1
+        * @param watchday The data capacity that the watch can store (unit: day), depends on the device. After password verification, in the onFunctionSupportDataChange callback, the return value can be obtained through getWatchday()
         */
        public void readOriginDataFromDay(IBleWriteResponse bleWriteResponse, IOriginData3Listener originDataListener, int day, int position, int watchday)
-   ```
+   
 
-3. 自定义要读取的哪天以及从当天第几条开始读取,并只读当天
+```3. Customize the day to read and the number of items on the day to start reading, and only read the current day.
 
-   ```
+```
     /***
-        * 读取原始数据,此方法可以自定义要读取的哪天以及从当天第几条开始读取,并只读当天
-        * ,比如设置了[昨天,150],那么读取顺序为[昨天{150}-昨天结束]
+        * Read the original data. This method can customize the day to be read and the number of items to be read from that day, and only read the current day.
+        *, for example, if [yesterday, 150] is set, then the reading order is [yesterday{150}-end of yesterday]
         *
-        * @param bleWriteResponse   写入操作的监听
-        * @param originDataListener 原始数据的回调,返回的数据包含计步,心率,血压,运动量
-        * @param day                读取哪天,0表示今天,1表示昨天,2表示前天,以此类推。
-        * @param position           读取条数的位置,一天最多288(5分钟每条)条,你可以定义读取的条数位置,此参数的值必须大于等于1
-        * @param watchday           手表可存储的数据容量(单位:天),依设备而定,密码验证后,在onFunctionSupportDataChange回调中,可通过getWatchday()获取返回值
+        * @param bleWriteResponse monitoring of write operations
+        * @param originDataListener callback of original data. The returned data includes step counting, heart rate, blood pressure, and amount of exercise.
+        * @param day Which day to read, 0 means today, 1 means yesterday, 2 means the day before yesterday, and so on.
+        * @param position The position of the number of items to be read, up to 288 items per day (5 minutes per item), you can define the position of the number of items to be read, the value of this parameter must be greater than or equal to 1
+        * @param watchday The data capacity that the watch can store (unit: day), depends on the device. After password verification, in the onFunctionSupportDataChange callback, the return value can be obtained through getWatchday()
         */
        public void readOriginDataSingleDay(IBleWriteResponse bleWriteResponse, IOriginData3Listener originDataListener, int day, int position, int watchday)
-   ```
+   
 
-4. 自定义要读取的哪天以及从当天第几条开始读取,是否只读当天
+```4. Customize which day to read and which item of the day to start reading from, whether to read only the current day
 
 ```
  /***
-     * 读取原始数据,此方法可以自定义要读取的哪天以及从当天第几条开始读取,是否只读当天
+     * Read the original data. This method can customize which day to read and which item to read from that day. Whether to read only the current day.
      *
-     * @param bleWriteResponse   写入操作的监听
-     * @param originDataListener 原始数据的回调,返回的数据包含计步,心率,血压,运动量
-     * @param readOriginSetting  读取原始数据的设置
+     * @param bleWriteResponse monitoring of write operations
+     * @param originDataListener callback of original data. The returned data includes step counting, heart rate, blood pressure, and amount of exercise.
+     * @param readOriginSetting The setting for reading original data
      */
     public void readOriginDataBySetting(IBleWriteResponse bleWriteResponse, IOriginProgressListener originDataListener, ReadOriginSetting readOriginSetting)
 ```
 
-##### 日常血糖数据获取回调
+##### Daily blood glucose data acquisition callback
 
-该接口会在该天数据读取结束后回调。（一个OriginData3数据表示一个五分钟原始数据，一天最多24小时*60分钟/5分钟 = 288块五分钟原始数据），所以一天中最多会产生288个血糖数据。
+This interface will call back after the day's data reading is completed. (One OriginData3 data represents a five-minute raw data, and a maximum of 24 hours * 60 minutes / 5 minutes = 288 pieces of five-minute raw data in a day), so a maximum of 288 pieces of blood glucose data will be generated in a day.
 
 ```
 public interface IOriginData3Listener extends IOriginProgressListener {
 
     /**
-     * 该接口会在该天数据读取结束后回调。（一个OriginData3数据表示一个五分钟原始数据，一天最多24小时*60分钟/5分钟 = 288块五分钟原始数据）
-     * 例如读取三天的原始数据则会依次返回今天-昨天-前天的五分钟原始数据列表，
-     * 具体看读取几天的原始数据，读几天则会调用几次该接口
+     * This interface will call back after the day's data reading is completed. (One OriginData3 data represents a five-minute raw data, and a maximum of 24 hours * 60 minutes / 5 minutes = 288 pieces of five-minute raw data in a day)
+     * For example, reading three days of raw data will return the five-minute raw data list of today - yesterday - the day before yesterday.
+     * Specifically, it depends on how many days of raw data have been read. How many days will the interface be called?
      *
-     * @param originDataList 返回一个5分钟数据的列表，心率值是一个数组，其对应字段的是getPpgs()，不是getRateValue()
+     * @param originDataList returns a list of 5-minute data. The heart rate value is an array, and its corresponding field is getPpgs(), not getRateValue()
      */
     void onOriginFiveMinuteListDataChange(List<OriginData3> originDataList);
     ...
 }
 ```
 
-OriginData3为原数数据，日常血糖值可以在数据结构中获取
+OriginData3 is the original data object; daily blood glucose values can be read from this structure.
 
-```
-
+```java
 public class OriginData3 extends OriginData {
     ...
     
     /**
-     * 血糖值
+     * Blood sugar level
      */
     public float bloodGlucose;
     
     /**
-    * 血糖风险等级
+    *Glycemic risk level
   */
     public EBloodGlucoseRiskLevel bloodGlucoseRiskLevel;
 
@@ -6323,469 +6315,469 @@ public class OriginData3 extends OriginData {
 
 ```
 
-| 参数名                | 类型                   | 默认单位 |
-| --------------------- | ---------------------- | -------- |
-| bloodGlucose          | float                  | mmol/L   |
-| bloodGlucoseRiskLevel | EBloodGlucoseRiskLevel | 无       |
+| Parameter name | Type | Default unit |
+| --------------------- | --------------------- | -------- |
+| bloodGlucose | float | mmol/L |
+| bloodGlucoseRiskLevel | EBloodGlucoseRiskLevel | None |
 
 ```java
 public enum EBloodGlucoseRiskLevel {
     /**
-     * 低风险
+     * low risk
      */
     LOW,
     /**
-     * 中风险
+     * Medium risk
      */
     MIDDLE,
     /**
-     * 高风险
+     * High risk
      */
     HIGH,
     /**
-     * 无等级
+     * No level
      */
     NONE,
 }
 ```
 
-注意：只有设备支持血糖风险评估时，bloodGlucoseRiskLevel才有效，其他情况下level无用，设备是否支持血糖风险评估判断如下：
+Note: bloodGlucoseRiskLevel is only valid when the device supports blood glucose risk assessment. In other cases, level is useless. Whether the device supports blood glucose risk assessment is determined as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportBloodGlucoseRiskAssessment
 ```
 
-#### 血糖测量
+#### Blood glucose measurement
 
-##### 开启血糖测量
-
-```
-VPOperateManager.getInstance().startBloodGlucoseDetect(writeResponse,listener)
-```
-
-| 参数名        | 类型                        | 备注             |
-| ------------- | --------------------------- | ---------------- |
-| writeResponse | IBleWriteResponse           | 命令写入回调     |
-| listener      | IBloodGlucoseChangeListener | 血糖测量结果回调 |
-
-##### 停止血糖监测
+##### Turn on blood glucose measurement
 
 ```
 VPOperateManager.getInstance().startBloodGlucoseDetect(writeResponse,listener)
 ```
 
-| 参数名        | 类型                        | 备注             |
-| :------------ | --------------------------- | ---------------- |
-| writeResponse | IBleWriteResponse           | 命令写入回调     |
-| listener      | IBloodGlucoseChangeListener | 血糖测量结果回调 |
+| Parameter name | Type | Remarks |
+| ------------- | -------------------------- | ------------- |
+| writeResponse | IBleWriteResponse | Command write callback |
+| listener | IBloodGlucoseChangeListener | Blood glucose measurement result callback |
 
-##### 血糖测量结果回调  
+##### Stop blood glucose monitoring
 
-###### 血糖测量中
+```
+VPOperateManager.getInstance().startBloodGlucoseDetect(writeResponse,listener)
+```
+
+| Parameter name | Type | Remarks |
+| :--------------------- | --------------------------- | ------------- |
+| writeResponse | IBleWriteResponse | Command write callback |
+| listener | IBloodGlucoseChangeListener | Blood glucose measurement result callback |
+
+##### Blood glucose measurement result callback
+
+###### Blood glucose measurement in progress
 
 ```java
  /**
-     * 血糖测量出值
+     * Blood glucose measurement value
      *
-     * @param progress     测量进度
-     * @param bloodGlucose 血糖值
-     * @param bloodGlucose 血糖风险等级，只有设备支持血糖风险评估时，该值才有效，其他情况下无效
+     * @param progress measurement progress
+     * @param bloodGlucose blood sugar value
+     * @param bloodGlucose Blood glucose risk level. This value is only valid if the device supports blood glucose risk assessment. It is invalid in other cases.
      */
     void onBloodGlucoseDetect(int progress, float bloodGlucose,EBloodGlucoseRiskLevel level);
 
 ```
 
-###### 血糖测量停止
+###### Blood glucose measurement stopped
 
 ```
  /**
-     * 血糖测量停止
+     * Blood glucose measurement stopped
      */
     void onBloodGlucoseStopDetect();
 ```
 
-###### 血糖测量异常
+###### Abnormal blood glucose measurement
 
 ```
     /**
-     * 血糖测量失败
+     * Blood glucose measurement failed
      *
-     * @param opt    操作码
-     * @param status 错误状态
+     * @param opt opcode
+     * @param status error status
      */
     void onDetectError(int opt, EBloodGlucoseStatus status);
 ```
 
-***血糖测量状态枚举***
+***Blood glucose measurement status enumeration***
 
 ```
 EBloodGlucoseStatus
 ```
 
-| 定义          | 描述           |
-| ------------- | -------------- |
-| NONSUPPORT    | 不支持         |
-| ENABLE        | 可用           |
-| DETECTING     | 测量中         |
-| LOW_POWER     | 低电量不可测量 |
-| BUSY          | 设备正忙       |
-| WEARING_ERROR | 佩戴错误       |
+| Definition | Description |
+| ------------- | ------------- |
+| NONSUPPORT | Not supported |
+| ENABLE | Available |
+| DETECTING | Measuring |
+| LOW_POWER | Low battery cannot be measured |
+| BUSY | The device is busy |
+| WEARING_ERROR | Wearing error |
 
-#### 血糖私人模式
+#### Blood sugar private mode
 
-##### 血糖私人模式读取
+##### Blood glucose private mode reading
 
 ```
 VPOperateManager.getInstance().readBloodGlucoseAdjustingData(writeResponse,listener)
 ```
 
-| 参数名        | 类型                        | 备注                 |
-| ------------- | --------------------------- | -------------------- |
-| writeResponse | IBleWriteResponse           | 命令写入回调         |
-| listener      | IBloodGlucoseChangeListener | 血糖私人模式读取回调 |
+| Parameter name | Type | Remarks |
+| ------------- | -------------------------- | -------------------- |
+| writeResponse | IBleWriteResponse | Command write callback |
+| listener | IBloodGlucoseChangeListener | Blood glucose private mode read callback |
 
-###### 读取成功回调
+###### Reading success callback
 
 ```
    /**
-     * 血糖私人模式设置读取回调
+     * Blood glucose private mode setting read callback
      *
-     * @param isOpen         是否开启
-     * @param adjustingValue 私人模式血糖校准值
+     * @param isOpen whether to open
+     * @param adjustingValue Private mode blood glucose calibration value
      */
     void onBloodGlucoseAdjustingReadSuccess(boolean isOpen, float adjustingValue);
 ```
 
-###### 读取失败回调
+###### Read failure callback
 
 ```
     /**
-     * 血糖私人模式校准读取失败回调
+     * Blood glucose private mode calibration read failure callback
      */
     void onBloodGlucoseAdjustingReadFailed();
 ```
 
-##### 血糖私人模式设置
+##### Blood sugar private mode settings
 
 ```
 VPOperateManager.getInstance().setBloodGlucoseAdjustingData(fValue, isOpen, writeResponse, AbsBloodGlucoseChangeListener)
 ```
 
-| 参数名                        | 类型                        | 描述                 |
-| ----------------------------- | --------------------------- | -------------------- |
-| fValue                        | float                       | 私人模式血糖校准值   |
-| isOpen                        | boolean                     | 是否开启血糖私人模式 |
-| writeResponse                 | IBleWriteResponse           | 命令写入回调         |
-| AbsBloodGlucoseChangeListener | IBloodGlucoseChangeListener | 血糖操作回调         |
+| Parameter name | Type | Description |
+| -------------------------- | -------------------------- | -------------------- |
+| fValue | float | private mode blood glucose calibration value |
+| isOpen | boolean | Whether to turn on blood glucose private mode |
+| writeResponse | IBleWriteResponse | Command write callback |
+| AbsBloodGlucoseChangeListener | IBloodGlucoseChangeListener | Blood glucose operation callback |
 
-###### 设置成功回调
+###### Set success callback
 
 ```
 /**
-     * 血糖私人模式设置成功回调
+     * Successful callback of blood sugar private mode setting
      *
-     * @param isOpen         是否开启
-     * @param adjustingValue 私人模式血糖校准值
+     * @param isOpen whether to open
+     * @param adjustingValue Private mode blood glucose calibration value
      */
     void onBloodGlucoseAdjustingSettingSuccess(boolean isOpen, float adjustingValue);
 ```
 
-###### 设置失败回调
+###### Set failure callback
 
 ```
     /**
-     * 血糖私人模式校准设置失败回调
+     * Blood glucose private mode calibration setting failure callback
      */
     void onBloodGlucoseAdjustingSettingFailed();
 ```
 
-#### 血糖多校准模式
+#### Blood glucose multi-calibration mode
 
-###### 前提
+###### Prerequisites
 
-需设备支持血糖多校准模式，判断条件如下：
+The device needs to support blood glucose multi-calibration mode, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportBloodGlucoseMultipleAdjusting
 ```
 
-##### 读取血糖多校准模式数据
+##### Read blood glucose multi-calibration mode data
 
-需设备支持血糖多校准模式
+The device needs to support blood glucose multi-calibration mode
 
-###### 接口
+###### API
 
 ```kotlin
 readMultipleCalibrationBGValue(bleWriteResponse, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                          | 备注           |
-| ---------------- | ----------------------------- | -------------- |
-| bleWriteResponse | IBleWriteResponse             | 写入操作的监听 |
-| listener         | AbsBloodGlucoseChangeListener | 血糖操作回调   |
+| Parameter name | Type | Remarks |
+|----------------|-----------------------------|--------------|
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| listener | AbsBloodGlucoseChangeListener | Blood glucose operation callback |
 
-###### 读取成功回调
+###### Reading success callback
 
 ```java
  /**
-     * 多校准模式读取成功
+     * Multi-calibration mode read successfully
      *
-     * @param isOpen    是否打开
-     * @param breakfast 早餐
-     * @param lunch     中餐
-     * @param dinner    晚餐
+     * @param isOpen whether to open
+     * @param breakfast breakfast
+     * @param lunch Chinese food
+     * @param dinner dinner
      */
     void onBGMultipleAdjustingReadSuccess(boolean isOpen, MealInfo breakfast, MealInfo lunch, MealInfo dinner);
 ```
 
-###### 读取失败回调
+###### Read failure callback
 
 ```java
 /**
-     * 多校准模式读取失败
+     * Multi-calibration mode read failed
      */
     void onBGMultipleAdjustingReadFailed();
 ```
 
-**MealInfo** -- 多校准模式数据
+**MealInfo** -- Multiple calibration mode data
 
-| 变量              | 类型    | 备注                                              |
-| ----------------- | ------- | ------------------------------------------------- |
-| index             | Int     | 当前餐的tag。 1：早餐，2：中餐，3：晚餐。         |
-| bgBeforeMeal      | Float   | 餐前血糖校准值，单位mmol/L                        |
-| bgAfterMeal       | Float   | 餐后血糖校准值，单位mmol/L                        |
-| bgBeforeMeal_mgDL | Int     | 餐前血糖校准值，单位mg/dL                         |
-| bgAfterMeal_mgDL  | Int     | 餐后血糖校准值，单位mg/dL                         |
-| beforeMealTime    | Int     | 餐前时间(分钟)：小时+分钟，例如：08:30  = 8*60+30 |
-| afterMealTime     | Int     | 餐后时间(分钟)：小时+分钟                         |
-| isUnitMmolL       | Boolean | 单位是否是mmol/L ，优先设置                       |
+| Variable | Type | Remarks |
+| ------------------ | ------- | -------------------------------------------------- |
+| index | Int | The tag of the current meal. 1: Breakfast, 2: Lunch, 3: Dinner.         |
+| bgBeforeMeal | Float | Premeal blood glucose calibration value, unit mmol/L |
+| bgAfterMeal | Float | After-meal blood glucose calibration value, unit mmol/L |
+| bgBeforeMeal_mgDL | Int | Premeal blood glucose calibration value, unit mg/dL |
+| bgAfterMeal_mgDL | Int | After-meal blood glucose calibration value, unit mg/dL |
+| beforeMealTime | Int | Time before meal (minutes): hours + minutes, for example: 08:30 = 8*60+30 |
+| afterMealTime | Int | Aftermeal time (minutes): hours + minutes |
+| isUnitMmolL | Boolean | Whether the unit is mmol/L, priority setting |
 
-##### 设置血糖多校准模式数据
+##### Set blood glucose multi-calibration mode data
 
-需设备支持血糖多校准模式
+The device needs to support blood glucose multi-calibration mode
 
-###### 接口
+###### API
 
 ```kotlin
 settingMultipleCalibrationBGValue(isOpen, breakfast, lunch, dinner, bleWriteResponse, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                          | 备注               |
-| ---------------- | ----------------------------- | ------------------ |
-| isOpen           | Boolean                       | 是否打开多校准模式 |
-| breakfast        | MealInfo                      | 早餐多校准数据     |
-| lunch            | MealInfo                      | 午餐多校准数据     |
-| dinner           | MealInfo                      | 晚餐多校准数据     |
-| bleWriteResponse | IBleWriteResponse             | 写入操作的监听     |
-| listener         | AbsBloodGlucoseChangeListener | 血糖操作的回调     |
+| Parameter name | Type | Remarks |
+|----------------|-----------------------------| ------------------|
+| isOpen | Boolean | Whether to open multi-calibration mode |
+| breakfast | MealInfo | Breakfast multi-calibration data |
+| lunch | MealInfo | Lunch multi-calibration data |
+| dinner | MealInfo | dinner multi-calibration data |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| listener | AbsBloodGlucoseChangeListener | callback for blood glucose operations |
 
-###### 设置成功回调
+###### Set success callback
 
 ```java
 /**
- * 多校准模式设置成功
+ *Multiple calibration mode set successfully
  *
  */
 void onBGMultipleAdjustingSettingSuccess();
 ```
 
-###### 设置失败回调
+###### Set failure callback
 
 ```java
 /**
- * 多校准模式设置失败
+ *Multiple calibration mode setup failed
  */
 void onBGMultipleAdjustingSettingFailed();
 ```
 
-**注意：**
+**Note:**
 
-1. 两餐之间时间间隔必须大于2小时；
-2. 餐后时间必须大于餐前时间
+1. The time interval between two meals must be greater than 2 hours;
+2. The time after a meal must be greater than the time before a meal
 
-## 女性功能
+##Female features
 
-#### 前提
+#### Prerequisites
 
-需设备支持女性功能，判断条件如下：
+The device needs to support female functions, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportWomenSetting
 ```
 
-#### 设置女性功能
+#### Set female function
 
-需设备支持女性功能
+The device needs to support female functions
 
-###### 接口
+###### API
 
 ```kotlin
 settingWomenState(bleWriteResponse, womenDataListener, womenSetting)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型               | 备注                                                         |
-| ----------------- | ------------------ | ------------------------------------------------------------ |
-| bleWriteResponse  | IBleWriteResponse  | 写入操作的监听                                               |
-| womenDataListener | IWomenDataListener | 女性状态操作的监听,返回操作的状态                            |
-| womenSetting      | WomenSetting       | 女性状态的设置类,总共包含4种状态[月经期,备孕期,怀孕期,妈咪期] |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | --------------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| womenDataListener | IWomenDataListener | Monitoring of female status operations, returning the status of the operation |
+| womenSetting | WomenSetting | Setting class for female status, including a total of 4 statuses [menstrual period, pregnancy preparation period, pregnancy period, mommy period] |
 
-**WomenSetting**--女性状态的设置
+**WomenSetting**--Setting of female status
 
-| 参数名         | 类型         | 备注                            |
-| -------------- | ------------ | ------------------------------- |
-| menseLength    | Int          | 女性的月经长度,范围是[4-28天]   |
-| menesInterval  | Int          | 月经持续的周期长度              |
-| menesLasterday | TimeData     | 最后一次月经的时间,精确到天就行 |
-| babyBirthday   | TimeData     | 孩子的出生日,精确到天就行       |
-| confinementDay | TimeData     | 孕妇的预产期,精确到天就行       |
-| womenStatus    | EWomenStatus | 女性的状态                      |
-| babySex        | ESex         | 孩子的性别：MAN男，WOMAN女      |
+| Parameter name | Type | Remarks |
+| -------------- | ---------- | ------------------------------- |
+| menseLength | Int | Female menstrual length, range is [4-28 days] |
+| menesInterval | Int | The length of the menstrual cycle |
+| menesLasterday | TimeData | The time of the last menstrual period, accurate to the day |
+| babyBirthday | TimeData | The child's birth date, as accurate as the day of birth |
+| confinementDay | TimeData | The expected date of delivery of a pregnant woman, accurate to the day |
+| womenStatus | EWomenStatus | Women's status |
+| babySex | ESex | Child’s gender: MAN male, WOMAN female |
 
->1.当女性的状态为[月经期]以及[备孕期]时，使用此构造方法WomenSetting(womenStatus, menseLength, menesInterval, menesLasterday)
->2.当女性的状态为[妈咪期]，使用此构造方法WomenSetting(womenStatus, menseLength, menesInterval, menesLasterday, babySex, babyBirthday)
->3.当女性的状态为[怀孕期]，使用此构造方法WomenSetting(womenStatus, menesLasterday, confinementDay)
+>1. When a woman’s status is [menstrual period] and [pregnancy preparation period], use this construction method WomenSetting(womenStatus, menseLength, menesInterval, menesLasterday)
+>2. When a woman’s status is [mom stage], use this construction method WomenSetting(womenStatus, menseLength, menesInterval, menesLasterday, babySex, babyBirthday)
+>3. When the woman’s status is [pregnancy], use this construction method WomenSetting(womenStatus, menesLasterday, confinementDay)
 
 **EWomenStatus**
 
-| 参数名   | 备注     |
+| Parameter name | Remarks |
 | -------- | -------- |
-| NONE     | 无状态   |
-| MENES    | 月经状态 |
-| PREREADY | 备孕状态 |
-| PREING   | 怀孕状态 |
-| MAMAMI   | 妈咪状态 |
+| NONE | No status |
+| MENES | Menstrual status |
+| PREREADY | Preparation status |
+| PREING | Pregnancy status |
+| MAMAMI | Mommy status |
 
-###### 返回数据
+###### Return data
 
-**IWomenDataListener**--女性状态操作的监听
+**IWomenDataListener**--Listening for female status operations
 
 ```kotlin
 /**
- * 返回女性的数据
+ * Returns female data
  *
- * @param womenData 女性数据
+ * @param womenData female data
  */
 fun onWomenDataChange(womenData:WomenData)
 ```
 
-**WomenData**--女性状态数据
+**WomenData**--Female status data
 
-| 变量         | 类型               | 备注             |
+| Variable | Type | Remarks |
 | ------------ | ------------------ | ---------------- |
-| oprateStatus | EWomenOprateStatus | 女性状态设置状态 |
+| oprateStatus | EWomenOprateStatus | Female status setting status |
 
-**EWomenOprateStatus**--设置状态
+**EWomenOprateStatus**--Set status
 
-| 变量            | 备注             |
-| --------------- | ---------------- |
-| SETTING_SUCCESS | 设置女性状态成功 |
-| SETTING_FAIL    | 设置女性状态失败 |
-| READ_SUCCESS    | 读取女性状态成功 |
-| READ_FAIL       | 读取女性状态失败 |
-| UNKONW          | 未知状态         |
+| Variables | Remarks |
+| ------------------ | ---------------- |
+| SETTING_SUCCESS | Set female status successfully |
+| SETTING_FAIL | Failed to set female status |
+| READ_SUCCESS | Read female status successfully |
+| READ_FAIL | Failed to read female status |
+| UNKONW | Unknown status |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-//        kotlin code
+// kotlin code
 VPOperateManager.getInstance().settingWomenState(
     {
 
     },
     { womenData ->
-        val message = "女性状态-设置:\n$womenData"
+        val message = "Female Status-Settings:\n$womenData"
     }, WomenSetting(EWomenStatus.PREING, TimeData(2016, 3, 1), TimeData(2017, 1, 14))
 )
 ```
 
-#### 读取女性功能
+#### Read female function
 
-设备需支持女性功能
+The device needs to support female functions
 
-###### 接口
+###### API
 
 ```kotlin
 readWomenState(IBleWriteResponse bleWriteResponse, IWomenDataListener womenDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型               | 备注                              |
-| ----------------- | ------------------ | --------------------------------- |
-| bleWriteResponse  | IBleWriteResponse  | 写入操作的监听                    |
-| womenDataListener | IWomenDataListener | 女性状态操作的监听,返回操作的状态 |
+| Parameter name | Type | Remarks |
+| ------------------ | ------------------ | ---------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| womenDataListener | IWomenDataListener | Monitoring of female status operations, returning the status of the operation |
 
-###### 返回数据
+###### Return data
 
-同【[设置女性功能](#设置女性功能)】返回数据一致
+Same as the data returned by [[Set Female Function](#SET Female Function)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-//        kotlin code
+// kotlin code
 VPOperateManager.getInstance().readWomenState(
     writeResponse
 ) { womenData ->
-    val message = "女性状态-读取:\n$womenData"
+    val message = "Female Status-Read:\n$womenData"
 }
 ```
 
-## 血压功能
+## Blood pressure function
 
-血压功能主要包括
+Blood pressure functions mainly include
 
-1. 血压自动监测开关设置和读取
-2. 日常佩戴手表产生的血压数据读取
-3. 手动血压测量
-4. 血压模式设置
-5. 血压功能设置和读取
+1. Automatic blood pressure monitoring switch setting and reading
+2. Reading blood pressure data generated by daily wearing of the watch
+3. Manual blood pressure measurement
+4. Blood pressure mode setting
+5. Blood pressure function setting and reading
 
-### 血压自动监测开关设置和读取
+### Blood pressure automatic monitoring switch setting and reading
 
-血压功能开关的读取和设置位于个性化设置中，请参考文档模块【[个性化设置](#个性化设置)】
+The reading and setting of the blood pressure function switch are located in the personalization settings, please refer to the document module [[Personalization Settings](#Personalization Settings)]
 
-### 日常血压数据读取
+### Daily blood pressure data reading
 
-日常血压数据读取位于日常数据读取中，请参考文档模块 【[读取日常数据功能](## 读取日常数据功能)】
+Daily blood pressure data reading is located in daily data reading, please refer to the document module [[Read daily data function](## Read daily data function)]
 
-#### 五分钟原始数据中血压数据
+#### Blood pressure data in five minutes of raw data
 
-OriginData为五分钟产生原数数据，日常血压值可以在数据结构中获取。改数据在日常读取接口中会被回调
+OriginData generates original data for five minutes, and daily blood pressure values can be obtained in the data structure. The changed data will be called back in the daily reading interface.
 
 ```
 public interface IOriginData3Listener extends IOriginProgressListener {
 
     /**
-     * 该接口会在该天数据读取结束后回调。（一个OriginData3数据表示一个五分钟原始数据，一天最多24小时*60分钟/5分钟 = 288块五分钟原始数据）
-     * 例如读取三天的原始数据则会依次返回今天-昨天-前天的五分钟原始数据列表，
-     * 具体看读取几天的原始数据，读几天则会调用几次该接口
+     * This interface will call back after the day's data reading is completed. (One OriginData3 data represents a five-minute raw data, and a maximum of 24 hours * 60 minutes / 5 minutes = 288 pieces of five-minute raw data in a day)
+     * For example, reading three days of raw data will return the five-minute raw data list of today - yesterday - the day before yesterday.
+     * Specifically, it depends on how many days of raw data have been read. How many days will the interface be called?
      *
-     * @param originDataList 返回一个5分钟数据的列表，心率值是一个数组，其对应字段的是getPpgs()，不是getRateValue()
+     * @param originDataList returns a list of 5-minute data. The heart rate value is an array, and its corresponding field is getPpgs(), not getRateValue()
      */
     void onOriginFiveMinuteListDataChange(List<OriginData3> originDataList);
     
-  ...   
+  ...
  }
 ```
 
-血压值位于类OriginData中
+The blood pressure value is in class OriginData
 
 ```
 public class OriginData {
     ...
     
     /**
-     * 高压值,范围[60-300]
+     * High pressure value, range [60-300]
      */
     private int highValue;
     /**
-     * 低压值,范围[20-200]
+     * Low voltage value, range [20-200]
      */
     private int lowValue;
     
@@ -6794,132 +6786,132 @@ public class OriginData {
 
 ```
 
-| 参数名    | 类型 | 描述                           |
-| --------- | ---- | ------------------------------ |
-| highValue | int  | 高压值，范围在60-300内（包含） |
-| lowValue  | int  | 低压值，范围在20-200内（包含） |
+| Parameter name | Type | Description |
+| --------- | ---- | ------------------------------- |
+| highValue | int | High voltage value, ranging from 60-300 (inclusive) |
+| lowValue | int | Low voltage value, ranging from 20-200 (inclusive) |
 
-#### 三十分钟统计血压数据
+#### Statistics of blood pressure data in thirty minutes
 
-OriginHalfHourData为30分钟原始数据,包含计步，心率，血压，是对原始五分钟数据的每30分钟进行汇总。
+OriginHalfHourData is 30 minutes of raw data, including step counting, heart rate, and blood pressure. It is a summary of the original five minutes of data every 30 minutes.
 
 OriginHalfHourData
 
-| 成员               | 类型                    | 描述                 |
-| ------------------ | ----------------------- | -------------------- |
-| halfHourRateDatas  | List<HalfHourRateData>  | 三十分钟心率数据数组 |
-| halfHourBps        | List<HalfHourBpData>    | 三十分钟血压数据数组 |
-| halfHourSportDatas | List<HalfHourSportData> | 三十分钟运动数据数组 |
-| allStep            | int                     | 三十分钟总步数汇总   |
+| Members | Type | Description |
+| ------------------ | ----------------------- | ------------------ |
+| halfHourRateDatas | List<HalfHourRateData> | Thirty-minute heart rate data array |
+| halfHourBps | List<HalfHourBpData> | Thirty-minute blood pressure data array |
+| halfHourSportDatas | List<HalfHourSportData> | Thirty-minute sports data array |
+| allStep | int | Summary of total steps in thirty minutes |
 
 HalfHourBpData
 
-| 成员      | 类型     | 描述                                                         |
-| --------- | -------- | ------------------------------------------------------------ |
-| highValue | int      | 高压值，范围在60-300内（包含）                               |
-| lowValue  | int      | 低压值，范围在20-200内（包含）                               |
-| date      | String   | 所属日期，日期格式为 yyyy-mm-dd                              |
-| time      | TimeDate | 具体的时间，最多的可以准确到分钟,如10:00表示的是10:00-10:30这段区间的均值 |
+| Members | Type | Description |
+| --------- | -------- | --------------------------------------------------------------- |
+| highValue | int | High voltage value, ranging from 60-300 (inclusive) |
+| lowValue | int | Low voltage value, ranging from 20-200 (inclusive) |
+| date | String | The date it belongs to, the date format is yyyy-mm-dd |
+| time | TimeDate | The specific time can be accurate to the minute at most. For example, 10:00 represents the average value of the interval from 10:00 to 10:30 |
 
-### 血压手动测量
+### Manual blood pressure measurement
 
-#### 开启血压手动测量
+#### Enable manual blood pressure measurement
 
 ```
 VPOperateManager.getInstance().startDetectBP(writeResponse, listener, detectModel);
 ```
 
-| 参数名        | 类型                  | 备注                                                         |
-| ------------- | --------------------- | ------------------------------------------------------------ |
-| writeResponse | IBleWriteResponse     | 写入操作的监听                                               |
-| listener      | IBPDetectDataListener | 血糖测量结果回调                                             |
-| detectModel   | EBPDetectModel        | 血压测量模式：<br />私人模式：DETECT_MODEL_PRIVATE<br />通用模式：DETECT_MODEL_PUBLIC |
+| Parameter name | Type | Remarks |
+| ------------- | -------------------------- | --------------------------------------------------------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| listener | IBPDetectDataListener | Blood glucose measurement result callback |
+| detectModel | EBPDetectModel | Blood pressure measurement mode:<br />Private mode: DETECT_MODEL_PRIVATE<br />General mode: DETECT_MODEL_PUBLIC |
 
-#### 停止血压手动测量
+#### Stop manual blood pressure measurement
 
 ```
 VPOperateManager.getInstance().stopDetectBP(writeResponse, detectModel)
 ```
 
-| 参数名        | 类型              | 备注                                                         |
-| :------------ | ----------------- | ------------------------------------------------------------ |
-| writeResponse | IBleWriteResponse | 写入操作的监听                                               |
-| detectModel   | EBPDetectModel    | 血压测量模式：<br />私人模式：DETECT_MODEL_PRIVATE<br />通用模式：DETECT_MODEL_PUBLIC |
+| Parameter name | Type | Remarks |
+| :--------------------- | ----------------- | --------------------------------------------------------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| detectModel | EBPDetectModel | Blood pressure measurement mode:<br />Private mode: DETECT_MODEL_PRIVATE<br />General mode: DETECT_MODEL_PUBLIC |
 
-#### 血压测量相关回调和数据
+#### Blood pressure measurement related callbacks and data
 
-血压手动测量回调接口
+Blood pressure manual measurement callback interface
 
 ```
 /**
- * 血压数据返回的监听
+ * Monitoring of blood pressure data return
  */
 public interface IBPDetectDataListener extends IListener {
     /**
-     * 返回血压数据
+     * Return blood pressure data
      *
-     * @param bpData 血压数据
+     * @param bpData blood pressure data
      */
     void onDataChange(BpData bpData);
 }
 
 ```
 
-血压数据  BpData
+Blood pressure data BpData
 
-| 成员           | 类型            | 描述                                                         |
-| -------------- | --------------- | ------------------------------------------------------------ |
-| status         | EBPDetectStatus | 血压检测状态<br />STATE_BP_BUSY：设备正忙，表示无法进行测量血压,收到此返回时，请调用 结束测量血压<br />STATE_BP_NORMAL：表示可以进行测量血压 |
-| progress       | int             | 血压测量进度,范围[0-100]                                     |
-| highPressure   | int             | 高压值,范围[60-300],如果不在此范围，请提示用用户测量无效     |
-| lowPressure    | int             | 低压值,范围[20-200]，,如果不在此范围，请提示用用户测量无效   |
-| isHaveProgress | boolean         | true表示手表有返回进度，false表示没有进度，无进度的手表会在开始测量后的55秒返回数据 |
+| Members | Type | Description |
+| -------------- | --------------- | --------------------------------------------------------------- |
+| status | EBPDetectStatus | Blood pressure detection status<br />STATE_BP_BUSY: The device is busy, indicating that blood pressure cannot be measured. When receiving this return, please call to end blood pressure measurement<br />STATE_BP_NORMAL: Indicates that blood pressure measurement can be performed |
+| progress | int | Blood pressure measurement progress, range [0-100] |
+| highPressure | int | High pressure value, range [60-300], if it is not within this range, please prompt that user measurement is invalid |
+| lowPressure | int | Low pressure value, range [20-200], if it is not within this range, please prompt that user measurement is invalid |
+| isHaveProgress | boolean | true means the watch has returned progress, false means there is no progress. A watch with no progress will return data 55 seconds after starting measurement |
 
-### 血压模式设置
+### Blood pressure mode setting
 
-#### 血压测量模式设置
+#### Blood pressure measurement mode setting
 
 ```
 VPOperateManager.getInstance().settingDetectBP(writeResponse, listener, bpSetting)
 ```
 
-| 参数名        | 类型                   | 描述                     |
-| ------------- | ---------------------- | ------------------------ |
-| writeResponse | IBleWriteResponse      | 写入操作的监听           |
-| listener      | IBPSettingDataListener | 血压模式设置回调         |
-| bpSetting     | BpSetting              | 血压私人模式设置参数相关 |
+| Parameter name | Type | Description |
+| ------------- | ----------------------- | ---------------------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| listener | IBPSettingDataListener | blood pressure mode setting callback |
+| bpSetting | BpSetting | Blood pressure private mode setting parameters related |
 
-血压设置类 BpSetting
+Blood pressure setting class BpSetting
 
-| 成员               | 类型    | 描述                             |
-| ------------------ | ------- | -------------------------------- |
-| isOpenPrivateModel | boolean | 自动测量是否打开私人模式是否开启 |
-| high               | int     | 用户私人的高压值                 |
-| low                | int     | 用户私人的低压值                 |
-| isAngioAdjuste     | boolean | 是否开启动态血压校准             |
+| Members | Type | Description |
+| ------------------ | ------- | ---------------------------------- |
+| isOpenPrivateModel | boolean | Automatically measure whether private mode is turned on |
+| high | int | User's private high voltage value |
+| low | int | User's private low voltage value |
+| isAngioAdjuste | boolean | Whether to enable dynamic blood pressure calibration |
 
-**当isOpenPrivateModel设置为true,isAngioAdjuste设置为false时表示此时为设置开启*血压私人模式***
+**When isOpenPrivateModel is set to true and isAngioAdjuste is set to false, it means that the *blood pressure private mode is enabled at this time***
 
-**当isOpenPrivateModel设置为false,isAngioAdjuste设置为true时表示此时为设置开启*血压动态调整模式***
+**When isOpenPrivateModel is set to false and isAngioAdjuste is set to true, it means that the *blood pressure dynamic adjustment mode is turned on at this time***
 
-#### 血压测量模式读取
+#### Blood pressure measurement mode reading
 
 ```
 VPOperateManager.getInstance().readDetectBP(writeResponse, listener)
 ```
 
-| 参数名        | 类型                   | 描述             |
-| ------------- | ---------------------- | ---------------- |
-| writeResponse | IBleWriteResponse      | 写入操作的监听   |
-| listener      | IBPSettingDataListener | 血压模式读取回调 |
+| Parameter name | Type | Description |
+| ------------- | ----------------------- | ------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| listener | IBPSettingDataListener | Blood pressure mode reading callback |
 
-#### 血压动态调试模式取消
+#### Blood pressure dynamic debugging mode canceled
 
 ```
 boolean isOpenPrivateModel = false;
-boolean isAngioAdjuste = true;
+boolean isAngioAdjust = true;
 BpSetting bpSetting = new BpSetting(isOpenPrivateModel, 111, 88);
-//是否开启动态血压调整模式，功能标志位在密码验证的返回
+//Whether to enable dynamic blood pressure adjustment mode, the function flag is located on the return of password verification
 bpSetting.setAngioAdjuste(isAngioAdjuste);
 VPOperateManager.getInstance().cancelAngioAdjust(writeResponse, new IBPSettingDataListener() {
     @Override
@@ -6931,111 +6923,107 @@ VPOperateManager.getInstance().cancelAngioAdjust(writeResponse, new IBPSettingDa
 }, bpSetting);
 ```
 
-血压模式设置读取监听，当设置或读取成功时IBPSettingDataListener.onDataChange方法将会被回调
+Blood pressure mode setting read listening, when the setting or reading is successful, the IBPSettingDataListener.onDataChange method will be called back
 
 ```
 /**
- * 设备保存私人血压的数据返回的监听
+ * The device saves the monitoring of private blood pressure data returned
  */
 public interface IBPSettingDataListener extends IListener {
     /**
-     * 私人保存的血压数据返回
+     * Return of privately saved blood pressure data
      *
-     * @param bpSettingData 私人保存的血压数据
+     * @param bpSettingData privately saved blood pressure data
      */
     void onDataChange(BpSettingData bpSettingData);
 }
-```
+```BpSettingData
 
-BpSettingData
+| Members | Type | Description |
+| -------------------------- | -------------- | --------------------------------------------------------------- |
+| status | EBPStatus | Status of operating ambulatory blood pressure calibration: |
+| model | EBPDetectModel | Blood pressure measurement mode:<br />DETECT_MODEL_PRIVATE: private mode<br />DETECT_MODEL_PUBLIC: common mode |
+| highPressure | int | The private high pressure value saved by the device. If it is 0, it means that when measuring in private mode, private data needs to be set first |
+| lowPressure | int | Private low pressure value saved by the device, range [20-200] |
+| angioAdjusterProgress | int | Progress of dynamic blood pressure adjustment [0-100] |
+| isAngioAdjuster | boolean | The status of dynamic blood pressure adjustment, true indicates that the current status is dynamic blood pressure adjustment |
 
-| 成员                  | 类型           | 描述                                                         |
-| --------------------- | -------------- | ------------------------------------------------------------ |
-| status                | EBPStatus      | 操作动态血压校准的状态：                                     |
-| model                 | EBPDetectModel | 血压测量模式：<br />DETECT_MODEL_PRIVATE：私人模式<br />DETECT_MODEL_PUBLIC：通用模式 |
-| highPressure          | int            | 设备保存的私人高压值，如果为0，说明在进行私人模式进行测量时,需要先设置私人数据 |
-| lowPressure           | int            | 设备保存的私人低压值,范围[20-200]                            |
-| angioAdjusterProgress | int            | 动态血压调整的进度[0-100]                                    |
-| isAngioAdjuster       | boolean        | 动态血压调整的状态，true表示当前是动态血压调整的状态         |
-
-血压校准状态 ：
+Blood pressure calibration status:
 
 EBPStatus
 
-| SETTING_NORMAL_SUCCESS        | 关闭私人模式[也称设置通用模式]成功 |
-| ----------------------------- | ---------------------------------- |
-| SETTING_NORMAL_FAIL           | 关闭私人模式[也称设置通用模式]失败 |
-| SETTING_PRIVATE_SUCCESS       | 设置私人模式成功                   |
-| SETTING_PRIVATE_FAIL          | 设置私人模式失败                   |
-| READ_SUCCESS                  | 读取血压模式成功                   |
-| READ_FAIL                     | 读取血压模式失败                   |
-| CANCLE_ANGIO_ADJUSTER_SUCCESS | 取消动态血压调整成功               |
-| CANCLE_ANGIO_ADJUSTER_FAIL    | 设置私人模式失败                   |
-| ANGIO_ADJUSTER_ING            | 血压动态校准中                     |
-| ANGIO_ADJUSTER_FAIL           | 血压动态校准失败                   |
-| ANGIO_ADJUSTER_SUCCESS        | 血压动态校准成功                   |
-| ANGIO_ADJUSTER_DEVICE_BUSY    | 血压动态校准过程中设备忙           |
-| UNKONW                        | 未知状态                           |
+| SETTING_NORMAL_SUCCESS | Turn off private mode [also called setting universal mode] successfully |
+|-------------------------------- | ---------------------------------- |
+| SETTING_NORMAL_FAIL | Failed to turn off private mode [also called setting universal mode] |
+| SETTING_PRIVATE_SUCCESS | Set private mode successfully |
+| SETTING_PRIVATE_FAIL | Setting private mode failed |
+| READ_SUCCESS | Read blood pressure pattern successfully |
+| READ_FAIL | Failed to read blood pressure pattern |
+| CANCEL_ANGIO_ADJUSTER_SUCCESS | Cancellation of dynamic blood pressure adjustment successfully |
+| CANCELE_ANGIO_ADJUSTER_FAIL | Failed to set private mode |
+| ANGIO_ADJUSTER_ING | Blood pressure dynamic calibration in progress |
+| ANGIO_ADJUSTER_FAIL | Blood pressure dynamic calibration failed |
+| ANGIO_ADJUSTER_SUCCESS | Blood pressure dynamic calibration successful |
+| ANGIO_ADJUSTER_DEVICE_BUSY | The device is busy during blood pressure dynamic calibration |
+| UNKONW | Unknown status |
 
-### 血压功能设置和读取
+### Blood pressure function setting and reading
 
-#### 读取血压功能
+#### Read blood pressure function
 
 ```
 VPOperateManager.getInstance().readBpFunctionState(writeResponse, IBPFunctionListener)
 ```
 
-#### 设置血压功能
+#### Set blood pressure function
 
 ```
 VPOperateManager.getInstance().settingBpFunctionState(writeResponse, IBPFunctionListener, isOpen)
 ```
 
-功能接口以及参数说明
+Functional interface and parameter description
 
-| 参数名              | 类型                | 描述                             |
-| ------------------- | ------------------- | -------------------------------- |
-| writeResponse       | IBleWriteResponse   | 写入操作的监听                   |
-| IBPFunctionListener | IBPFunctionListener | 血压功能读取设置回调监听         |
-| isOpen              | boolean             | 是否开启 true：打开， false:关闭 |
+| Parameter name | Type | Description |
+| ------------------- | ------------------- | ----------------------------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| IBPFunctionListener | IBPFunctionListener | Blood pressure function read setting callback listening |
+| isOpen | boolean | Whether to open true: open, false: closed |
 
 IBPFunctionListener
 
 ```
 /**
- * 血压功能的状态返回
+ * Status return of blood pressure function
  */
 public interface IBPFunctionListener extends IListener {
     /**
-     * 返回血压功能的状态
+     * Returns the status of the blood pressure function
      *
-     * @param bpFunctionData 血压功能的状态
+     * @param bpFunctionData status of blood pressure function
      */
     void onDataChange(BpFunctionData bpFunctionData);
 }
-```
+```BpFunctionData: blood pressure function status
 
-BpFunctionData：血压功能状态
-
-| 成本名    | 类型    | 描述             |
+| Cost Name | Type | Description |
 | --------- | ------- | ---------------- |
-| isSupport | boolean | 是否支持血压检测 |
-| isOpen    | boolean | 血压功能是否打开 |
+| isSupport | boolean | Whether to support blood pressure detection |
+| isOpen | boolean | Whether the blood pressure function is turned on |
 
-## 闹钟功能
+## Alarm clock function
 
-闹钟分为三大类闹钟：
+Alarm clocks are divided into three major categories: alarm clocks:
 
-1. 普通闹钟（仅支持3个）
-2. 场景闹钟（支持20个）
-3. 文字闹钟（支持10个）
+1. Ordinary alarm clock (only supports 3)
+2. Scene alarm clock (supports 20)
+3. Text alarm clock (supports 10)
 
-连接成功的设备当且只支持一种闹钟。当用户进行设备密码校验操作，设备会更新上报设备的设备功能支持类型，其中就包括闹钟类型。（当设备进行密码校验时传入的监听【IDeviceFuctionDataListener】会上报闹钟类型 [请参考 密码校验](\#验证密码操作)）
-闹钟包含对闹钟的增删改查功能。
+A successfully connected device must only support one alarm clock. When the user performs a device password verification operation, the device will update and report the device function support type, including the alarm clock type. (When the device performs password verification, the incoming listening [IDeviceFuctionDataListener] will report the alarm type [please refer to Password Verification](\#Verification Password Operation))
+The alarm clock includes the function of adding, deleting, modifying and checking the alarm clock.
 
-### 普通闹钟
+### Ordinary alarm clock
 
-AlarmSetting：闹钟实体类
+AlarmSetting: alarm clock entity class
 
 ```
 public class AlarmSetting {
@@ -7043,7 +7031,7 @@ public class AlarmSetting {
     private boolean isOpen;
 
     /**
-     * 时，分，是否开关
+     * Hours, minutes, whether to switch on or off
      *
      * @param alarmHour
      * @param alarmMinute
@@ -7055,41 +7043,41 @@ public class AlarmSetting {
     }
 ```
 
-| 成员名    | 类型    | 描述                                              |
-| --------- | ------- | ------------------------------------------------- |
-| alarmTime | int     | 闹钟时间 = （小时*60 + 分钟）                     |
-| isOpen    | boolean | 是否打开，true为闹钟开启状态，false为闹钟关闭状态 |
+| member name | type | description |
+| --------- | ------- | -------------------------------------------------- |
+| alarmTime | int | alarm time = (hour * 60 + minutes) |
+| isOpen | boolean | Whether to open, true means the alarm is on, false means the alarm is off |
 
-#### 读取闹钟列表
+#### Read alarm clock list
 
-使用举例：
+Usage examples:
 
 ```
 VPOperateManager.getInstance().readAlarm(writeResponse, new IAlarmDataListener() {
                 @Override
                 public void onAlarmDataChangeListener(AlarmData alarmData) {
-                    String message = "读取闹钟:\n" + alarmData.toString();
+                    String message = "Read alarm clock:\n" + alarmData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
             });
 ```
 
-| 参数名        | 类型               | 描述                                                         |
-| ------------- | ------------------ | ------------------------------------------------------------ |
-| writeResponse | IBleWriteResponse  | 命令写入回调                                                 |
-| listener      | IAlarmDataListener | 闹钟数据的回调，当读、设置以及闹钟状态改变的时候该方法会被回调 |
+| Parameter name | Type | Description |
+| ------------- | ------------------ | --------------------------------------------------------------- |
+| writeResponse | IBleWriteResponse | Command write callback |
+| listener | IAlarmDataListener | Alarm data callback, this method will be called back when reading, setting and alarm status changes |
 
-AlarmData：闹钟列表封装类
+AlarmData: Alarm clock list encapsulation class
 
-| 成员名           | 类型               | 描述                                                         |
-| ---------------- | ------------------ | ------------------------------------------------------------ |
-| status           | EAalarmStatus      | 操作闹钟后的状态：<br />SETTING_SUCCESS：操作成功<br />SETTING_FAIL：操作失败<br />READ_SUCCESS：读取成功<br />READ_FAIL：读取失败<br />UNKONW：未知异常 |
-| alarmSettingList | List<AlarmSetting> | 闹钟列表                                                     |
+| member name | type | description |
+|---------------- | ------------------ | --------------------------------------------------------------- |
+| status | EAalarmStatus | Status after operating the alarm:<br />SETTING_SUCCESS: Operation successful<br />SETTING_FAIL: Operation failed<br />READ_SUCCESS: Reading successful<br />READ_FAIL: Reading failed<br />UNKONW: Unknown exception |
+| alarmSettingList | List<AlarmSetting> | Alarm clock list |
 
-#### 设置闹钟
+#### Set alarm clock
 
-使用举例：
+Usage examples:
 
 ```
 List<AlarmSetting> alarmSettingList = new ArrayList<>(3);
@@ -7105,78 +7093,78 @@ alarmSettingList.add(alarmSetting3);
 VPOperateManager.getInstance().settingAlarm(writeResponse, new IAlarmDataListener() {
     @Override
     public void onAlarmDataChangeListener(AlarmData alarmData) {
-        String message = "设置闹钟:\n" + alarmData.toString();
+        String message = "Set alarm:\n" + alarmData.toString();
         Logger.t(TAG).i(message);
         sendMsg(message, 1);
     }
 }, alarmSettingList);
 ```
 
-### 场景闹钟(新闹钟)
+### Scene alarm clock (new alarm clock)
 
-场景闹钟对于普通闹钟的区别在于手表可以设置更多的闹钟（最多20个场景闹钟）且闹钟的内容更加丰富，手表支持对应的场景图标。
+The difference between scene alarm clocks and ordinary alarm clocks is that the watch can set more alarm clocks (up to 20 scene alarm clocks) and the content of the alarm clock is richer. The watch supports corresponding scene icons.
 
-Alarm2Setting:场景闹钟
+Alarm2Setting: scene alarm clock
 
-| 成员名           | 类型    | 描述                                                         |
-| ---------------- | ------- | ------------------------------------------------------------ |
-| MAFlag           | String  | 闹钟的唯一标志位                                             |
-| BluetoothAddress | String  | 闹钟所属的蓝牙地址                                           |
-| alarmId          | int     | 闹钟序号，序号范围是[1-20]                                   |
-| alarmHour        | int     | 保存都是24小时制,时                                          |
-| alarmMinute      | int     | 保存都是24小时制，分                                         |
-| repeatStatus     |         | 闹钟的重复状态(周一，周二，周三...周末)，<br/>  <p><br/>  要求格式为7位由（0,1组成的字符串），从右到左依次为周一，周二，..周六，周日<br/>  <p><br/>  1100000-表示周日,周六<br/>  <p><br/>  0000011-周二,周一<br/>  <p><br/>  如果是要设置非重复状态的闹钟，则设置为0000000<br/> |
-| unRepeatDate     | String  | 闹钟非重复状态下，设定日期，<br/> <p><br/> 要求格式为 xxxx-xx-xx,<br/> <p><br/>如果是要设置重复状态的闹钟，则设置为0000-00-00 |
-| scene            | int     | 闹钟的场景[0-20] 一共21种场景，默认为普通闹钟icon<br /><br />*0:闹钟图标* 1:睡眠 *2:起坐* 3:喝水 *4:吃药* 5:约会 *6:读书* 7:电影 *8:音乐* 9:购物 *10:理发* 11:生日 *12:求婚* 13:上班 *14:育儿* 15:亲子游玩 *16:存钱* 17:就医 *18:遛狗* 19:钓鱼 * 20:出行 |
-| isOpen           | boolean | 是否打开，true为闹钟开启状态，false为闹钟关闭状态            |
+| member name | type | description |
+|---------------- | ------- | --------------------------------------------------------------- |
+| MAFlag | String | The only flag of the alarm clock |
+| BluetoothAddress | String | The Bluetooth address to which the alarm clock belongs |
+| alarmId | int | Alarm clock serial number, the serial number range is [1-20] |
+| alarmHour | int | Saved in 24-hour format, hours |
+| alarmMinute | int | Saved in 24-hour format, minutes |
+| repeatStatus | | The repeat status of the alarm clock (Monday, Tuesday, Wednesday...weekend),<br/> <p><br/> The required format is a 7-digit string consisting of (0,1), from right to left, Monday, Tuesday,...Saturday, Sunday<br/> <p><br/> 1100000 - means Sunday, Saturday<br/> <p><br/> 0000011-Tuesday, Monday<br/> <p><br/> If you want to set an alarm clock with a non-repeating state, set it to 0000000<br/> |
+| unRepeatDate | String | When the alarm clock is in non-repeating state, set the date,<br/> <p><br/> The required format is xxxx-xx-xx,<br/> <p><br/>If you want to set the alarm clock in repeating state, set it to 0000-00-00 |
+| scene | int | Alarm clock scene [0-20] There are 21 scenes in total, the default is ordinary alarm clock icon<br /><br />*0: alarm clock icon* 1: sleep *2: sit up* 3: drink water *4: take medicine* 5: date *6: read* 7: movie *8: music* 9: shopping *10: haircut* 11: birthday *12: proposal* 13: work *14: parenting* 15: Family fun *16: Saving money* 17: Medical treatment *18: Walking the dog* 19: Fishing * 20: Traveling |
+| isOpen | boolean | Whether to open, true means the alarm is on, false means the alarm is off |
 
-EMultiAlarmOprate: 场景闹钟操作状态（枚举类型），当用户使用对闹钟进行增删改查的时候在相关的监听中该状态会被返回
+EMultiAlarmOprate: Scenario alarm clock operation status (enumeration type). When the user adds, deletes, modifies and checks the alarm clock, this status will be returned in the relevant monitoring.
 
-| 类型                             | 描述                          |
-| -------------------------------- | ----------------------------- |
-| SETTING_SUCCESS                  | 设置成功【修改，添加】        |
-| SETTING_FAIL                     | 设置失败【修改，添加】        |
-| CLEAR_SUCCESS                    | 删除成功                      |
-| CLEAR_FAIL                       | 删除失败                      |
-| READ_SUCCESS                     | 读取成功                      |
-| READ_FAIL                        | 读取失败                      |
-| READ_SUCCESS_NULL                | 读取成功并没有闹钟            |
-| READ_SUCCESS_SAVE                | 读取成功并保存到本地          |
-| READ_SUCCESS_SAME_CRC            | 读取CRC一致 ,表明闹钟没有改变 |
-| ALARM_FULL                       | 闹钟数达到上限                |
-| ALARM_REPORT                     | 闹钟上报                      |
-| ALARM_REPORT_DATE_ERROR          | 闹钟上报但数据错误            |
-| DEVICE_ALARM_MODIFY              | 设备上修改闹钟                |
-| DEVICE_ADD_ONE_TEXT_ALARM        | 设备添加一条闹钟              |
-| DEVICE_DELETE_ONE_TEXT_ALARM,    | 设备端删除一条闹钟            |
-| DEVICE_TEXT_ALARM_SWITCH_CHANGED | 设备文字闹钟开关状态改变      |
-| UNKONW                           | 未知操作                      |
+| Type | Description |
+|-------------------------------- |-------------------------------- |
+| SETTING_SUCCESS | Setting successful [modify, add] |
+| SETTING_FAIL | Setting failed [modify, add] |
+| CLEAR_SUCCESS | Deletion successful |
+| CLEAR_FAIL | Delete failed |
+| READ_SUCCESS | Read successfully |
+| READ_FAIL | Read failed |
+| READ_SUCCESS_NULL | Read successfully and no alarm |
+| READ_SUCCESS_SAVE | Read successfully and save to local |
+| READ_SUCCESS_SAME_CRC | The read CRC is consistent, indicating that the alarm clock has not changed |
+| ALARM_FULL | The number of alarm clocks reaches the upper limit |
+| ALARM_REPORT | Alarm clock report |
+| ALARM_REPORT_DATE_ERROR | The alarm is reported but the data is wrong |
+| DEVICE_ALARM_MODIFY | Modify the alarm clock on the device |
+| DEVICE_ADD_ONE_TEXT_ALARM | Add an alarm to the device |
+| DEVICE_DELETE_ONE_TEXT_ALARM, | Delete an alarm clock on the device |
+| DEVICE_TEXT_ALARM_SWITCH_CHANGED | Device text alarm switch status changes |
+| UNKONW | Unknown operation |
 
-AlarmData2：场景闹钟列表封装类
+AlarmData2: Scene alarm clock list encapsulation class
 
-| 成员名            | 类型                | 描述               |
-| ----------------- | ------------------- | ------------------ |
-| status            | EMultiAlarmOprate   | 场景闹钟的操作状态 |
-| alarm2SettingList | List<Alarm2Setting> | 场景闹钟列表       |
+| member name | type | description |
+| ------------------ | ------------------ | ------------------ |
+| status | EMultiAlarmOprate | The operation status of the scene alarm clock |
+| alarm2SettingList | List<Alarm2Setting> | Scene alarm list |
 
-#### 读取场景闹钟
+#### Read scene alarm clock
 
-使用举例：
+Usage examples:
 
 ```
 VPOperateManager.getInstance().readAlarm2(writeResponse, new IAlarm2DataListListener() {
     @Override
     public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
-        String message = "读取闹钟[新版]:\n" + alarmData2.toString();
+        String message = "Read alarm clock [new version]:\n" + alarmData2.toString();
         Logger.t(TAG).i(message);
         sendMsg(message, 1);
     }
 });
 ```
 
-#### 设置场景闹钟
+#### Set scene alarm clock
 
-使用举例：
+Usage examples:
 
 ```
 private Alarm2Setting getMultiAlarmSetting() {
@@ -7194,16 +7182,16 @@ Alarm2Setting alarm2Setting = getMultiAlarmSetting();
 VPOperateManager.getInstance().addAlarm2(writeResponse, new IAlarm2DataListListener() {
     @Override
     public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
-        String message = "添加闹钟[新版]:\n" + alarmData2.toString();
+        String message = "Add alarm clock [new version]:\n" + alarmData2.toString();
         Logger.t(TAG).i(message);
         sendMsg(message, 1);
     }
 }, alarm2Setting);
 ```
 
-#### 删除场景闹钟
+#### Delete scene alarm clock
 
-使用举例：
+Usage examples:
 
 ```
 private Alarm2Setting getMultiAlarmSetting() {
@@ -7223,7 +7211,7 @@ alarm2Setting.setAlarmId(deleteID);
 VPOperateManager.getInstance().deleteAlarm2(writeResponse, new IAlarm2DataListListener() {
     @Override
     public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
-        String message = "删除闹钟[新版]:\n" + alarmData2.toString();
+        String message = "Delete alarm clock [new version]:\n" + alarmData2.toString();
         Logger.t(TAG).i(message);
         sendMsg(message, 1);
     }
@@ -7231,9 +7219,9 @@ VPOperateManager.getInstance().deleteAlarm2(writeResponse, new IAlarm2DataListLi
 }, alarm2Setting);
 ```
 
-#### 修改场景闹钟
+#### Modify scene alarm clock
 
-使用举例：
+Usage examples:
 
 ```
 private Alarm2Setting getMultiAlarmSetting() {
@@ -7256,56 +7244,56 @@ alarm2Setting.setOpen(false);
 VPOperateManager.getInstance().modifyAlarm2(writeResponse, new IAlarm2DataListListener() {
     @Override
     public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
-        String message = "修改闹钟[新版]:\n" + alarmData2.toString();
+        String message = "Modify alarm clock [new version]:\n" + alarmData2.toString();
         Logger.t(TAG).i(message);
         sendMsg(message, 1);
     }
 }, alarm2Setting);
 ```
 
-### 文字闹钟
+### Text alarm clock
 
-文字闹钟最多支持10组，TextAlarm2Setting(文字)继承自Alarm2Setting（场景），多了一个闹钟提示文字描述。
+The text alarm clock supports up to 10 groups. TextAlarm2Setting (text) inherits from Alarm2Setting (scene), with an additional alarm prompt text description.
 
 ```
 public class TextAlarm2Setting extends Alarm2Setting {
 
     /**
-     * 闹钟信息
+     * Alarm information
      */
     private String content;
     ...
 ```
 
-TextAlarmData：文字闹钟列表封装类
+**TextAlarmData:** text alarm list wrapper
 
-| 成员名                | 类型                    | 描述               |
+| member name | type | description |
 | --------------------- | ----------------------- | ------------------ |
-| oprate                | EMultiAlarmOprate       | 文字闹钟的操作状态 |
-| textAlarm2SettingList | List<TextAlarm2Setting> | 文字闹钟列表       |
+| oprate | EMultiAlarmOprate | Text alarm clock operating status |
+| textAlarm2SettingList | List<TextAlarm2Setting> | Text alarm list |
 
-ITextAlarmDataListener：文字闹钟操作的监听回调，当在手表上或手机上对文字闹钟进行增删改查时该监听会被回调
+ITextAlarmDataListener: Listening callback for text alarm operations. This listener will be called back when the text alarm is added, deleted, modified, or checked on the watch or mobile phone.
 
 ```
 /**
  * Author: YWX
  * Date: 2021/9/24 14:40
- * Description: 文字闹钟操作回调
+ * Description: Text alarm clock operation callback
  */
 interface ITextAlarmDataListener : IListener {
 
     /**
-     * 闹钟数据的回调
+     * Callback of alarm clock data
      *
-     * @param textAlarmData 闹钟数据
+     * @param textAlarmData alarm clock data
      */
     fun onAlarmDataChangeListListener(textAlarmData: TextAlarmData?)
 }
 ```
 
-#### 读取文字闹钟
+#### Read text alarm clock
 
-使用举例：
+Usage examples:
 
 ```
 VPOperateManager.getInstance().readTextAlarm(writeResponse, new ITextAlarmDataListener() {
@@ -7320,25 +7308,25 @@ VPOperateManager.getInstance().readTextAlarm(writeResponse, new ITextAlarmDataLi
             mSettings.addAll(textAlarmData.getTextAlarm2SettingList());
             mAdapter.notifyDataSetChanged();
         }
-        showMsg(isOk ? "读取文字闹钟成功" : "读取文字闹钟失败");
+        showMsg(isOk? "Read text alarm successfully" : "Read text alarm failed");
     }
 });
 ```
 
-| 参数名                 | 类型                   | 描述             |
-| ---------------------- | ---------------------- | ---------------- |
-| writeResponse          | IBleWriteResponse      | 写入操作的监听   |
-| ITextAlarmDataListener | ITextAlarmDataListener | 文字闹钟改变回调 |
+| Parameter name | Type | Description |
+| --------------------------- | --------------------------- | ------------- |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| ITextAlarmDataListener | ITextAlarmDataListener | Text alarm change callback |
 
-#### 增加文字闹钟
+#### Add text alarm clock
 
-使用举例：
+Usage examples:
 
 ```
   private TextAlarm2Setting getTextAlarm2Setting() {
         String content = mEditText.getText().toString();
         if (TextUtils.isEmpty(content)) {
-            content = "大郎，该吃饭了 @^_^@ !";
+            content = "Dalang, it's time to eat @^_^@ !";
         }
         String strHour = etHour.getText().toString();
         String strMinute = etMinute.getText().toString();
@@ -7357,65 +7345,65 @@ TextAlarm2Setting setting = getTextAlarm2Setting();
 VPOperateManager.getInstance().addTextAlarm(writeResponse, new ITextAlarmDataListener() {
     @Override
     public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-        Logger.t(TAG).e("添加闹钟 --》" + textAlarmData.toString());
+        Logger.t(TAG).e("Add alarm --》" + textAlarmData.toString());
         EMultiAlarmOprate OPT = textAlarmData.getOprate();
-        showMsg("添加闹钟 --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "成功" : "失败"));
+        showMsg("Add alarm --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "Success" : "Failure"));
         if (OPT == EMultiAlarmOprate.ALARM_FULL) {
-            showMsg("闹钟已满（最多添加十个）");
+            showMsg("Alarm clock is full (up to ten added)");
         } else if (OPT == EMultiAlarmOprate.SETTING_SUCCESS) {
-            showMsg("闹钟添加成功");
+            showMsg("Alarm clock added successfully");
             mSettings.clear();
             mSettings.addAll(textAlarmData.getTextAlarm2SettingList());
             mAdapter.notifyDataSetChanged();
         } else if (OPT == EMultiAlarmOprate.SETTING_FAIL) {
-            showMsg("闹钟添加失败");
+            showMsg("Alarm clock added failed");
         }
     }
 }, setting);
 ```
 
-| 参数名                 | 类型                   | 描述               |
-| ---------------------- | ---------------------- | ------------------ |
-| writeResponse          | IBleWriteResponse      | 写入操作的监听     |
-| ITextAlarmDataListener | ITextAlarmDataListener | 文字闹钟改变回调   |
-| setting                | TextAlarm2Setting      | 需要添加的闹钟实体 |
+| Parameter name | Type | Description |
+| ----------------------- | ---------------------------- | ------------------ |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| ITextAlarmDataListener | ITextAlarmDataListener | Text alarm change callback |
+| setting | TextAlarm2Setting | Alarm clock entity that needs to be added |
 
-#### 删除文字闹钟
+#### Delete text alarm
 
-使用举例：
+Usage examples:
 
 ```
 VPOperateManager.getInstance().deleteTextAlarm(writeResponse, new ITextAlarmDataListener() {
     @Override
     public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-        EMultiAlarmOprate OPT =  textAlarmData.getOprate();
+        EMultiAlarmOprate OPT = textAlarmData.getOprate();
         if(OPT == EMultiAlarmOprate.CLEAR_SUCCESS) {
-            showMsg("闹钟删除成功");
+            showMsg("Alarm clock deleted successfully");
             mSettings.clear();
             mSettings.addAll(textAlarmData.getTextAlarm2SettingList());
             mAdapter.notifyDataSetChanged();
         } else {
-            showMsg("删除失败");
+            showMsg("Deletion failed");
         }
     }
 }, textAlarm);
 ```
 
-| 参数名                 | 类型                   | 描述               |
-| ---------------------- | ---------------------- | ------------------ |
-| writeResponse          | IBleWriteResponse      | 写入操作的监听     |
-| ITextAlarmDataListener | ITextAlarmDataListener | 文字闹钟改变回调   |
-| textAlarm              | TextAlarm2Setting      | 需要删除的闹钟实体 |
+| Parameter name | Type | Description |
+| ----------------------- | ---------------------------- | ------------------ |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| ITextAlarmDataListener | ITextAlarmDataListener | Text alarm change callback |
+| textAlarm | TextAlarm2Setting | Alarm clock entity that needs to be deleted |
 
-#### 修改文字闹钟
+#### Modify text alarm clock
 
-使用举例：
+Usage examples:
 
 ```
 VPOperateManager.getInstance().modifyTextAlarm(writeResponse, new ITextAlarmDataListener() {
     @Override
     public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-        showMsg("修改闹钟 --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "成功" : "失败"));
+        showMsg("Modify alarm clock --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "Success" : "Failure"));
         mSettings.clear();
         mSettings.addAll(textAlarmData.getTextAlarm2SettingList());
         mAdapter.notifyDataSetChanged();
@@ -7423,141 +7411,143 @@ VPOperateManager.getInstance().modifyTextAlarm(writeResponse, new ITextAlarmData
 }, setting);
 ```
 
-| 参数名                 | 类型                   | 描述               |
-| ---------------------- | ---------------------- | ------------------ |
-| writeResponse          | IBleWriteResponse      | 写入操作的监听     |
-| ITextAlarmDataListener | ITextAlarmDataListener | 文字闹钟改变回调   |
-| textAlarm              | TextAlarm2Setting      | 需要修改的闹钟实体 |
+| Parameter name | Type | Description |
+| ----------------------- | ---------------------------- | ------------------ |
+| writeResponse | IBleWriteResponse | Listening for write operations |
+| ITextAlarmDataListener | ITextAlarmDataListener | Text alarm change callback |
+| textAlarm | TextAlarm2Setting | Alarm clock entity that needs to be modified |
 
-## 天气功能
+## Weather function
 
-当手表支持天气时, （当设备进行密码校验时传入的监听【deviceFunctionDataListener】会上报天气功能有无 [请参考 密码校验](#验证密码操作)）
-天气包含以下功能
+When the watch supports weather, (when the device performs password verification, the incoming listening [deviceFunctionDataListener] will report whether the weather function is present [please refer to Password Verification](#Verify Password Operation))
+Weather includes the following features
 
-1. 天气数据设置
-2. 天气开关以及单位设置
+1. Weather data settings
+2. Weather switch and unit settings
 
-### 天气数据设置
+### Weather data settings
 
-天气设置调用方法
+Weather setting calling method
 
 ```
 VPOperateManager.getInstance().settingWeatherData(writeResponse, weatherData, IWeatherStatusDataListener)
 ```
 
-| 参数名        | 类型                       | 描述                 |
+| Parameter name | Type | Description |
 | ------------- | -------------------------- | -------------------- |
-| writeResponse | IBleWriteResponse          | 命令写入回调         |
-| weatherData   | WeatherData                | 天气数据             |
-| listener      | IWeatherStatusDataListener | 天气数据设置结果回调 |
+| writeResponse | IBleWriteResponse | Command write callback |
+| weatherData | WeatherData | weather data |
+| listener | IWeatherStatusDataListener | Weather data setting result callback |
 
-WeatherData：天气数据
+WeatherData: weather data
 
-| 成员名                | 类型                    | 描述                                                         |
-| --------------------- | ----------------------- | ------------------------------------------------------------ |
-| crc                   | int                     | crc可以根据更新时间或全体数据拼接成数据的CRC，确保唯一就可以 <br />（当crc相同时则不需要更新天气数据，可以避免过快频率的更新天气数据） |
-| cityName              | String                  | 城市名，具体城市的UTF-8编码                                  |
-| source                | int                     | 天气数据的来源，比如是雅虎还是和风,(此处可以不填)            |
-| timeBean              | TimeData                | 最后更新时间                                                 |
-| weatherEvery3HourList | List<WeatherEvery3Hour> | 每3小时天气预报列表                                          |
-| weatherEverdayList    | List<WeatherEveryDay>   | 每天天气预报列表                                             |
+| member name | type | description |
+| --------------------- | ----------------------- | --------------------------------------------------------------- |
+| crc | int | crc can be spliced into the CRC of the data based on the update time or the entire data, ensuring uniqueness <br /> (When the crc is the same, there is no need to update the weather data, which can avoid updating the weather data too quickly) |
+| cityName | String | City name, UTF-8 encoding of the specific city |
+| source | int | The source of weather data, such as Yahoo or Zephyr, (you can leave it blank here) |
+| timeBean | TimeData | Last updated time |
+| weatherEvery3HourList | List<WeatherEvery3Hour> | Every 3-hour weather forecast list |
+| weatherEverdayList | List<WeatherEveryDay> | Daily weather forecast list |
 
-WeatherEvery3Hour：三小时天气预报
+WeatherEvery3Hour: three-hour weather forecast
 
-| 成员名       | 类型     | 描述                                                         |
-| ------------ | -------- | ------------------------------------------------------------ |
-| timeBean     | TimeData | 当前的时间，年月日时分，精确到时分秒                         |
-| temperatureF | int      | 华氏度                                                       |
-| temperatureC | int      | 摄氏度                                                       |
-| yellowLevel  | int      | 紫外线强度指数                                               |
-| weatherState | int      | 天气状态，此值是一个指定范围内的int值，值域判断如下：<br/>  0-4 晴<br/>  5-12    晴转多云<br/>  13-16   阴天<br/>  17-20   阵雨<br/>  21-24   雷阵雨<br/>  25-32   冰雹<br/>  33-40   小雨<br/>  41-48   中雨<br/>  49-56   大雨<br/>  57-72   暴雨<br/>  73-84   小雪<br/>  85-100  大雪<br/>  101-155 多云 |
-| windLevel    | String   | 风向等级,如果风力是一个范围值，请用‘-’连接，例如"3-5";如果是单个值，直接"3" |
-| canSeeWay    | double   | 能见度单位m,3.16                                             |
+| member name | type | description |
+| ------------ | -------- | --------------------------------------------------------------- |
+| timeBean | TimeData | Current time, year, month, day, hour and minute, accurate to hour, minute and second |
+| temperatureF | int | Fahrenheit |
+| temperatureC | int | degrees Celsius |
+| yellowLevel | int | UV intensity index |
+| weatherState | int | Weather state, this value is an int value within the specified range, the value range is judged as follows:<br/> 0-4 Sunny<br/> 5-12 Sunny to cloudy<br/> 13-16 Cloudy<br/> 17-20 Shower<br/> 21-24 Thunderstorm<br/> 25-32 Hail<br/> 33-40 Light rain<br/> 41-48 Moderate rain<br/> 49-56 Heavy rain<br/> 57-72 Heavy rain<br/> 73-84 Light snow<br/> 85-100 Heavy snow<br/> 101-155 Cloudy |
+| windLevel | String | Wind direction level, if the wind force is a range value, please use '-' to connect, such as "3-5"; if it is a single value, just "3" |
+| canSeeWay | double | Visibility unit m,3.16 |
 
-WeatherEveryDay：每天天气预报
+WeatherEveryDay: Daily weather forecast
 
-| 成员名               | 类型     | 描述                                                         |
-| -------------------- | -------- | ------------------------------------------------------------ |
-| timeBean             | TimeData | 年月日时分                                                   |
-| temperatureMaxF      | int      | 最大华氏度                                                   |
-| temperatureMinF      | int      | 最小华氏度                                                   |
-| temperatureMaxC      | int      | 最大摄氏度                                                   |
-| temperatureMinC      | int      | 最小摄氏度                                                   |
-| yellowLevel          | int      | 紫外线强度指数                                               |
-| weatherStateWhiteDay | int      | 白天天气状态，此值是一个指定范围内的int值，值域判断如下：<br/>  0-4 晴<br/>  5-12    晴转多云<br/>  13-16   阴天<br/>  17-20   阵雨<br/>  21-24   雷阵雨<br/>  25-32   冰雹<br/>  33-40   小雨<br/>  41-48   中雨<br/>  49-56   大雨<br/>  57-72   暴雨<br/>  73-84   小雪<br/>  85-100  大雪<br/>  101-155 多云 |
-| weatherStateNightDay | int      | 夜间天气状态，此值是一个指定范围内的int值，值域判断如下：<br/>  0-4 晴<br/>  5-12    晴转多云<br/>  13-16   阴天<br/>  17-20   阵雨<br/>  21-24   雷阵雨<br/>  25-32   冰雹<br/>  33-40   小雨<br/>  41-48   中雨<br/>  49-56   大雨<br/>  57-72   暴雨<br/>  73-84   小雪<br/>  85-100  大雪<br/>  101-155 多云 |
-| windLevel            | String   | 风向等级,如果风力是一个范围值，请用‘-’连接，例如"3-5";如果是单个值，直接"3" |
-| canSeeWay            | double   | 能见度单位m,3.16                                             |
+| member name | type | description |
+| -------------------- | -------- | --------------------------------------------------------------- |
+| timeBean | TimeData | year, month, day, hour and minute |
+| temperatureMaxF | int | maximum degree Fahrenheit |
+| temperatureMinF | int | Minimum degree Fahrenheit |
+| temperatureMaxC | int | maximum degree Celsius |
+| temperatureMinC | int | Minimum degree Celsius |
+| yellowLevel | int | UV intensity index |
+| weatherStateWhiteDay | int | Daytime weather status, this value is an int value within the specified range, the value range is determined as follows:<br/> 0-4 Sunny<br/> 5-12 Sunny to cloudy<br/> 13-16 Cloudy<br/> 17-20 Shower<br/> 21-24 Thunderstorm<br/> 25-32 Hail<br/> 33-40 Light rain<br/> 41-48 Moderate rain<br/> 49-56 Heavy rain<br/> 57-72 Heavy rain<br/> 73-84 Light snow<br/> 85-100 Heavy snow<br/> 101-155 Cloudy |
+| weatherStateNightDay | int | Night weather status, this value is an int value within the specified range, the value range is determined as follows:<br/> 0-4 Sunny<br/> 5-12 Sunny to cloudy<br/> 13-16 Cloudy<br/> 17-20 Shower<br/> 21-24 Thunderstorm<br/> 25-32 Hail<br/> 33-40 light rain<br/> 41-48 moderate rain<br/> 49-56 heavy rain<br/> 57-72 heavy rain<br/> 73-84 light snow<br/> 85-100 heavy snow<br/> 101-155 cloudy |
+| windLevel | String | Wind direction level, if the wind force is a range value, please use '-' to connect, such as "3-5"; if it is a single value, just "3" |
+| canSeeWay | double | Visibility unit m,3.16 |
 
-IWeatherStatusDataListener：天气数据设置结果回调，当天气数据设置成功，或天气开关，天气单位发生改变时该方法会被回调
+IWeatherStatusDataListener: Weather data setting result callback. This method will be called back when the weather data is set successfully, or the weather switch or weather unit changes.
 
 ```
 /**
- * 天气数据的监听，返回操作的状态
+ * Monitor weather data and return the status of the operation
  */
 public interface IWeatherStatusDataListener extends IListener {
     /**
-     * 天气数据的回调
+     * Callback of weather data
      *
      * @param weatherStatusData
      */
     void onWeatherDataChange(WeatherStatusData weatherStatusData);
 }
+
+public enum EWeatherOprateStatus {
     /**
-     * 设置天气状态成功
+     * Set weather status successfully
      */
     SETTING_STATUS_SUCCESS,
     /**
-     * 设置天气状态失败
+     * Failed to set weather status
      */
     SETTING_STATUS_FAIL,
     /**
-     * 设置天气数据成功
+     * Set weather data successfully
      */
     SETTING_CONTENT_SUCCESS,
     /**
-     * 设置天气数据失败
+     * Failed to set weather data
      */
     SETTING_CONTENT_FAIL,
     /**
-     * 读取成功
+     * Read successfully
      */
     READ_SUCCESS,
     /**
-     * 读取失败
+     * Failed to read
      */
     READ_FAIL,
     /**
-     * 未知
+     * unknown
      */
     UNKONW;
-
+}
 ```
 
-WeatherStatusData：天气状态数据
+**WeatherStatusData:** weather status data
 
-| 成员名      | 类型                 | 描述                                                         |
-| ----------- | -------------------- | ------------------------------------------------------------ |
-| oprate      | EWeatherOprateStatus | 天气操作状态：<br />SETTING_STATUS_SUCCESS：设置天气状态成功<br />SETTING_STATUS_FAIL：设置天气状态失败<br />SETTING_CONTENT_SUCCESS：设置天气数据成功<br />SETTING_CONTENT_FAIL：设置天气数据失败<br />READ_SUCCESS：读取成功<br />READ_FAIL：读取失败<br />UNKONW：未知状态 |
-| crc         | int                  | 当前天气的crc                                                |
-| isOpen      | boolean              | 是否打开天气功能                                             |
-| weatherType | EWeatherType         | 天气的类型（华氏度，摄氏度）：<br />C：摄氏度<br />F：华氏度 |
+| member name | type | description |
+| ----------- | -------------------- | --------------------------------------------------------------- |
+| oprate | EWeatherOprateStatus | Weather operation status:<br />SETTING_STATUS_SUCCESS: Setting weather status successfully<br />SETTING_STATUS_FAIL: Setting weather status failed<br />SETTING_CONTENT_SUCCESS: Setting weather data successfully<br />SETTING_CONTENT_FAIL: Setting weather data failed<br />READ_SUCCESS: Reading successful<br />READ_FAIL: Reading failure<br /> />UNKONW: Unknown status |
+| crc | int | crc of current weather |
+| isOpen | boolean | Whether to turn on the weather function |
+| weatherType | EWeatherType | Type of weather (Fahrenheit, Celsius):<br />C: Celsius<br />F: Fahrenheit |
 
-天气设置代码示例：
+Weather setting code example:
 
 ```
 //CRC
 int crc = 0;
-//城市名称
-String cityName = "深圳";
-//数据来源
-int sourcr = 0;
-//最近更新时间
+//city name
+String cityName = "Shenzhen";
+//data source
+int sourcecr = 0;
+//Last update time
 int year = TimeData.getSysYear();
 int month = TimeData.getSysMonth();
 int day = TimeData.getSysDay();
 TimeData lasTimeUpdate = new TimeData(year, month, day, 12, 59, 23);
-//天气列表（以小时为单位）
+//Weather list (in hours)
 List<WeatherEvery3Hour> weatherEvery3HourList = new ArrayList<>();
 TimeData every3Hour0 = new TimeData(year, month, day, 12, 59, 23);
 TimeData every3Hour1 = new TimeData(year, month, day, 15, 59, 23);
@@ -7575,7 +7565,7 @@ weatherEvery3HourList.add(weatherEvery3Hour0);
 weatherEvery3HourList.add(weatherEvery3Hour1);
 weatherEvery3HourList.add(weatherEvery3Hour2);
 weatherEvery3HourList.add(weatherEvery3Hour3);
-//天气列表（以天为单位）
+//Weather list (in days)
 List<WeatherEveryDay> weatherEveryDayList = new ArrayList<>();
 TimeData everyDay0 = new TimeData(year, month, day, 12, 59, 23);
 WeatherEveryDay weatherEveryDay0 = new WeatherEveryDay(everyDay0, 80, -80, 60,
@@ -7592,27 +7582,27 @@ VPOperateManager.getInstance().settingWeatherData(writeResponse, weatherData, ne
 });
 ```
 
-### 天气开关以及单位设置
+### Weather switch and unit settings
 
 ```
 VPOperateManager.getInstance().settingWeatherStatusInfo(writeResponse, weatherStatusSetting, listener)
 ```
 
-| 参数名               | 类型                       | 描述                 |
+| Parameter name | Type | Description |
 | -------------------- | -------------------------- | -------------------- |
-| writeResponse        | IBleWriteResponse          | 命令写入回调         |
-| weatherStatusSetting | WeatherStatusSetting       | 天气开关和单位设置   |
-| listener             | IWeatherStatusDataListener | 天气数据设置结果回调 |
+| writeResponse | IBleWriteResponse | Command write callback |
+| weatherStatusSetting | WeatherStatusSetting | Weather switches and unit settings |
+| listener | IWeatherStatusDataListener | Weather data setting result callback |
 
-WeatherStatusSetting：天气单位和开关设置
+WeatherStatusSetting: weather unit and switch settings
 
-| 成员名   | 类型         | 描述                                                         |
-| -------- | ------------ | ------------------------------------------------------------ |
-| crc      | int          | 当前天气的crc, 进行天气设置时，如果天气数据没有改变crc请传入上次保存的天气crc值 |
-| isOpen   | boolean      | 是否打开天气功能，true:打开，false:关闭                      |
-| eWeather | EWeatherType | 天气的类型（华氏度，摄氏度）：<br />C：摄氏度<br />F：华氏度 |
+| member name | type | description |
+| -------- | ------------ | --------------------------------------------------------------- |
+| crc | int | The crc of the current weather. When setting the weather, if the weather data does not change the crc, please pass in the last saved weather crc value |
+| isOpen | boolean | Whether to open the weather function, true: open, false: closed |
+| eWeather | EWeatherType | Type of weather (Fahrenheit, Celsius):<br />C: Celsius<br />F: Fahrenheit |
 
-天气单位和开关代码示例：
+Weather unit and switch code example:
 
 ```
 WeatherStatusSetting weatherStatusSetting = new WeatherStatusSetting(crc, true, EWeatherType.C);
@@ -7625,218 +7615,218 @@ VPOperateManager.getInstance().settingWeatherStatusInfo(writeResponse, weatherSt
 });
 ```
 
-## 查找手机功能
+## Find phone features
 
-#### 设置查找手机监听
+#### Set up mobile phone monitoring
 
-###### 接口
+###### API
 
 ```kotlin
 settingFindPhoneListener(findPhonelistener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名            | 类型               | 描述           |
-| ----------------- | ------------------ | -------------- |
-| findPhonelistener | IFindPhonelistener | 查找手机的监听 |
+| Parameter name | Type | Description |
+| ------------------ | ------------------ | --------------- |
+| findPhonelistener | IFindPhonelistener | Find the phone's listener |
 
-###### 返回数据
+###### Return data
 
-**IFindPhonelistener**--查找手机的监听
+**IFindPhonelistener**--Find the phone’s listener
 
 ```kotlin
 /**
- * 接收到此回调时，手机应该做相应的反馈提醒用户，如振动，响铃等
+ * When receiving this callback, the mobile phone should provide corresponding feedback to remind the user, such as vibrating, ringing, etc.
  */
 fun findPhone()
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-//        kotlin code
+// kotlin code
 VPOperateManager.getInstance().settingFindPhoneListener {
-    val message = "(监听到手环要查找手机)-where is the phone,make some noise!"
+    val message = "(Monitoring the bracelet to find the phone)-where is the phone, make some noise!"
 
 }
 ```
 
-## 久坐功能
+## Sedentary function
 
-#### 前提
+#### Prerequisites
 
-需设备支持久坐功能，判断条件如下：
+The device needs to support sedentary function, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportLongseat
 ```
 
-#### 读取久坐设置
+#### Read sedentary settings
 
-需设置支持久坐
+Requires settings to support prolonged sitting
 
-###### 接口
+###### API
 
 ```
 readLongSeat(bleWriteResponse, longSeatDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名               | 类型                  | 描述           |
-| -------------------- | --------------------- | -------------- |
-| bleWriteResponse     | IBleWriteResponse     | 写入操作的监听 |
-| longSeatDataListener | ILongSeatDataListener | 久坐数据监听   |
+| Parameter name | Type | Description |
+| -------------------------- | -------------------------- | ------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| longSeatDataListener | ILongSeatDataListener | Sedentary data listening |
 
-###### 返回数据
+###### Return data
 
-**ILongSeatDataListener** --久坐数据监听
+**ILongSeatDataListener** --Sedentary data listening
 
 ```kotlin
 /**
- * 返回久坐的数据
+ * Return sedentary data
  *
- * @param longSeat 久坐数据
+ * @param longSeat sedentary data
  */
 fun onLongSeatDataChange(longSeat:LongSeatData)
 ```
 
-**LongSeatData**--久坐数据
+**LongSeatData**--sedentary data
 
-| 变量        | 类型            | 描述                           |
-| ----------- | --------------- | ------------------------------ |
-| status      | ELongSeatStatus | 久坐操作的状态                 |
-| startHour   | Int             | 开始时间的小时                 |
-| startMinute | Int             | 开始时间的分钟                 |
-| endHour     | Int             | 结束时间的小时                 |
-| endMinute   | Int             | 结束时间的分钟                 |
-| threshold   | Int             | 阈值：多久没动过，手表就会提醒 |
-| isOpen      | Boolean         | 开关状态                       |
+| Variable | Type | Description |
+| ----------- | --------------- | ------------------------------- |
+| status | ELongSeatStatus | Status of sedentary operation |
+| startHour | Int | Hour of start time |
+| startMinute | Int | The minute of the start time |
+| endHour | Int | The hour of the end time |
+| endMinute | Int | Minutes of end time |
+| threshold | Int | Threshold: how long it has been without movement, the watch will remind |
+| isOpen | Boolean | switch status |
 
-**ELongSeatStatus**--久坐操作的状态
+**ELongSeatStatus**--Status of sedentary operation
 
-| 变量          | 描述         |
+| variable | description |
 | ------------- | ------------ |
-| OPEN_SUCCESS  | 打开成功     |
-| OPEN_FAIL     | 打开失败     |
-| CLOSE_SUCCESS | 关闭成功     |
-| CLOSE_FAIL    | 关闭失败     |
-| READ_SUCCESS  | 读取成功     |
-| READ_FAIL     | 读取失败     |
-| UNSUPPORT     | 不支持此功能 |
-| UNKONW        | 未知状态     |
+| OPEN_SUCCESS | Open successfully |
+| OPEN_FAIL | Open failed |
+| CLOSE_SUCCESS | Closed successfully |
+| CLOSE_FAIL | Close failed |
+| READ_SUCCESS | Read successfully |
+| READ_FAIL | Read failed |
+| UNSUPPORT | This feature is not supported |
+| UNKONW | Unknown status |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-//        kotlin code
+// kotlin code
 VPOperateManager.getInstance().readLongSeat(
     writeResponse
 ) { longSeat ->
-    val message = "设置久坐-读取:\n$longSeat"
+    val message = "Set long seat-read:\n$longSeat"
 
 }
 ```
 
-#### 设置久坐
+#### Set up sedentary
 
-需设备支持久坐功能
+Requires device to support sedentary function
 
-###### 接口
+###### API
 
 ```
 settingLongSeat(IBleWriteResponse bleWriteResponse, LongSeatSetting longSeatSetting, ILongSeatDataListener longSeatDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名               | 类型                  | 描述           |
-| -------------------- | --------------------- | -------------- |
-| bleWriteResponse     | IBleWriteResponse     | 写入操作的监听 |
-| longSeatSetting      | LongSeatSetting       | 久坐设置       |
-| longSeatDataListener | ILongSeatDataListener | 久坐数据监听   |
+| Parameter name | Type | Description |
+| -------------------------- | -------------------------- | ------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| longSeatSetting | LongSeatSetting | Sedentary setting |
+| longSeatDataListener | ILongSeatDataListener | Sedentary data listening |
 
-**LongSeatSetting**--久坐设置
+**LongSeatSetting**--Sedentary setting
 
-| 参数名      | 类型    | 描述                           |
-| ----------- | ------- | ------------------------------ |
-| startHour   | Int     | 开始时间的小时                 |
-| startMinute | Int     | 开始时间的分钟                 |
-| endHour     | Int     | 结束时间的小时                 |
-| endMinute   | Int     | 结束时间的分钟                 |
-| threshold   | Int     | 阈值：多久没动过，手表就会提醒 |
-| isOpen      | Boolean | 开关状态                       |
+| Parameter name | Type | Description |
+| ----------- | ------- | ------------------------------- |
+| startHour | Int | Hour of start time |
+| startMinute | Int | The minute of the start time |
+| endHour | Int | The hour of the end time |
+| endMinute | Int | Minutes of end time |
+| threshold | Int | Threshold: how long it has been without movement, the watch will remind |
+| isOpen | Boolean | switch status |
 
-###### 返回数据
+###### Return data
 
-同【[读取久坐设置](#读取久坐设置)】返回的数据一致
+Consistent with the data returned by [[Read Sedentary Settings](#Read Sedentary Settings)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
-//        kotlin code
+// kotlin code
 VPOperateManager.getInstance().settingLongSeat(
     writeResponse, LongSeatSetting(10, 40, 12, 40, 40, false)
 ) { longSeat ->
-    val message = "设置久坐:\n$longSeat"
+    val message = "Set long seat:\n$longSeat"
 
 }
 ```
 
-## 拍照功能
+## Photography function
 
-#### 前提
+#### Prerequisites
 
-设备需支持拍照功能，判断条件如下：
+The device needs to support the camera function, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportCamera
 ```
 
-#### 进入拍照模式
+#### Enter photo mode
 
-设备需支持拍照功能
+The device needs to support the camera function
 
-###### 接口
+###### API
 
 ```
 startCamera(bleWriteResponse, cameraDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名             | 类型                | 描述                                                         |
-| ------------------ | ------------------- | ------------------------------------------------------------ |
-| bleWriteResponse   | IBleWriteResponse   | 写入操作的监听                                               |
-| cameraDataListener | ICameraDataListener | 拍照操作的回调,返回进入拍照模式成功/失败,可以/不可以拍照,退出拍照模式成功/失败 |
+| Parameter name | Type | Description |
+| ------------------ | ------------------ | --------------------------------------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| cameraDataListener | ICameraDataListener | Callback for camera operation, returns success/failure to enter camera mode, can/cannot take pictures, success/failure to exit camera mode |
 
-###### 返回数据
+###### Return data
 
-**ICameraDataListener**--拍照操作的回调
+**ICameraDataListener**--Callback for photo taking operation
 
 ```kotlin
 /**
- * 返回拍照的状态
+ * Return to the state of taking photos
  *
  * @param oprateStatus
  */
 fun OnCameraDataChange(oprateStatus:ECameraStatus)
 ```
 
-**ECameraStatus**--拍照状态
+**ECameraStatus**--Photography status
 
-| 变量              | 描述             |
-| ----------------- | ---------------- |
-| OPEN_SUCCESS      | 进入拍照模式成功 |
-| OPEN_FALI         | 进入拍照模式失败 |
-| TAKEPHOTO_CAN     | 进行拍照         |
-| TAKEPHOTO_CAN_NOT | 不可以进行拍照   |
-| CLOSE_SUCCESS     | 退出拍照成功     |
-| CLOSE_FAIL        | 退出拍照失败     |
-| UNKONW            | 未知             |
+| variable | description |
+| ------------------ | ------------------ |
+| OPEN_SUCCESS | Entering photo mode successfully |
+| OPEN_FALI | Failed to enter photo mode |
+| TAKEPHOTO_CAN | Take a photo |
+| TAKEPHOTO_CAN_NOT | Taking pictures is not allowed |
+| CLOSE_SUCCESS | Exit photo taking successfully |
+| CLOSE_FAIL | Failed to exit photo taking |
+| UNKONW | Unknown |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -7847,25 +7837,25 @@ VPOperateManager.getInstance().startCamera(
 }
 ```
 
-#### 退出拍照模式
+#### Exit photo mode
 
-需设备支持拍照且已进入拍照模式
+The device needs to support taking photos and has entered the photo mode
 
-###### 接口
+###### API
 
 ```
 stopCamera(IBleWriteResponse bleWriteResponse, ICameraDataListener cameraDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-同【[进入拍照模式](#进入拍照模式)】参数一致
+Same parameters as [[Enter photo mode](#Enter photo mode)]
 
-###### 返回数据
+###### Return data
 
-同【[进入拍照模式](#进入拍照模式)】返回数据一致
+Same as the data returned by [[Enter photo mode](#Enter photo mode)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 //        kotlin code
@@ -7876,164 +7866,164 @@ VPOperateManager.getInstance().stopCamera(
 }
 ```
 
-## OTA升级功能
+## OTA upgrade function
 
-#### 获取当前固件版本号
+#### Get the current firmware version number
 
-###### 前提
+###### Prerequisites
 
-设备已连接
+Device is connected
 
-**注意：**OTA过程较长，如果电池电量不足，传输过程可能会因低电关机，建议电池电量在30%以上，才允许升级；
+**Note:** The OTA process is long. If the battery power is insufficient, the transmission process may be shut down due to low power. It is recommended that the battery power be above 30% before the upgrade is allowed;
 
-###### 接口
+###### API
 
-在【[验证密码](#验证密码操作)】操作后，返回的pwdDataListener数据中包含了当前固件版本号
+After the [[Verify Password](#Verify Password Operation)] operation, the returned pwdDataListener data contains the current firmware version number.
 
-###### 示例代码
+###### Sample code
 
 ```
 pwdData.deviceVersion
 ```
 
-#### 获取新固件版本号以及升级描述
+#### Get the new firmware version number and upgrade description
 
-###### 前提
+###### Prerequisites
 
-设备已连接且已知晓设备版本号
+The device is connected and the device version number is known
 
-###### 接口
+###### API
 
 ```
 getOadVersion(oadSetting, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名     | 类型                    | 描述         |
-| ---------- | ----------------------- | ------------ |
-| oadSetting | OadSetting              | 校验版本设置 |
-| listener   | OnGetOadVersionListener | 校验版本监听 |
+| Parameter name | Type | Description |
+| ---------- | ----------------------- | ---------- |
+| oadSetting | OadSetting | Verification version setting |
+| listener | OnGetOadVersionListener | Verification version listening |
 
-**OadSetting**--校验版本设置
+**OadSetting**--Verify version settings
 
-| 参数名              | 类型    | 描述                                                         |
-| ------------------- | ------- | ------------------------------------------------------------ |
-| deviceAddressString | String  | 设备地址(必要)                                               |
-| deviceVersion       | String  | 设备版本(必要)                                               |
-| deviceTestVersion   | String  | 设备测试版本(必要)                                           |
-| deviceNumber        | String  | 设备号(必要)                                                 |
-| isOadModel          | Boolean | 固件升级模式(必要)                                           |
-| isDebug             | Boolean | 调试模式(可不传),true表示使用的是我司服务器的调试端口，false表示使用的是我司服务器的发布端口， |
-| hostUrl             | String  | 主机地址，传输格式为：<http://www.baidu.com;可不传,默认为我司服务器;慎用！！！使用前先对接我司开发人员> |
-| isAutoDownload      | Boolean | 是否检测版本后自动下载                                       |
+| Parameter name | Type | Description |
+| ------------------- | ------- | --------------------------------------------------------------- |
+| deviceAddressString | String | Device address (required) |
+| deviceVersion | String | Device version (required) |
+| deviceTestVersion | String | Device test version (required) |
+| deviceNumber | String | Device number (required) |
+| isOadModel | Boolean | Firmware upgrade mode (required) |
+| isDebug | Boolean | Debug mode (optional), true means the debugging port of our server is used, false means the release port of our server is used, |
+| hostUrl | String | Host address, the transmission format is: <http://www.baidu.com; it can be omitted, the default is our server; use with caution! ! ! Contact our developers before using > |
+| isAutoDownload | Boolean | Whether to automatically download after detecting the version |
 
-###### 返回数据
+###### Return data
 
-**OnGetOadVersionListener**-- 校验版本回调
+**OnGetOadVersionListener**--Verification version callback
 
 ```java
 /**
- * 返回此设备在服务器的最新版本信息
+ * Return the latest version information of this device on the server
  *
- * @param deviceNumber  设备号
- * @param deviceVersion 最新版本
- * @param des           升级描述
- * @param netIsNew      网络版本大于本地版本，需要更新
+ * @param deviceNumber device number
+ * @param deviceVersion latest version
+ * @param des upgrade description
+ * @param netIsNew The network version is greater than the local version and needs to be updated
  */
 void onNetOadInfo(int deviceNumber, String deviceVersion, String des, boolean netIsNew);
 
 void onNetOadDetailInfo(OadFileBean oadFileBean,boolean netIsNew);
 ```
 
-**OadFileBean** -- 设备升级文件信息
+**OadFileBean** -- device upgrade file information
 
-| 变量          | 类型   | 描述            |
+| Variable | Type | Description |
 | ------------- | ------ | --------------- |
-| deviceNumber  | String | 新固件设备号    |
-| deviceVersion | String | 新固件版本      |
-| downUrl       | String | 新固件下载的url |
-| size          | String | 新固件的大小    |
-| md5           | String | 新固件md5       |
-| des           | String | 新版本升级描述  |
+| deviceNumber | String | New firmware device number |
+| deviceVersion | String | New firmware version |
+| downUrl | String | URL for downloading new firmware |
+| size | String | The size of the new firmware |
+| md5 | String | New firmware md5 |
+| des | String | New version upgrade description |
 
-#### 下载新固件
+#### Download new firmware
 
-根据获取到的新固件下载地址，进行正常的网络下载即可
+According to the download address of the new firmware obtained, just perform normal network download.
 
-#### 杰理平台设备OTA升级
+#### Jerry platform equipment OTA upgrade
 
-注意，杰理OTA升级过程一般比较长，大概在10-20分钟范围内，升级过程中需要保持手表手机电量充足，且升级中APP处于前台。（部分android系统会将处于后台的app的蓝牙操作视为耗电运行，可能会将蓝牙传输挂起，从而导致ota升级失败）
+Note that the Jerry OTA upgrade process is generally relatively long, probably within 10-20 minutes. During the upgrade process, you need to keep the watch and phone fully charged, and the APP being upgraded is in the foreground. (Some Android systems will regard the Bluetooth operation of the app in the background as power-consuming operation, and may suspend the Bluetooth transmission, causing the ota upgrade to fail)
 
-杰理OTA流程分为三阶段，
-第一阶段：OTA文件传输，此过程升级时长视升级文件大小而定。onProgress 方法正常情况下progress值从0.00到99.9
+Jerry's OTA process is divided into three stages.
+The first stage: OTA file transfer. The upgrade time of this process depends on the size of the upgrade file. In the onProgress method, the progress value ranges from 0.00 to 99.9 under normal circumstances.
 
-第二阶段：内部文件copy, onProgress 会快速从0.00到99.9
+The second stage: internal file copy, onProgress will quickly go from 0.00 to 99.9
 
-第三阶段：此阶段为内部升级，设备回主动断开连接，并回调onNeedReconnect方法，此时设备会自动更改设备名为DFULang，且设备地址在原有的设备地址+1
+The third stage: This stage is an internal upgrade. The device will actively disconnect and call back the onNeedReconnect method. At this time, the device will automatically change the device name to DFULang, and the device address will be the original device address + 1.
 
-SDK会自动搜索重连DFULang设备，连接成功后，SDK会触发内部升级， onProgress 会快速从0.00到100, 并回调onOTASuccess方法
+The SDK will automatically search for and reconnect the DFULang device. After the connection is successful, the SDK will trigger an internal upgrade. onProgress will quickly change from 0.00 to 100, and call back the onOTASuccess method.
 
-###### 前提
+###### Prerequisites
 
-需设备为杰理设备且已完成【[打开杰理文件系统](#打开杰理文件系统)】，并且已经下载好新固件
+The device needs to be a Jerry device and has completed [[Open Jerry File System](#Open Jerry File System)], and the new firmware has been downloaded
 
-###### 接口
+###### API
 
 ```
 VPOperateManager.getInstance().startJLDeviceOTAUpgrade(firmwareFilePath, listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                              | 描述                      |
-| ---------------- | --------------------------------- | ------------------------- |
-| firmwareFilePath | String                            | 本地存放的OTA升级文件路径 |
-| listener         | JLOTAHolder.OnJLDeviceOTAListener | 杰理设备OTA监听           |
+| Parameter name | Type | Description |
+|---------------- | ---------------------------------- | ---------------------------------- |
+| firmwareFilePath | String | The path to the locally stored OTA upgrade file |
+| listener | JLOTAHolder.OnJLDeviceOTAListener | Jerry device OTA listening |
 
-###### 返回数据
+###### Return data
 
-OnJLDeviceOTAListener：杰理OTA升级监听
+OnJLDeviceOTAListener: Jerry OTA upgrade listener
 
 ```java
 public interface OnJLDeviceOTAListener {
 
     /**
-     * 开始OTA
+     * Start OTA
      */
     void onOTAStart();
 
     /**
-     * 升级进度，保留小数点后两位
+     *Upgrade progress, keep to two decimal places
      *
-     * @param progress 升级进度[0.00 - 100]
+     * @param progress Upgrade progress [0.00 - 100]
      */
     void onProgress(float progress);
 
     /**
-     * 需要重连时回调
+     * Called back when reconnection is required
      *
-     * @param address          设备地址
-     * @param dfuLangAddress   dfuLang状态下的设备地址： address+1
-     * @param isReconnectBySdk 是否由SDK内部自动重连，完成ota最后一阶段
+     * @param address device address
+     * @param dfuLangAddress Device address in dfuLang state: address+1
+     * @param isReconnectBySdk Whether to automatically reconnect within the SDK to complete the last stage of ota
      */
     void onNeedReconnect(String address, String dfuLangAddress, boolean isReconnectBySdk);
 
     /**
-     * OTA成功
+     *OTA successful
      */
     void onOTASuccess();
 
     /**
-     * OTA升级失败
+     *OTA upgrade failed
      *
-     * @param error 失败原因
+     * @param error Reason for failure
      */
     void onOTAFailed(BaseError error);
 }
 ```
 
-###### 示例代码
+###### Sample code
 
 ```java
 private void startOTA() {
@@ -8042,65 +8032,65 @@ private void startOTA() {
         VPOperateManager.getInstance().startJLDeviceOTAUpgrade(firmwareFilePath, new JLOTAHolder.OnJLDeviceOTAListener() {
             @Override
             public void onOTAStart() {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级【开始】");
-                tvOTAInfo.setText("开始升级");
+                Logger.t(TAG).e("[Jerry OTA]--->OTA upgrade [Start]");
+                tvOTAInfo.setText("Start Upgrade");
             }
 
             @Override
             public void onProgress(float progress) {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级中:" + progress + "%");
+                Logger.t(TAG).e("[Jerry OTA]--->OTA upgrading:" + progress + "%");
                 tvOTAProgress.setText(String.format(Locale.CHINA, "%.2f", progress) + "%");
                 pbOTAProgress.setProgress((int) (progress * 100));
             }
 
             @Override
             public void onNeedReconnect(String address, String dfuLangAddress, boolean isReconnectBySdk) {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级dfuLang重连中: address = " + address + " , dfuLangAddress = " + dfuLangAddress + " , 是否由SDK重连 = " + isReconnectBySdk);
-                tvOTAInfo.setText("数据传输结束，开始搜索DFULang设备->设备内部升级");
+                Logger.t(TAG).e("[Jerry OTA]--->OTA upgrade dfuLang reconnecting: address = " + address + " , dfuLangAddress = " + dfuLangAddress + " , whether to reconnect by SDK = " + isReconnectBySdk);
+                tvOTAInfo.setText("Data transfer ends, start searching for DFULang device -> device internal upgrade");
             }
 
             @Override
             public void onOTASuccess() {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级【成功】");
-                tvOTAInfo.setText("OTA升级成功");
+                Logger.t(TAG).e("[Jerry OTA]--->OTA upgrade [successful]");
+                tvOTAInfo.setText("OTA upgrade successful");
                 tvOTAProgress.setText("100%");
             }
 
             @Override
             public void onOTAFailed(com.jieli.jl_bt_ota.model.base.BaseError error) {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级【失败】:" + error.toString());
-                tvOTAInfo.setText("升级失败，error: code = " + error.getSubCode() + " , msg = " + error.getMessage());
+                Logger.t(TAG).e("[Jerry OTA]--->OTA upgrade [failed]:" + error.toString());
+                tvOTAInfo.setText("Upgrade failed, error: code = " + error.getSubCode() + " , msg = " + error.getMessage());
             }
         });
     }
 ```
 
-## 联系人功能
+## Contact function
 
-前提
+Premise
 
-设备需支持联系人功能，判断条件如下：
+The device needs to support the contact function, and the judgment conditions are as follows:
 
 ```
 boolean isHaveContactFunction = VpSpGetUtil.getVpSpVariInstance(this).isSupportContactFunction();
 ```
 
-是否支持紧急联系人，判断条件如下：
+Whether emergency contacts are supported is determined by the following conditions:
 
 ```
 boolean isSupportSOSContact = VpSpGetUtil.getVpSpVariInstance(this).isSupportSOSContactFunction();
 ```
 
-联系人封装实体：Contact
+Contact encapsulated entity: Contact
 
 ```kotlin
 /**
- * 联系人
- * @param contactID 联系人ID
- * @param name 联系人昵称
- * @param phoneNumber 联系人号码
- * @param isSettingSOS 是否设置为紧急联系人
- * @param isSupportSOS 是否支持SOS功能
+ *Contact person
+ * @param contactID contact ID
+ * @param name contact nickname
+ * @param phoneNumber contact number
+ * @param isSettingSOS Whether to set as emergency contact
+ * @param isSupportSOS Whether to support SOS function
  */
 data class Contact(
         var contactID: Int,
@@ -8111,79 +8101,79 @@ data class Contact(
 )
 ```
 
-联系人操作枚举类：EContactOpt
+Contact operation enumeration class: EContactOpt
 
 ```
 enum class EContactOpt(var des: String) {
     /**
-     * 读取联系人
+     * Read contacts
      */
     READ("read contact list"),
 
     /**
-     * 设置联系人
+     * Set up contacts
      */
     SETTING("setting contact"),
 
     /**
-     * 设置紧急联系人
+     * Set up emergency contacts
      */
     SETTING_SOS("setting contact"),
 
     /**
-     * 移动联系人
+     * Mobile contacts
      */
     MOVE("move contact position"),
 
     /**
-     * 删除联系人
+     * Delete contact
      */
     DELETE("delete one contact");
 }
 ```
 
-联系人操作回调监听：
+Contact operation callback monitoring:
 
 ```
 interface IContactOptListener : IListener {
 
     /**
-     * 联系人操作成功
-     * @param opt 当前操作类型
-     * @param crc 当前操作成功后的crc，每次操作更新后需要保存crc以及联系人列表
+     * Contact operation successful
+     * @param opt current operation type
+     * @param crc The crc after the current operation is successful. The crc and contact list need to be saved after each operation update.
      */
     fun onContactOptSuccess(opt: EContactOpt, crc: Int)
 
     /**
-     * 联系人操作失败
+     * Contact operation failed
      */
     fun onContactOptFailed(opt: EContactOpt)
 
     /**
-     * 读取联系成功
-     * @param contactList 联系人列表，如果列表为空则表示设备端无联系人
+     * Read contact successfully
+     * @param contactList Contact list. If the list is empty, it means there are no contacts on the device.
      */
     fun onContactReadSuccess(contactList: List<Contact>)
 
     /**
-     * 表示读取联系人时下发的crc和设备端的crc一致
-     * crc一致表示设备端的联系人没有更改（注意联系人每次更新后都需要保存，通过crc判断是否需要更新联系人）
+     * Indicates that the crc issued when reading the contact is consistent with the crc on the device
+     * The consistent crc means that the contacts on the device have not changed (note that the contacts need to be saved after each update, and the crc is used to determine whether the contacts need to be updated)
      */
     fun onContactReadASSameCRC()
 
     /**
-     * 读取联系人失败
+     * Failed to read contacts
      */
     fun onContactReadFailed()
 
 }
 ```
 
-### 读取联系人
+### Read contacts
 
-代码示例：
+Code example:
 
-第一次读取的时候crc传入-1，表示会返回完整的设备端联系人。 如果用户此前已经读取过联系人可以将联系人的CRC值传入，如果CRC值和设备端保持一致则会回调onContactReadASSameCRC表示不需要重复读取，否则将返回一个完整的联系人列表。
+When reading for the first time, crc is passed in -1, which means that the complete device-side contacts will be returned. If the user has read the contact before, the CRC value of the contact can be passed in. If the CRC value is consistent with the device, onContactReadASSameCRC will be called back to indicate that repeated reading is not required, otherwise a complete contact list will be returned.
 
 ```
 VPOperateManager.getInstance().readContact(-1, IContactOptListener, response);
@@ -8193,11 +8183,11 @@ Or
 
 ```
 /**
- * 读取紧急联系人呼叫次数
+ * Read the number of emergency contact calls
  *
- * @param contacts         上一次保存的联系人列表，用来计算crc
- * @param listener         紧急联系人呼叫次数监听
- * @param bleWriteResponse 数据写入回调
+ * @param contacts The last saved contact list, used to calculate crc
+ * @param listener Emergency contact call number monitoring
+ * @param bleWriteResponse data writing callback
  */
 public void readContact(List<Contact> contacts, @NotNull IContactOptListener listener, IBleWriteResponse bleWriteResponse) {
 .
@@ -8205,41 +8195,41 @@ public void readContact(List<Contact> contacts, @NotNull IContactOptListener lis
 .
 ```
 
-Crc值的获取：
+Obtaining Crc value:
 
 ```
 int crc = CrcUtil.INSTANCE.getCrcByContactList(contacts);
 ```
 
-### 添加联系人
+### Add contact
 
-传入一个具有联系人 昵称和手机号码的Contact 实体即可，**注：**如果设备支持sos功能，isSupportSOS需设置为true
+Just pass in a Contact entity with the contact's nickname and mobile phone number. **Note: **If the device supports the sos function, isSupportSOS needs to be set to true
 
 ```
 VPOperateManager.getInstance().addContact(contact, IContactOptListener, IBleWriteResponse);
 ```
 
-传入一个联系列表即可，需包含昵称、手机号码、是否支持sos功能信息
+Just pass in a contact list, which needs to include nickname, mobile phone number, and whether it supports SOS function information.
 
 ```
 VPOperateManager.getInstance().addContactList(List<Contact>, IContactOptListener, IBleWriteResponse)
 ```
 
-### 删除联系人
+### Delete contact
 
-删除联系人需要传入一个从设备端获取的完整信息（包含contactID）的联系人
+Deleting a contact requires passing in a contact with complete information (including contactID) obtained from the device.
 
-代码示例：
+Code example:
 
 ```
 VPOperateManager.getInstance().deleteContact(contact, IContactOptListener, IBleWriteResponse);
 ```
 
-### 移动联系人
+### Mobile Contacts
 
-移动联系人是将设备端两个联系人的排序互换。
+Moving contacts swaps the order of two contacts on the device.
 
-代码示例：
+Code example:
 
 ```
 VPOperateManager.getInstance().moveContact(fromContact, toContact, IContactOptListener, IBleWriteResponse);
@@ -8249,64 +8239,64 @@ VPOperateManager.getInstance().moveContact(fromContact, toContact, IContactOptLi
 VPOperateManager.getInstance().moveContactWithPosition(fromPosition, toPosition, IContactOptListener, IBleWriteResponse);
 ```
 
-### 紧急联系人
+### Emergency Contact
 
-当设备支持紧急联系人时可以进行紧急联系人操作，判断条件如下：
+Emergency contact operations can be performed when the device supports emergency contacts. The judgment conditions are as follows:
 
 ```
 boolean isSupportSOSContact = VpSpGetUtil.getVpSpVariInstance(this).isSupportSOSContactFunction();
 ```
 
-#### 紧急联系人开启关闭设置
+#### Emergency contact on and off settings
 
-代码示例：
+Code example:
 
-当isOpen 为true时为设置紧急联系人
+When isOpen is true, set the emergency contact
 
-当isOpen 为false时为取消紧急联系人
+When isOpen is false, the emergency contact is cancelled.
 
 ```
 VPOperateManager.getInstance().setContactSOSState(isOpen, contact, IContactOptListener, IBleWriteResponse);
 ```
 
-#### 紧急联系人呼叫次数
+#### Number of emergency contact calls
 
-紧急联系人呼叫次数操作回调监听：
+Emergency contact call count operation callback monitoring:
 
 ```
 /**
- * 联系人SOS呼叫次数设置
+ *Contact SOS call number setting
  */
 interface ISOSCallTimesListener : IListener {
     /**
-     * 设置SOS呼叫次数成功
-     * @param times SOS呼叫次数
+     *Successfully set the number of SOS calls
+     * @param times SOS call times
      */
     fun onSOSCallTimesSettingSuccess(times: Int)
 
     /**
-     * 设置SOS呼叫次数失败
+     * Failed to set the number of SOS calls
      */
     fun onSOSCallTimesSettingFailed()
 
     /**
-     * 读取SOS呼叫次数成功
-     * @param times SOS呼叫次数
-     * @param minTimes 支持最小的SOS呼叫次数
-     * @param maxTimes 支出最大的SOS呼叫次数
+     * Successfully read the number of SOS calls
+     * @param times SOS call times
+     * @param minTimes supports the minimum number of SOS calls
+     * @param maxTimes The maximum number of SOS calls spent
      */
     fun onSOSCallTimesReadSuccess(times: Int, minTimes: Int, maxTimes: Int)
 
     /**
-     * 读取SOS呼叫次数失败
+     * Failed to read the number of SOS calls
      */
     fun onSOSCallTimesReadFailed()
 }
 ```
 
-##### 读取呼叫次数
+##### Read the number of calls
 
-读取紧急联系人呼叫次数代码示例：
+Code example for reading the number of emergency contact calls:
 
 ```
 VPOperateManager.getInstance().readSOSCallTimes(new ISOSCallTimesListener() {
@@ -8323,7 +8313,7 @@ VPOperateManager.getInstance().readSOSCallTimes(new ISOSCallTimesListener() {
     @Override
     public void onSOSCallTimesReadSuccess(int times, int minTimes, int maxTimes) {
         etSOSCount.setText(times + "");
-        tvSOSInfo.setText("呼叫次数设置范围：[" + minTimes + "-" + maxTimes + "]");
+        tvSOSInfo.setText("Calling times setting range: [" + minTimes + "-" + maxTimes + "]");
     }
 
     @Override
@@ -8338,25 +8328,25 @@ VPOperateManager.getInstance().readSOSCallTimes(new ISOSCallTimesListener() {
 });
 ```
 
-##### 设置呼叫次数
+##### Set the number of calls
 
-设置紧急联系人呼叫次数代码示例：
+Code example for setting the number of emergency contact calls:
 
 ```
 VPOperateManager.getInstance().setSOSCallTimes(callTimes, new ISOSCallTimesListener() {
     @Override
     public void onSOSCallTimesSettingSuccess(int times) {
-        Toast.makeText(AddContactActivity.this, "设置成功：" + times + "次", Toast.LENGTH_SHORT).show();
+        Toast.makeText(AddContactActivity.this, "Set successfully:" + times + "times", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSOSCallTimesSettingFailed() {
-        Toast.makeText(AddContactActivity.this, "设置失败", Toast.LENGTH_SHORT).show();
+        Toast.makeText(AddContactActivity.this, "Setup failed", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSOSCallTimesReadSuccess(int times, int minTimes, int maxTimes) {
-        Toast.makeText(AddContactActivity.this, "读取成功：" + times + "-范围：[" + minTimes + "-" + maxTimes + "]", Toast.LENGTH_SHORT).show();
+        Toast.makeText(AddContactActivity.this, "Read successfully: " + times + "-Range: [" + minTimes + "-" + maxTimes + "]", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -8371,403 +8361,403 @@ VPOperateManager.getInstance().setSOSCallTimes(callTimes, new ISOSCallTimesListe
 });
 ```
 
-## 身体成分功能
+## Body Composition Function
 
-前提：需设备支持身体成分功能，判断条件如下：
+Prerequisite: The device needs to support the body composition function, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportBodyComponent
 ```
 
-注：以下所有接口都需在满足设备支持身体成分功能下才能调用
+Note: All the following interfaces can only be called if the device supports the body composition function.
 
-#### 读取身体成分ID(设备手动测量数据)
+#### Read body composition ID (device manual measurement data)
 
-###### 前提
+###### Prerequisites
 
-需设备支持身体成分功能
+Requires equipment to support body composition function
 
-###### 接口
+###### API
 
 ```
 readBodyComponentId(bleWriteResponse, readIdListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                         | 描述                             |
-| ---------------- | ---------------------------- | -------------------------------- |
-| bleWriteResponse | IBleWriteResponse            | 写入操作的监听                   |
-| readIdListener   | IBodyComponentReadIdListener | 身体成分读取测量保存的数据ID回调 |
+| Parameter name | Type | Description |
+|---------------- | ---------------------------------- | ---------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| readIdListener | IBodyComponentReadIdListener | Body composition reading measurement saved data ID callback |
 
-###### 返回数据
+###### Return data
 
-**IBodyComponentReadIdListener** -- 身体成分读取测量保存的数据ID回调
+**IBodyComponentReadIdListener** -- Body composition reading and measurement saved data ID callback
 
 ```kotlin
 /**
- * 读取ID结束回调
- * @param ids 读取到的id列表
+ * Read ID end callback
+ * @param ids read id list
  */
 fun readIdFinish(ids: ArrayList<Int>)
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().readBodyComponentId(bleWriteResponse, object:IBodyComponentReadIdListener{
         override fun readIdFinish(ids: ArrayList<Int>) {
-            val msg = "读取身体成分数据ID列表：$ids"
+            val msg = "Read body composition data ID list: $ids"
         }
 })
 ```
 
-#### 读取身体成分数据(设备手动测量)
+#### Read body composition data (manual measurement by device)
 
-###### 前提
+###### Prerequisites
 
-需设备支持身体成分功能
+Requires equipment to support body composition function
 
-###### 接口
+###### API
 
 ```kotlin
 readBodyComponentData(bleWriteResponse, readDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                           | 描述                       |
-| ---------------- | ------------------------------ | -------------------------- |
-| bleWriteResponse | IBleWriteResponse              | 写入操作的监听             |
-| readDataListener | IBodyComponentReadDataListener | 读取身体成分数据的数据回调 |
+| Parameter name | Type | Description |
+|---------------- | --------------------------------- | -------------------------------- |
+| bleWriteResponse | IBleWriteResponse | Monitoring of write operations |
+| readDataListener | IBodyComponentReadDataListener | Data callback for reading body composition data |
 
-###### 返回数据
+###### Return data
 
-**IBodyComponentReadDataListener** --读取身体成分数据的数据回调
+**IBodyComponentReadDataListener** --Data callback for reading body composition data
 
 ```kotlin
 /**
- * 数据读取完毕
+ * Data reading completed
  *
- * @param bodyComponentList 身体成分数据
+ * @param bodyComponentList body composition data
  */
 fun readBodyComponentDataFinish(bodyComponentList: List<BodyComponent>?)
 ```
 
-**BodyComponent** -- 身体成分数据
+**BodyComponent** -- body composition data
 
-| 变量名             | 类型     | 描述                                                         |
-| ------------------ | -------- | ------------------------------------------------------------ |
-| BMI                | Float    | BMI有效范围【4.0，1114.0】，保留一位小数，上报的值是10倍，下同 |
-| bodyFatRate        | Float    | 体脂率，有效范围【2.0，48.0】%                               |
-| fatRate            | Float    | 脂肪量，有效范围【10.0，248.0】kg                            |
-| FFM                | Float    | 去脂体重，有效范围【1.0，132.0】kg                           |
-| muscleRate         | Float    | 肌肉率，有效范围【39.0，90.0】%                              |
-| muscleMass         | Float    | 肌肉量，有效范围【9.0，248.0】kg                             |
-| subcutaneousFat    | Float    | 皮下脂肪，有效范围【1.0，47.0】%                             |
-| bodyWater          | Float    | 体内水分，有效范围【28.0，79.0】%                            |
-| waterContent       | Float    | 含水量，有效范围【7.0，217.0】kg                             |
-| skeletalMuscleRate | Float    | 骨骼肌率，有效范围【13.0，69.0】%                            |
-| boneMass           | Float    | 骨量，有效范围【2.3，4.8】kg                                 |
-| proteinProportion  | Float    | 蛋白质占比，有效范围【4.0，26.0】%                           |
-| proteinMass        | Float    | 蛋白质量，有效范围【1.0，71.0】kg                            |
-| basalMetabolicRate | Float    | 基础代谢率，有效范围【25，14995】kcal                        |
-| timeBean           | TimeData | 此次测量的时间                                               |
-| duration           | Int      | 测量持续时间                                                 |
-| idType             | Int      | 测量设备类型：1:设备测试，2: App测试                         |
+| Variable name | Type | Description |
+| ------------------ | -------- | --------------------------------------------------------------- |
+| BMI | Float | The valid range of BMI is [4.0, 1114.0], one decimal place is retained, and the reported value is 10 times, the same below |
+| bodyFatRate | Float | Body fat rate, valid range [2.0, 48.0]% |
+| fatRate | Float | Fat mass, valid range [10.0, 248.0] kg |
+| FFM | Float | Lean body mass, valid range [1.0, 132.0] kg |
+| muscleRate | Float | Muscle rate, valid range [39.0, 90.0]% |
+| muscleMass | Float | Muscle mass, valid range [9.0, 248.0] kg |
+| subcutaneousFat | Float | Subcutaneous fat, effective range [1.0, 47.0]% |
+| bodyWater | Float | Body water, effective range [28.0, 79.0]% |
+| waterContent | Float | Water content, valid range [7.0, 217.0] kg |
+| skeletalMuscleRate | Float | Skeletal muscle rate, valid range [13.0, 69.0]% |
+| boneMass | Float | Bone mass, valid range [2.3, 4.8] kg |
+| proteinProportion | Float | Protein proportion, valid range [4.0, 26.0]% |
+| proteinMass | Float | Protein mass, valid range [1.0, 71.0] kg |
+| basalMetabolicRate | Float | Basal metabolic rate, valid range [25, 14995] kcal |
+| timeBean | TimeData | The time of this measurement |
+| duration | Int | Measurement duration |
+| idType | Int | Measurement device type: 1: Device test, 2: App test |
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().readBodyComponentData(bleWriteResponse, object : IBodyComponentReadDataListener {
     override fun readBodyComponentDataFinish(bodyComponentList: List<BodyComponent>?) {
-        HBLogger.bleConnectLog("【读取身体成分数据成功】bodyComponentList+${bodyComponentList.toString()}")
+        HBLogger.bleConnectLog("[Read body composition data successfully] bodyComponentList+${bodyComponentList.toString()}")
 
     }
 })
 ```
 
-#### 设置身体成分(设备手动测量)数据上报监听
+#### Set up body composition (manual measurement by device) data reporting and monitoring
 
-###### 接口
+###### API
 
 ```kotlin
 setBodyComponentReportListener(reportListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名         | 类型                            | 描述                              |
-| -------------- | ------------------------------- | --------------------------------- |
-| reportListener | INewBodyComponentReportListener | 新的身体成分测量数据 主动上报监听 |
+| Parameter name | Type | Description |
+| ----------------- | ---------------------------------- | ---------------------------------- |
+| reportListener | INewBodyComponentReportListener | New body composition measurement data actively reported for monitoring |
 
-###### 返回数据
+###### Return data
 
-**INewBodyComponentReportListener** --新的身体成分测量数据 主动上报监听
+**INewBodyComponentReportListener** --New body composition measurement data is proactively reported for monitoring
 
 ```kotlin
 /**
- * 新的身体成分测量数据 上报数据监听接口
- * 只要设备端有新的测量数据诞生时触发，触发时通过[VPOperateManager.readBodyComponentData]接口读取新的身体成分测量数据
+ * New body composition measurement data reporting data monitoring interface
+ * Triggered whenever new measurement data is generated on the device side. When triggered, new body composition measurement data is read through the [VPOperateManager.readBodyComponentData] interface.
  */
 fun onNewBodyComponentReport()
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().setBodyComponentReportListener(object : INewBodyComponentReportListener {
             override fun onNewBodyComponentReport() {
-                "新的身体成分数据上报-----".logd()
+                "New body composition data reported-----".logd()
                 
             }
         })
 ```
 
-#### 开始测量身体成分
+#### Start measuring body composition
 
-###### 前提
+###### Prerequisites
 
-设置支持身体成分
+Settings support body composition
 
-###### 接口
+###### API
 
 ```kotlin
 startDetectBodyComponent(bleWriteResponse, bodyDetectListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                         | 描述             |
-| ---------------- | ---------------------------- | ---------------- |
-| bleWriteResponse | BleWriteResponse             | 写入操作的监听   |
-| detectListener   | IBodyComponentDetectListener | 身体成分测量回调 |
+| Parameter name | Type | Description |
+|---------------- | ---------------------------------- | ---------------- |
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
+| detectListener | IBodyComponentDetectListener | Body composition measurement callback |
 
-###### 返回数据
+###### Return data
 
-**IBodyComponentDetectListener** -- 身体成分测量回调
+**IBodyComponentDetectListener** -- Body composition measurement callback
 
 ```kotlin
 /**
- * 测量中回调
- * @param progress 测量进度
- * @param leadState 导联状态：0->导联通过；1->导联脱落，连续4个导联脱落后，app主动发停止测量给设备
+ * Callback during measurement
+ * @param progress measurement progress
+ * @param leadState Lead status: 0->Lead passed; 1->Lead dropped off. After 4 consecutive leads dropped off, the app actively sends a stop measurement message to the device.
  */
 fun onDetecting(progress: Int, leadState: Int)
 
 /**
- * 测量成功回调
- * @param bodyComponent 本次的身体成分数据
+ * Measurement success callback
+ * @param bodyComponent This body composition data
  */
 fun onDetectSuccess(bodyComponent: BodyComponent)
 
 /**
- * 测量失败
- * @param detectState 失败原因
+ * Measurement failed
+ * @param detectState failure reason
  */
 fun onDetectFailed(detectState: DetectState)
 
 /**
- * 停止测量
+ * Stop measurement
  */
-fun onDetectStop() 
+fun onDetectStop()
 ```
 
-**DetectState** -- 测量状态枚举
+**DetectState** -- Measurement state enumeration
 
 ```kotlin
-PROGRESS(0, "测量中"),
-SUCCESS(1, "测量成功-结果包"),
-FAILED(2, "测量失败-无结果"),
-BUSY(3, "设备正忙"),
-LOW_POWER(4, "低电")
+PROGRESS(0, "Measuring"),
+SUCCESS(1, "Measurement successful-result package"),
+FAILED(2, "Measurement failed - no result"),
+BUSY(3, "The device is busy"),
+LOW_POWER(4, "Low power")
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().startDetectBodyComponent(bleWriteResponse,object :IBodyComponentDetectListener{
     override fun onDetecting(progress: Int, leadState: Int) {
-        "【身体成分测量】onDetecting：$progress,$leadState".logd()
+        "[Body composition measurement] onDetecting: $progress,$leadState".logd()
     }
 
     override fun onDetectSuccess(bodyComponent: BodyComponent) {
-        "【身体成分测量】onDetectSuccess：${bodyComponent}".logd()
+        "[Body composition measurement] onDetectSuccess: ${bodyComponent}".logd()
     }
 
     override fun onDetectFailed(detectState: DetectState) {
-        "【身体成分测量】onDetectFailed：${detectState}".loge()
+        "[Body composition measurement] onDetectFailed: ${detectState}".loge()
     }
 
     override fun onDetectStop() {
-        "【身体成分测量】onDetectStop".loge()
+        "[Body composition measurement] onDetectStop".loge()
     }
 
 })
 ```
 
-#### 结束身体成分测量
+#### End body composition measurement
 
-###### 前提
+###### Prerequisites
 
-设备支持身体成分功能且已开始身体成分测量
+The device supports the body composition function and body composition measurement has started
 
-###### 接口
+###### API
 
 ```
 stopDetectBodyComponent(bleWriteResponse)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型             | 描述           |
-| ---------------- | ---------------- | -------------- |
-| bleWriteResponse | BleWriteResponse | 写入操作的监听 |
+| Parameter name | Type | Description |
+| ---------------- | ---------------- | ---------------- |
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
 
-###### 返回数据
+###### Return data
 
-无
+None
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
  VPOperateManager.getInstance().stopDetectBodyComponent(bleWriteResponse)
 ```
 
-## 血液成分功能
+## Blood component function
 
-需设备支持血液成分功能，判断条件如下：
+The equipment needs to support the blood component function, and the judgment conditions are as follows:
 
 ```
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportBloodComponent
 ```
 
-#### 血液成分日常数据读取
+#### Daily data reading of blood components
 
-【[读取日常数据](##读取日常数据)】中五分钟原始数据包含了血液成分相关数据返回
+[[Read daily data](##Read daily data)] The five-minute raw data contains blood component-related data returned
 
-#### 读取血液成分校准值
+#### Read blood component calibration values
 
-###### 前提
+###### Prerequisites
 
-需设备支持血液成分功能
+Requires equipment to support blood component functions
 
-###### 接口
+###### API
 
 ```
 readBloodComponentCalibration(bleWriteResponse, optListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                       | 描述             |
-| ---------------- | -------------------------- | ---------------- |
-| bleWriteResponse | BleWriteResponse           | 写入操作的监听   |
-| optListener      | IBloodComponentOptListener | 血液成分操作监听 |
+| Parameter name | Type | Description |
+|----------------|-----------------------------|----------------|
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
+| optListener | IBloodComponentOptListener | Blood component operation listening |
 
-###### 返回数据
+###### Return data
 
-**IBloodComponentOptListener** -- 血液成分操作回调
+**IBloodComponentOptListener** -- blood component operation callback
 
 ```kotlin
 /**
- * 血液成分校准读取成功
- * @param isOpen 是否打开
- * @param bloodComposition 血液成分校准值
+ * Blood component calibration read successfully
+ * @param isOpen whether to open
+ * @param bloodComposition blood component calibration value
  */
 fun onBloodCompositionReadSuccess(isOpen: Boolean, bloodComposition: BloodComponent)
 
 /**
- * 血液成分校准读取失败
+ * Blood component calibration reading failed
  */
 fun onBloodCompositionReadFailed()
 
 /**
- * 血液成分校准值设置成功
- * @param isOpen 是否打开
- * @param bloodComposition 血液成分校准值
+ * Blood component calibration value set successfully
+ * @param isOpen whether to open
+ * @param bloodComposition blood component calibration value
  */
 fun onBloodCompositionSettingSuccess(isOpen: Boolean, bloodComposition: BloodComponent)
 
 /**
- * 血液成分校准值设置失败
+ * Failed to set blood component calibration value
  */
 fun onBloodCompositionSettingFailed()
 ```
 
-**BloodComponent** -- 血液成分校准值，同【[读取日常数据](##读取日常数据)】返回的类一致
+**BloodComponent** -- blood component calibration value, consistent with the class returned by [[Read daily data](##Read daily data)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().readBloodComponentCalibration(bleWriteResponse, optListener)
 ```
 
-#### 设置血液成分校准值
+#### Set blood component calibration values
 
-###### 前提
+###### Prerequisites
 
-设备支持血液成分功能
+Device supports blood component functionality
 
-###### 接口
+###### API
 
 ```
 settingBloodComponentCalibration(bleWriteResponse, isOpen, bloodComponent, optListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                       | 描述                 |
-| ---------------- | -------------------------- | -------------------- |
-| bleWriteResponse | BleWriteResponse           | 写入操作的监听       |
-| isOpen           | Boolean                    | 是否开启血液成分校准 |
-| bloodComponent   | BloodComponent             | 血液成分校准值       |
-| optListener      | IBloodComponentOptListener | 血液成分操作监听     |
+| Parameter name | Type | Description |
+| ---------------- | ----------------------------- | -------------------- |
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
+| isOpen | Boolean | Whether to open blood component calibration |
+| bloodComponent | BloodComponent | Blood component calibration value |
+| optListener | IBloodComponentOptListener | Blood component operation listening |
 
-###### 返回数据
+###### Return data
 
-**IBloodComponentOptListener** -- 血液成分操作监听，同【[读取血液成分校准值](####读取血液成分校准值)】返回一致
+**IBloodComponentOptListener** -- Blood component operation monitoring, returns the same as [[Read blood component calibration value](####Read blood component calibration value)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
  VPOperateManager.getInstance().settingBloodComponentCalibration(bleWriteResponse, isOpen, bloodComponent, optListener)
 ```
 
-#### 开始血液成分测量
+#### Start blood component measurement
 
-###### 前提
+###### Prerequisites
 
-设备需支持血液成分功能
+The device needs to support blood component function
 
-###### 接口
+###### API
 
 ```kotlin
 startDetectBloodComponent(bleWriteResponse, isUseCalibrationMode, detectListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名               | 类型                          | 描述             |
-| -------------------- | ----------------------------- | ---------------- |
-| bleWriteResponse     | BleWriteResponse              | 写入操作的监听   |
-| isUseCalibrationMode | Boolean                       | 是否使用校准模式 |
-| detectListener       | IBloodComponentDetectListener | 血液成分测量回调 |
+| Parameter name | Type | Description |
+| -------------------- | -------------------------------- | ---------------- |
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
+| isUseCalibrationMode | Boolean | Whether to use calibration mode |
+| detectListener | IBloodComponentDetectListener | Blood component measurement callback |
 
-###### 数据返回
+###### Data return
 
-**IBloodComponentDetectListener** -- 血液成分测量回调
+**IBloodComponentDetectListener** -- blood component measurement callback
 
 ```kotlin
 /**
- * 检测失败
+ * Detection failed
  */
 fun onDetectFailed(errorState: EBloodComponentDetectState)
 
 /**
- * 检测中
- * @param progress 检测进度
- * @param bloodComponent 血液成分
+ * Under detection
+ * @param progress detection progress
+ * @param bloodComponent blood component
  */
 fun onDetecting(progress: Int, bloodComponent: BloodComponent)
 
@@ -8777,35 +8767,35 @@ fun onDetecting(progress: Int, bloodComponent: BloodComponent)
 fun onDetectStop()
 
 /**
- * 检测完成
- * @param bloodComponent 血液成分
+ * Test completed
+ * @param bloodComponent blood component
  */
 fun onDetectComplete(bloodComponent: BloodComponent)
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().startDetectBloodComponent(bleWriteResponse, isUseCalibrationMode, detectListener)
 ```
 
-#### 停止血液功能成分测量
+#### Stop blood functional component measurement
 
-###### 前
+###### Prerequisites
 
-设备需支持血液且已开启血液成分测量
+The device must support blood and have blood component measurement turned on
 
-###### 接口
+###### API
 
 ```
 stopDetectBloodComponent(bleWriteResponse)
 ```
 
-###### 返回数据
+###### Return data
 
-无
+None
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().stopDetectBloodComponent {
@@ -8813,58 +8803,58 @@ VPOperateManager.getInstance().stopDetectBloodComponent {
 }
 ```
 
-## 读取设备手动测量数据
+## Read the manual measurement data of the device
 
-包含多种数据读取，需满足以下任何一条件才可读取
+Contains a variety of data reading, which must meet any of the following conditions before it can be read
 
-**血压** 是否支持读取，判定条件：需支持气泵血压才可读取，判断代码如下：
+**Blood pressure** Whether it supports reading, judgment conditions: it must support air pump blood pressure before it can be read, the judgment code is as follows:
 
 ```
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportBumpBp
 ```
 
-**其他** 其他数据暂不支持读取手动测量数据，后续支持
+**Others** Other data does not currently support reading manual measurement data, and will be supported in the future.
 
-#### 读取设备手动测量数据
+#### Read device manual measurement data
 
-###### 前提
+###### Prerequisites
 
-需设备支持
+Requires equipment support
 
-###### 接口
+###### API
 
 ```
 readDeviceManualData(bleWriteResponse, timeStampSecond, dataTypeList, dataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                            | 描述                                                         |
-| ---------------- | ------------------------------- | ------------------------------------------------------------ |
-| bleWriteResponse | BleWriteResponse                | 写入操作的监听                                               |
-| timeStampSecond  | long                            | 秒级时间戳，表示APP端上一次读取的时间，设备只上报大于它的数据，如果其值为0则表示APP上一次没有读取过 |
-| dataTypeList     | List<DeviceManualDataType>      | 要读取的数据类型，如果为全部则传DeviceManualDataType.ALL     |
-| dataListener     | IDeviceManualDetectDataListener | 设备手动测量数据读取监听                                     |
+| Parameter name | Type | Description |
+|---------------- | ---------------------------------- | --------------------------------------------------------------- |
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
+| timeStampSecond | long | Second-level timestamp, indicating the last time read by the APP. The device only reports data larger than it. If its value is 0, it means that the APP has not read it last time |
+| dataTypeList | List<DeviceManualDataType> | The data type to be read, if it is all, pass DeviceManualDataType.ALL |
+| dataListener | IDeviceManualDetectDataListener | Device manual measurement data reading and listening |
 
-**DeviceManualDataType** -- 读取的数据类型
+**DeviceManualDataType** -- read data type
 
 ```kotlin
 enum class DeviceManualDataType(val bitPosition: Int) {
 
     /**
-     * 0x00表示血压<br>
-     * 0x01表示心率<br>
-     * 0x02表示血糖<br>
-     * 0x03表示压力<br>
-     * 0x04表示血氧<br>
-     * 0x05表示体温<br>
-     * 0x06表示梅脱<br>
-     * 0x07表示HRV<br>
-     * 0x08表示血液成分<br>
-     * 0x09表示微体检<br>
-     * 0x0A表示情绪<br>
-     * 0x0B表示疲劳度<br>
-     * 0x0C表示皮电
+     * 0x00 means blood pressure<br>
+     * 0x01 indicates heart rate<br>
+     * 0x02 means blood sugar<br>
+     * 0x03 means pressure<br>
+     * 0x04 means blood oxygen<br>
+     * 0x05 indicates body temperature<br>
+     * 0x06 means Mett<br>
+     * 0x07 means HRV<br>
+     * 0x08 indicates blood components<br>
+     * 0x09 indicates micro-physical examination<br>
+     * 0x0A indicates emotion<br>
+     * 0x0B indicates fatigue degree<br>
+     * 0x0C means skin electricity
      */
     BLOOD_PRESSURE(0),
     HEART_RATE(1),
@@ -8876,308 +8866,308 @@ enum class DeviceManualDataType(val bitPosition: Int) {
     HRV(7),
     BLOOD_COMPOSITION(8),
     MINI_CHECKUP(9),
-    EMOTION(10),            // 情绪 (位10)
-    FATIGUE(11),         // 疲劳度 (位11)
-    SKIN_CONDUCTANCE(12), // 皮电 (位12)
+    EMOTION(10), // Emotion (bit 10)
+    FATIGUE(11), // Fatigue (bit 11)
+    SKIN_CONDUCTANCE(12), // Skin electricity (bit 12)
     ALL(33);
 
-    // 计算对应的二进制掩码
+    // Calculate the corresponding binary mask
     val bitMask: Int
         get() = 1 shl bitPosition
    
 }
 ```
 
-###### 返回数据
+###### Return data
 
-**IDeviceManualDetectDataListener** -- 设备手动测量数据读取监听
+**IDeviceManualDetectDataListener** -- device manual measurement data reading and listening
 
 ```kotlin
  /**
-     * 血压手动测量数据回调
+     * Callback of manual blood pressure measurement data
      *
-     * @param bloodPressureManualDataList 返回血压手动测量全部数据
+     * @param bloodPressureManualDataList returns all blood pressure manual measurement data
      */
     fun onBloodPressureDataChange(bloodPressureManualDataList:List<BloodPressureManualData> );
 
     /**
-     * 心率手动测量数据回调
+     * Callback of manual heart rate measurement data
      *
-     * @param heartRateManualDataList 返回血压手动测量全部数据
+     * @param heartRateManualDataList returns all blood pressure manual measurement data
      */
     fun onHeartRateDataChange(heartRateManualDataList:List<HeartRateManualData> );
 
     /**
-     * 血糖手动测量数据回调
+     * Callback of manual blood glucose measurement data
      * @param bloodGlucoseManualDataList
      */
     fun onBloodGlucoseDataChange( bloodGlucoseManualDataList:List<BloodGlucoseManualData>);
 
 
     /**
-     * 压力手动测量数据回调
+     * Callback of manual pressure measurement data
      * @param pressureManualDataList
      */
     fun onPressureManualDataChange(pressureManualDataList:List<PressureManualData> );
 
     /**
-     * 血氧手动测量数据回调
+     * Callback of manual blood oxygen measurement data
      * @param bloodOxygenManualDataList
      */
     fun onBloodOxygenDataChange(bloodOxygenManualDataList:List<BloodOxygenManualData> );
     /**
-     * 体温手动测量数据回调
+     * Manual body temperature measurement data callback
      * @param bodyTemperatureManualDataList
      */
     fun onBodyTemperatureDataChange(bodyTemperatureManualDataList:List<BodyTemperatureManualData> );
 
     /**
-     * 梅托手动测量数据回调
+     *MeTo manual measurement data callback
      * @param metoManualDataList
      */
     fun onMetoManualDataChange(metoManualDataList:List<MetoManualData> );
 
     /**
-     * HRV手动测量数据回调
+     * HRV manual measurement data callback
      * @param hrvManualDataList
      */
     fun onHrvManualDataChange(hrvManualDataList:List<HrvManualData> );
 
     /**
-     * 血液成分手动测量数据回调
+     * Callback of manual measurement data of blood components
      * @param bloodComponentManualDataList
      */
     fun onBloodComponentManualDataChange(bloodComponentManualDataList:List<BloodComponentManualData> );
 
     /**
-     * 微体检手动测量数据回调
+     * Micro physical examination manual measurement data callback
      * @param miniCheckupManualDataList
      */
     fun onMiniCheckupManualDataChange(miniCheckupManualDataList:List<MiniCheckupManualData> );
 
     /**
-     * 情绪手动测量数据回调
+     * Emotion manual measurement data callback
      * @param emotionManualDataList
      */
     fun onEmotionManualDataChange(emotionManualDataList:List<EmotionManualData> );
 
 
     /**
-     * 疲劳度手动测量数据回调
+     * Callback of manual fatigue measurement data
      * @param fatigueManualDataList
      */
     fun onFatigueManualDataChange(fatigueManualDataList：List<FatigueManualData> );
 
     /**
-     * 皮电手动测量数据回调
+     * Callback of manual measurement data of skin electricity
      * @param skinConductanceManualDataList
      */
     fun onSkinConductanceManualDataChange(skinConductanceManualDataList：List<SkinConductanceManualData> );
 
     /**
-     * 返回读取的进度
+     * Return the progress of reading
      *
-     * @param progress 进度值，范围[0-1]
+     * @param progress progress value, range [0-1]
      */
     fun onReadProgress(float progress);
 
     /**
-     * 读取结束
+     * End of reading
      */
     fun onReadComplete();
 
     /**
-     * 读取失败
+     * Failed to read
      */
     fun onReadFail();
 ```
 
-**BloodPressureManualData**--血压手动测量数据
+**BloodPressureManualData**--blood pressure manual measurement data
 
 ```java
 /**
-     * 本条数据的测量时间戳
+     * The measurement timestamp of this data
      */
     private int timeStamp;
 
     /**
-     * 对应的协议类型，0x00：气囊血压（详情见气囊血压单条数据结构）<br>0x01：普通血压
-     * 注：当version == 1时，只有收缩压(血压高压)-systolic、舒张压(血压低压)-diastolic值有用，其余值无参考意义
+     * Corresponding protocol type, 0x00: Air bag blood pressure (see air bag blood pressure single data structure for details)<br>0x01: Normal blood pressure
+     * Note: When version == 1, only the systolic blood pressure (high blood pressure)-systolic and diastolic blood pressure (low blood pressure)-diastolic values are useful, and the other values have no reference significance.
      */
     private int version;
 
     /**
-     * 测量模式 0光电，1气囊
+     *Measurement mode 0 photoelectric, 1 air bag
      */
     private int measurementMode;
 
     /**
-     * 心率值
+     *Heart rate value
      */
     private int heartRate;
 
     /**
-     * 收缩压(血压高压)
+     * Systolic blood pressure (high blood pressure)
      */
     private int systolic;
 
     /**
-     * 舒张压(血压低压)
+     * Diastolic blood pressure (low blood pressure)
      */
     private int diastolic;
 
     /**
-     * 测试状态
+     *Test status
      */
     private int testStatus;
 
     /**
-     * 结果可信度
+     *Result credibility
      */
     private int resultCredibility;
 
     /**
-     * 身高cm
+     * Height cm
      */
     private int height;
 
     /**
-     * 体重kg
+     * Weight kg
      */
     private int weight;
 
     /**
-     * 年龄
+     *Age
      */
     private int age;
 
     /**
-     * 性别：是否为男性
+     * Gender: whether male or not
      */
     private boolean isMale;
 
     /**
-     * 实际测量时长，最大60秒
+     * Actual measurement time, maximum 60 seconds
      */
     private int testTime;
 
     /**
-     * 测量失败超时计数:超过这个次数还没达到最低压力值就会返回测试失败
+     * Measurement failure timeout count: If this number is exceeded and the minimum pressure value is not reached, the test will fail.
      */
     private int testFailTimeoutCount;
 
     /**
-     * 气泵型号
+     * Air pump model
      */
     private int pumpModel;
 
     /**
-     * AFE型号
+     *AFE model
      */
     private int afeModel;
 
     /**
-     * 加速度型号
+     * Acceleration model
      */
     private int accelerationModel;
 
     /**
-     * mcu型号
+     * mcu model
      */
     private int mcuModel;
 
     /**
-     * 算法版本
+     * Algorithm version
      */
     private String algorithmVersion;
 
     /**
-     * 软件版本
+     *Software version
      */
     private String softwareVersion;
 
     /**
-     * 姿态
+     * Posture
      */
     private int[] attitudeArray;
 
     /**
-     * 运动量
+     *Amount of exercise
      */
     private int[] sportArray;
 
     /**
-     * 压力ADC
+     * Pressure ADC
      */
     private int[] pressureAdcArray;
 
     /**
-     * PPG数据ADC
+     *PPG data ADC
      */
     private int[] ppgAdcArray;
 
     /**
-     * 加速度X轴ADC
+     * Acceleration X-axis ADC
      */
     private int[] accelerationXArray;
 
     /**
-     * 加速度Y轴ADC
+     * Acceleration Y-axis ADC
      */
     private int[] accelerationYArray;
 
     /**
-     * 加速度Z轴ADC
+     * Acceleration Z-axis ADC
      */
     private int[] accelerationZArray;
 ```
 
-**其他** --其他数据暂不支持，响应的数据结构暂不展示
+**Others** --Other data is not supported yet, and the response data structure is not displayed yet.
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().readDeviceManualData(bleWriteResponse, timeStampSecond, dataTypeList, dataListener)
 ```
 
-## 自动测量功能
+## Automatic measurement function
 
-前提：需设备支持自动测量功能，判断条件如下：
+Prerequisite: The equipment needs to support the automatic measurement function, and the judgment conditions are as follows:
 
 ```kotlin
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportAutoMeasure
 ```
 
-注：以下所有接口都需在满足设备支持自动测量功能才能调用
+Note: All the following interfaces can only be called if the device supports the automatic measurement function.
 
-#### 读取自动测量设置
+#### Read automatic measurement settings
 
-###### 前提
+###### Prerequisites
 
-需设备支持自动测量功能
+Requires equipment to support automatic measurement function
 
-###### 接口
+###### API
 
 ```
 readAutoMeasureSettingData(bleWriteResponse, settingDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名              | 类型                            | 描述                                          |
-| ------------------- | ------------------------------- | --------------------------------------------- |
-| bleWriteResponse    | BleWriteResponse                | 写入操作的监听                                |
-| settingDataListener | IAutoMeasureSettingDataListener | 自动测量设置操作的监听,返回自动测量设置的数据 |
+| Parameter name | Type | Description |
+| ------------------- | ---------------------------------- | -------------------------------------------------- |
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
+| settingDataListener | IAutoMeasureSettingDataListener | Monitors automatic measurement setting operations and returns automatic measurement setting data |
 
-###### 数据返回
+###### Data return
 
-**IAutoMeasureSettingDataListener** -- 自动测量功能回调
+**IAutoMeasureSettingDataListener** -- Automatic measurement function callback
 
 ```kotlin
  /**
-     * 返回自动测量设置的数据
+     * Returns the data of automatic measurement settings
      *
-     * @param autoMeasureDataList 自动测量设置的数据列表
+     * @param autoMeasureDataList Data list of automatic measurement settings
      */
     fun onSettingDataChange(autoMeasureDataList:List<AutoMeasureData>)
 
@@ -9186,44 +9176,44 @@ readAutoMeasureSettingData(bleWriteResponse, settingDataListener)
     fun onSettingDataChangeSuccess()
 ```
 
-**AutoMeasureData** -- 自动测量数据
+**AutoMeasureData** -- automatic measurement data
 
 ```kotlin
-//    协议类型
+//Protocol type
     var protocolType = 0
 
-    //    功能类型
+    // Function type
     var funType = EAutoMeasureType.PULSE_RATE
 
-    //    功能开关
+    // function switch
     var isSwitchOpen = false
 
-    //    支持最小的步进，单位:m(分)
+    //Support the smallest step, unit: m (minutes)
     var stepUnit = 0
 
-    //    是否支持时间段修改
+    // Whether to support time period modification
     var isSlotModify = false
 
-    //    是否支持时间间隔修改
+    // Whether to support time interval modification
     var isIntervalModify = false
 
-    //    支持测试的时间段-开始
+    // Support test time period-start
     var supportStartMinute = 0
 
-    //    支持测试的时间段-结束
+    // Support test period-end
     var supportEndMinute = 0
 
-    //    测量间隔，单位:m(分)
+    // Measurement interval, unit: m (minutes)
     var measureInterval = 0
 
-    //    当前的测试时间段-开始
+    //Current test period-start
     var currentStartMinute = 0
 
-    //    当前的测试时间段-结束
+    //Current test period-end
     var currentEndMinute = 0
 ```
 
-**EAutoMeasureType** -- 自动测量 类型枚举类
+**EAutoMeasureType** -- automatic measurement type enumeration class
 
 ```kotlin
 enum class EAutoMeasureType(val value: Int) {
@@ -9245,163 +9235,163 @@ enum class EAutoMeasureType(val value: Int) {
 }
 ```
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().readAutoMeasureSettingData(bleWriteResponse, settingDataListener)
 ```
 
-#### 设置自动测量设置
+#### Set automatic measurement settings
 
-###### 前提
+###### Prerequisites
 
-需设备支持自动测量功能
+Requires equipment to support automatic measurement function
 
-###### 接口
+###### API
 
 ```
 setAutoMeasureSettingData(bleWriteResponse, measureData, settingDataListener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名              | 类型                            | 描述                                          |
-| ------------------- | ------------------------------- | --------------------------------------------- |
-| bleWriteResponse    | BleWriteResponse                | 写入操作的监听                                |
-| measureData         | AutoMeasureData                 | 自动测量数据                                  |
-| settingDataListener | IAutoMeasureSettingDataListener | 自动测量设置操作的监听,返回自动测量设置的数据 |
+| Parameter name | Type | Description |
+| ------------------- | ---------------------------------- | -------------------------------------------------- |
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
+| measureData | AutoMeasureData | Automatic measurement data |
+| settingDataListener | IAutoMeasureSettingDataListener | Monitors automatic measurement setting operations and returns automatic measurement setting data |
 
-###### 数据返回
+###### Data return
 
-**IAutoMeasureSettingDataListener** -- 自动测量功能回调，同【[读取设备手动测量数据](####读取设备手动测量数据)】返回一致
+**IAutoMeasureSettingDataListener** -- Automatic measurement function callback, the same as [[Read device manual measurement data] (####Read device manual measurement data)] return the same
 
-**AutoMeasureData** -- 自动测量数据，同【[读取设备手动测量数据](####读取设备手动测量数据)】返回的数据结构一致
+**AutoMeasureData** -- automatic measurement data, consistent with the data structure returned by [[Read device manual measurement data] (####Read device manual measurement data)]
 
-###### 示例代码
+###### Sample code
 
 ```kotlin
 VPOperateManager.getInstance().setAutoMeasureSettingData(bleWriteResponse, measureData, settingDataListener)
 ```
 
-## 图文推送功能
+## Image and text push function
 
-前提：需设备支持图文推送功能，判断条件如下：
+Prerequisite: The device needs to support the image and text push function. The judgment conditions are as follows:
 
 ```
 VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportTextImagePush()
 ```
 
-注：以下所有接口都需在满足设备支持图文推送功能才能调用
+Note: All the following interfaces can only be called if the device supports the image and text push function.
 
-### 推送文字信息
+### Push text messages
 
-###### 前提
+###### Prerequisites
 
-需设备支持图文推送功能
+The device needs to support image and text push function
 
-###### 接口
+###### API
 
 ```java
 /**
-* 推送文字信息
+* Push text messages
 *
-* @param msg      文字信息
-* @param listener 文字信息推送监听
+* @param msg text message
+* @param listener text message push listening
 */
-public void pushTextMsg(String msg, BleWriteResponse bleWriteResponse, ITextMsgPushListener listener) 
+public void pushTextMsg(String msg, BleWriteResponse bleWriteResponse, ITextMsgPushListener listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名           | 类型                 | 描述             |
+| Parameter name | Type | Description |
 | ---------------- | -------------------- | ---------------- |
-| msg              | String               | 需要发送文本信息 |
-| bleWriteResponse | BleWriteResponse     | 写入操作的监听   |
-| listener         | ITextMsgPushListener | 文字推送的监听   |
+| msg | String | Need to send text message |
+| bleWriteResponse | BleWriteResponse | Monitoring of write operations |
+| listener | ITextMsgPushListener | Text push listening |
 
-###### 数据返回
+###### Data return
 
-**ITextMsgPushListener** -- 文字推送功能回调
+**ITextMsgPushListener** -- text push function callback
 
 ```java
 /**
- * 文本消息推送监听
+ * Text message push monitoring
  */
 public interface ITextMsgPushListener extends IListener {
 
     /**
-     * 文字信息推送成功
+     * Text message pushed successfully
      */
     void onTextMsgPushSuccess();
 
     /**
-     * 文字消息推送失败
+     * Text message push failed
      */
     void onTextMsgPushFailed();
 
     /**
-     * 当前设备不支持该功能
+     *The current device does not support this function
      */
     void onFunctionNotSupport();
 }
 ```
 
-###### 示例代码
+###### Sample code
 
 ```java
 VPOperateManager.getInstance().pushTextMsg(content, new BleWriteResponse() {
     @Override
     public void onResponse(int code) {
         if(code!= Code.REQUEST_SUCCESS) {
-            tvPushInfo.setText("蓝牙数据发送失败");
+            tvPushInfo.setText("Bluetooth data sending failed");
         }
     }
 }, new ITextMsgPushListener() {
     @Override
     public void onTextMsgPushSuccess() {
-        tvPushInfo.setText("文本推送成功");
+        tvPushInfo.setText("Text push successful");
     }
 
     @Override
     public void onTextMsgPushFailed() {
-        tvPushInfo.setText("文本推送失败");
+        tvPushInfo.setText("Text push failed");
     }
 
     @Override
     public void onFunctionNotSupport() {
-        tvPushInfo.setText("不支持该功能");
+        tvPushInfo.setText("This function is not supported");
     }
 });
 ```
 
-### 推送图片信息
+### Push picture information
 
-###### 前提
+###### Prerequisites
 
-需设备支持图文推送功能
+The device needs to support image and text push function
 
-###### 接口
+###### API
 
 ```java
 /**
-* 推送图片信息
+* Push picture information
 *
-* @param imageFilePath 图片本地地址
-* @param listener      图片消息推送监听
+* @param imageFilePath local address of the image
+* @param listener Picture message push listening
 */
-public void pushImageMsg(String imageFilePath, IImageMsgPushListener listener) 
+public void pushImageMsg(String imageFilePath, IImageMsgPushListener listener)
 ```
 
-###### 参数解释
+###### Parameters
 
-| 参数名        | 类型                  | 描述                 |
-| ------------- | --------------------- | -------------------- |
-| imageFilePath | String                | 需要发送图片本地路径 |
-| listener      | IImageMsgPushListener | 图片信息推送的监听   |
+| Parameter name | Type | Description |
+| ------------- | -------------------------- | -------------------- |
+| imageFilePath | String | The local path of the image needs to be sent |
+| listener | IImageMsgPushListener | Listener for picture information push |
 
-###### 数据返回
+###### Data return
 
-**IImageMsgPushListener** -- 文字推送功能回调
+**IImageMsgPushListener** -- text push function callback
 
 ```java
 public interface IImageMsgPushListener extends IListener {
@@ -9409,7 +9399,7 @@ public interface IImageMsgPushListener extends IListener {
     void onImageMsgPushSuccess();
 
     /**
-     * 
+     *
      * @param currentBlock
      * @param sumBlock
      * @param progress
@@ -9417,28 +9407,28 @@ public interface IImageMsgPushListener extends IListener {
     void onImageMsgPushProgress(int currentBlock, int sumBlock, int progress);
 
     /**
-     * 图片推送错误
-     * @param errorCode 错误类型
+     * Image push error
+     * @param errorCode error type
      */
     void onImageMsgPushFailed(ErrorCode errorCode);
 
     /**
-     * 错误码
+     * Error code
      */
     enum ErrorCode {
-        IMAGE_PATH_ERROR("图片地址错误，不存在"),
-        IMAGE_SIZE_ERROR("图片尺寸异常"),
-        IMAGE_TOO_LARGE("图片内存太大了"),
-        TERMINATION("传输终止"),
-        LISTENER_IS_NULL("监听为空"),
-        NEED_READ_BASE_INFO("没有先执行读取UI信息"),
-        FILE_NOT_EXIST("文件不存在"),
-        LOW_BATTERY("电量过低"),
-        INTO_UPDATE_MODE_FAIL("进入UI模式失败"),
-        FILE_LENGTH_NOT_4_POWER("文件没有4字节对齐"),
-        CHECK_CRC_FAIL("crc校验失败"),
-        FUNCTION_NOT_SUPPORT("功能不支持"),
-        UNKNOWN("未知错误");
+        IMAGE_PATH_ERROR("The image address is wrong and does not exist"),
+        IMAGE_SIZE_ERROR("Image size is abnormal"),
+        IMAGE_TOO_LARGE("The image memory is too large"),
+        TERMINATION("Transmission Termination"),
+        LISTENER_IS_NULL("Listening is empty"),
+        NEED_READ_BASE_INFO("Reading UI information without executing it first"),
+        FILE_NOT_EXIST("File does not exist"),
+        LOW_BATTERY("Battery is too low"),
+        INTO_UPDATE_MODE_FAIL("Failed to enter UI mode"),
+        FILE_LENGTH_NOT_4_POWER("The file is not 4-byte aligned"),
+        CHECK_CRC_FAIL("crc check failed"),
+        FUNCTION_NOT_SUPPORT("Function not supported"),
+        UNKNOWN("Unknown error");
 
         ErrorCode(String info){
             this.info = info;
@@ -9449,23 +9439,23 @@ public interface IImageMsgPushListener extends IListener {
 }
 ```
 
-###### 示例代码
+###### Sample code
 
 ```java
 VPOperateManager.getInstance().pushImageMsg(pushImagePath, new IImageMsgPushListener() {
     @Override
     public void onImageMsgPushSuccess() {
-        tvPushInfo.setText("图片推送成功");
+        tvPushInfo.setText("Picture pushed successfully");
     }
 
     @Override
     public void onImageMsgPushProgress(int currentBlock, int sumBlock, int progress) {
-        tvPushInfo.setText("图片推送进度：" + progress + "%");
+        tvPushInfo.setText("Picture push progress: " + progress + "%");
     }
 
     @Override
     public void onImageMsgPushFailed(ErrorCode errorCode) {
-        tvPushInfo.setText("图片推送错误：" + errorCode.info);
+        tvPushInfo.setText("Picture push error: " + errorCode.info);
     }
 });
 ```

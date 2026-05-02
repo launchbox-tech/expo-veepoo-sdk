@@ -1,20 +1,19 @@
-# Docs
+# Documentation
 
-当前 `docs/` 目录包含两类文档：
+The `docs/` folder holds:
 
-- Veepoo 原厂 SDK 文档
-- 包版本升级说明
+- Frozen snapshots of the vendor Veepoo SDK manuals  
+- Package upgrade notes  
+- Maintainer-facing **vendor / upstream** parity material (`vendor-manifest.json` at repo root, `npm run vendor:check`)
 
-以及维护者用的 **vendor / 上游对照**（根目录 `vendor-manifest.json`、`npm run vendor:check`）。
-
-## Vendor SDK（离线快照）
+## Vendor SDK (offline snapshots)
 
 - `VeepooSDK Android Api.md`
 - `VeepooSDK iOS Api.md`
 
-Wiki 实时文档与 drift 说明见各文件顶部提示框；API 与 JS 桥对照见 **`vendor-parity-matrix.md`**；策略见 **`adr/0002-vendor-upstream-tracking.md`**。
+Each snapshot begins with a box linking the live wiki and drift checks; API coverage versus this bridge is in **`vendor-parity-matrix.md`**; policy is in **`adr/0002-vendor-upstream-tracking.md`**.
 
-## Release Notes
+## Release notes
 
 - `release-notes/1.1.0.md`
 - `release-notes/1.2.0.md`
@@ -26,14 +25,14 @@ Wiki 实时文档与 drift 说明见各文件顶部提示框；API 与 JS 桥对
 - `release-notes/1.2.6.md`
 - `release-notes/1.2.7.md`
 
-对外使用说明请优先查看仓库根目录 `README.md`。
+For integration guidance, start with the root **`README.md`**.
 
-## Vendor parity（维护）
+## Vendor parity (maintainers)
 
-| 文档 | 用途 |
-|------|------|
-| [`vendor-parity-matrix.md`](vendor-parity-matrix.md) | Vendor 能力与 `VeepooSDK` JS API / 事件对照表 |
-| [`adr/0002-vendor-upstream-tracking.md`](adr/0002-vendor-upstream-tracking.md) | 不落 submodule、manifest、`vendor:check` 决策 |
-| [`prd/0059-vendor-upstream-tracking-and-parity.md`](prd/0059-vendor-upstream-tracking-and-parity.md) | PRD #59（父工单） |
+| Doc | Purpose |
+|-----|---------|
+| [`vendor-parity-matrix.md`](vendor-parity-matrix.md) | Vendor capabilities vs `VeepooSDK` JS APIs / events |
+| [`adr/0002-vendor-upstream-tracking.md`](adr/0002-vendor-upstream-tracking.md) | No submodule, manifest, `vendor:check` decision |
+| [`prd/0059-vendor-upstream-tracking-and-parity.md`](prd/0059-vendor-upstream-tracking-and-parity.md) | PRD #59 (parent work item) |
 
-本地 **`docs/issues/`** / **`docs/prd/`** 卡片里的 **`Labels:`** 应与 GitHub 一致；**`needs-triage`** 仅作入库队列，结案或分流后应从远端与镜像中去掉（见根目录 **AGENTS.md**）。
+Keep **`Labels:`** in local **`docs/issues/`** and **`docs/prd/`** cards aligned with GitHub. **`needs-triage`** is only an inbox queue—remove it from closed issues and once triaged (see root **AGENTS.md**).
