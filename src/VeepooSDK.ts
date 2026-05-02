@@ -3,6 +3,8 @@ import { Platform } from "react-native";
 
 import type {
   ConnectionStatus,
+  DeviceAlarm,
+  OperationStatus,
   ScanOptions,
   ConnectOptions,
   LogEntry,
@@ -28,8 +30,9 @@ import type {
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
 import type { VeepooSDKModuleInterface, LogListener } from "./VeepooSDKModule.js";
-import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting } from "./validators/index.js";
+import { validateDeviceId, validateConnectOptions, validatePersonalInfo, validateAutoMeasureSetting, validateAlarm, validateDeleteAlarm } from "./validators/index.js";
 import {
+  normalizeAlarmList,
   normalizeAutoMeasureSettings,
   normalizeBatteryInfo,
   normalizeDaySummaryData,
@@ -164,6 +167,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       "batteryData",
       "connectionStatusChanged",
       "originSpo2Data",
+      "alarmData",
       "error",
     ];
 
@@ -717,6 +721,23 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   setLanguage = (language: Language): Promise<boolean> => this.native.setLanguage(language);
+
+  async readAlarms(): Promise<DeviceAlarm[]> {
+    const raw = await this.native.readAlarms();
+    const alarms = normalizeAlarmList(raw);
+    this.emitLocal('alarmData', { deviceId: this.connectedDeviceId, alarms: raw });
+    return alarms;
+  }
+
+  async setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> {
+    validateAlarm(alarm);
+    return this.native.setAlarm(alarm);
+  }
+
+  async deleteAlarm(alarmId: number): Promise<OperationStatus> {
+    validateDeleteAlarm(alarmId);
+    return this.native.deleteAlarm(alarmId);
+  }
 
   private loggedVoidCall(
     scope: LogScope,

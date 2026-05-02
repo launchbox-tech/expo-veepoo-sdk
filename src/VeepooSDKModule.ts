@@ -1,5 +1,7 @@
 import type {
   ConnectionStatus,
+  DeviceAlarm,
+  OperationStatus,
   ScanOptions,
   ConnectOptions,
   LogEntry,
@@ -58,6 +60,9 @@ export interface VeepooSDKModuleInterface {
   stopStressTest(): Promise<void>;
   startBloodGlucoseTest(): Promise<void>;
   stopBloodGlucoseTest(): Promise<void>;
+  readAlarms(): Promise<DeviceAlarm[]>;
+  setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
+  deleteAlarm(alarmId: number): Promise<OperationStatus>;
   setLogEnabled(enabled: boolean): this;
   isLogEnabled(): boolean;
   setLogger(logger: LogListener | null): this;

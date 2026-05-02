@@ -2,6 +2,8 @@ import { requireNativeModule, EventSubscription } from 'expo-modules-core';
 
 import type {
   ConnectionStatus,
+  DeviceAlarm,
+  OperationStatus,
   PersonalInfo,
   VeepooEvent,
   ScanOptions,
@@ -52,6 +54,9 @@ export interface NativeVeepooSDKInterface {
   stopStressTest(): Promise<void>;
   startBloodGlucoseTest(): Promise<void>;
   stopBloodGlucoseTest(): Promise<void>;
+  readAlarms(): Promise<unknown>;
+  setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
+  deleteAlarm(alarmId: number): Promise<OperationStatus>;
   addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
   removeListeners(count: number): void;
 }

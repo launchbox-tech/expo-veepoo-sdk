@@ -24,7 +24,7 @@ export function validateAlarm(alarm: DeviceAlarm): void {
     requireInRange(alarm.scene, 'scene', 0, 20);
   }
   if (alarm.text !== undefined) {
-    if (Buffer.byteLength(alarm.text, 'utf8') > 60) {
+    if (new TextEncoder().encode(alarm.text).byteLength > 60) {
       throw { code: 'INVALID_ARGUMENT', message: 'text must not exceed 60 bytes' };
     }
   }
