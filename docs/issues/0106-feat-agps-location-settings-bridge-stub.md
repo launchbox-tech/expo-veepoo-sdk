@@ -1,7 +1,7 @@
 # 106 — feat(settings): AGPS / location settings — bridge stub (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/106
-> Status: open | Labels: needs-triage
+> Status: open | Labels: enhancement, ready-for-human
 
 ## Parent
 

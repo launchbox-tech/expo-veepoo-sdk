@@ -9,6 +9,7 @@ import {
   normalizeWristFlipWakeSettings,
   normalizeWomenHealthSettings,
   normalizeWatchFaceStyle,
+  normalizeWeatherSettings,
 } from "../normalizers/index.js";
 import {
   validatePersonalInfo,
@@ -25,6 +26,8 @@ import {
   validateFirmwareDfuFilePath,
   validateReadWatchFaceStyleOptions,
   validateWatchFaceStyleSettings,
+  validateWeatherSettings,
+  validateWeatherData,
 } from "../validators/index.js";
 import type {
   AutoMeasureSetting,
@@ -41,6 +44,8 @@ import type {
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
+  WeatherSettings,
+  WeatherData,
 } from "../types/index.js";
 import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
 
@@ -315,6 +320,36 @@ export class DeviceSettings {
     return invokeNative({
       validate: () => validateWomenHealthSettings(settings),
       invoke: () => this.rt.native.setWomenHealthSettings(settings),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  readWeatherSettings(): Promise<WeatherSettings> {
+    return invokeNative({
+      invoke: () => this.rt.native.readWeatherSettings(),
+      normalize: normalizeWeatherSettings,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setWeatherSettings(settings: WeatherSettings): Promise<void> {
+    return invokeNative({
+      validate: () => validateWeatherSettings(settings),
+      invoke: () => this.rt.native.setWeatherSettings(settings),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  pushWeatherData(data: WeatherData): Promise<void> {
+    return invokeNative({
+      validate: () => validateWeatherData(data),
+      invoke: () => this.rt.native.pushWeatherData(data),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),

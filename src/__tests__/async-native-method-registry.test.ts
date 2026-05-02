@@ -9,7 +9,7 @@ describe("NATIVE_ASYNC_METHOD_NAMES (#84)", () => {
   });
 
   it("has one entry per Expo AsyncFunction on the native module", () => {
-    expect(NATIVE_ASYNC_METHOD_NAMES.length).toBe(67);
-    expect(new Set(NATIVE_ASYNC_METHOD_NAMES).size).toBe(67);
+    expect(NATIVE_ASYNC_METHOD_NAMES.length).toBe(70);
+    expect(new Set(NATIVE_ASYNC_METHOD_NAMES).size).toBe(70);
   });
 });

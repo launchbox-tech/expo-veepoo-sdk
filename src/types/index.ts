@@ -43,6 +43,11 @@ export type {
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
+  WeatherUnit,
+  WeatherSettings,
+  WeatherHourlyForecast,
+  WeatherDailyForecast,
+  WeatherData,
   DeviceData,
 } from './device.js';
 

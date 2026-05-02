@@ -1,7 +1,7 @@
 # 105 — feat(device): Contacts & SOS — bridge stub (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/105
-> Status: open | Labels: needs-triage
+> Status: open | Labels: enhancement, ready-for-agent
 
 ## Parent
 

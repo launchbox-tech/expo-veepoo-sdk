@@ -24,6 +24,8 @@ import type {
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
+  WeatherSettings,
+  WeatherData,
   ScanOptions,
   ConnectOptions,
   ConnectionStatus,
@@ -213,6 +215,15 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   setWomenHealthSettings = (settings: WomenHealthSettings): Promise<void> =>
     this.deviceSettings.setWomenHealthSettings(settings);
+
+  readWeatherSettings = (): Promise<WeatherSettings> =>
+    this.deviceSettings.readWeatherSettings();
+
+  setWeatherSettings = (settings: WeatherSettings): Promise<void> =>
+    this.deviceSettings.setWeatherSettings(settings);
+
+  pushWeatherData = (data: WeatherData): Promise<void> =>
+    this.deviceSettings.pushWeatherData(data);
 
   startLocalFirmwareDfu = (filePath: string): Promise<void> =>
     this.deviceSettings.startLocalFirmwareDfu(filePath);

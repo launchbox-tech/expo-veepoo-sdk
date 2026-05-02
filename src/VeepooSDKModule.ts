@@ -22,6 +22,8 @@ import type {
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
+  WeatherSettings,
+  WeatherData,
   SleepData,
   SportStepData,
   OriginData,
@@ -99,6 +101,9 @@ export interface VeepooSDKModuleInterface {
   setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
   readWomenHealthSettings(): Promise<WomenHealthSettings>;
   setWomenHealthSettings(settings: WomenHealthSettings): Promise<void>;
+  readWeatherSettings(): Promise<WeatherSettings>;
+  setWeatherSettings(settings: WeatherSettings): Promise<void>;
+  pushWeatherData(data: WeatherData): Promise<void>;
   startLocalFirmwareDfu(filePath: string): Promise<void>;
   readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle>;
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;

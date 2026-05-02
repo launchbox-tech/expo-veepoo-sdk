@@ -52,6 +52,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Sedentary (long-sit) reminder | `readSedentaryReminder`, `setSedentaryReminder` | Shipped | TBD |
 | Wrist-flip / raise-to-wake | `readWristFlipWakeSettings`, `setWristFlipWakeSettings` | Shipped | TBD |
 | Women's health (cycle / maternity modes) | `readWomenHealthSettings`, `setWomenHealthSettings` | Shipped | TBD |
+| Weather push | `readWeatherSettings`, `setWeatherSettings`, `pushWeatherData` | Shipped | TBD |
 | Watch face / screen style (dial slot) | `readWatchFaceStyle`, `setWatchFaceStyle` | Shipped | TBD |
 | Local firmware DFU (OTA file on disk) | `startLocalFirmwareDfu`; `firmwareDfuProgress` | Partial | TBD |
 
@@ -62,6 +63,8 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 **Sedentary reminder:** Gate with `readDeviceFunctions().sedentaryRemind`. **Android:** `readLongSeat` / `settingLongSeat` (`LongSeatSetting`); `VpSpGetUtil.isSupportLongseat`. **iOS:** `veepooSDKSettingDeviceLongSeatWithLongSeatModel` (read `settingMode` 2, on `1` / off `0`); threshold (gate) 30–240 minutes per vendor model.
 
 **Wrist-flip wake:** Gate with `readDeviceFunctions().nightTurnSetting` / `isOpenNightTurnWrist`. **Android:** `readNightTurnWriste` / `settingNightTurnWriste` (`NightTurnWristSetting`, `TimeData` window, sensitivity 1–10); `VpSpGetUtil.isSupportNightturnSetting`. **iOS:** `veepooSDKSettingRaiseHandWithRaiseHandModel` (read mode 2, on 1 / off 0); `VPDeviceRaiseHandModel` (`sensitive` / `defaultSensitive`).
+
+**Weather push:** Gate with `readDeviceFunctions().weatherFunction` / `weatherStyle`. **Android:** `settingWeatherData` (`WeatherData`, `IWeatherStatusDataListener`) for push; `settingWeatherStatusInfo` (`WeatherStatusSetting`) for switch/unit; read state from `VpSpGetUtil` cache (Android SDK does not expose a standalone read method — state is populated post-connect). **iOS:** `VPWeatherHandle.share()` — `readWeatherInfo`, `settingWeatherInfo` (`VPWeatherConfigModel`), `syncWeatherDataToDevice` (`VPWeatherServerModel` with hourly `VPWeatherServerHourlyModel` + daily `VPWeatherServerForecastModel`). **Visibility:** iOS model uses km; JS API normalizes all visibility to metres (`visibilityM`). **Temperature:** iOS `VPWeatherServerHourlyModel.temp` is °F only; Android accepts both C and F.
 
 **Women's health:** Gate with `readDeviceFunctions().woman`. **Android:** `readWomenState` / `settingWomenState` (`WomenSetting`, `IWomenDataListener`, `WomenData`); `VpSpGetUtil.isSupportWomenSetting`. **iOS:** `veepooSDKSettingDeviceFemaleWithFemaleModel` (read `settingMode` 2 / set 1, `VPDeviceFemaleModel`). Dates are `yyyy-MM-dd` strings on iOS; Android uses `TimeData` internally.
 
@@ -125,7 +128,7 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 
 - Remote OTA metadata / download (`checkDeviceOTAInfo`, `getOadVersion`, `veepooSDKStartDfu` server path) and non-JL Android DFU  
 - Server / marketplace dial transfer, custom photo push pipelines, video dials (beyond slot read/set)  
-- Weather push, contacts/SOS, AGPS, music/camera remote  
+- Contacts/SOS, AGPS, music/camera remote  
 - Platform-specific extras (e.g. toggling OS Bluetooth from SDK)
 
 Treat gaps as **Not in JS** until a PR adds methods **and** updates this matrix.

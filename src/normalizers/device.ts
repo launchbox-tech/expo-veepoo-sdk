@@ -11,6 +11,8 @@ import type {
   SocialMsgData,
   WatchFaceDialType,
   WatchFaceStyle,
+  WeatherSettings,
+  WeatherUnit,
   WomenHealthSettings,
   WomenHealthStatus,
   WristFlipWakeSettings,
@@ -394,5 +396,17 @@ export function normalizeDeviceVersion(value: unknown): DeviceVersion {
     deviceNumber: toStringValue(record.deviceNumber),
     newVersion: toStringValue(record.newVersion),
     description: toStringValue(record.description),
+  };
+}
+
+/** Normalizes native `WeatherStatusData` / `VPWeatherConfigModel` read result. */
+export function normalizeWeatherSettings(value: unknown): WeatherSettings {
+  const record = isRecord(value) ? value : {};
+  const unitRaw = toStringValue(record.unit, 'C').toUpperCase();
+  const unit: WeatherUnit = unitRaw === 'F' ? 'F' : 'C';
+  return {
+    isOpen: toBoolean(record.isOpen),
+    unit,
+    crc: toInt(record.crc),
   };
 }

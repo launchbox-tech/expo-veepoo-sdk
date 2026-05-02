@@ -17,6 +17,7 @@ export {
   normalizeWatchFaceStyle,
   normalizeSocialMsgData,
   normalizeDeviceVersion,
+  normalizeWeatherSettings,
 } from './device.js';
 
 export {

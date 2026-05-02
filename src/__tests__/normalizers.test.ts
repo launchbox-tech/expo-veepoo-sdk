@@ -613,3 +613,39 @@ describe('normalizeWomenHealthSettings', () => {
     expect(r.status).toBe('none');
   });
 });
+
+describe('normalizeWeatherSettings', () => {
+  const { normalizeWeatherSettings } = require('../normalizers');
+
+  it('normalizes a valid weather settings object', () => {
+    const r = normalizeWeatherSettings({ isOpen: true, unit: 'C', crc: 99 });
+    expect(r.isOpen).toBe(true);
+    expect(r.unit).toBe('C');
+    expect(r.crc).toBe(99);
+  });
+
+  it('normalizes Fahrenheit unit', () => {
+    const r = normalizeWeatherSettings({ isOpen: false, unit: 'f', crc: 0 });
+    expect(r.unit).toBe('F');
+    expect(r.isOpen).toBe(false);
+  });
+
+  it('defaults to C for unknown unit', () => {
+    const r = normalizeWeatherSettings({ isOpen: true, unit: 'X', crc: 0 });
+    expect(r.unit).toBe('C');
+  });
+
+  it('returns safe defaults for empty object', () => {
+    const r = normalizeWeatherSettings({});
+    expect(r.isOpen).toBe(false);
+    expect(r.unit).toBe('C');
+    expect(r.crc).toBe(0);
+  });
+
+  it('returns safe defaults for non-object input', () => {
+    const r = normalizeWeatherSettings(null);
+    expect(r.isOpen).toBe(false);
+    expect(r.unit).toBe('C');
+    expect(r.crc).toBe(0);
+  });
+});

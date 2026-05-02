@@ -1,7 +1,7 @@
 # 104 — feat(device): Weather push — bridge stub (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/104
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: enhancement, ready-for-agent
 
 ## Parent
 

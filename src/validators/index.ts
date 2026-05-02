@@ -15,4 +15,6 @@ export {
   validateReadWatchFaceStyleOptions,
   validateWatchFaceStyleSettings,
   validateDeviceTime,
+  validateWeatherSettings,
+  validateWeatherData,
 } from './device-settings.js';

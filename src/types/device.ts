@@ -270,6 +270,58 @@ export interface WomenHealthSettings {
   operationStatus?: string;
 }
 
+/** Weather temperature unit. Vendor `EWeatherType` / `VPWeatherConfigModel.weatherUnit`. */
+export type WeatherUnit = 'C' | 'F';
+
+/** Weather switch + unit state. Android `WeatherStatusData`; iOS `VPWeatherConfigModel`. */
+export interface WeatherSettings {
+  isOpen: boolean;
+  unit: WeatherUnit;
+  /** CRC of current weather on device; pass back when pushing data to skip no-op updates. */
+  crc: number;
+}
+
+/** 3-hour forecast entry. Android `WeatherEvery3Hour`; iOS `VPWeatherServerHourlyModel`. */
+export interface WeatherHourlyForecast {
+  /** ISO datetime "YYYY-MM-DD HH:mm" */
+  time: string;
+  tempC: number;
+  tempF: number;
+  /** Weather state code 0–155 (sunny→cloudy→rain→snow). See vendor docs for ranges. */
+  weatherState: number;
+  uvIndex: number;
+  /** Wind level e.g. "3" or "3-5". */
+  windLevel: string;
+  /** Visibility in metres. */
+  visibilityM: number;
+}
+
+/** Daily forecast entry. Android `WeatherEveryDay`; iOS `VPWeatherServerForecastModel`. */
+export interface WeatherDailyForecast {
+  /** ISO date "YYYY-MM-DD" */
+  date: string;
+  maxTempC: number;
+  minTempC: number;
+  maxTempF: number;
+  minTempF: number;
+  weatherStateDay: number;
+  weatherStateNight: number;
+  uvIndex?: number;
+  windLevel?: string;
+  visibilityM?: number;
+}
+
+/** Full weather payload to push to the Band. Android `WeatherData`; iOS `VPWeatherServerModel`. */
+export interface WeatherData {
+  cityName: string;
+  /** CRC uniqueness key — Band skips write when CRC matches stored value. */
+  crc: number;
+  latitude?: number;
+  longitude?: number;
+  hourly: WeatherHourlyForecast[];
+  daily: WeatherDailyForecast[];
+}
+
 export interface DeviceData {
   deviceId: string;
   data: unknown;

@@ -13,6 +13,8 @@ import type {
   WomenHealthSettings,
   WatchFaceDialType,
   WatchFaceStyleSettings,
+  WeatherSettings,
+  WeatherData,
   VeepooEvent,
   ScanOptions,
   ConnectOptions,
@@ -94,6 +96,9 @@ export interface NativeVeepooSDKInterface {
   setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
   readWomenHealthSettings(): Promise<unknown>;
   setWomenHealthSettings(settings: WomenHealthSettings): Promise<void>;
+  readWeatherSettings(): Promise<unknown>;
+  setWeatherSettings(settings: WeatherSettings): Promise<void>;
+  pushWeatherData(data: WeatherData): Promise<void>;
   startLocalFirmwareDfu(filePath: string): Promise<void>;
   readWatchFaceStyle(
     options?: { dialType?: WatchFaceDialType } | null,

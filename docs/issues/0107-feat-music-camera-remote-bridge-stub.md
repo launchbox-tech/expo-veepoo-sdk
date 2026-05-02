@@ -1,7 +1,7 @@
 # 107 — feat(device): Music & camera remote — bridge stub (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/107
-> Status: open | Labels: needs-triage
+> Status: open | Labels: enhancement, ready-for-agent
 
 ## Parent
 

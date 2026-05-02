@@ -1,7 +1,7 @@
 # 108 — feat(device): Bluetooth power toggle (Android) — bridge stub (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/108
-> Status: open | Labels: needs-triage
+> Status: open | Labels: enhancement, ready-for-human
 
 ## Parent
 

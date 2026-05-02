@@ -854,6 +854,18 @@ public class VeepooSDKModule: Module {
       self.handleSetWomenHealthSettings(settings, promise: promise)
     }
 
+    AsyncFunction("readWeatherSettings") { (promise: Promise) in
+      self.handleReadWeatherSettings(promise: promise)
+    }
+
+    AsyncFunction("setWeatherSettings") { (settings: [String: Any], promise: Promise) in
+      self.handleSetWeatherSettings(settings, promise: promise)
+    }
+
+    AsyncFunction("pushWeatherData") { (data: [String: Any], promise: Promise) in
+      self.handlePushWeatherData(data, promise: promise)
+    }
+
     AsyncFunction("startLocalFirmwareDfu") { (filePath: String, promise: Promise) in
       self.handleStartLocalFirmwareDfu(filePath: filePath, promise: promise)
     }
