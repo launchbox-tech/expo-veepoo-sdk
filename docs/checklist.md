@@ -113,38 +113,40 @@ Tests:              src/__tests__/validators/ + normalizers.test.ts
 
 ---
 
-## §7. Feature backlog — PRD queue (grill with docs before each, do not implement yet)
+## §7. Feature backlog — PRD queue
 
-Run `/grill-with-docs` against `docs/vendor-api/veepoo-sdk-android-api.md` + `docs/vendor-api/veepoo-sdk-ios-api.md` for each.
+**Inventory audit (2026-05-02):** Compared each item to `VeepooSDKModuleInterface`, `NATIVE_ASYNC_METHOD_NAMES`, and native modules. Groups A–B are **already shipped** in the JS public API unless marked partial. Groups C–D have **capability flags** on `DeviceFunctions` / `ConnectionStatus` where the vendor exposes them, but **no** matching `VeepooSDK` methods or events yet.
 
-### Group A — Device control (high: stubs/flags already exist)
-- [ ] **Alarms read/write** — `DeviceAlarm` type exists; `alarm` flag in `DeviceFunctionPackage1`; Android: `settingAlarm`/`readAlarm`; iOS: `VPAlarmSetting`
-- [ ] **Set device time** — `DeviceTimeSetting` type exists; exposed via `ConnectOptions.timeSetting` but no standalone `setDeviceTime()` method
-- [ ] **Write notification settings** — `SocialMsgData` read exists; no write; Android: `settingSocialMsgData()`; iOS: `veepooSDKSettingSocialMsgData:`
-- [ ] **Heart rate alarm thresholds** — read + write `HeartWaringData`; `heartRateWarning` flag in `DeviceFunctionPackage1`
+For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepoo-sdk-android-api.md` + `docs/vendor-api/veepoo-sdk-ios-api.md` before writing a PRD.
 
-### Group B — Real-time health measurements (high: core value)
-- [ ] **HRV test** — `hrvFunction` flag in `DeviceFunctionPackage2`; Android: `HRVOriginData`, `RRIntervalData`; iOS: `veepooSDKGetDeviceHrvDataWithDate:`
-- [ ] **ECG test** — waveform at 250/512 Hz; `ecgFunction`, `ecgType` in `DeviceFunctionPackage2`; Android: `startDetectECG`, `EcgDetectResult`; iOS: `veepooSDKTestECGStart`, `VPECGTestDataModel`
-- [ ] **Fatigue test** — `startDetectFatigue`/`stopDetectFatigue`, `FatigueData`
-- [ ] **Breathing / respiration** — `startDetectBreath`, `BreathData`; `breathFunction` in `DeviceFunctionPackage2`
+### Group A — Device control
+- [x] **Alarms read/write** — Shipped: `readAlarms`, `setAlarm`, `deleteAlarm`; event `alarmData`. Native: `VeepooSDKModuleAlarms` (Android), `VeepooSDKModule+Alarms` (iOS).
+- [x] **Set device time** — Shipped: `setDeviceTime(time?)` (in addition to `ConnectOptions.timeSetting` on connect). `DeviceTimeSetting` type remains for connect-time sync.
+- [x] **Write notification settings** — Shipped: `writeSocialMsgData` (plus `readSocialMsgData`). Older checklist text was stale.
+- [x] **Heart rate alarm thresholds** — Shipped: `readHeartRateAlarm`, `setHeartRateAlarm`; event `heartRateAlarmData`.
 
-### Group C — Device personalization (medium)
-- [ ] **Anti-loss / find device** — `sendFindDevice()`; `findDeviceByPhoneFunction` in `DeviceFunctionPackage3`
-- [ ] **Screen settings** — brightness + duration; `screenLight`, `screenLightTime` in packages 1 and 2
-- [ ] **Sedentary reminder** — `LongSeatSetting`; `sedentaryRemind` in `DeviceFunctionPackage1`
-- [ ] **Wrist-flip wake** — `NightTurnWristSetting`; `nightTurnSetting` in `DeviceFunctionPackage1`; iOS: `VPSettingWristUp`
+### Group B — Real-time health measurements
+- [x] **HRV test (manual / realtime)** — Shipped: `startHrvTest`, `stopHrvTest`; event `hrvTestResult`. **Partial / gap:** vendor **historical** HRV origin lists (`HRVOriginData`, RR-style data, date-keyed reads) are not surfaced to JS — Android `onOriginHRVOriginListDataChange` currently only logs; no `RRInterval` types in the bridge.
+- [x] **ECG test** — Shipped: `startEcgTest(options?)`, `stopEcgTest`; event `ecgTestResult`; `EcgTestOptions.includeWaveform` when supported.
+- [x] **Fatigue test** — Shipped: `startFatigueTest`, `stopFatigueTest`; event `fatigueTestResult`.
+- [x] **Breathing / respiration** — Shipped: `startBreathingTest`, `stopBreathingTest`; event `breathingTestResult`.
 
-### Group D — Advanced (lower priority)
-- [ ] **OTA firmware upgrade** — `isOadModel` flag emitted; `libdfu`/`libfastdfu` AARs already in config; iOS: `VPDFUController`
-- [ ] **Watch face / dial management** — `screenStyleFunction` in `DeviceFunctionPackage2`
-- [ ] **Body composition** — iOS `VPBodyCompositionModel`; `bodyComponent` in packages 3 and 4
-- [ ] **Women's health** — `woman` in `DeviceFunctionPackage1`; iOS `VPWomenHealthSetting`
-- [ ] **Weather push** — `weatherFunction` in `DeviceFunctionPackage2`; iOS `VPWeatherSettingModel`
-- [ ] **Contact management with SOS** — `contactFunction` in `DeviceFunctionPackage3`
-- [ ] **GPS / location settings** — `agpsFunction` in `DeviceFunctionPackage3`
-- [ ] **Music / camera control** — `musicStyle` in `DeviceFunctionPackage3`
-- [ ] **Bluetooth on/off** — Android-only (`openBluetooth`, `closeBluetooth`)
+### Group C — Device personalization (not in public API yet)
+- [ ] **Anti-loss / find device** — Flag: `findDeviceByPhoneFunction`. No `sendFindDevice` (or similar) on `VeepooSDK`.
+- [ ] **Screen settings** — Flags: `screenLight`, `screenLightTime`. No brightness/duration read/write methods.
+- [ ] **Sedentary reminder** — Flag: `sedentaryRemind`. No `LongSeatSetting` read/write.
+- [ ] **Wrist-flip wake** — Flags: `nightTurnSetting`, `isOpenNightTurnWrist`. No dedicated read/write settings API.
+
+### Group D — Advanced (not in public API yet)
+- [ ] **OTA firmware upgrade** — AARs `libdfu` / `libfastdfu` present in config; no DFU/OTA methods or events in the module.
+- [ ] **Dial / face management** — Flags: `screenStyleFunction`, `aiDial`, `videoDial`. No dial management API.
+- [ ] **Body composition** — Vendor types exist upstream; no bridge types or methods.
+- [ ] **Women's health** — Flag: `woman` on device functions. No settings API.
+- [ ] **Weather push** — Flags: `weatherFunction`, `weatherStyle`. No weather push API.
+- [ ] **Contact management with SOS** — Flags: `contactFunction`, `contactType`, `contactMsgLength`. No contact API.
+- [ ] **GPS / location settings** — Flag: `agpsFunction`. No AGPS settings API.
+- [ ] **Music / camera control** — Flag: `musicStyle` (and related HID flags). No music/camera remote API.
+- [ ] **Bluetooth on/off** — No `openBluetooth` / `closeBluetooth` in the Expo module.
 
 ---
 
@@ -155,7 +157,7 @@ Run `/grill-with-docs` against `docs/vendor-api/veepoo-sdk-android-api.md` + `do
 3. **`VeepooSDK.ts` split: now or after Group A?** **Resolved:** façade + `src/sdk/*` split is in place; monitor size of individual `sdk/` modules as features land.
 4. **Native layer in scope for this refactor pass?** Kotlin/Swift style/organization audit before features, or TS-only for now?
 5. **`"ios"` → `"apple"` in config: safe to change now?** Or wait until a device build is possible to verify it doesn't break anything?
-6. **Example app demos for new features?** When alarms and ECG land, should the example app expose them? Or is it frozen at current scope?
+6. **Example app demos for new features?** Alarms, ECG, and other Group A/B APIs exist on the module — should the example app surface them, or stay minimal? Same question for upcoming Group C/D work.
 
 ---
 
@@ -167,5 +169,5 @@ Run `/grill-with-docs` against `docs/vendor-api/veepoo-sdk-android-api.md` + `do
 3.  §3 — Manual: 0001 prebuild/permissions; confirm 0032 / #32 status on GitHub
 4.  §5 — Answer §8 Q1, Q4, Q5, Q6 (validation errors, native audit scope, apple key, example demos)
 5.  §5-B — Optional: move VeepooSDKModuleInterface to src/types/module.ts
-6.  §7 — Group A PRDs — start with alarms (after §8 decisions)
+6.  §7 — Next vendor gaps: historical HRV origin + RR data (Group B partial), then Group C/D PRDs after §8 decisions
 ```
