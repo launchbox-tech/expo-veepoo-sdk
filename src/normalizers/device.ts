@@ -1,0 +1,178 @@
+import type {
+  BatteryInfo,
+  DeviceFunctions,
+  DeviceVersion,
+  SocialMsgData,
+} from '../types/index.js';
+import { isRecord, toInt, toBoolean, toStringValue, normalizeFunctionStatus } from './shared.js';
+
+const supportedFunctionKeys = [
+  'phone',
+  'sms',
+  'wechat',
+  'qq',
+  'facebook',
+  'twitter',
+  'instagram',
+  'linkedin',
+  'whatsapp',
+  'line',
+  'skype',
+  'email',
+  'other',
+] as const;
+
+export function normalizeBatteryInfo(value: unknown): BatteryInfo {
+  const record = isRecord(value) ? value : {};
+  const state = toInt(record.state);
+  const chargeState =
+    state === 0 ? 'normal'
+    : state === 1 ? 'charging'
+    : state === 2 ? 'lowPressure'
+    : state === 3 ? 'full'
+    : undefined;
+
+  return {
+    level: toInt(record.level, toInt(record.percent)),
+    percent: toInt(record.percent, toInt(record.level)),
+    powerModel: toInt(record.powerModel),
+    state,
+    bat: toInt(record.bat),
+    isPercent: toBoolean(record.isPercent, true),
+    isLowBattery: toBoolean(record.isLowBattery),
+    chargeState,
+  };
+}
+
+export function normalizeDeviceFunctions(value: unknown): DeviceFunctions {
+  const record = isRecord(value) ? value : {};
+  if (
+    isRecord(record.package1) ||
+    isRecord(record.package2) ||
+    isRecord(record.package3) ||
+    isRecord(record.package4) ||
+    isRecord(record.package5)
+  ) {
+    return {
+      package1: isRecord(record.package1)
+        ? Object.fromEntries(
+            Object.entries(record.package1)
+              .filter(([key]) => key !== 'type')
+              .map(([key, item]) => [key, normalizeFunctionStatus(item)])
+          )
+        : undefined,
+      package2: isRecord(record.package2)
+        ? Object.fromEntries(
+            Object.entries(record.package2)
+              .filter(([key]) => key !== 'type')
+              .map(([key, item]) =>
+                typeof item === 'number' ? [key, item] : [key, normalizeFunctionStatus(item)]
+              )
+          )
+        : undefined,
+      package3: isRecord(record.package3)
+        ? Object.fromEntries(
+            Object.entries(record.package3)
+              .filter(([key]) => key !== 'type')
+              .map(([key, item]) =>
+                typeof item === 'number' ? [key, item] : [key, normalizeFunctionStatus(item)]
+              )
+          )
+        : undefined,
+      package4: isRecord(record.package4)
+        ? Object.fromEntries(
+            Object.entries(record.package4).map(([key, item]) => [key, normalizeFunctionStatus(item)])
+          )
+        : undefined,
+      package5: isRecord(record.package5)
+        ? Object.fromEntries(
+            Object.entries(record.package5).map(([key, item]) => [key, normalizeFunctionStatus(item)])
+          ) as unknown as DeviceFunctions['package5']
+        : undefined,
+    };
+  }
+
+  return {
+    package1: {
+      bloodPressure: normalizeFunctionStatus(record.Bp ?? record.bp),
+      drinking: normalizeFunctionStatus(record.Drink ?? record.drink),
+      sedentaryRemind: normalizeFunctionStatus(record.Longseat ?? record.longseat),
+      heartRateWarning: normalizeFunctionStatus(record.HeartWaring ?? record.heartWaring),
+      weChatSport: normalizeFunctionStatus(record.WeChatSport ?? record.weChatSport),
+      camera: normalizeFunctionStatus(record.Camera ?? record.camera),
+      fatigue: normalizeFunctionStatus(record.Fatigue ?? record.fatigue),
+      spoH: normalizeFunctionStatus(record.SpoH ?? record.spoH),
+      spo2HAdjustment: normalizeFunctionStatus(record.SpoHAdjuster ?? record.spoHAdjuster),
+      spoHBreathBreak: normalizeFunctionStatus(record.SpoHBreathBreak ?? record.spoHBreathBreak),
+      woman: normalizeFunctionStatus(record.Woman ?? record.woman),
+      alarm: normalizeFunctionStatus(record.Alarm2 ?? record.alarm2),
+      newCalcSport: normalizeFunctionStatus(record.newCalcSport),
+      ambulatoryBPAdjustment: normalizeFunctionStatus(record.AngioAdjuster ?? record.angioAdjuster),
+      screenLight: normalizeFunctionStatus(record.SreenLight ?? record.sreenLight),
+      heartRateDetect: normalizeFunctionStatus(record.HeartDetect ?? record.heartDetect),
+      nightTurnSetting: normalizeFunctionStatus(record.NightTurnSetting ?? record.nightTurnSetting),
+      textAlarm: normalizeFunctionStatus(record.textAlarm),
+      temperatureFunction: normalizeFunctionStatus(record.temperatureFunction),
+    },
+    package2: {
+      countDown: normalizeFunctionStatus(record.CountDown ?? record.countDown),
+      sportModelFunction: normalizeFunctionStatus(record.SportModel ?? record.sportModel),
+      hidFunction: normalizeFunctionStatus(record.hidFuction ?? record.hidFunction),
+      screenStyleFunction: normalizeFunctionStatus(record.screenStyleFunction),
+      breathFunction: normalizeFunctionStatus(record.beathFunction ?? record.breathFunction),
+      hrvFunction: normalizeFunctionStatus(record.hrvFunction),
+      weatherFunction: normalizeFunctionStatus(record.weatherFunction),
+      screenLightTime: normalizeFunctionStatus(record.screenLightTime),
+      precisionSleep: normalizeFunctionStatus(record.precisionSleep),
+      ecgFunction: normalizeFunctionStatus(record.ecg),
+      multSportMode: normalizeFunctionStatus(record.multSportModel),
+      lowPower: normalizeFunctionStatus(record.lowPower),
+      sleepTag: toInt(record.sleepTag),
+      watchDataDayNumber: toInt(record.WathcDay ?? record.wathcDay),
+      contactMsgLength: toInt(record.contactMsgLength),
+      allMsgLength: toInt(record.allMsgLength),
+      sportModelDay: toInt(record.sportmodelday),
+      screenstyle: toInt(record.screenstyle),
+      weatherStyle: toInt(record.weatherStyle),
+      originProtocolVersion: toInt(record.originProtcolVersion),
+      ecgType: toInt(record.ecgType),
+    },
+    package3: {
+      bigDataTranType: toInt(record.bitDataTranType ?? record.bigDataTranType),
+      watchUiServerCount: toInt(record.watchUiServerCount),
+      watchUiCustomCount: toInt(record.watchUiCoustomCount ?? record.watchUiCustomCount),
+      temperatureFunction: normalizeFunctionStatus(record.temperatureFunction),
+      temperatureType: toInt(record.temptureType ?? record.temperatureType),
+      cpuType: toInt(record.cpuType),
+      stressFunction: normalizeFunctionStatus(record.stress),
+      musicStyle: toInt(record.musicStyle),
+      findDeviceByPhoneFunction: normalizeFunctionStatus(
+        record.findDeviceByPhone ?? record.findDeviceByPhoneFunction
+      ),
+      agpsFunction: normalizeFunctionStatus(record.agps),
+      bloodGlucose: toInt(record.bloodGlucoseType ?? record.bloodGlucose),
+      bloodGlucoseAdjusting: normalizeFunctionStatus(record.bloodGlucoseAdjusting),
+      bloodComponent: normalizeFunctionStatus(record.bloodComponent),
+      bodyComponent: normalizeFunctionStatus(record.bodyComponent),
+    },
+  };
+}
+
+export function normalizeSocialMsgData(value: unknown): SocialMsgData {
+  const record = isRecord(value) ? value : {};
+  return Object.fromEntries(
+    supportedFunctionKeys.map((key) => [key, normalizeFunctionStatus(record[key])])
+  ) as unknown as SocialMsgData;
+}
+
+export function normalizeDeviceVersion(value: unknown): DeviceVersion {
+  const record = isRecord(value) ? value : {};
+  return {
+    hardwareVersion: toStringValue(record.hardwareVersion),
+    firmwareVersion: toStringValue(record.firmwareVersion),
+    softwareVersion: toStringValue(record.softwareVersion),
+    deviceNumber: toStringValue(record.deviceNumber),
+    newVersion: toStringValue(record.newVersion),
+    description: toStringValue(record.description),
+  };
+}

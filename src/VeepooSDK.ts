@@ -42,7 +42,7 @@ import {
   normalizeSocialMsgData,
   normalizeSportStepData,
   normalizeEventPayload,
-} from "./normalizers.js";
+} from "./normalizers/index.js";
 
 type EventListener = (payload: unknown) => void;
 
@@ -614,12 +614,8 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     return result;
   }
 
-  async startReadOriginData(): Promise<void> {
-    this.log("info", "read", "read.origin.start", "Starting origin data read", {
-      deviceId: this.connectedDeviceId ?? undefined,
-    });
-    return this.native.startReadOriginData();
-  }
+  startReadOriginData = (): Promise<void> =>
+    this.loggedVoidCall("read", "read.origin.start", "Starting origin data read", () => this.native.startReadOriginData());
 
   readDeviceAllData = (): Promise<boolean> => this.native.readDeviceAllData();
 
@@ -722,149 +718,51 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   setLanguage = (language: Language): Promise<boolean> => this.native.setLanguage(language);
 
-  async startHeartRateTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.heartRate.start",
-      "Starting heart rate test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.startHeartRateTest();
+  private loggedVoidCall(
+    scope: LogScope,
+    action: string,
+    message: string,
+    fn: () => Promise<void>,
+  ): Promise<void> {
+    this.log("info", scope, action, message, { deviceId: this.connectedDeviceId ?? undefined });
+    return fn();
   }
 
-  async stopHeartRateTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.heartRate.stop",
-      "Stopping heart rate test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.stopHeartRateTest();
-  }
+  startHeartRateTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.heartRate.start", "Starting heart rate test", () => this.native.startHeartRateTest());
 
-  async startBloodPressureTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.bloodPressure.start",
-      "Starting blood pressure test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.startBloodPressureTest();
-  }
+  stopHeartRateTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.heartRate.stop", "Stopping heart rate test", () => this.native.stopHeartRateTest());
 
-  async stopBloodPressureTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.bloodPressure.stop",
-      "Stopping blood pressure test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.stopBloodPressureTest();
-  }
+  startBloodPressureTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.bloodPressure.start", "Starting blood pressure test", () => this.native.startBloodPressureTest());
 
-  async startBloodOxygenTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.bloodOxygen.start",
-      "Starting blood oxygen test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.startBloodOxygenTest();
-  }
+  stopBloodPressureTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.bloodPressure.stop", "Stopping blood pressure test", () => this.native.stopBloodPressureTest());
 
-  async stopBloodOxygenTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.bloodOxygen.stop",
-      "Stopping blood oxygen test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.stopBloodOxygenTest();
-  }
+  startBloodOxygenTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.bloodOxygen.start", "Starting blood oxygen test", () => this.native.startBloodOxygenTest());
 
-  async startTemperatureTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.temperature.start",
-      "Starting temperature test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.startTemperatureTest();
-  }
+  stopBloodOxygenTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.bloodOxygen.stop", "Stopping blood oxygen test", () => this.native.stopBloodOxygenTest());
 
-  async stopTemperatureTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.temperature.stop",
-      "Stopping temperature test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.stopTemperatureTest();
-  }
+  startTemperatureTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.temperature.start", "Starting temperature test", () => this.native.startTemperatureTest());
 
-  async startStressTest(): Promise<void> {
-    this.log("info", "test", "test.stress.start", "Starting stress test", {
-      deviceId: this.connectedDeviceId ?? undefined,
-    });
-    return this.native.startStressTest();
-  }
+  stopTemperatureTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.temperature.stop", "Stopping temperature test", () => this.native.stopTemperatureTest());
 
-  async stopStressTest(): Promise<void> {
-    this.log("info", "test", "test.stress.stop", "Stopping stress test", {
-      deviceId: this.connectedDeviceId ?? undefined,
-    });
-    return this.native.stopStressTest();
-  }
+  startStressTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.stress.start", "Starting stress test", () => this.native.startStressTest());
 
-  async startBloodGlucoseTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.bloodGlucose.start",
-      "Starting blood glucose test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.startBloodGlucoseTest();
-  }
+  stopStressTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.stress.stop", "Stopping stress test", () => this.native.stopStressTest());
 
-  async stopBloodGlucoseTest(): Promise<void> {
-    this.log(
-      "info",
-      "test",
-      "test.bloodGlucose.stop",
-      "Stopping blood glucose test",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-      },
-    );
-    return this.native.stopBloodGlucoseTest();
-  }
+  startBloodGlucoseTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.bloodGlucose.start", "Starting blood glucose test", () => this.native.startBloodGlucoseTest());
+
+  stopBloodGlucoseTest = (): Promise<void> =>
+    this.loggedVoidCall("test", "test.bloodGlucose.stop", "Stopping blood glucose test", () => this.native.stopBloodGlucoseTest());
 
   setLogEnabled(enabled: boolean): this {
     this.logEnabled = enabled;
