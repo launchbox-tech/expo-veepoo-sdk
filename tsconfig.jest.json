@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "noEmit": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/expo-module-scripts/ts-declarations"
+    ]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

@@ -3,7 +3,7 @@ import {
   withInfoPlist,
   withAndroidManifest,
   AndroidConfig,
-} from '@expo/config-plugins';
+} from 'expo/config-plugins';
 
 type VeepooSDKPluginProps = {
   bluetoothAlwaysPermission?: string;

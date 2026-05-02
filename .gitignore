@@ -1,3 +1,6 @@
+# Expo local tooling (expo-doctor: do not commit)
+.expo/
+
 # Logs
 logs
 *.log

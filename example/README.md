@@ -4,7 +4,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Local `expo-veepoo-sdk` (this monorepo)
 
-The example depends on the parent folder via `"expo-veepoo-sdk": "file:.."`. The **package name** in the parent `package.json` is `@gaozh1024/expo-veepoo-sdk`; Bun may show that scoped name during install even though imports use `expo-veepoo-sdk`.
+The example depends on the parent folder via `"expo-veepoo-sdk": "file:.."`. The **package name** in the parent `package.json` is `@gaozh1024/expo-veepoo-sdk`; Bun may show that scoped name during install even though imports use `expo-veepoo-sdk`. The parent package marks `expo` / `react` / `react-native` peers as **optional** in `peerDependenciesMeta` so `file:..` installs do not pull a second copy of those native modules under `node_modules/expo-veepoo-sdk/` (which breaks `expo-doctor`). Host apps must still depend on **Expo SDK**, **React**, and **React Native** as usual.
 
 ### Bun: `ENOENT: failed copying files from cache` (scoped / `file:` package)
 
