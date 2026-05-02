@@ -29,6 +29,7 @@ enum VeepooEvent {
   static let originHalfHourData = "originHalfHourData"
   static let originSpo2Data = "originSpo2Data"
   static let socialMsgData = "socialMsgData"
+  static let findDeviceState = "findDeviceState"
   static let error = "error"
 }
 
@@ -57,6 +58,7 @@ let ORIGIN_FIVE_MINUTE_DATA = VeepooEvent.originFiveMinuteData
 let ORIGIN_HALF_HOUR_DATA = VeepooEvent.originHalfHourData
 let ORIGIN_SPO2_DATA = VeepooEvent.originSpo2Data
 let SOCIAL_MSG_DATA = VeepooEvent.socialMsgData
+let FIND_DEVICE_STATE = VeepooEvent.findDeviceState
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -205,6 +207,7 @@ public class VeepooSDKModule: Module {
       ORIGIN_SPO2_DATA, SOCIAL_MSG_DATA,
       SLEEP_DATA, SPORT_STEP_DATA, ALARM_DATA,
       HRV_TEST_RESULT, ECG_TEST_RESULT, FATIGUE_TEST_RESULT, BREATHING_TEST_RESULT,
+      FIND_DEVICE_STATE,
       ERROR
     )
 
@@ -795,6 +798,14 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("setHeartRateAlarm") { (alarm: [String: Any], promise: Promise) in
       self.handleSetHeartRateAlarm(alarm, promise: promise)
+    }
+
+    AsyncFunction("startFindDevice") { (promise: Promise) in
+      self.handleStartFindDevice(promise: promise)
+    }
+
+    AsyncFunction("stopFindDevice") { (promise: Promise) in
+      self.handleStopFindDevice(promise: promise)
     }
 
     // MARK: Tests

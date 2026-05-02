@@ -71,6 +71,7 @@ export type {
   BloodGlucoseUnit,
   DeviceAlarm,
   HeartRateAlarm,
+  FindDevicePhase,
   DeviceData,
   PermissionsResult,
   PermissionStatus,

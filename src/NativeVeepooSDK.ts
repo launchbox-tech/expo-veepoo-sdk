@@ -72,6 +72,8 @@ export interface NativeVeepooSDKInterface {
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
   readHeartRateAlarm(): Promise<unknown>;
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>;
+  startFindDevice(): Promise<void>;
+  stopFindDevice(): Promise<void>;
   addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
   removeListeners(count: number): void;
 }

@@ -172,6 +172,10 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     return this.deviceSettings.setHeartRateAlarm(alarm);
   }
 
+  startFindDevice = (): Promise<void> => this.deviceSettings.startFindDevice();
+
+  stopFindDevice = (): Promise<void> => this.deviceSettings.stopFindDevice();
+
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 
   stopHeartRateTest = (): Promise<void> => this.realtime.stopHeartRateTest();

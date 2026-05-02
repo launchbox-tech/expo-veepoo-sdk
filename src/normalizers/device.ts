@@ -3,6 +3,7 @@ import type {
   DeviceAlarm,
   DeviceFunctions,
   DeviceVersion,
+  FindDevicePhase,
   HeartRateAlarm,
   SocialMsgData,
 } from '../types/index.js';
@@ -203,6 +204,36 @@ export function normalizeHeartRateAlarm(value: unknown): HeartRateAlarm {
     enabled: toBoolean(record.enabled, false),
     highThreshold: toInt(record.highThreshold),
     lowThreshold: toInt(record.lowThreshold),
+  };
+}
+
+const FIND_DEVICE_PHASES: readonly FindDevicePhase[] = [
+  'unsupported',
+  'searching',
+  'found',
+  'timeout',
+  'stopped',
+];
+
+export function normalizeFindDeviceStatePayload(value: unknown): {
+  deviceId: string;
+  phase: FindDevicePhase;
+  rawState?: number;
+} {
+  const record = isRecord(value) ? value : {};
+  const phaseRaw = toStringValue(record.phase);
+  const phase: FindDevicePhase = (FIND_DEVICE_PHASES as readonly string[]).includes(
+    phaseRaw
+  )
+    ? (phaseRaw as FindDevicePhase)
+    : 'unsupported';
+  const raw = record.rawState;
+  const rawState =
+    typeof raw === 'number' && Number.isFinite(raw) ? Math.trunc(raw) : undefined;
+  return {
+    deviceId: toStringValue(record.deviceId),
+    phase,
+    rawState,
   };
 }
 

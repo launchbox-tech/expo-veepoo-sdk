@@ -142,6 +142,7 @@ export class VeepooSDKRuntime {
       "connectionStatusChanged",
       "originSpo2Data",
       "alarmData",
+      "findDeviceState",
       "error",
     ];
 

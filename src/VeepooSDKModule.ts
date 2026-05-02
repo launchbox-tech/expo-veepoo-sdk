@@ -77,6 +77,8 @@ export interface VeepooSDKModuleInterface {
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
   readHeartRateAlarm(): Promise<HeartRateAlarm>;
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>;
+  startFindDevice(): Promise<void>;
+  stopFindDevice(): Promise<void>;
   setLogEnabled(enabled: boolean): this;
   isLogEnabled(): boolean;
   setLogger(logger: LogListener | null): this;

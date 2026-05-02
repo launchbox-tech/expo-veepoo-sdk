@@ -19,6 +19,7 @@
     "ecgTestResult",
     "error",
     "fatigueTestResult",
+    "findDeviceState",
     "heartRateTestResult",
     "hrvTestResult",
     "originFiveMinuteData",

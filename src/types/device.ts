@@ -169,6 +169,14 @@ export interface HeartRateAlarm {
   lowThreshold: number;
 }
 
+/** Phone → Band find / anti-loss (vibrate, screen on). Emitted on `findDeviceState`. */
+export type FindDevicePhase =
+  | 'unsupported'
+  | 'searching'
+  | 'found'
+  | 'timeout'
+  | 'stopped';
+
 export interface DeviceData {
   deviceId: string;
   data: unknown;

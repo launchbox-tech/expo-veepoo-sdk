@@ -32,6 +32,7 @@ export type {
   CustomSettingData,
   DeviceAlarm,
   HeartRateAlarm,
+  FindDevicePhase,
   DeviceData,
 } from './device.js';
 

@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { VeepooDevice } from "expo-veepoo-sdk";
+import sdk from "expo-veepoo-sdk";
 import { BLUE, GREEN, RED } from "../components/theme";
 import { DeviceRow, HealthTestCard, InfoRow } from "../components";
 import { appStateReducer } from "../hooks/appStateReducer";
@@ -22,10 +23,12 @@ import { useBandScan } from "../hooks/useBandScan";
 import { useBandSession } from "../hooks/useBandSession";
 import { useHealthTests } from "../hooks/useHealthTests";
 import { useDataSync } from "../hooks/useDataSync";
+import { useSDKEvent } from "../hooks/useSDKEvent";
 export type { AppState } from "../hooks/appStateReducer";
 
 export default function Index() {
   const [appState, dispatch] = useReducer(appStateReducer, "initializing");
+  const [findPhase, setFindPhase] = useState<string | null>(null);
   const { permissions } = useSDKInit(dispatch);
   const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
   const {
@@ -78,6 +81,14 @@ export default function Index() {
     clearLabLog,
   } = healthTests;
   const { syncData } = dataSync;
+
+  useSDKEvent(
+    "findDeviceState",
+    ({ phase }) => {
+      setFindPhase(phase);
+    },
+    appState === "ready"
+  );
 
   const permissionsGranted = permissions?.granted ?? false;
 
@@ -174,6 +185,42 @@ export default function Index() {
                 label="Firmware"
                 value={deviceVersion?.firmwareVersion ?? "—"}
               />
+            </View>
+          </View>
+
+          {/* ── Find Band (phone → Band) (#96) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Find Band</Text>
+            <Text style={styles.findPhase}>
+              Last state: {findPhase ?? "—"}
+            </Text>
+            <View style={styles.findRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk.startFindDevice().catch(() => {});
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Start find</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk.stopFindDevice().catch(() => {});
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Stop find</Text>
+              </Pressable>
             </View>
           </View>
 
@@ -585,11 +632,20 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   buttonPrimary: { backgroundColor: BLUE },
+  buttonSecondary: {
+    flex: 1,
+    backgroundColor: "#E8F0FE",
+    borderWidth: 1,
+    borderColor: "#C5D9F5",
+  },
   buttonStop: { backgroundColor: RED },
   buttonDisabled: { backgroundColor: "#E5E5E5" },
   buttonPressed: { opacity: 0.82 },
   buttonText: { fontSize: 16, fontWeight: "600", color: "#fff" },
+  buttonTextSecondary: { fontSize: 14, fontWeight: "600", color: BLUE },
   buttonTextDisabled: { color: "#999" },
+  findPhase: { fontSize: 14, color: "#555", marginBottom: 4 },
+  findRow: { flexDirection: "row", gap: 10 },
   spinnerInline: { marginRight: 4 },
   disconnectBtn: { marginHorizontal: 24, marginTop: 8 },
   list: { flex: 1 },

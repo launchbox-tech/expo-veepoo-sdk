@@ -47,6 +47,9 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Clock / device time | `setDeviceTime` | Shipped | TBD |
 | Alarms | `readAlarms`, `setAlarm`, `deleteAlarm`; `alarmData` | Shipped | TBD |
 | Heart rate alarm thresholds | `readHeartRateAlarm`, `setHeartRateAlarm`; `heartRateAlarmData` | Shipped | TBD |
+| Find Band (phone → Band) | `startFindDevice`, `stopFindDevice`; `findDeviceState` | Shipped | TBD |
+
+**Find device:** Gate with `readDeviceFunctions().findDeviceByPhoneFunction`. **Android** uses `startFindDeviceByPhone` / `stopFindDeviceByPhone` (`IFindDevicelistener`). **iOS** uses `veepooSDK_searchDeviceFuntionWithState` + `peripheralModel.searchDeviceFunction`; callback states map to `searching` / `stopped` / `timeout` (no separate `found` phase on iOS — see `rawState`).
 
 ---
 

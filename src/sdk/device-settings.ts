@@ -180,4 +180,22 @@ export class DeviceSettings {
       },
     });
   }
+
+  startFindDevice(): Promise<void> {
+    return invokeNative({
+      invoke: () => this.rt.native.startFindDevice(),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  stopFindDevice(): Promise<void> {
+    return invokeNative({
+      invoke: () => this.rt.native.stopFindDevice(),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
 }

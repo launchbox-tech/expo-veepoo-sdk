@@ -404,6 +404,25 @@ describe('normalizeEventPayload', () => {
     expect(result.data.highThreshold).toBe(120);
     expect(result.data.lowThreshold).toBe(50);
   });
+
+  it('findDeviceState: normalizes phase and rawState', () => {
+    const result = normalizeEventPayload('findDeviceState', {
+      deviceId: 'd1',
+      phase: 'searching',
+      rawState: 1,
+    }) as any;
+    expect(result.deviceId).toBe('d1');
+    expect(result.phase).toBe('searching');
+    expect(result.rawState).toBe(1);
+  });
+
+  it('findDeviceState: unknown phase becomes unsupported', () => {
+    const result = normalizeEventPayload('findDeviceState', {
+      deviceId: 'd1',
+      phase: 'nope',
+    }) as any;
+    expect(result.phase).toBe('unsupported');
+  });
 });
 
 describe('normalizeHeartRateAlarm', () => {
