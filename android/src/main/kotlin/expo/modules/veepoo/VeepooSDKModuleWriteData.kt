@@ -5,6 +5,8 @@ import com.inuker.bluetooth.library.Code
 import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
 import com.veepoo.protocol.listener.data.IAutoMeasureSettingDataListener
+import com.veepoo.protocol.listener.data.ISocialMsgDataListener
+import com.veepoo.protocol.model.datas.FunctionSocailMsgData
 import com.veepoo.protocol.model.datas.AutoMeasureData
 import com.veepoo.protocol.model.enums.EAutoMeasureType
 import com.veepoo.protocol.model.enums.ELanguage
@@ -244,6 +246,85 @@ fun ModuleDefinitionBuilder.defineWriteData(module: VeepooSDKModule) {
           Log.d(TAG, "modifyAutoMeasureSetting: read success callback")
         }
       }
+    )
+  }
+
+  AsyncFunction("writeSocialMsgData") { partial: Map<String, Any?>, promise: Promise ->
+    if (!module.isInitialized || module.connectedDeviceId == null) {
+      promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
+      return@AsyncFunction
+    }
+    val manager = VPOperateManager.getInstance() ?: run {
+      promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
+      return@AsyncFunction
+    }
+
+    // Build merged data: start from last-read cache so unmentioned channels are preserved.
+    // If FunctionSocailMsgData fields are Java byte, change statusToNative return type to Byte.
+    fun statusToNative(s: String): Int = when (s) { "open" -> 1; "close" -> 2; else -> 0 }
+
+    val socialData = FunctionSocailMsgData()
+    val cached = module.cachedSocialMsgData
+    if (cached != null) {
+      socialData.phone = cached.phone
+      socialData.msg = cached.msg
+      socialData.wechat = cached.wechat
+      socialData.qq = cached.qq
+      socialData.facebook = cached.facebook
+      socialData.twitter = cached.twitter
+      socialData.instagram = cached.instagram
+      socialData.linkin = cached.linkin
+      socialData.whats = cached.whats
+      socialData.line = cached.line
+      socialData.skype = cached.skype
+      socialData.gmail = cached.gmail
+      socialData.other = cached.other
+    }
+
+    (partial["phone"] as? String)?.let { socialData.phone = statusToNative(it) }
+    (partial["sms"] as? String)?.let { socialData.msg = statusToNative(it) }
+    (partial["wechat"] as? String)?.let { socialData.wechat = statusToNative(it) }
+    (partial["qq"] as? String)?.let { socialData.qq = statusToNative(it) }
+    (partial["facebook"] as? String)?.let { socialData.facebook = statusToNative(it) }
+    (partial["twitter"] as? String)?.let { socialData.twitter = statusToNative(it) }
+    (partial["instagram"] as? String)?.let { socialData.instagram = statusToNative(it) }
+    (partial["linkedin"] as? String)?.let { socialData.linkin = statusToNative(it) }
+    (partial["whatsapp"] as? String)?.let { socialData.whats = statusToNative(it) }
+    (partial["line"] as? String)?.let { socialData.line = statusToNative(it) }
+    (partial["skype"] as? String)?.let { socialData.skype = statusToNative(it) }
+    (partial["email"] as? String)?.let { socialData.gmail = statusToNative(it) }
+    (partial["other"] as? String)?.let { socialData.other = statusToNative(it) }
+
+    Log.d(TAG, "writeSocialMsgData: writing social message settings")
+
+    var resolved = false
+    manager.settingSocialMsg(
+      object : IBleWriteResponse {
+        override fun onResponse(code: Int) {
+          if (code != Code.REQUEST_SUCCESS && !resolved) {
+            resolved = true
+            Log.e(TAG, "writeSocialMsgData: BLE write failed code=$code")
+            promise.resolve("fail")
+          }
+        }
+      },
+      object : ISocialMsgDataListener {
+        override fun onSocialMsgSupportDataChange(data: FunctionSocailMsgData?) {
+          if (resolved) return
+          resolved = true
+          val result = if (data != null) "success" else "fail"
+          Log.d(TAG, "writeSocialMsgData: callback1 result=$result")
+          promise.resolve(result)
+        }
+        override fun onSocialMsgSupportDataChange2(data: FunctionSocailMsgData?) {
+          if (resolved) return
+          resolved = true
+          val result = if (data != null) "success" else "fail"
+          Log.d(TAG, "writeSocialMsgData: callback2 result=$result")
+          promise.resolve(result)
+        }
+      },
+      socialData
     )
   }
 

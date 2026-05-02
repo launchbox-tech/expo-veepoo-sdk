@@ -174,6 +174,7 @@ fun ModuleDefinitionBuilder.defineReadData(module: VeepooSDKModule) {
       object : ISocialMsgDataListener {
         override fun onSocialMsgSupportDataChange(data: FunctionSocailMsgData?) {
           if (data != null) {
+            module.cachedSocialMsgData = data
             Log.d(TAG, "readSocialMsgData: received social message data")
             
             val result = mapOf(

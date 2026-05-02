@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import java.lang.Runnable
+import com.veepoo.protocol.model.datas.FunctionSocailMsgData
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -30,6 +31,8 @@ class VeepooSDKModule : Module() {
   @Volatile var bloodOxygenTestProgress: Int = 0
   @Volatile var isBloodOxygenTesting: Boolean = false
   var bloodOxygenTestRunnable: Runnable? = null
+
+  @Volatile var cachedSocialMsgData: FunctionSocailMsgData? = null
 
   @Volatile var pendingPermissionsPromise: Promise? = null
   @Volatile var requestedPermissions: Array<String>? = null
