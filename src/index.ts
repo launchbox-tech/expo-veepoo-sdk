@@ -67,4 +67,7 @@ export type {
   DeviceAlarm,
   DeviceData,
   PermissionsResult,
+  PermissionStatus,
 } from './types';
+
+export type { VeepooSDKModuleInterface, LogListener } from './VeepooSDKModule.js';
