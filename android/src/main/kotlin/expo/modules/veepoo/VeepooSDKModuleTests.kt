@@ -13,12 +13,12 @@ import expo.modules.kotlin.modules.ModuleDefinitionBuilder
 
 fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
   AsyncFunction("startHeartRateTest") { promise: Promise ->
-    if (!module.isInitialized || module.connectedDeviceId == null) {
-      promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
+    if (!module.tryBeginRealtimeTest("heartRate", promise)) {
       return@AsyncFunction
     }
-    
+
     val manager = VPOperateManager.getInstance() ?: run {
+      module.endRealtimeTest("heartRate")
       promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
       return@AsyncFunction
     }
@@ -41,6 +41,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
         manager.stopDetectHeart(object : IBleWriteResponse {
           override fun onResponse(code: Int) {}
         })
+        module.endRealtimeTest("heartRate")
         module.sendEvent(HEART_RATE_TEST_RESULT, mapOf(
           "deviceId" to (module.connectedDeviceId ?: ""),
           "result" to mapOf(
@@ -60,6 +61,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
             promise.resolve(null)
           } else {
             module.stopSimulatedHeartRateProgress()
+            module.endRealtimeTest("heartRate")
             promise.reject("START_FAILED", "Start detect heart failed: $code", null)
           }
         }
@@ -67,7 +69,8 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
       object : IHeartDataListener {
         override fun onDataChange(heartData: HeartData?) {
           if (heartData != null && module.isHeartRateTesting) {
-            val testState = normalizeTestState(heartData.heartStatus?.toString())
+            val rawStatus = heartData.heartStatus?.toString() ?: ""
+            val testState = normalizeTestState(rawStatus)
             lastHeartValue = heartData.data
 
             if (testState == "error" || testState == "notWear" || testState == "deviceBusy") {
@@ -75,7 +78,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
               manager.stopDetectHeart(object : IBleWriteResponse {
                 override fun onResponse(code: Int) {}
               })
-              
+              module.endRealtimeTest("heartRate")
               module.sendEvent(HEART_RATE_TEST_RESULT, mapOf(
                 "deviceId" to (module.connectedDeviceId ?: ""),
                 "result" to mapOf(
@@ -99,6 +102,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
     }
 
     module.stopSimulatedHeartRateProgress()
+    module.endRealtimeTest("heartRate")
     
     val manager = VPOperateManager.getInstance()
     manager?.stopDetectHeart(
@@ -115,12 +119,12 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
   }
 
   AsyncFunction("startBloodPressureTest") { promise: Promise ->
-    if (!module.isInitialized || module.connectedDeviceId == null) {
-      promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
+    if (!module.tryBeginRealtimeTest("bloodPressure", promise)) {
       return@AsyncFunction
     }
-    
+
     val manager = VPOperateManager.getInstance() ?: run {
+      module.endRealtimeTest("bloodPressure")
       promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
       return@AsyncFunction
     }
@@ -137,6 +141,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
           if (code == Code.REQUEST_SUCCESS) {
             promise.resolve(null)
           } else {
+            module.endRealtimeTest("bloodPressure")
             promise.reject("START_FAILED", "Start BP failed: $code", null)
           }
         }
@@ -176,7 +181,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
                 },
                 EBPDetectModel.DETECT_MODEL_PUBLIC
               )
-              
+              module.endRealtimeTest("bloodPressure")
               // 发送最终结果
               module.sendEvent(BLOOD_PRESSURE_TEST_RESULT, mapOf(
                 "deviceId" to (module.connectedDeviceId ?: ""),
@@ -202,7 +207,8 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    
+
+    module.endRealtimeTest("bloodPressure")
     val manager = VPOperateManager.getInstance()
     manager?.stopDetectBP(
       object : IBleWriteResponse {
@@ -219,12 +225,12 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
   }
 
   AsyncFunction("startBloodOxygenTest") { promise: Promise ->
-    if (!module.isInitialized || module.connectedDeviceId == null) {
-      promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
+    if (!module.tryBeginRealtimeTest("bloodOxygen", promise)) {
       return@AsyncFunction
     }
-    
+
     val manager = VPOperateManager.getInstance() ?: run {
+      module.endRealtimeTest("bloodOxygen")
       promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
       return@AsyncFunction
     }
@@ -254,6 +260,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
             override fun onSpO2HADataChange(data: Spo2hData?) {}
           }
         )
+        module.endRealtimeTest("bloodOxygen")
         module.sendEvent(BLOOD_OXYGEN_TEST_RESULT, mapOf(
           "deviceId" to (module.connectedDeviceId ?: ""),
             "result" to mapOf(
@@ -274,6 +281,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
             promise.resolve(null)
           } else {
             module.stopSimulatedBloodOxygenProgress()
+            module.endRealtimeTest("bloodOxygen")
             promise.reject("START_FAILED", "Start SPO2 failed: $code", null)
           }
         }
@@ -295,7 +303,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
                   override fun onSpO2HADataChange(data: Spo2hData?) {}
                 }
               )
-              
+              module.endRealtimeTest("bloodOxygen")
               module.sendEvent(BLOOD_OXYGEN_TEST_RESULT, mapOf(
                 "deviceId" to (module.connectedDeviceId ?: ""),
                 "result" to mapOf(
@@ -323,6 +331,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
     }
 
     module.stopSimulatedBloodOxygenProgress()
+    module.endRealtimeTest("bloodOxygen")
     
     val manager = VPOperateManager.getInstance()
     manager?.stopDetectSPO2H(
@@ -342,36 +351,40 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
   }
 
   AsyncFunction("startTemperatureTest") { promise: Promise ->
-    if (!module.isInitialized || module.connectedDeviceId == null) {
-      promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
+    if (!module.tryBeginRealtimeTest("temperature", promise)) {
       return@AsyncFunction
     }
-    
+
     val manager = VPOperateManager.getInstance() ?: run {
+      module.endRealtimeTest("temperature")
       promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
       return@AsyncFunction
     }
-    
+
     manager.startDetectTempture(
       object : IBleWriteResponse {
         override fun onResponse(code: Int) {
           if (code == Code.REQUEST_SUCCESS) {
             promise.resolve(null)
           } else {
+            module.endRealtimeTest("temperature")
             promise.reject("START_FAILED", "Start Temp failed: $code", null)
           }
         }
       },
       object : ITemptureDetectDataListener {
         override fun onDataChange(data: TemptureDetectData?) {
-          if (data != null) {
+            if (data != null) {
             val testState = when {
               data.oprate == 1 -> "over"
               data.progress <= 0 -> "start"
               data.progress >= 100 -> "over"
               else -> "testing"
             }
-            
+            val terminal = data.oprate == 1 || data.progress >= 100
+            if (terminal) {
+              module.endRealtimeTest("temperature")
+            }
             module.sendEvent(TEMPERATURE_TEST_RESULT, mapOf(
               "deviceId" to (module.connectedDeviceId ?: ""),
               "result" to mapOf(
@@ -394,7 +407,8 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    
+
+    module.endRealtimeTest("temperature")
     val manager = VPOperateManager.getInstance()
     manager?.stopDetectTempture(
       object : IBleWriteResponse {
@@ -413,32 +427,27 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
   }
 
   AsyncFunction("startStressTest") { promise: Promise ->
-    if (!module.isInitialized || module.connectedDeviceId == null) {
-      promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
+    if (!module.tryBeginRealtimeTest("stress", promise)) {
       return@AsyncFunction
     }
-    
-    if (module.isPressureMeasuring) {
-      promise.reject("ALREADY_MEASURING", "Pressure measurement is already in progress", null)
-      return@AsyncFunction
-    }
-    
+
     module.isPressureMeasuring = true
     module.startPressureLoop(promise)
   }
 
   AsyncFunction("stopStressTest") { promise: Promise ->
     module.isPressureMeasuring = false
+    module.endRealtimeTest("stress")
     promise.resolve(null)
   }
 
   AsyncFunction("startBloodGlucoseTest") { promise: Promise ->
-    if (!module.isInitialized || module.connectedDeviceId == null) {
-      promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
+    if (!module.tryBeginRealtimeTest("bloodGlucose", promise)) {
       return@AsyncFunction
     }
-    
+
     val manager = VPOperateManager.getInstance() ?: run {
+      module.endRealtimeTest("bloodGlucose")
       promise.reject("SDK_NOT_INITIALIZED", "SDK manager is null", null)
       return@AsyncFunction
     }
@@ -452,6 +461,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
           if (code == Code.REQUEST_SUCCESS) {
             promise.resolve(null)
           } else {
+            module.endRealtimeTest("bloodGlucose")
             promise.reject("START_FAILED", "Start blood glucose detect failed: $code", null)
           }
         }
@@ -482,6 +492,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
 
           // 当进度到达 100% 时自动停止
           if (progress >= 100) {
+            module.endRealtimeTest("bloodGlucose")
             manager.stopBloodGlucoseDetect(
               object : IBleWriteResponse {
                 override fun onResponse(code: Int) {}
@@ -504,6 +515,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
         }
 
         override fun onBloodGlucoseStopDetect() {
+          module.endRealtimeTest("bloodGlucose")
           module.sendEvent(BLOOD_GLUCOSE_DATA, mapOf(
             "deviceId" to (module.connectedDeviceId ?: ""),
             "data" to mapOf(
@@ -520,6 +532,7 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
         }
 
         override fun onDetectError(opt: Int, status: EBloodGlucoseStatus?) {
+          module.endRealtimeTest("bloodGlucose")
           module.sendEvent(BLOOD_GLUCOSE_DATA, mapOf(
             "deviceId" to (module.connectedDeviceId ?: ""),
             "data" to mapOf(
@@ -553,7 +566,8 @@ fun ModuleDefinitionBuilder.defineTests(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    
+
+    module.endRealtimeTest("bloodGlucose")
     val manager = VPOperateManager.getInstance()
     manager?.stopBloodGlucoseDetect(
       object : IBleWriteResponse {

@@ -88,6 +88,7 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
           override fun onResponse(code: Int) {
             if (code == Code.REQUEST_SUCCESS) {
               module.connectedDeviceId = null
+              module.activeRealtimeTest = null
               module.sendEvent(DEVICE_DISCONNECTED, mapOf("deviceId" to deviceId))
               module.emitConnectionStatus(deviceId, "disconnected")
               promise.resolve(null)

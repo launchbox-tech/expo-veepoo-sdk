@@ -203,6 +203,7 @@ fun VeepooSDKModule.cleanup() {
   })
   isScanning = false
   isPressureMeasuring = false
+  activeRealtimeTest = null
   connectedDeviceId = null
   isInitialized = false
   cachedDeviceFunctions.clear()

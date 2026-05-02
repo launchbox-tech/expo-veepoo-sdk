@@ -37,6 +37,9 @@ class VeepooSDKModule : Module() {
   @Volatile var pendingPermissionsPromise: Promise? = null
   @Volatile var requestedPermissions: Array<String>? = null
 
+  /** Single active realtime health test (same mutex contract as iOS `activeMeasurementType`). */
+  @Volatile var activeRealtimeTest: String? = null
+
   val context: Context
     get() = appContext.reactContext
       ?: appContext.currentActivity?.applicationContext

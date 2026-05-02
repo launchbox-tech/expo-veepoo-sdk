@@ -44,9 +44,10 @@ extension VeepooSDKModule {
       return false
     }
 
-    if let activeMeasurementType = self.activeMeasurementType, activeMeasurementType != type {
-      print("[Measurement] 拒绝启动\(type)测量 - 已有其他测量进行中: \(activeMeasurementType)")
-      promise.reject("MEASUREMENT_IN_PROGRESS", "Another measurement is already in progress")
+    if self.activeMeasurementType != nil {
+      let busy = self.activeMeasurementType ?? ""
+      print("[Measurement] 拒绝启动\(type)测量 - 已有测量进行中: \(busy)")
+      promise.reject("REALTIME_TEST_IN_PROGRESS", busy == type ? "This realtime test is already in progress" : "Another realtime test is already in progress (\(busy))")
       return false
     }
 
