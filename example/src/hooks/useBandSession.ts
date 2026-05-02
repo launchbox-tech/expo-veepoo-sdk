@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import sdk from 'expo-veepoo-sdk';
-import type { BatteryInfo, DeviceVersion, PersonalInfo, VeepooDevice } from 'expo-veepoo-sdk';
+import sdk from '@gaozh1024/expo-veepoo-sdk';
+import type { BatteryInfo, DeviceVersion, PersonalInfo, VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
 import type { AppAction, AppState } from './appStateReducer';
 import { useSDKEvent } from './useSDKEvent';
 
@@ -39,7 +39,7 @@ export function useBandSession(
 
   useSDKEvent(
     'deviceReady',
-    async () => {
+    async ({ deviceId: _ }) => {
       setSyncDone(false);
       setBatteryInfo(null);
       setDeviceVersion(null);
@@ -60,7 +60,7 @@ export function useBandSession(
 
   useSDKEvent(
     'deviceDisconnected',
-    () => {
+    ({ deviceId: _ }) => {
       setConnectedDevice(null);
       setSyncDone(false);
       setConnectError(null);
@@ -73,7 +73,7 @@ export function useBandSession(
 
   useSDKEvent(
     'deviceConnectStatus',
-    ({ status, code }) => {
+    ({ deviceId: _, status, code }) => {
       if (status === 'error') {
         setConnectError(
           code != null
@@ -90,7 +90,7 @@ export function useBandSession(
 
   useSDKEvent(
     'batteryData',
-    ({ data }) => {
+    ({ deviceId: _, data }) => {
       setBatteryInfo(data);
     },
     appState === 'ready'

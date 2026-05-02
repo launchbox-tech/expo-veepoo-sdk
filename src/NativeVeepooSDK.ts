@@ -1,4 +1,4 @@
-import { requireNativeModule, EventSubscription } from 'expo-modules-core';
+import { requireNativeModule, EventSubscription } from "expo-modules-core";
 
 import type {
   ConnectionStatus,
@@ -20,12 +20,12 @@ import type {
   AutoMeasureSetting,
   PermissionsResult,
   SocialMsgData,
-} from './types/index.js';
+} from "./types/index.js";
 
 const LINKING_ERROR =
-  "The package 'expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go (this module requires a development build)\n';
+  "The package '@gaozh1024/expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +
+  "- You rebuilt the app after installing the package\n" +
+  "- You are not using Expo Go (this module requires a development build)\n";
 
 export interface NativeVeepooSDKInterface {
   init(): Promise<void>;
@@ -50,7 +50,9 @@ export interface NativeVeepooSDKInterface {
   readOriginData(dayOffset?: number): Promise<unknown>;
   readDaySummaryData(dayOffset?: number): Promise<unknown>;
   readAutoMeasureSetting(): Promise<unknown>;
-  modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<unknown>;
+  modifyAutoMeasureSetting(
+    setting: Partial<AutoMeasureSetting>,
+  ): Promise<unknown>;
   setLanguage(language: Language): Promise<boolean>;
   startHeartRateTest(): Promise<void>;
   stopHeartRateTest(): Promise<void>;
@@ -74,7 +76,7 @@ export interface NativeVeepooSDKInterface {
   stopBreathingTest(): Promise<void>;
   startBodyCompositionTest(): Promise<void>;
   stopBodyCompositionTest(): Promise<void>;
-  setDeviceTime(time?: Omit<DeviceTimeSetting, 'system'>): Promise<boolean>;
+  setDeviceTime(time?: Omit<DeviceTimeSetting, "system">): Promise<boolean>;
   readAlarms(): Promise<unknown>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
@@ -93,16 +95,20 @@ export interface NativeVeepooSDKInterface {
   readWomenHealthSettings(): Promise<unknown>;
   setWomenHealthSettings(settings: WomenHealthSettings): Promise<void>;
   startLocalFirmwareDfu(filePath: string): Promise<void>;
-  readWatchFaceStyle(options?: { dialType?: WatchFaceDialType } | null): Promise<unknown>;
+  readWatchFaceStyle(
+    options?: { dialType?: WatchFaceDialType } | null,
+  ): Promise<unknown>;
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;
-  addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
+  addListener(
+    event: VeepooEvent,
+    listener: (payload: unknown) => void,
+  ): EventSubscription;
   removeListeners(count: number): void;
 }
 
 let NativeModule: NativeVeepooSDKInterface;
-
 try {
-  NativeModule = requireNativeModule('VeepooSDK');
+  NativeModule = requireNativeModule("VeepooSDK");
 } catch {
   NativeModule = new Proxy({} as NativeVeepooSDKInterface, {
     get() {

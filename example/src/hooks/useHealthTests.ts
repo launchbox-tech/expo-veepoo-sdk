@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import sdk from 'expo-veepoo-sdk';
+import sdk from "@gaozh1024/expo-veepoo-sdk";
 import type {
   BloodOxygenTestResult,
   BloodPressureTestResult,
@@ -9,7 +9,7 @@ import type {
   FatigueTestResult,
   HeartRateTestResult,
   HrvTestResult,
-} from 'expo-veepoo-sdk';
+} from "@gaozh1024/expo-veepoo-sdk";
 import type { AppState } from './appStateReducer';
 import { useSDKEvent } from './useSDKEvent';
 
@@ -110,7 +110,7 @@ export function useHealthTests(appState: AppState): {
 
   useSDKEvent(
     'heartRateTestResult',
-    ({ result }) => {
+    ({ deviceId: _, result }) => {
       setHrResult(result);
       appendLog(`heartRateTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -122,7 +122,7 @@ export function useHealthTests(appState: AppState): {
 
   useSDKEvent(
     'bloodPressureTestResult',
-    ({ result }) => {
+    ({ deviceId: _, result }) => {
       setBpResult(result);
       appendLog(`bloodPressureTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -134,7 +134,7 @@ export function useHealthTests(appState: AppState): {
 
   useSDKEvent(
     'bloodOxygenTestResult',
-    ({ result }) => {
+    ({ deviceId: _, result }) => {
       setSpo2Result(result);
       appendLog(`bloodOxygenTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -146,7 +146,7 @@ export function useHealthTests(appState: AppState): {
 
   useSDKEvent(
     'hrvTestResult',
-    ({ result }) => {
+    ({ deviceId: _, result }) => {
       setHrvResult(result);
       appendLog(`hrvTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -158,7 +158,7 @@ export function useHealthTests(appState: AppState): {
 
   useSDKEvent(
     'ecgTestResult',
-    ({ result }) => {
+    ({ deviceId: _, result }) => {
       const slim =
         result.waveform && result.waveform.length > 0
           ? { ...result, waveform: [`…${result.waveform.length} samples`] }
@@ -174,7 +174,7 @@ export function useHealthTests(appState: AppState): {
 
   useSDKEvent(
     'fatigueTestResult',
-    ({ result }) => {
+    ({ deviceId: _, result }) => {
       setFatigueResult(result);
       appendLog(`fatigueTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -186,7 +186,7 @@ export function useHealthTests(appState: AppState): {
 
   useSDKEvent(
     'breathingTestResult',
-    ({ result }) => {
+    ({ deviceId: _, result }) => {
       setBreathingResult(result);
       appendLog(`breathingTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -198,7 +198,7 @@ export function useHealthTests(appState: AppState): {
 
   useSDKEvent(
     'bodyCompositionTestResult',
-    ({ result }) => {
+    ({ deviceId: _, result }) => {
       setBodyCompositionResult(result);
       appendLog(`bodyCompositionTestResult ${clipJson(result)}`);
       if (result.isEnd === true || isTerminalState(String(result.state))) {

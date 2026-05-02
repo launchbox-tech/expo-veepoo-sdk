@@ -20,11 +20,11 @@ private func isoWeekdaysToRepeatDecimal(_ days: [Any]) -> String {
 
 private func newAlarmModelToDict(_ model: VPDeviceNewAlarmModel) -> [String: Any] {
   var dict: [String: Any] = [
-    "id": Int(model.alarmID ?? "0") ?? 0,
-    "hour": Int(model.alarmHour ?? "0") ?? 0,
-    "minute": Int(model.alarmMinute ?? "0") ?? 0,
-    "enabled": (model.alarmState ?? "0") == "1",
-    "repeat": repeatDecimalToBinaryString(model.repeatState ?? "0")
+    "id": Int(model.alarmID) ?? 0,
+    "hour": Int(model.alarmHour) ?? 0,
+    "minute": Int(model.alarmMinute) ?? 0,
+    "enabled": model.alarmState == "1",
+    "repeat": repeatDecimalToBinaryString(model.repeatState)
   ]
   if let scene = model.alarmScene, !scene.isEmpty, let sceneInt = Int(scene) {
     dict["scene"] = sceneInt
@@ -34,15 +34,15 @@ private func newAlarmModelToDict(_ model: VPDeviceNewAlarmModel) -> [String: Any
 
 private func textAlarmModelToDict(_ model: VPDeviceTextAlarmModel) -> [String: Any] {
   var dict: [String: Any] = [
-    "id": Int(model.alarmID ?? "0") ?? 0,
-    "hour": Int(model.alarmHour ?? "0") ?? 0,
-    "minute": Int(model.alarmMinute ?? "0") ?? 0,
-    "enabled": (model.alarmState ?? "0") == "1",
-    "repeat": repeatDecimalToBinaryString(model.repeatState ?? "0"),
+    "id": Int(model.alarmID) ?? 0,
+    "hour": Int(model.alarmHour) ?? 0,
+    "minute": Int(model.alarmMinute) ?? 0,
+    "enabled": model.alarmState == "1",
+    "repeat": repeatDecimalToBinaryString(model.repeatState),
     "type": "text"
   ]
-  if let text = model.alarmText, !text.isEmpty {
-    dict["text"] = text
+  if !model.alarmText.isEmpty {
+    dict["text"] = model.alarmText
   }
   return dict
 }

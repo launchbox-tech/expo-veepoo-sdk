@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import sdk from 'expo-veepoo-sdk';
-import type { PermissionsResult } from 'expo-veepoo-sdk';
+import sdk from '@gaozh1024/expo-veepoo-sdk';
+import type { PermissionsResult } from '@gaozh1024/expo-veepoo-sdk';
 import type { AppAction } from './appStateReducer';
 
 export function useSDKInit(dispatch: React.Dispatch<AppAction>): {

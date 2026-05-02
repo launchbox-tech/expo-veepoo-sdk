@@ -14,6 +14,10 @@ Pod::Spec.new do |s|
   s.swift_versions = '5.4'
 
   frameworks_dir = File.expand_path('VeepooSDK/Frameworks', __dir__)
+  # VeepooBleSDK is vendored under ios/VeepooSDK/Frameworks. Pod target and user target
+  # have different available vars, so keep separate search-path strings.
+  veepoo_fw_search = '$(inherited) "$(PODS_TARGET_SRCROOT)/VeepooSDK/Frameworks"'
+  veepoo_fw_search_user = %($(inherited) "#{frameworks_dir}")
   linked_frameworks = %w[
     VeepooBleSDK
     JL_BLEKit
@@ -73,15 +77,16 @@ SCRIPT
 
   s.preserve_paths = 'VeepooSDK/Frameworks/**/*'
   s.pod_target_xcconfig = {
-    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => %($(inherited) "#{frameworks_dir}"),
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => veepoo_fw_search,
     'OTHER_LDFLAGS[sdk=iphoneos*]' => %($(inherited) #{linker_flags}),
-    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => '$(inherited)',
-    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)'
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => veepoo_fw_search,
+    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)',
+    'EXCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]' => 'VeepooSDK.swift VeepooSDKModule+*.swift'
   }
   s.user_target_xcconfig = {
-    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => %($(inherited) "#{frameworks_dir}"),
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => veepoo_fw_search_user,
     'OTHER_LDFLAGS[sdk=iphoneos*]' => %($(inherited) #{linker_flags}),
-    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => '$(inherited)',
+    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => veepoo_fw_search_user,
     'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)'
   }
   s.script_phase = {

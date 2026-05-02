@@ -349,8 +349,8 @@ extension VeepooSDKModule {
 
   private func bodyCompositionValueModelToMap(_ m: VPBodyCompositionValueModel) -> [String: Any] {
     var o: [String: Any] = [:]
-    if let d = m.date { o["date"] = d }
-    if let t = m.testTime { o["testTime"] = t }
+    o["date"] = m.date
+    o["testTime"] = m.testTime
     o["isDeviceTest"] = m.isDeviceTest
     o["statureCm"] = m.stature
     o["weightKg"] = m.weight

@@ -8,9 +8,6 @@
       ],
       "@/assets/*": [
         "./assets/*"
-      ],
-      "expo-veepoo-sdk": [
-        "../src/index.ts"
       ]
     }
   },

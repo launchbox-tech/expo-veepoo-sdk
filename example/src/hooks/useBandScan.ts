@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import sdk from 'expo-veepoo-sdk';
-import type { VeepooDevice } from 'expo-veepoo-sdk';
+import sdk from '@gaozh1024/expo-veepoo-sdk';
+import type { VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
 import type { AppAction, AppState } from './appStateReducer';
 import { useSDKEvent } from './useSDKEvent';
 
@@ -16,7 +16,7 @@ export function useBandScan(
 
   useSDKEvent(
     'deviceFound',
-    ({ device }) => {
+    ({ device, timestamp: _ }) => {
       setDevices(prev => {
         const idx = prev.findIndex(d => d.id === device.id);
         if (idx !== -1) {

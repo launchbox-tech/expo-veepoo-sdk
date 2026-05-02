@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import sdk from 'expo-veepoo-sdk';
-import type { ReadOriginProgress, SleepData, SportStepData } from 'expo-veepoo-sdk';
+import sdk from '@gaozh1024/expo-veepoo-sdk';
+import type { ReadOriginProgress, SleepData, SportStepData } from '@gaozh1024/expo-veepoo-sdk';
 import type { AppState } from './appStateReducer';
 import { useSDKEvent } from './useSDKEvent';
 

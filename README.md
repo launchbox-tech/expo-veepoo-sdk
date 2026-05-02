@@ -42,6 +42,8 @@ yarn add @gaozh1024/expo-veepoo-sdk
 
 ## Expo configuration
 
+**Metro:** After `npm install @gaozh1024/expo-veepoo-sdk`, you do **not** need a custom `metro.config.js`. Metro resolves the package from `node_modules` using `package.json` `main` and `exports` (including the `react-native` condition used by Metro 0.82+).
+
 ### iOS
 
 Add the config plugin in `app.json` or `app.config.js`:

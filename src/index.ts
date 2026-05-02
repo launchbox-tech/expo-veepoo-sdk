@@ -89,7 +89,7 @@ export type {
   DeviceData,
   PermissionsResult,
   PermissionStatus,
-} from './types';
+} from './types/index.js';
 
 export type { VeepooSDKModuleInterface, LogListener } from './VeepooSDKModule.js';
 

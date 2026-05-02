@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { VeepooDevice } from 'expo-veepoo-sdk';
+import type { VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
 import { BLUE } from './theme';
 
 export function DeviceRow({

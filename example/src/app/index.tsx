@@ -13,8 +13,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import type { VeepooDevice } from "expo-veepoo-sdk";
-import sdk from "expo-veepoo-sdk";
+import type { VeepooDevice } from "@gaozh1024/expo-veepoo-sdk";
+import sdk from "@gaozh1024/expo-veepoo-sdk";
 import { BLUE, GREEN, RED } from "../components/theme";
 import { DeviceRow, HealthTestCard, InfoRow } from "../components";
 import { appStateReducer } from "../hooks/appStateReducer";
@@ -94,7 +94,7 @@ export default function Index() {
 
   useSDKEvent(
     "findDeviceState",
-    ({ phase }) => {
+    ({ deviceId: _, phase }) => {
       setFindPhase(phase);
     },
     appState === "ready"
@@ -698,7 +698,7 @@ export default function Index() {
 
       <View style={styles.header}>
         <Text style={styles.title}>HBand Connect</Text>
-        <Text style={styles.version}>expo-veepoo-sdk v1.2.11</Text>
+        <Text style={styles.version}>@gaozh1024/expo-veepoo-sdk v1.2.11</Text>
       </View>
 
       <View style={styles.scanControls}>

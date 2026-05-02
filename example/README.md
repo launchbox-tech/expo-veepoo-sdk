@@ -2,13 +2,21 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Local `expo-veepoo-sdk` (this monorepo)
+## Local `@gaozh1024/expo-veepoo-sdk` (this monorepo)
 
-The example depends on the parent folder via **`"expo-veepoo-sdk": "file:.."`**. The **package name** in the parent `package.json` is `@gaozh1024/expo-veepoo-sdk`; the dependency key stays `expo-veepoo-sdk` so imports match the host-app README. TypeScript maps that specifier to `../src` via **`tsconfig.json` `paths`**; **Metro ignores `paths`**, so **`metro.config.js`** resolves `expo-veepoo-sdk` to **`../src/index.ts`**, watches only the library’s `src` / `build` / `android` / `ios` (not the whole repo), and **blockLists** the recursive symlink path `…/expo-veepoo-sdk/example/node_modules/expo-veepoo-sdk/…` that otherwise triggers Watchman **File name too long**.
+The example depends on the parent package via **`"@gaozh1024/expo-veepoo-sdk": "file:.."`** — same **package name** as on npm, so imports and the **config plugin** match what host apps use.
 
-**`example/bunfig.toml`** sets **`install.backend = "symlink"`** so Bun does not copy the local package out of its global store (that copy often fails with **`ENOENT`** on large trees such as `android/libs/*.aar`). The parent package marks `expo` / `react` / `react-native` peers as **optional** in `peerDependenciesMeta` so local installs do not pull a second copy of those native modules under `node_modules/expo-veepoo-sdk/` (which breaks `expo-doctor`). Host apps must still depend on **Expo SDK**, **React**, and **React Native** as usual.
+**Host apps** that install from npm only need:
 
-If Watchman still warns after upgrading, reset the watch from the **repo root**:
+1. `npm install @gaozh1024/expo-veepoo-sdk`
+2. Add **`"@gaozh1024/expo-veepoo-sdk"`** to **`expo.plugins`** in `app.json` / `app.config.*` (see repo `README.md`).
+3. No custom **`metro.config.js`** is required — Metro resolves the published package under `node_modules` using `main` / `exports`.
+
+**This folder** keeps a small **`metro.config.js`** because `file:..` symlinks the whole repo: SDK files resolve under the repo root (`realpath`), so Metro needs extra `node_modules` search paths and a `blockList` for the accidental `…/example/node_modules/…/example/…` loop. That is **not** copied to consumers.
+
+**`example/bunfig.toml`** sets **`install.backend = "symlink"`** so Bun does not copy the local package out of its global store (that copy often fails with **`ENOENT`** on large trees such as `android/libs/*.aar`). The parent package marks `expo` / `react` / `react-native` peers as **optional** in `peerDependenciesMeta` so local installs do not pull a second copy of those native modules under the linked package (which breaks `expo-doctor`). Host apps must still depend on **Expo SDK**, **React**, and **React Native** as usual.
+
+If Watchman warns about path length after upgrades, reset from the **repo root**:
 
 `watchman watch-del '/path/to/expo-veepoo-sdk' ; watchman watch-project '/path/to/expo-veepoo-sdk'`
 
@@ -23,7 +31,8 @@ Work from a **local disk** path (avoid network volumes).
 
 ## Get started
 
-1. Install dependencies
+1. From the **repository root**, build the library: `npm run build`
+2. Install dependencies in **`example/`**
 
    ```bash
    npm install
@@ -31,7 +40,7 @@ Work from a **local disk** path (avoid network volumes).
 
    Or with Bun: `bun install`
 
-2. Start the app
+3. Start the app
 
    ```bash
    npx expo start
@@ -44,7 +53,7 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction/).
 
 ## Get a fresh project
 
@@ -58,9 +67,9 @@ This command will move the starter code to the **app-example** directory and cre
 
 ### Other setup steps
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
+- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint-and-prettier/)
 - If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript with Expo"](https://docs.expo.dev/guides/typescript/)
 
 ## Learn more
 
