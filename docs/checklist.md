@@ -152,12 +152,12 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 
 ## §8. Grilling questions — answer before starting
 
-1. **Error event on validation failure?** `connect('')` throws without emitting `error`. Should `INVALID_ARGUMENT` also trigger `sdk.on('error', ...)` listeners?
+1. **Error event on validation failure?** **Resolved** (grill-with-docs): **throw-only** for sync validators; **`error`** event stays for async/native paths — see **`CONTEXT.md`** (*Validator vs `error` event*).
 2. **`normalizers.ts` split: now or after features?** **Resolved:** split landed under `src/normalizers/`; new work extends domain files + `events.ts`.
 3. **`VeepooSDK.ts` split: now or after Group A?** **Resolved:** façade + `src/sdk/*` split is in place; monitor size of individual `sdk/` modules as features land.
 4. **Native layer in scope for this refactor pass?** Kotlin/Swift style/organization audit before features, or TS-only for now?
 5. **`"ios"` → `"apple"` in config: safe to change now?** Or wait until a device build is possible to verify it doesn't break anything?
-6. **Example app demos for new features?** Alarms, ECG, and other Group A/B APIs exist on the module — should the example app surface them, or stay minimal? Same question for upcoming Group C/D work.
+6. **Example app demos for new features?** **Resolved** (grill-with-docs): minimal safe demos for new **C/D** APIs; **OTA/DFU** exempt from real flash — see **`CONTEXT.md`** (*Example app*).
 
 ---
 
@@ -167,7 +167,7 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 1.  §1 — Decide `"ios"` → `"apple"` + run a device/prebuild smoke test, or defer with rationale
 2.  §1 — Spot-check AAR names vs android/libs/*.aar
 3.  §3 — Manual: 0001 prebuild/permissions; confirm 0032 / #32 status on GitHub
-4.  §5 — Answer §8 Q1, Q4, Q5, Q6 (validation errors, native audit scope, apple key, example demos)
+4.  §5 — Answer §8 Q4, Q5 (native audit scope, `"apple"` config key)
 5.  §5-B — Optional: move VeepooSDKModuleInterface to src/types/module.ts
 6.  §7 — Next vendor gaps: historical HRV origin + RR data (Group B partial), then Group C/D PRDs after §8 decisions
 ```
