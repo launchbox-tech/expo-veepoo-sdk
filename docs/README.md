@@ -34,6 +34,7 @@ For integration guidance, start with the root **`README.md`**.
 |-----|---------|
 | [`vendor-parity-matrix.md`](vendor-parity-matrix.md) | Vendor capabilities vs `VeepooSDK` JS APIs / events |
 | [`adr/0002-vendor-upstream-tracking.md`](adr/0002-vendor-upstream-tracking.md) | No submodule, manifest, `vendor:check` decision |
+| [`adr/0003-native-rejection-to-veepoo-error.md`](adr/0003-native-rejection-to-veepoo-error.md) | Map native `AsyncFunction` rejections to `VeepooError` |
 | [`prd/0059-vendor-upstream-tracking-and-parity.md`](prd/0059-vendor-upstream-tracking-and-parity.md) | PRD #59 (parent work item) |
 
 Keep **`Labels:`** in local **`docs/issues/`** and **`docs/prd/`** cards aligned with GitHub. **`needs-triage`** is only an inbox queue—remove it from closed issues and once triaged (see root **AGENTS.md**).
