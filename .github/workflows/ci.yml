@@ -13,11 +13,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
 
-      - uses: actions/cache@v5
+      - name: Cache Bun install cache
+        uses: actions/cache@v5
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
@@ -36,13 +39,13 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Check Veepoo events bridge contract
+      - name: Verify Veepoo events bridge contract
         run: node build/bridge-contract/cli-check-veepoo-events.js
 
-      - name: Check native rejection bridge contract
+      - name: Verify native rejection bridge contract
         run: node build/bridge-contract/cli-check-native-rejection.js
 
-      - name: Vendor manifest check
+      - name: Verify vendor manifest
         run: bun run vendor:check
 
       - name: Test with coverage
