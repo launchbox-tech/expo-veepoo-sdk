@@ -33,7 +33,7 @@ End-to-end **research slice** only: inventory **VeepooBleSDK** (headers, **VPPer
 | Other vitals pattern | Explicit `*TestStart` exists for stress, temperature, heart, SpO₂, ECG, fatigue, breathing, etc.; **no `TestHrv` / `hrvTestStart`**. |
 | Micro-test | `veepooSDKMicroTestOpenState` / `veepooSDKMicroTestManualMeasurement` expose multi-vital micro checkup models with an `hrv` field; **not** a documented substitute for Android’s dedicated manual HRV detect loop and would change device UX semantics. |
 
-**Conclusion:** Issue **#79** (native iOS bridge for parity) is **blocked** until the vendor documents an iOS API equivalent to `readDeviceManualData(HRV)` or this repo upgrades to a framework version that adds one. Maintainer-facing detail lives in **`docs/vendor-parity-matrix.md`** (HRV Further notes) and **`docs/prd/0077-...md`** (Research outcome).
+**Conclusion:** Issue **#79** (native iOS bridge for parity) is **blocked** until the vendor documents an iOS API equivalent to `readDeviceManualData(HRV)` or this repo upgrades to a framework version that adds one. Maintainer-facing detail lives in **`docs/vendor-api/vendor-parity-matrix.md`** (HRV Further notes) and **`docs/prd/0077-...md`** (Research outcome).
 
 ## Blocked by
 

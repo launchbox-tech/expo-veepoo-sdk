@@ -17,9 +17,9 @@ Product glossary (**Band**, **Session**, **Band Discovery**, **Pairing**) stays 
 ## Decision
 
 1. **`vendor-manifest.json`** at the repository root is the authoritative list of **vendored artifact identities** (Android AAR paths tied to `expo-module.config.json`, iOS linked frameworks from the podspec) and **`upstreamReference`** entries with `lastReviewedHeadSha` for `HBandSDK/Android_Ble_SDK` and `HBandSDK/iOS_Ble_SDK`.
-2. **No git submodules** for those upstream repos. Reference remains wiki URLs + manifest pins + offline snapshots under `docs/veepoo-sdk-android-api.md` and `docs/veepoo-sdk-ios-api.md`.
+2. **No git submodules** for those upstream repos. Reference remains wiki URLs + manifest pins + offline snapshots under `docs/vendor-api/` (see **`docs/vendor-api/README.md`**).
 3. **`npm run vendor:check`** (`scripts/vendor-check.mjs`) performs **read-only** `git ls-remote … HEAD` comparisons to manifest pins, **prints warnings** when default branches move, checks for **missing AAR files** when `android/libs` is present, and **always exits code 0** (warn-only; does not fail CI by default).
-4. When bumping any vendored binary: update **`vendor-manifest.json`**, **`docs/release-notes/`**, and **`docs/vendor-parity-matrix.md`** as applicable; refresh **`lastReviewedHeadSha`** after reviewing upstream wikis/commits.
+4. When bumping any vendored binary: update **`vendor-manifest.json`**, **`docs/release-notes/`**, and **`docs/vendor-api/vendor-parity-matrix.md`** as applicable; refresh **`lastReviewedHeadSha`** after reviewing upstream wikis/commits.
 
 ## Consequences
 

@@ -19,7 +19,7 @@ Deliver **iOS native bindings** for the realtime HRV manual test (or an explicit
 3. As a host-app developer, I want **`hrvTestResult`** events on **iOS** to include **`state`**, **`progress`**, and **`value`** (and optional aliases) consistent with **Android**, so that my UI state machine stays one implementation.
 4. As a host-app developer, I want failures to surface as **`VeepooError`** codes (**`CAPABILITY_UNSUPPORTED`**, **`DEVICE_NOT_CONNECTED`**, **`REALTIME_TEST_IN_PROGRESS`**, etc.) per **ADR 0003**, so that error UX matches other realtime tests.
 5. As a host-app developer, I want the **example app** Vitals lab to run HRV on **iOS** without special-casing, so that smoke-testing mirrors production apps.
-6. As an SDK maintainer, I want **`docs/vendor-parity-matrix.md`** updated so the HRV row moves from **Partial** to **Shipped** for both platforms when iOS is implemented, so that consumers trust the matrix.
+6. As an SDK maintainer, I want **`docs/vendor-api/vendor-parity-matrix.md`** updated so the HRV row moves from **Partial** to **Shipped** for both platforms when iOS is implemented, so that consumers trust the matrix.
 7. As an SDK maintainer, I want **`docs/release-notes/`** and version metadata bumped for consuming apps that install from GitHub.
 8. As an SDK maintainer, I want research notes (vendor symbols, delegate/listener names, payload shapes) recorded in the issue or PR description, so AFK agents and future maintainers know which APIs were bound.
 9. As a tester, I want a physical **Band** verification checklist for **iOS** HRV (start, progress, stop, mutex conflict), so regressions are caught before merge.
@@ -51,9 +51,9 @@ Deliver **iOS native bindings** for the realtime HRV manual test (or an explicit
 ## Further Notes
 
 - **Domain language:** Use **Band**, **Session**, **Band Discovery**, **Pairing** per **AGENTS.md**; avoid “watch” / “peripheral” in user-facing copy.
-- **Matrix maintenance:** After merge, update **`docs/vendor-parity-matrix.md`** HRV row and **Further notes** (remove or narrow the iOS-only unsupported bullet).
+- **Matrix maintenance:** After merge, update **`docs/vendor-api/vendor-parity-matrix.md`** HRV row and **Further notes** (remove or narrow the iOS-only unsupported bullet).
 - If research proves no suitable iOS API in the pinned framework version, the outcome should be an explicit **ADR or matrix decision** rather than an eternal stub.
 
 ## Research outcome (issue #78)
 
-**Decision:** **No-go** for iOS realtime HRV manual test parity with the current pinned **VeepooBleSDK** headers: there is no public API mirroring Android `readDeviceManualData` + `DeviceManualDataType.HRV`. Historical HRV remains available via native sync/read paths; **`startHrvTest`** on **iOS** (device) continues to reject **`CAPABILITY_UNSUPPORTED`** with a message that points consumers to **`docs/vendor-parity-matrix.md`**. Full symbol inventory and Android delta are recorded in **`docs/issues/0078-feat-ios-hrv-realtime-vendor-research-go-no-go.md`** and the matrix **Further notes**.
+**Decision:** **No-go** for iOS realtime HRV manual test parity with the current pinned **VeepooBleSDK** headers: there is no public API mirroring Android `readDeviceManualData` + `DeviceManualDataType.HRV`. Historical HRV remains available via native sync/read paths; **`startHrvTest`** on **iOS** (device) continues to reject **`CAPABILITY_UNSUPPORTED`** with a message that points consumers to **`docs/vendor-api/vendor-parity-matrix.md`**. Full symbol inventory and Android delta are recorded in **`docs/issues/0078-feat-ios-hrv-realtime-vendor-research-go-no-go.md`** and the matrix **Further notes**.

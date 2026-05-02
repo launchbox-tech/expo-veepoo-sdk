@@ -31,7 +31,7 @@ export class DeviceSettings {
       validate: () => validatePersonalInfo(info),
       invoke: () => this.rt.native.syncPersonalInfo(info),
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
@@ -41,11 +41,11 @@ export class DeviceSettings {
       invoke: () => this.rt.native.readAutoMeasureSetting(),
       normalize: normalizeAutoMeasureSettings,
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: AutoMeasureSetting[]) => {
         this.rt.log("debug", "device", "autoMeasure.read", "Auto measure settings received", {
-          deviceId: this.rt.connectedDeviceId ?? undefined,
+          deviceId: this.rt.state.connectedDeviceId ?? undefined,
           data: { count: result.length },
         });
       },
@@ -62,7 +62,7 @@ export class DeviceSettings {
       "autoMeasure.modify.start",
       "Modifying auto measure settings",
       {
-        deviceId: this.rt.connectedDeviceId ?? undefined,
+        deviceId: this.rt.state.connectedDeviceId ?? undefined,
         data: setting,
       },
     );
@@ -70,7 +70,7 @@ export class DeviceSettings {
       invoke: () => this.rt.native.modifyAutoMeasureSetting(setting),
       normalize: normalizeAutoMeasureSettings,
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: AutoMeasureSetting[]) => {
         this.rt.log(
@@ -79,7 +79,7 @@ export class DeviceSettings {
           "autoMeasure.modify.result",
           "Auto measure settings updated",
           {
-            deviceId: this.rt.connectedDeviceId ?? undefined,
+            deviceId: this.rt.state.connectedDeviceId ?? undefined,
             data: { count: result.length },
           },
         );
@@ -91,7 +91,7 @@ export class DeviceSettings {
     return invokeNative({
       invoke: () => this.rt.native.setLanguage(language),
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
@@ -111,7 +111,7 @@ export class DeviceSettings {
           },
         ),
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
@@ -121,10 +121,10 @@ export class DeviceSettings {
       invoke: () => this.rt.native.readAlarms(),
       normalize: normalizeAlarmList,
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (alarms: DeviceAlarm[]) => {
-        this.rt.emitLocal("alarmData", { deviceId: this.rt.connectedDeviceId, alarms });
+        this.rt.emitLocal("alarmData", { deviceId: this.rt.state.connectedDeviceId, alarms });
       },
     });
   }
@@ -134,7 +134,7 @@ export class DeviceSettings {
       validate: () => validateAlarm(alarm),
       invoke: () => this.rt.native.setAlarm(alarm),
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
@@ -144,7 +144,7 @@ export class DeviceSettings {
       validate: () => validateDeleteAlarm(alarmId),
       invoke: () => this.rt.native.deleteAlarm(alarmId),
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
@@ -154,11 +154,11 @@ export class DeviceSettings {
       invoke: () => this.rt.native.readHeartRateAlarm(),
       normalize: normalizeHeartRateAlarm,
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (data: HeartRateAlarm) => {
         this.rt.emitLocal("heartRateAlarmData", {
-          deviceId: this.rt.connectedDeviceId ?? "",
+          deviceId: this.rt.state.connectedDeviceId ?? "",
           data,
         });
       },
@@ -170,11 +170,11 @@ export class DeviceSettings {
       validate: () => validateHeartRateAlarm(alarm),
       invoke: () => this.rt.native.setHeartRateAlarm(alarm),
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: () => {
         this.rt.emitLocal("heartRateAlarmData", {
-          deviceId: this.rt.connectedDeviceId ?? "",
+          deviceId: this.rt.state.connectedDeviceId ?? "",
           data: alarm,
         });
       },

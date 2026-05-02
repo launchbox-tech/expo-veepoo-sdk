@@ -30,7 +30,7 @@ export class SessionConnection {
         throw this.rt.handleError(error, "CONNECTION_FAILED", deviceId);
       },
       afterSuccess: () => {
-        this.rt.connectedDeviceId = deviceId;
+        this.rt.state.setConnectedDeviceId(deviceId);
         this.rt.log(
           "info",
           "connection",
@@ -45,7 +45,7 @@ export class SessionConnection {
   }
 
   async disconnect(deviceId?: string): Promise<void> {
-    const id = deviceId || this.rt.connectedDeviceId;
+    const id = deviceId || this.rt.state.connectedDeviceId;
     if (!id) return;
 
     this.rt.log("info", "connection", "disconnect.start", "Disconnecting device", {
@@ -59,8 +59,8 @@ export class SessionConnection {
         throw this.rt.handleError(error, "DISCONNECTION_FAILED", id);
       },
       afterSuccess: () => {
-        if (this.rt.connectedDeviceId === id) {
-          this.rt.connectedDeviceId = null;
+        if (this.rt.state.connectedDeviceId === id) {
+          this.rt.state.setConnectedDeviceId(null);
         }
         this.rt.log("info", "connection", "disconnect.success", "Device disconnected", {
           deviceId: id,
@@ -70,7 +70,7 @@ export class SessionConnection {
   }
 
   async getConnectionStatus(deviceId?: string): Promise<ConnectionStatus> {
-    const id = deviceId || this.rt.connectedDeviceId;
+    const id = deviceId || this.rt.state.connectedDeviceId;
     if (!id) return "disconnected";
 
     return invokeNative({
@@ -95,20 +95,20 @@ export class SessionConnection {
     is24Hour: boolean = false,
   ): Promise<PasswordData> {
     this.rt.log("info", "connection", "password.verify.start", "Verifying device password", {
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       data: { is24Hour },
     });
     return invokeNative({
       invoke: () => this.rt.native.verifyPassword(password, is24Hour),
       normalize: normalizePasswordData,
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (error: unknown) => {
-        throw this.rt.handleError(error, "OPERATION_FAILED", this.rt.connectedDeviceId ?? undefined);
+        throw this.rt.handleError(error, "OPERATION_FAILED", this.rt.state.connectedDeviceId ?? undefined);
       },
       afterSuccess: (result: PasswordData) => {
         this.rt.log("info", "connection", "password.verify.result", "Device password verified", {
-          deviceId: this.rt.connectedDeviceId ?? undefined,
+          deviceId: this.rt.state.connectedDeviceId ?? undefined,
           data: {
             status: result.status,
             deviceNumber: result.deviceNumber,

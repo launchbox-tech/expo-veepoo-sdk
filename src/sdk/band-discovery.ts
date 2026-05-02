@@ -55,9 +55,9 @@ export class BandDiscovery {
   }
 
   async startScan(options?: ScanOptions): Promise<void> {
-    if (this.rt.isScanning) return;
+    if (this.rt.state.isScanning) return;
 
-    this.rt.isScanning = true;
+    this.rt.state.setScanning(true);
     try {
       this.rt.log("info", "scan", "scan.start", "Starting device scan", {
         data: options,
@@ -70,13 +70,13 @@ export class BandDiscovery {
         },
       });
     } catch (e) {
-      this.rt.isScanning = false;
+      this.rt.state.setScanning(false);
       throw e;
     }
   }
 
   async stopScan(): Promise<void> {
-    if (!this.rt.isScanning) return;
+    if (!this.rt.state.isScanning) return;
 
     try {
       await invokeNative({
@@ -86,10 +86,10 @@ export class BandDiscovery {
           throw this.rt.handleError(error, "UNKNOWN");
         },
       });
-      this.rt.isScanning = false;
+      this.rt.state.setScanning(false);
       this.rt.log("info", "scan", "scan.stop", "Stopped device scan");
     } catch (e) {
-      this.rt.isScanning = false;
+      this.rt.state.setScanning(false);
       throw e;
     }
   }

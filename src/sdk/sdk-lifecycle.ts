@@ -5,7 +5,7 @@ export class SdkLifecycle {
   constructor(private readonly rt: VeepooSDKRuntime) {}
 
   async init(): Promise<void> {
-    if (this.rt.isInitialized) return;
+    if (this.rt.state.isInitialized) return;
     this.rt.log("info", "sdk", "init.start", "Initializing SDK");
     this.rt.setupEventListeners();
     await invokeNative({
@@ -15,7 +15,7 @@ export class SdkLifecycle {
         throw this.rt.handleError(error, "UNKNOWN");
       },
       afterSuccess: () => {
-        this.rt.isInitialized = true;
+        this.rt.state.markInitialized(true);
         this.rt.log("info", "sdk", "init.success", "SDK initialized");
       },
     });

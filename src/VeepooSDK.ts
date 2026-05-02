@@ -229,15 +229,15 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   isScanningActive(): boolean {
-    return this.rt.isScanning;
+    return this.rt.state.isScanning;
   }
 
   isSDKInitialized(): boolean {
-    return this.rt.isInitialized;
+    return this.rt.state.isInitialized;
   }
 
   getConnectedDeviceId(): string | null {
-    return this.rt.connectedDeviceId;
+    return this.rt.state.connectedDeviceId;
   }
 
   on<K extends VeepooEvent>(

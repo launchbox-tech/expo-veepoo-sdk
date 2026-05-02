@@ -1,6 +1,6 @@
 # Pre-Feature Refactor Checklist
 
-> **Vendor / API inventory:** [`vendor-parity-matrix.md`](vendor-parity-matrix.md) is the canonical map from vendor wiki capability areas to `VeepooSDK` methods and events. Update it when you ship features. Upstream drift: [`vendor-manifest.json`](../vendor-manifest.json) · `npm run vendor:check`.
+> **Vendor / API inventory:** [`vendor-parity-matrix.md`](vendor-api/vendor-parity-matrix.md) is the canonical map from vendor wiki capability areas to `VeepooSDK` methods and events. Update it when you ship features. Upstream drift: [`vendor-manifest.json`](../vendor-manifest.json) · `npm run vendor:check`.
 
 > Created: 2026-05-01. Continue from here tomorrow.
 > Start at §0 and work top to bottom. Answer §8 grilling questions before touching any feature code.
@@ -121,7 +121,7 @@ Tests:              src/__tests__/validators/ + normalizers.test.ts
 
 ## §7. Feature backlog — PRD queue (grill with docs before each, do not implement yet)
 
-Run `/grill-with-docs` against `docs/veepoo-sdk-android-api.md` + `docs/veepoo-sdk-ios-api.md` for each.
+Run `/grill-with-docs` against `docs/vendor-api/veepoo-sdk-android-api.md` + `docs/vendor-api/veepoo-sdk-ios-api.md` for each.
 
 ### Group A — Device control (high: stubs/flags already exist)
 - [ ] **Alarms read/write** — `DeviceAlarm` type exists; `alarm` flag in `DeviceFunctionPackage1`; Android: `settingAlarm`/`readAlarm`; iOS: `VPAlarmSetting`

@@ -13,7 +13,7 @@ Expo module for Bluetooth connectivity to Veepoo hardware, data reads, and healt
 - Usage: this `README.md`
 - Upgrade notes: [docs/release-notes/1.2.11.md](docs/release-notes/1.2.11.md)
 - Older releases: [docs/README.md](docs/README.md)
-- Vendor API parity table: [docs/vendor-parity-matrix.md](docs/vendor-parity-matrix.md)
+- Vendor API parity table: [docs/vendor-api/vendor-parity-matrix.md](docs/vendor-api/vendor-parity-matrix.md)
 
 Design goals:
 
@@ -382,8 +382,8 @@ npm publish
 
 Vendor SDK snapshots checked into this repo:
 
-- `docs/veepoo-sdk-android-api.md`
-- `docs/veepoo-sdk-ios-api.md`
+- `docs/vendor-api/veepoo-sdk-android-api.md`
+- `docs/vendor-api/veepoo-sdk-ios-api.md`
 
 ## License
 

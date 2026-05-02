@@ -11,7 +11,7 @@
 
 ## What to build
 
-**Only if research (#78) is go:** implement **iOS** native **HRV manual realtime test** so **`startHrvTest` / `stopHrvTest`** run without **`CAPABILITY_UNSUPPORTED`**, emit **`hrvTestResult`** payloads that pass **`normalizeEventPayload('hrvTestResult')`** aligned with Android semantics (**state**, **progress**, **value** / aliases), participate in the global realtime-test mutex as **`hrv`**, and surface rejects per **ADR 0003**. Add **Jest** coverage only if new raw shapes appear. Update **`docs/vendor-parity-matrix.md`** (HRV row **Shipped** + **Further notes**), **`docs/release-notes/`**, and version metadata. PR description must reference research notes.
+**Only if research (#78) is go:** implement **iOS** native **HRV manual realtime test** so **`startHrvTest` / `stopHrvTest`** run without **`CAPABILITY_UNSUPPORTED`**, emit **`hrvTestResult`** payloads that pass **`normalizeEventPayload('hrvTestResult')`** aligned with Android semantics (**state**, **progress**, **value** / aliases), participate in the global realtime-test mutex as **`hrv`**, and surface rejects per **ADR 0003**. Add **Jest** coverage only if new raw shapes appear. Update **`docs/vendor-api/vendor-parity-matrix.md`** (HRV row **Shipped** + **Further notes**), **`docs/release-notes/`**, and version metadata. PR description must reference research notes.
 
 If **#78** is **no-go**, close this issue as **not planned** or replace with documentation-only work per maintainer decision.
 

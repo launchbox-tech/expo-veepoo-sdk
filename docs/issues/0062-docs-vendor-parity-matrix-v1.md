@@ -8,7 +8,7 @@
 
 ## What to build
 
-Create **`docs/vendor-parity-matrix.md`** (canonical, versioned): maps major **vendor API / capability areas** to **`VeepooSDK` JS surface** (methods, events) and **device-tested** status (TBD / yes / no). First version may leave gaps explicit — goal is an honest inventory aligned with PRD #59 User Stories 4, 6, 19.
+Create **`docs/vendor-api/vendor-parity-matrix.md`** (canonical, versioned): maps major **vendor API / capability areas** to **`VeepooSDK` JS surface** (methods, events) and **device-tested** status (TBD / yes / no). First version may leave gaps explicit — goal is an honest inventory aligned with PRD #59 User Stories 4, 6, 19.
 
 ## Acceptance criteria
 

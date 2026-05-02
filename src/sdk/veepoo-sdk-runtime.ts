@@ -14,20 +14,18 @@ import type { NativeVeepooSDKInterface } from "../NativeVeepooSDK.js";
 import type { LogListener } from "../VeepooSDKModule.js";
 import { normalizeEventPayload } from "../normalizers/index.js";
 import { mapNativeRejection } from "../errors/map-native-rejection.js";
+import { VeepooSdkState } from "./veepoo-sdk-state.js";
 
 export type EventListener = (payload: unknown) => void;
 
 /**
- * Shared session/scan state, logging, native subscriptions, and JS event hub.
+ * Shared **Session** / scan / init state (`state`), logging, native subscriptions, and JS event hub.
  * Single owner for `nativeSubscriptions` teardown (see `teardownNativeListeners`).
  */
 export class VeepooSDKRuntime {
   readonly native: NativeVeepooSDKInterface;
-  isScanning = false;
-  isInitialized = false;
-  connectedDeviceId: string | null = null;
+  readonly state = new VeepooSdkState();
   private eventListenersSetup = false;
-  lastReadOriginProgressByDevice: Map<string, number> = new Map();
   private logEnabled = false;
   private logger: LogListener | null = null;
   private listeners: Map<VeepooEvent, Set<EventListener>> = new Map();
@@ -170,7 +168,7 @@ export class VeepooSDKRuntime {
         this.getPayloadDeviceId(normalizedPayload) ?? "__default__";
       const progressValue = normalizedPayload.progress.progress;
       const readState = normalizedPayload.progress.readState;
-      const lastProgress = this.lastReadOriginProgressByDevice.get(deviceId);
+      const lastProgress = this.state.getLastReadOriginProgress(deviceId);
 
       if (typeof progressValue === "number" && Number.isFinite(progressValue)) {
         if (
@@ -178,11 +176,11 @@ export class VeepooSDKRuntime {
           lastProgress === undefined ||
           progressValue < lastProgress
         ) {
-          this.lastReadOriginProgressByDevice.set(deviceId, progressValue);
+          this.state.recordReadOriginProgress(deviceId, progressValue);
         } else if (progressValue === lastProgress) {
           return;
         } else {
-          this.lastReadOriginProgressByDevice.set(deviceId, progressValue);
+          this.state.recordReadOriginProgress(deviceId, progressValue);
         }
       }
     }
@@ -201,26 +199,26 @@ export class VeepooSDKRuntime {
     if (event === "bluetoothStateChanged") {
       const bluetoothStatus = normalizedPayload as { isScanning?: boolean };
       if (typeof bluetoothStatus.isScanning === "boolean") {
-        this.isScanning = bluetoothStatus.isScanning;
+        this.state.setScanning(bluetoothStatus.isScanning);
       }
     }
 
     if (event === "deviceConnected") {
       const device = normalizedPayload as { deviceId?: string };
       if (typeof device.deviceId === "string" && device.deviceId.length > 0) {
-        this.connectedDeviceId = device.deviceId;
+        this.state.setConnectedDeviceId(device.deviceId);
       }
     }
 
     if (event === "deviceDisconnected") {
       const device = normalizedPayload as { deviceId?: string };
-      if (!device.deviceId || this.connectedDeviceId === device.deviceId) {
-        this.connectedDeviceId = null;
+      if (!device.deviceId || this.state.connectedDeviceId === device.deviceId) {
+        this.state.setConnectedDeviceId(null);
       }
       if (device.deviceId) {
-        this.lastReadOriginProgressByDevice.delete(device.deviceId);
+        this.state.clearReadOriginProgressForDevice(device.deviceId);
       }
-      this.isScanning = false;
+      this.state.setScanning(false);
     }
 
     if (
@@ -233,9 +231,10 @@ export class VeepooSDKRuntime {
       };
       if (
         connection.status === "disconnected" &&
-        (!connection.deviceId || this.connectedDeviceId === connection.deviceId)
+        (!connection.deviceId ||
+          this.state.connectedDeviceId === connection.deviceId)
       ) {
-        this.connectedDeviceId = null;
+        this.state.setConnectedDeviceId(null);
       }
     }
 
@@ -334,7 +333,7 @@ export class VeepooSDKRuntime {
     throw this.handleError(
       error,
       "OPERATION_FAILED",
-      this.connectedDeviceId ?? undefined,
+      this.state.connectedDeviceId ?? undefined,
     );
   }
 
@@ -412,10 +411,7 @@ export class VeepooSDKRuntime {
 
   resetAfterDestroy(): void {
     this.listeners.clear();
-    this.lastReadOriginProgressByDevice.clear();
-    this.isScanning = false;
-    this.connectedDeviceId = null;
-    this.isInitialized = false;
+    this.state.reset();
     this.logger = null;
     this.logEnabled = false;
   }

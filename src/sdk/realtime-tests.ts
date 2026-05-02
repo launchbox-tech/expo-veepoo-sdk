@@ -12,11 +12,11 @@ export class RealtimeTests {
     message: string,
     invoke: () => Promise<void>,
   ): Promise<void> {
-    this.rt.log("info", scope, action, message, { deviceId: this.rt.connectedDeviceId ?? undefined });
+    this.rt.log("info", scope, action, message, { deviceId: this.rt.state.connectedDeviceId ?? undefined });
     return invokeNative({
       invoke,
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
@@ -65,13 +65,13 @@ export class RealtimeTests {
 
   async startEcgTest(options?: EcgTestOptions): Promise<void> {
     this.rt.log("info", "test", "test.ecg.start", "Starting ECG test", {
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       data: options,
     });
     await invokeNative({
       invoke: () => this.rt.native.startEcgTest(options),
       fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.connectedDeviceId ?? undefined,
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }

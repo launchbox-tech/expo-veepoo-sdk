@@ -1,6 +1,6 @@
 # VeepooSDK Android API documentation
 
-> **Offline snapshot.** Prose in this file was machine-translated from the vendor wiki snapshot to English (Google Translate via `scripts/vendor_snapshot_translate.py`). Terminology may differ slightly from the vendor’s official English wiki. For authoritative wording and API updates, use the live **[Android API wiki (English)](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document)**. The changelog table mirrors a frozen import. Maintainer drift check: compare pins in [`vendor-manifest.json`](../vendor-manifest.json) with `npm run vendor:check`; parity versus this bridge: [`vendor-parity-matrix.md`](vendor-parity-matrix.md).
+> **Offline snapshot.** Prose in this file was machine-translated from the vendor wiki snapshot to English (Google Translate via `scripts/vendor_snapshot_translate.py`). Terminology may differ slightly from the vendor’s official English wiki. For authoritative wording and API updates, use the live **[Android API wiki (English)](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document)**. The changelog table mirrors a frozen import. Maintainer drift check: compare pins in [`vendor-manifest.json`](../../vendor-manifest.json) with `npm run vendor:check`; parity versus this bridge: [`vendor-parity-matrix.md`](vendor-parity-matrix.md).
 >
 > **Last manifest-aligned upstream review:** `upstreamReference.androidBleSdk.lastReviewedHeadSha` in `vendor-manifest.json` (default branch `HEAD` at time of pin).
 

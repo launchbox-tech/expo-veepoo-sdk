@@ -9,7 +9,7 @@
 
 ## What to build
 
-After **HRV, ECG, fatigue, and breathing** bridges exist: update **`docs/vendor-parity-matrix.md`** (move items out of backlog into realtime health tests; accurate **Status** / **Device tested**); add **`docs/release-notes/`** entry for consuming apps; update **`example/`** with a minimal **vitals lab** (start/stop all four + log events/errors). Ensures one coherent UX for exercising the vertical on hardware.
+After **HRV, ECG, fatigue, and breathing** bridges exist: update **`docs/vendor-api/vendor-parity-matrix.md`** (move items out of backlog into realtime health tests; accurate **Status** / **Device tested**); add **`docs/release-notes/`** entry for consuming apps; update **`example/`** with a minimal **vitals lab** (start/stop all four + log events/errors). Ensures one coherent UX for exercising the vertical on hardware.
 
 ## Acceptance criteria
 

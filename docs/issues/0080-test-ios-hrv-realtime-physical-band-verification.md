@@ -11,7 +11,7 @@
 
 ## What to build
 
-With **#79** merged (or native HRV otherwise available), run **manual acceptance** on a **physical Band**: start HRV test, observe **`hrvTestResult`** progression, stop test, attempt second **`start*Test`** while HRV active to confirm **`REALTIME_TEST_IN_PROGRESS`**. Update **`docs/vendor-parity-matrix.md`** **Device tested** for the HRV row when verified (or note failure/limitation).
+With **#79** merged (or native HRV otherwise available), run **manual acceptance** on a **physical Band**: start HRV test, observe **`hrvTestResult`** progression, stop test, attempt second **`start*Test`** while HRV active to confirm **`REALTIME_TEST_IN_PROGRESS`**. Update **`docs/vendor-api/vendor-parity-matrix.md`** **Device tested** for the HRV row when verified (or note failure/limitation).
 
 ## Acceptance criteria
 

@@ -8,7 +8,7 @@
 
 ## What to build
 
-Update **`docs/checklist.md`**: add a **banner** at the top linking to **`docs/vendor-parity-matrix.md`**; fix **§2** so it no longer claims `originSpo2Data` is missing from TS (parity with current code). Trim or annotate other stale rows so maintainers are not misled.
+Update **`docs/checklist.md`**: add a **banner** at the top linking to **`docs/vendor-api/vendor-parity-matrix.md`**; fix **§2** so it no longer claims `originSpo2Data` is missing from TS (parity with current code). Trim or annotate other stale rows so maintainers are not misled.
 
 ## Acceptance criteria
 
