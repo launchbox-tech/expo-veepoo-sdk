@@ -14,4 +14,12 @@ module.exports = {
     'node_modules/',
     'example/',
   ],
+  overrides: [
+    {
+      files: ['**/__tests__/**/*.ts', '**/*.test.ts'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+      },
+    },
+  ],
 };

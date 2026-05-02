@@ -345,7 +345,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
       : undefined;
   }
 
-  private isEventRecord(payload: unknown): payload is Record<string, any> {
+  private isEventRecord(payload: unknown): payload is Record<string, unknown> {
     return typeof payload === "object" && payload !== null;
   }
 
@@ -1040,8 +1040,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     event: K,
     listener: (payload: VeepooEventPayload[K]) => void,
   ): this {
-    let wrapper!: EventListener;
-    wrapper = payload => {
+    const wrapper: EventListener = payload => {
       this.listeners.get(event)?.delete(wrapper);
       (listener as EventListener)(payload);
     };

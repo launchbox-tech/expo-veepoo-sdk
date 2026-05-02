@@ -90,7 +90,6 @@ describe('VeepooSDK', () => {
 
   beforeEach(() => {
     native = makeMockNative();
-    // @ts-ignore — constructor injection will be added in the refactoring
     sdk = new VeepooSDK(native);
   });
 

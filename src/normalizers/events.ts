@@ -63,7 +63,7 @@ export function normalizeReadOriginProgressPayload(value: unknown): unknown {
 
 export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unknown {
   if (typeof payload !== 'object' || payload === null) return payload;
-  const p = payload as Record<string, any>;
+  const p = payload as Record<string, unknown>;
   switch (event) {
     case 'bluetoothStateChanged':
       return normalizeBluetoothStatus(p);
