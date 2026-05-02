@@ -158,6 +158,7 @@ export interface DeviceAlarm {
   hour: number;
   minute: number;
   repeat: number[];
+  scene?: number;
   type?: 'normal' | 'text';
   text?: string;
 }

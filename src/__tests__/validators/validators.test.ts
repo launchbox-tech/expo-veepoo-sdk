@@ -4,6 +4,7 @@ import {
   validatePersonalInfo,
   validateAutoMeasureSetting,
   validateAlarm,
+  validateDeleteAlarm,
 } from '../../validators/index';
 
 function expectInvalidArgument(fn: () => void, fieldHint?: string): void {
@@ -166,6 +167,19 @@ describe('validateAlarm', () => {
     expect(() => validateAlarm(valid)).not.toThrow();
   });
 
+  it('passes for empty repeat (one-shot)', () => {
+    expect(() => validateAlarm({ ...valid, repeat: [] })).not.toThrow();
+  });
+
+  it('passes for text of exactly 60 bytes', () => {
+    expect(() => validateAlarm({ ...valid, text: 'a'.repeat(60) })).not.toThrow();
+  });
+
+  it('throws for id out of range', () => {
+    expectInvalidArgument(() => validateAlarm({ ...valid, id: 0 }), 'id');
+    expectInvalidArgument(() => validateAlarm({ ...valid, id: 21 }), 'id');
+  });
+
   it('throws for hour out of range', () => {
     expectInvalidArgument(() => validateAlarm({ ...valid, hour: 24 }), 'hour');
     expectInvalidArgument(() => validateAlarm({ ...valid, hour: -1 }), 'hour');
@@ -174,5 +188,36 @@ describe('validateAlarm', () => {
   it('throws for minute out of range', () => {
     expectInvalidArgument(() => validateAlarm({ ...valid, minute: 60 }), 'minute');
     expectInvalidArgument(() => validateAlarm({ ...valid, minute: -1 }), 'minute');
+  });
+
+  it('throws for invalid repeat element', () => {
+    expectInvalidArgument(() => validateAlarm({ ...valid, repeat: [0] }), 'repeat element');
+    expectInvalidArgument(() => validateAlarm({ ...valid, repeat: [8] }), 'repeat element');
+  });
+
+  it('throws for scene out of range', () => {
+    expectInvalidArgument(() => validateAlarm({ ...valid, scene: 21 }), 'scene');
+    expectInvalidArgument(() => validateAlarm({ ...valid, scene: -1 }), 'scene');
+  });
+
+  it('passes for scene at boundaries', () => {
+    expect(() => validateAlarm({ ...valid, scene: 0 })).not.toThrow();
+    expect(() => validateAlarm({ ...valid, scene: 20 })).not.toThrow();
+  });
+
+  it('throws for text exceeding 60 bytes', () => {
+    expectInvalidArgument(() => validateAlarm({ ...valid, text: 'a'.repeat(61) }), 'text');
+  });
+});
+
+describe('validateDeleteAlarm', () => {
+  it('passes for valid alarmId', () => {
+    expect(() => validateDeleteAlarm(1)).not.toThrow();
+    expect(() => validateDeleteAlarm(20)).not.toThrow();
+  });
+
+  it('throws for alarmId out of range', () => {
+    expectInvalidArgument(() => validateDeleteAlarm(0), 'alarmId');
+    expectInvalidArgument(() => validateDeleteAlarm(21), 'alarmId');
   });
 });
