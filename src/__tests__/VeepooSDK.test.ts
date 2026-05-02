@@ -631,6 +631,16 @@ describe('VeepooSDK', () => {
       expect(native.startHeartRateTest).toHaveBeenCalled();
     });
 
+    it('startHeartRateTest() preserves REALTIME_TEST_IN_PROGRESS from native', async () => {
+      native.startHeartRateTest.mockRejectedValueOnce({
+        code: 'REALTIME_TEST_IN_PROGRESS',
+        message: 'Another realtime test is already in progress',
+      });
+      await expect(sdk.startHeartRateTest()).rejects.toMatchObject({
+        code: 'REALTIME_TEST_IN_PROGRESS',
+      });
+    });
+
     it('stopHeartRateTest() delegates to native', async () => {
       await sdk.stopHeartRateTest();
       expect(native.stopHeartRateTest).toHaveBeenCalled();

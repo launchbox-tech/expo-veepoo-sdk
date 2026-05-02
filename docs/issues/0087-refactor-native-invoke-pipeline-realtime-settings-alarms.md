@@ -13,10 +13,10 @@ Migrate **realtime vitals** start/stop methods, **device settings** (**auto meas
 
 ## Acceptance criteria
 
-- [ ] All realtime start/stop pairs and settings/alarm/social write paths use the pipeline; **mutex** errors still surface as expected from mocks/native fixtures.
-- [ ] Full **Jest** suite green; no bypassed **`catch`** blocks for native failures.
-- [ ] Release notes or contributor note if any **internal** logging scope changes are visible to integrators.
-- [ ] **Example app** unchanged unless a bugfix falls out of parity work.
+- [x] All realtime start/stop pairs and settings/alarm/social write paths use the pipeline; **mutex** errors still surface as expected from mocks/native fixtures.
+- [x] Full **Jest** suite green; no bypassed **`catch`** blocks for native failures.
+- [x] Release notes or contributor note if any **internal** logging scope changes are visible to integrators.
+- [x] **Example app** unchanged unless a bugfix falls out of parity work.
 
 ## Blocked by
 

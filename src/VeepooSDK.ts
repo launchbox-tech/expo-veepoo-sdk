@@ -371,21 +371,6 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     );
   }
 
-  private async withNative<T>(
-    fallbackCode: VeepooError["code"],
-    deviceId: string | undefined,
-    fn: () => Promise<T>,
-  ): Promise<T> {
-    return invokeNative({
-      invoke: fn,
-      fallbackCode,
-      deviceId,
-      throwMapped: (error: unknown) => {
-        throw this.handleError(error, fallbackCode, deviceId);
-      },
-    });
-  }
-
   async init(): Promise<void> {
     if (this.isInitialized) return;
     this.log("info", "sdk", "init.start", "Initializing SDK");
@@ -653,10 +638,13 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   async writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus> {
-    validateSocialMsgData(data);
-    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.writeSocialMsgData(data),
-    );
+    return invokeNative({
+      validate: () => validateSocialMsgData(data),
+      invoke: () => this.native.writeSocialMsgData(data),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
   }
 
   async readDeviceVersion(): Promise<DeviceVersion> {
@@ -789,168 +777,204 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
         data: setting,
       },
     );
-    const result = normalizeAutoMeasureSettings(
-      await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-        this.native.modifyAutoMeasureSetting(setting),
-      ),
-    );
-    this.log(
-      "info",
-      "device",
-      "autoMeasure.modify.result",
-      "Auto measure settings updated",
-      {
-        deviceId: this.connectedDeviceId ?? undefined,
-        data: { count: result.length },
+    return invokeNative({
+      invoke: () => this.native.modifyAutoMeasureSetting(setting),
+      normalize: normalizeAutoMeasureSettings,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (result: AutoMeasureSetting[]) => {
+        this.log(
+          "info",
+          "device",
+          "autoMeasure.modify.result",
+          "Auto measure settings updated",
+          {
+            deviceId: this.connectedDeviceId ?? undefined,
+            data: { count: result.length },
+          },
+        );
       },
-    );
-    return result;
+    });
   }
 
   setLanguage = (language: Language): Promise<boolean> =>
-    this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.setLanguage(language),
-    );
+    invokeNative({
+      invoke: () => this.native.setLanguage(language),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
 
   async setDeviceTime(time?: Date): Promise<boolean> {
     validateDeviceTime(time);
-    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.setDeviceTime(
-        time === undefined ? undefined : {
-          year: time.getFullYear(),
-          month: time.getMonth() + 1,
-          day: time.getDate(),
-          hour: time.getHours(),
-          minute: time.getMinutes(),
-          second: time.getSeconds(),
-        },
-      ),
-    );
+    return invokeNative({
+      invoke: () =>
+        this.native.setDeviceTime(
+          time === undefined ? undefined : {
+            year: time.getFullYear(),
+            month: time.getMonth() + 1,
+            day: time.getDate(),
+            hour: time.getHours(),
+            minute: time.getMinutes(),
+            second: time.getSeconds(),
+          },
+        ),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
   }
 
   async readAlarms(): Promise<DeviceAlarm[]> {
-    const raw = await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.readAlarms(),
-    );
-    const alarms = normalizeAlarmList(raw);
-    this.emitLocal('alarmData', { deviceId: this.connectedDeviceId, alarms: raw });
-    return alarms;
+    return invokeNative({
+      invoke: () => this.native.readAlarms(),
+      normalize: normalizeAlarmList,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (alarms: DeviceAlarm[]) => {
+        this.emitLocal("alarmData", { deviceId: this.connectedDeviceId, alarms });
+      },
+    });
   }
 
   async setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> {
-    validateAlarm(alarm);
-    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.setAlarm(alarm),
-    );
+    return invokeNative({
+      validate: () => validateAlarm(alarm),
+      invoke: () => this.native.setAlarm(alarm),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
   }
 
   async deleteAlarm(alarmId: number): Promise<OperationStatus> {
-    validateDeleteAlarm(alarmId);
-    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.deleteAlarm(alarmId),
-    );
+    return invokeNative({
+      validate: () => validateDeleteAlarm(alarmId),
+      invoke: () => this.native.deleteAlarm(alarmId),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
   }
 
   async readHeartRateAlarm(): Promise<HeartRateAlarm> {
-    const raw = await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.readHeartRateAlarm(),
-    );
-    const data = normalizeHeartRateAlarm(raw);
-    this.emitLocal("heartRateAlarmData", {
-      deviceId: this.connectedDeviceId ?? "",
-      data,
+    return invokeNative({
+      invoke: () => this.native.readHeartRateAlarm(),
+      normalize: normalizeHeartRateAlarm,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: (data: HeartRateAlarm) => {
+        this.emitLocal("heartRateAlarmData", {
+          deviceId: this.connectedDeviceId ?? "",
+          data,
+        });
+      },
     });
-    return data;
   }
 
   async setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> {
-    validateHeartRateAlarm(alarm);
-    const status = await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.setHeartRateAlarm(alarm),
-    );
-    this.emitLocal("heartRateAlarmData", {
-      deviceId: this.connectedDeviceId ?? "",
-      data: alarm,
+    return invokeNative({
+      validate: () => validateHeartRateAlarm(alarm),
+      invoke: () => this.native.setHeartRateAlarm(alarm),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+      afterSuccess: () => {
+        this.emitLocal("heartRateAlarmData", {
+          deviceId: this.connectedDeviceId ?? "",
+          data: alarm,
+        });
+      },
     });
-    return status;
   }
 
-  private loggedVoidCall(
+  private invokeRealtimeTestVoid(
     scope: LogScope,
     action: string,
     message: string,
-    fn: () => Promise<void>,
+    invoke: () => Promise<void>,
   ): Promise<void> {
     this.log("info", scope, action, message, { deviceId: this.connectedDeviceId ?? undefined });
-    return this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, fn);
+    return invokeNative({
+      invoke,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
   }
 
   startHeartRateTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.heartRate.start", "Starting heart rate test", () => this.native.startHeartRateTest());
+    this.invokeRealtimeTestVoid("test", "test.heartRate.start", "Starting heart rate test", () => this.native.startHeartRateTest());
 
   stopHeartRateTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.heartRate.stop", "Stopping heart rate test", () => this.native.stopHeartRateTest());
+    this.invokeRealtimeTestVoid("test", "test.heartRate.stop", "Stopping heart rate test", () => this.native.stopHeartRateTest());
 
   startBloodPressureTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.bloodPressure.start", "Starting blood pressure test", () => this.native.startBloodPressureTest());
+    this.invokeRealtimeTestVoid("test", "test.bloodPressure.start", "Starting blood pressure test", () => this.native.startBloodPressureTest());
 
   stopBloodPressureTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.bloodPressure.stop", "Stopping blood pressure test", () => this.native.stopBloodPressureTest());
+    this.invokeRealtimeTestVoid("test", "test.bloodPressure.stop", "Stopping blood pressure test", () => this.native.stopBloodPressureTest());
 
   startBloodOxygenTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.bloodOxygen.start", "Starting blood oxygen test", () => this.native.startBloodOxygenTest());
+    this.invokeRealtimeTestVoid("test", "test.bloodOxygen.start", "Starting blood oxygen test", () => this.native.startBloodOxygenTest());
 
   stopBloodOxygenTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.bloodOxygen.stop", "Stopping blood oxygen test", () => this.native.stopBloodOxygenTest());
+    this.invokeRealtimeTestVoid("test", "test.bloodOxygen.stop", "Stopping blood oxygen test", () => this.native.stopBloodOxygenTest());
 
   startTemperatureTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.temperature.start", "Starting temperature test", () => this.native.startTemperatureTest());
+    this.invokeRealtimeTestVoid("test", "test.temperature.start", "Starting temperature test", () => this.native.startTemperatureTest());
 
   stopTemperatureTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.temperature.stop", "Stopping temperature test", () => this.native.stopTemperatureTest());
+    this.invokeRealtimeTestVoid("test", "test.temperature.stop", "Stopping temperature test", () => this.native.stopTemperatureTest());
 
   startStressTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.stress.start", "Starting stress test", () => this.native.startStressTest());
+    this.invokeRealtimeTestVoid("test", "test.stress.start", "Starting stress test", () => this.native.startStressTest());
 
   stopStressTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.stress.stop", "Stopping stress test", () => this.native.stopStressTest());
+    this.invokeRealtimeTestVoid("test", "test.stress.stop", "Stopping stress test", () => this.native.stopStressTest());
 
   startBloodGlucoseTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.bloodGlucose.start", "Starting blood glucose test", () => this.native.startBloodGlucoseTest());
+    this.invokeRealtimeTestVoid("test", "test.bloodGlucose.start", "Starting blood glucose test", () => this.native.startBloodGlucoseTest());
 
   stopBloodGlucoseTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.bloodGlucose.stop", "Stopping blood glucose test", () => this.native.stopBloodGlucoseTest());
+    this.invokeRealtimeTestVoid("test", "test.bloodGlucose.stop", "Stopping blood glucose test", () => this.native.stopBloodGlucoseTest());
 
   startHrvTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.hrv.start", "Starting HRV test", () => this.native.startHrvTest());
+    this.invokeRealtimeTestVoid("test", "test.hrv.start", "Starting HRV test", () => this.native.startHrvTest());
 
   stopHrvTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.hrv.stop", "Stopping HRV test", () => this.native.stopHrvTest());
+    this.invokeRealtimeTestVoid("test", "test.hrv.stop", "Stopping HRV test", () => this.native.stopHrvTest());
 
   async startEcgTest(options?: EcgTestOptions): Promise<void> {
     this.log("info", "test", "test.ecg.start", "Starting ECG test", {
       deviceId: this.connectedDeviceId ?? undefined,
       data: options,
     });
-    await this.withNative("OPERATION_FAILED", this.connectedDeviceId ?? undefined, () =>
-      this.native.startEcgTest(options),
-    );
+    await invokeNative({
+      invoke: () => this.native.startEcgTest(options),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.nativeOpFailed(e),
+    });
   }
 
   stopEcgTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.ecg.stop", "Stopping ECG test", () => this.native.stopEcgTest());
+    this.invokeRealtimeTestVoid("test", "test.ecg.stop", "Stopping ECG test", () => this.native.stopEcgTest());
 
   startFatigueTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.fatigue.start", "Starting fatigue test", () => this.native.startFatigueTest());
+    this.invokeRealtimeTestVoid("test", "test.fatigue.start", "Starting fatigue test", () => this.native.startFatigueTest());
 
   stopFatigueTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.fatigue.stop", "Stopping fatigue test", () => this.native.stopFatigueTest());
+    this.invokeRealtimeTestVoid("test", "test.fatigue.stop", "Stopping fatigue test", () => this.native.stopFatigueTest());
 
   startBreathingTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.breathing.start", "Starting breathing test", () => this.native.startBreathingTest());
+    this.invokeRealtimeTestVoid("test", "test.breathing.start", "Starting breathing test", () => this.native.startBreathingTest());
 
   stopBreathingTest = (): Promise<void> =>
-    this.loggedVoidCall("test", "test.breathing.stop", "Stopping breathing test", () => this.native.stopBreathingTest());
+    this.invokeRealtimeTestVoid("test", "test.breathing.stop", "Stopping breathing test", () => this.native.stopBreathingTest());
 
   setLogEnabled(enabled: boolean): this {
     this.logEnabled = enabled;
