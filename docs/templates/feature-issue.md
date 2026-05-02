@@ -29,8 +29,8 @@ Every feature PR must satisfy all items below before merge.
 - [ ] Re-export from `src/normalizers/index.ts`
 
 ## SDK — JS layer
-- [ ] `src/VeepooSDK.ts` — add public method(s), wire validators + normalizers
-- [ ] `src/types/module.ts` (`VeepooSDKModuleInterface`) — add new method signatures
+- [ ] `src/VeepooSDK.ts` — add public method(s), wire validators + normalizers (delegate to `src/sdk/*` where appropriate)
+- [ ] `src/VeepooSDKModule.ts` (`VeepooSDKModuleInterface`) — add new method signatures (or `src/types/module.ts` if the interface is relocated)
 
 ## Public API
 - [ ] `src/index.ts` — re-export new type(s)
