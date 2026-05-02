@@ -3,6 +3,7 @@ import type {
   DeviceAlarm,
   DeviceFunctions,
   DeviceVersion,
+  HeartRateAlarm,
   SocialMsgData,
 } from '../types/index.js';
 import { isRecord, toInt, toBoolean, toStringValue, normalizeFunctionStatus } from './shared.js';
@@ -194,6 +195,15 @@ export function normalizeAlarmList(value: unknown): DeviceAlarm[] {
       }
       return alarm;
     });
+}
+
+export function normalizeHeartRateAlarm(value: unknown): HeartRateAlarm {
+  const record = isRecord(value) ? value : {};
+  return {
+    enabled: toBoolean(record.enabled, false),
+    highThreshold: toInt(record.highThreshold),
+    lowThreshold: toInt(record.lowThreshold),
+  };
 }
 
 export function normalizeSocialMsgData(value: unknown): SocialMsgData {

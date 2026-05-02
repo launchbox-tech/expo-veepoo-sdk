@@ -9,6 +9,7 @@ import type {
   DeviceAlarm,
   DeviceFunctions,
   DeviceVersion,
+  HeartRateAlarm,
   SocialMsgData,
 } from './device.js';
 import type {
@@ -56,6 +57,7 @@ export type VeepooEvent =
   | 'connectionStatusChanged'
   | 'originSpo2Data'
   | 'alarmData'
+  | 'heartRateAlarmData'
   | 'error';
 
 export interface VeepooEventPayload {
@@ -90,5 +92,6 @@ export interface VeepooEventPayload {
   connectionStatusChanged: { deviceId: string; status: ConnectionStatus };
   originSpo2Data: { deviceId: string; data: Spo2OriginData };
   alarmData: { deviceId: string; alarms: DeviceAlarm[] };
+  heartRateAlarmData: { deviceId: string; data: HeartRateAlarm };
   error: VeepooError;
 }

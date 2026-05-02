@@ -1,4 +1,4 @@
-import type { AutoMeasureSetting, DeviceAlarm, FunctionStatus, SocialMsgData } from '../types/index.js';
+import type { AutoMeasureSetting, DeviceAlarm, FunctionStatus, HeartRateAlarm, SocialMsgData } from '../types/index.js';
 import { requireInRange, requireValidHour, requireValidMinute } from './shared.js';
 
 const VALID_FUNCTION_STATUSES = new Set<FunctionStatus>([
@@ -49,4 +49,12 @@ export function validateAlarm(alarm: DeviceAlarm): void {
 
 export function validateDeleteAlarm(alarmId: number): void {
   requireInRange(alarmId, 'alarmId', 1, 20);
+}
+
+export function validateHeartRateAlarm(alarm: HeartRateAlarm): void {
+  requireInRange(alarm.highThreshold, 'highThreshold', 1, 300);
+  requireInRange(alarm.lowThreshold, 'lowThreshold', 1, 300);
+  if (alarm.highThreshold <= alarm.lowThreshold) {
+    throw { code: 'INVALID_ARGUMENT', message: 'highThreshold must be greater than lowThreshold' };
+  }
 }

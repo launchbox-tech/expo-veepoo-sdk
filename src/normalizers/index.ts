@@ -8,6 +8,7 @@ export {
   normalizeAlarmList,
   normalizeBatteryInfo,
   normalizeDeviceFunctions,
+  normalizeHeartRateAlarm,
   normalizeSocialMsgData,
   normalizeDeviceVersion,
 } from './device.js';

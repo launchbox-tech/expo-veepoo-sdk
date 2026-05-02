@@ -65,6 +65,7 @@ export type {
   TimeFormat,
   BloodGlucoseUnit,
   DeviceAlarm,
+  HeartRateAlarm,
   DeviceData,
   PermissionsResult,
   PermissionStatus,

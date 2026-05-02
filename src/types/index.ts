@@ -31,6 +31,7 @@ export type {
   SocialMsgData,
   CustomSettingData,
   DeviceAlarm,
+  HeartRateAlarm,
   DeviceData,
 } from './device.js';
 

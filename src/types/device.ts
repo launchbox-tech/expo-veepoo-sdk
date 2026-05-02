@@ -163,6 +163,12 @@ export interface DeviceAlarm {
   text?: string;
 }
 
+export interface HeartRateAlarm {
+  enabled: boolean;
+  highThreshold: number;
+  lowThreshold: number;
+}
+
 export interface DeviceData {
   deviceId: string;
   data: unknown;

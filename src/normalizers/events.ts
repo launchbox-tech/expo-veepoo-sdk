@@ -6,6 +6,7 @@ import {
   normalizeBatteryInfo,
   normalizeDeviceFunctions,
   normalizeDeviceVersion,
+  normalizeHeartRateAlarm,
   normalizeSocialMsgData,
 } from './device.js';
 import {
@@ -102,6 +103,8 @@ export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unk
       return { ...p, data: normalizeSpo2OriginData(p.data) };
     case 'alarmData':
       return { ...p, alarms: normalizeAlarmList(p.alarms ?? p.data) };
+    case 'heartRateAlarmData':
+      return { ...p, data: normalizeHeartRateAlarm(p.data) };
     default:
       return payload;
   }

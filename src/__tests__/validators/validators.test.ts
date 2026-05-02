@@ -6,6 +6,7 @@ import {
   validateAlarm,
   validateDeleteAlarm,
   validateSocialMsgData,
+  validateHeartRateAlarm,
 } from '../../validators/index';
 
 function expectInvalidArgument(fn: () => void, fieldHint?: string): void {
@@ -270,5 +271,45 @@ describe('validateSocialMsgData', () => {
         other: 'close',
       })
     ).not.toThrow();
+  });
+});
+
+describe('validateHeartRateAlarm', () => {
+  const valid = { enabled: true, highThreshold: 120, lowThreshold: 50 };
+
+  it('passes for a valid alarm', () => {
+    expect(() => validateHeartRateAlarm(valid)).not.toThrow();
+  });
+
+  it('passes when enabled is false', () => {
+    expect(() => validateHeartRateAlarm({ ...valid, enabled: false })).not.toThrow();
+  });
+
+  it('throws for highThreshold of 0', () => {
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, highThreshold: 0 }), 'highThreshold');
+  });
+
+  it('throws for highThreshold of 301', () => {
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, highThreshold: 301 }), 'highThreshold');
+  });
+
+  it('throws for lowThreshold of 0', () => {
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, lowThreshold: 0 }), 'lowThreshold');
+  });
+
+  it('throws for lowThreshold of 301', () => {
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, lowThreshold: 301 }), 'lowThreshold');
+  });
+
+  it('throws when lowThreshold equals highThreshold', () => {
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, highThreshold: 100, lowThreshold: 100 }), 'highThreshold');
+  });
+
+  it('throws when lowThreshold is greater than highThreshold', () => {
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, highThreshold: 50, lowThreshold: 120 }), 'highThreshold');
+  });
+
+  it('passes at boundary values 1 and 300', () => {
+    expect(() => validateHeartRateAlarm({ enabled: true, highThreshold: 300, lowThreshold: 1 })).not.toThrow();
   });
 });

@@ -2,6 +2,7 @@ import {
   normalizeAlarmList,
   normalizeBluetoothStatus,
   normalizeEventPayload,
+  normalizeHeartRateAlarm,
   normalizePermissionsResult,
   normalizeReadOriginProgressPayload,
 } from '../normalizers';
@@ -372,5 +373,43 @@ describe('normalizeEventPayload', () => {
     expect(result.data.value).toBe(98);
     expect(result.data.allPackNumber).toBe(10);
     expect(result.data.currentPackNumber).toBe(1);
+  });
+
+  it('heartRateAlarmData: normalizes enabled and thresholds', () => {
+    const result = normalizeEventPayload('heartRateAlarmData', {
+      deviceId: 'd1',
+      data: { enabled: 1, highThreshold: 120, lowThreshold: 50 },
+    }) as any;
+    expect(result.deviceId).toBe('d1');
+    expect(result.data.enabled).toBe(true);
+    expect(result.data.highThreshold).toBe(120);
+    expect(result.data.lowThreshold).toBe(50);
+  });
+});
+
+describe('normalizeHeartRateAlarm', () => {
+  it('coerces numeric enabled to boolean', () => {
+    expect(normalizeHeartRateAlarm({ enabled: 1, highThreshold: 120, lowThreshold: 50 }).enabled).toBe(true);
+    expect(normalizeHeartRateAlarm({ enabled: 0, highThreshold: 120, lowThreshold: 50 }).enabled).toBe(false);
+  });
+
+  it('coerces string thresholds to integers', () => {
+    const result = normalizeHeartRateAlarm({ enabled: true, highThreshold: '120', lowThreshold: '50.9' });
+    expect(result.highThreshold).toBe(120);
+    expect(result.lowThreshold).toBe(50);
+  });
+
+  it('defaults missing fields to false / 0', () => {
+    const result = normalizeHeartRateAlarm({});
+    expect(result.enabled).toBe(false);
+    expect(result.highThreshold).toBe(0);
+    expect(result.lowThreshold).toBe(0);
+  });
+
+  it('defaults all fields for non-object input', () => {
+    const result = normalizeHeartRateAlarm(null);
+    expect(result.enabled).toBe(false);
+    expect(result.highThreshold).toBe(0);
+    expect(result.lowThreshold).toBe(0);
   });
 });
