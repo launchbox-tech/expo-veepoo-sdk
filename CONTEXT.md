@@ -26,4 +26,6 @@ Vocabulary for **Band**, **Session**, **Band Discovery**, and **Pairing** follow
 
 **Cross-platform API shape:** The module keeps a **unified JavaScript API** on iOS and Android for each capability. If the pinned native SDK on one platform has **no** compatible vendor entry point, that platform’s implementation **rejects** with **`CAPABILITY_UNSUPPORTED`** (per **`VeepooError`** / **ADR 0003**), and the gap is recorded in **`docs/vendor-api/vendor-parity-matrix.md`**. Host apps rely on **`readDeviceFunctions()`** and runtime errors rather than platform-conditional TypeScript exports.
 
+**Session semantics (C / D):** New Band-facing APIs **default** to the **same Session eligibility and native invocation patterns** as existing **`DeviceSettings`** flows (connected Band, shared error mapping per **ADR 0003**). If vendor documentation shows a capability requires a **non-standard mode** (e.g. **OTA/DFU** or bulk **dial** transfer), capture the real contract in the implementing **PRD** (and **ADR** only if the trade-off is hard to reverse) before diverging from that default.
+
 _(Grill-with-docs #4 — Q1–Q6.)_
