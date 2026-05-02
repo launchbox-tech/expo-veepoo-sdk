@@ -1,7 +1,7 @@
 # 80 — test(ios): HRV realtime — physical Band verification (#77)
 
-**Status:** open (sync from GitHub)  
-**Labels:** needs-triage
+**Status:** closed — not planned (blocked on #79; sync from GitHub)  
+**Labels:** _(none)_
 
 > https://github.com/launchbox-tech/expo-veepoo-sdk/issues/80
 

@@ -1,7 +1,7 @@
 # 79 — feat(ios): HRV realtime — native bridge, tests, matrix, release (#77)
 
-**Status:** open (sync from GitHub)  
-**Labels:** needs-triage
+**Status:** closed — not planned (vendor API; sync from GitHub)  
+**Labels:** _(none)_
 
 > https://github.com/launchbox-tech/expo-veepoo-sdk/issues/79
 

@@ -1,7 +1,7 @@
 # 78 — feat(ios): HRV realtime — vendor research & go/no-go (#77)
 
-**Status:** open (sync from GitHub)  
-**Labels:** needs-triage
+**Status:** closed (sync from GitHub)  
+**Labels:** _(none)_
 
 > https://github.com/launchbox-tech/expo-veepoo-sdk/issues/78
 

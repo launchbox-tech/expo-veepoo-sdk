@@ -1,8 +1,8 @@
 # 77 — PRD: iOS HRV realtime manual test parity with Android
 
 **GitHub:** https://github.com/launchbox-tech/expo-veepoo-sdk/issues/77  
-**Status:** open  
-**Labels:** needs-triage (sync from GitHub)
+**Status:** closed (completed — maintainer decision / matrix documented; iOS parity blocked on vendor API)  
+**Labels:** _(none; sync from GitHub)_
 
 ## Problem Statement
 
