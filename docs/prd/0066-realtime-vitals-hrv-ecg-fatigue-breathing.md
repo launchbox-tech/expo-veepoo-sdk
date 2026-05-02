@@ -1,7 +1,7 @@
 # 66 — PRD: Realtime vitals (HRV, ECG, fatigue, breathing) JS parity
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/66
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: enhancement
 
 ## Problem Statement
 
