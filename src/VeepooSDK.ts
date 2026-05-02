@@ -16,6 +16,8 @@ import type {
   PermissionsResult,
   EcgTestOptions,
   HeartRateAlarm,
+  ScreenLightDuration,
+  ScreenLightSettings,
   ScanOptions,
   ConnectOptions,
   ConnectionStatus,
@@ -175,6 +177,18 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   startFindDevice = (): Promise<void> => this.deviceSettings.startFindDevice();
 
   stopFindDevice = (): Promise<void> => this.deviceSettings.stopFindDevice();
+
+  readScreenLightSettings = (): Promise<ScreenLightSettings> =>
+    this.deviceSettings.readScreenLightSettings();
+
+  setScreenLightSettings = (settings: ScreenLightSettings): Promise<void> =>
+    this.deviceSettings.setScreenLightSettings(settings);
+
+  readScreenLightDuration = (): Promise<ScreenLightDuration> =>
+    this.deviceSettings.readScreenLightDuration();
+
+  setScreenLightDuration = (seconds: number): Promise<void> =>
+    this.deviceSettings.setScreenLightDuration(seconds);
 
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 

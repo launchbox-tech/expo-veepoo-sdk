@@ -33,6 +33,8 @@ export type {
   DeviceAlarm,
   HeartRateAlarm,
   FindDevicePhase,
+  ScreenLightSettings,
+  ScreenLightDuration,
   DeviceData,
 } from './device.js';
 

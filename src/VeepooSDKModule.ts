@@ -14,6 +14,8 @@ import type {
   Language,
   AutoMeasureSetting,
   HeartRateAlarm,
+  ScreenLightDuration,
+  ScreenLightSettings,
   SleepData,
   SportStepData,
   OriginData,
@@ -79,6 +81,10 @@ export interface VeepooSDKModuleInterface {
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>;
   startFindDevice(): Promise<void>;
   stopFindDevice(): Promise<void>;
+  readScreenLightSettings(): Promise<ScreenLightSettings>;
+  setScreenLightSettings(settings: ScreenLightSettings): Promise<void>;
+  readScreenLightDuration(): Promise<ScreenLightDuration>;
+  setScreenLightDuration(seconds: number): Promise<void>;
   setLogEnabled(enabled: boolean): this;
   isLogEnabled(): boolean;
   setLogger(logger: LogListener | null): this;

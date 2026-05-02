@@ -7,6 +7,7 @@ import type {
   HeartRateAlarm,
   OperationStatus,
   PersonalInfo,
+  ScreenLightSettings,
   VeepooEvent,
   ScanOptions,
   ConnectOptions,
@@ -74,6 +75,10 @@ export interface NativeVeepooSDKInterface {
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>;
   startFindDevice(): Promise<void>;
   stopFindDevice(): Promise<void>;
+  readScreenLightSettings(): Promise<unknown>;
+  setScreenLightSettings(settings: ScreenLightSettings): Promise<void>;
+  readScreenLightDuration(): Promise<unknown>;
+  setScreenLightDuration(seconds: number): Promise<void>;
   addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
   removeListeners(count: number): void;
 }

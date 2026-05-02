@@ -29,6 +29,8 @@ export type { AppState } from "../hooks/appStateReducer";
 export default function Index() {
   const [appState, dispatch] = useReducer(appStateReducer, "initializing");
   const [findPhase, setFindPhase] = useState<string | null>(null);
+  const [screenLightInfo, setScreenLightInfo] = useState<string>("—");
+  const [screenDurationInfo, setScreenDurationInfo] = useState<string>("—");
   const { permissions } = useSDKInit(dispatch);
   const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
   const {
@@ -220,6 +222,55 @@ export default function Index() {
                 accessibilityRole="button"
               >
                 <Text style={styles.buttonTextSecondary}>Stop find</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* ── Screen light & duration (#97) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Screen (brightness / on-time)</Text>
+            <Text style={styles.findPhase} numberOfLines={4}>
+              Brightness: {screenLightInfo}
+            </Text>
+            <Text style={styles.findPhase} numberOfLines={3}>
+              On-time: {screenDurationInfo}
+            </Text>
+            <View style={styles.findRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk
+                    .readScreenLightSettings()
+                    .then(s => setScreenLightInfo(JSON.stringify(s)))
+                    .catch(() =>
+                      setScreenLightInfo("(unsupported or error)")
+                    );
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Read brightness</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk
+                    .readScreenLightDuration()
+                    .then(d => setScreenDurationInfo(JSON.stringify(d)))
+                    .catch(() =>
+                      setScreenDurationInfo("(unsupported or error)")
+                    );
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Read on-time</Text>
               </Pressable>
             </View>
           </View>

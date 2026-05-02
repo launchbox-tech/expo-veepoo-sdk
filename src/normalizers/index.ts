@@ -9,6 +9,8 @@ export {
   normalizeBatteryInfo,
   normalizeDeviceFunctions,
   normalizeHeartRateAlarm,
+  normalizeScreenLightDuration,
+  normalizeScreenLightSettings,
   normalizeSocialMsgData,
   normalizeDeviceVersion,
 } from './device.js';

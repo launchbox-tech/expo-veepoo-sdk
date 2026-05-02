@@ -808,6 +808,22 @@ public class VeepooSDKModule: Module {
       self.handleStopFindDevice(promise: promise)
     }
 
+    AsyncFunction("readScreenLightSettings") { (promise: Promise) in
+      self.handleReadScreenLightSettings(promise: promise)
+    }
+
+    AsyncFunction("setScreenLightSettings") { (settings: [String: Any], promise: Promise) in
+      self.handleSetScreenLightSettings(settings, promise: promise)
+    }
+
+    AsyncFunction("readScreenLightDuration") { (promise: Promise) in
+      self.handleReadScreenLightDuration(promise: promise)
+    }
+
+    AsyncFunction("setScreenLightDuration") { (seconds: Double, promise: Promise) in
+      self.handleSetScreenLightDuration(seconds, promise: promise)
+    }
+
     // MARK: Tests
     AsyncFunction("startHeartRateTest") { (promise: Promise) in
       #if targetEnvironment(simulator)

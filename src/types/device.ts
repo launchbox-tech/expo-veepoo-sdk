@@ -177,6 +177,28 @@ export type FindDevicePhase =
   | 'timeout'
   | 'stopped';
 
+/** Screen brightness schedule (night window + day levels). Vendor `ScreenSetting` / `VPDeviceBrightModel`. */
+export interface ScreenLightSettings {
+  nightStartHour: number;
+  nightStartMinute: number;
+  nightEndHour: number;
+  nightEndMinute: number;
+  nightLevel: number;
+  dayLevel: number;
+  autoAdjust: boolean;
+  maxLevel: number;
+  /** iOS: last manual day brightness gear */
+  lastManualDayLevel?: number;
+}
+
+/** Bright screen duration (seconds). */
+export interface ScreenLightDuration {
+  currentSeconds: number;
+  minSeconds: number;
+  maxSeconds: number;
+  recommendSeconds?: number;
+}
+
 export interface DeviceData {
   deviceId: string;
   data: unknown;

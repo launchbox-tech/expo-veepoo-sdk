@@ -3,6 +3,8 @@ import {
   normalizeAlarmList,
   normalizeAutoMeasureSettings,
   normalizeHeartRateAlarm,
+  normalizeScreenLightDuration,
+  normalizeScreenLightSettings,
 } from "../normalizers/index.js";
 import {
   validatePersonalInfo,
@@ -11,6 +13,8 @@ import {
   validateDeleteAlarm,
   validateDeviceTime,
   validateHeartRateAlarm,
+  validateScreenLightDurationSeconds,
+  validateScreenLightSettings,
 } from "../validators/index.js";
 import type {
   AutoMeasureSetting,
@@ -19,6 +23,8 @@ import type {
   Language,
   OperationStatus,
   PersonalInfo,
+  ScreenLightDuration,
+  ScreenLightSettings,
 } from "../types/index.js";
 import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
 
@@ -193,6 +199,46 @@ export class DeviceSettings {
   stopFindDevice(): Promise<void> {
     return invokeNative({
       invoke: () => this.rt.native.stopFindDevice(),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  readScreenLightSettings(): Promise<ScreenLightSettings> {
+    return invokeNative({
+      invoke: () => this.rt.native.readScreenLightSettings(),
+      normalize: normalizeScreenLightSettings,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setScreenLightSettings(settings: ScreenLightSettings): Promise<void> {
+    return invokeNative({
+      validate: () => validateScreenLightSettings(settings),
+      invoke: () => this.rt.native.setScreenLightSettings(settings),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  readScreenLightDuration(): Promise<ScreenLightDuration> {
+    return invokeNative({
+      invoke: () => this.rt.native.readScreenLightDuration(),
+      normalize: normalizeScreenLightDuration,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setScreenLightDuration(seconds: number): Promise<void> {
+    return invokeNative({
+      validate: () => validateScreenLightDurationSeconds(seconds),
+      invoke: () => this.rt.native.setScreenLightDuration(seconds),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),

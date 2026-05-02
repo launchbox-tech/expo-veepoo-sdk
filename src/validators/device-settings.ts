@@ -1,4 +1,11 @@
-import type { AutoMeasureSetting, DeviceAlarm, FunctionStatus, HeartRateAlarm, SocialMsgData } from '../types/index.js';
+import type {
+  AutoMeasureSetting,
+  DeviceAlarm,
+  FunctionStatus,
+  HeartRateAlarm,
+  ScreenLightSettings,
+  SocialMsgData,
+} from '../types/index.js';
 import { requireInRange, requireValidHour, requireValidMinute } from './shared.js';
 
 const VALID_FUNCTION_STATUSES = new Set<FunctionStatus>([
@@ -57,6 +64,23 @@ export function validateHeartRateAlarm(alarm: HeartRateAlarm): void {
   if (alarm.highThreshold <= alarm.lowThreshold) {
     throw { code: 'INVALID_ARGUMENT', message: 'highThreshold must be greater than lowThreshold' };
   }
+}
+
+export function validateScreenLightSettings(s: ScreenLightSettings): void {
+  requireValidHour(s.nightStartHour, 'nightStartHour');
+  requireValidMinute(s.nightStartMinute, 'nightStartMinute');
+  requireValidHour(s.nightEndHour, 'nightEndHour');
+  requireValidMinute(s.nightEndMinute, 'nightEndMinute');
+  requireInRange(s.nightLevel, 'nightLevel', 0, 15);
+  requireInRange(s.dayLevel, 'dayLevel', 0, 15);
+  requireInRange(s.maxLevel, 'maxLevel', 1, 15);
+  if (s.lastManualDayLevel !== undefined) {
+    requireInRange(s.lastManualDayLevel, 'lastManualDayLevel', 0, 15);
+  }
+}
+
+export function validateScreenLightDurationSeconds(seconds: number): void {
+  requireInRange(seconds, 'seconds', 1, 600);
 }
 
 export function validateDeviceTime(time?: Date): void {

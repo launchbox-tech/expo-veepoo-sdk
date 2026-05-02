@@ -48,8 +48,11 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Alarms | `readAlarms`, `setAlarm`, `deleteAlarm`; `alarmData` | Shipped | TBD |
 | Heart rate alarm thresholds | `readHeartRateAlarm`, `setHeartRateAlarm`; `heartRateAlarmData` | Shipped | TBD |
 | Find Band (phone → Band) | `startFindDevice`, `stopFindDevice`; `findDeviceState` | Shipped | TBD |
+| Screen brightness & on-time | `readScreenLightSettings`, `setScreenLightSettings`, `readScreenLightDuration`, `setScreenLightDuration` | Shipped | TBD |
 
 **Find device:** Gate with `readDeviceFunctions().findDeviceByPhoneFunction`. **Android** uses `startFindDeviceByPhone` / `stopFindDeviceByPhone` (`IFindDevicelistener`). **iOS** uses `veepooSDK_searchDeviceFuntionWithState` + `peripheralModel.searchDeviceFunction`; callback states map to `searching` / `stopped` / `timeout` (no separate `found` phase on iOS — see `rawState`).
+
+**Screen light:** Gate with `readDeviceFunctions().screenLight` / `screenLightTime` where applicable. **Android:** `readScreenLight` / `settingScreenLight` (`ScreenSetting`), `readScreenLightTime` / `setScreenLightTime` (seconds); `VpSpGetUtil.isSupportScreenlight` / `isSupportScreenlightTime`. **iOS:** `veepooSDKSettingBrightWithBrightModel` (mode 2 read / 1 set), `veepooSDKSettingScreenDuration` (mode 2 read / 1 set); duration requires `peripheralModel.screenDurationType == 1`.
 
 ---
 

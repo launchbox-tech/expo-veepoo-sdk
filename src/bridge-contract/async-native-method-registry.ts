@@ -64,6 +64,10 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "setHeartRateAlarm",
   "startFindDevice",
   "stopFindDevice",
+  "readScreenLightSettings",
+  "setScreenLightSettings",
+  "readScreenLightDuration",
+  "setScreenLightDuration",
 ] as const satisfies readonly NativeAsyncMethodName[];
 
 export type NativeAsyncRegistryUnion =

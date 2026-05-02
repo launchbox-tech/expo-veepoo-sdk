@@ -7,6 +7,8 @@ import {
   validateDeleteAlarm,
   validateSocialMsgData,
   validateHeartRateAlarm,
+  validateScreenLightDurationSeconds,
+  validateScreenLightSettings,
   validateDeviceTime,
 } from '../../validators/index';
 
@@ -334,5 +336,36 @@ describe('validateDeviceTime', () => {
 
   it('throws INVALID_ARGUMENT for a number', () => {
     expectInvalidArgument(() => validateDeviceTime(1234567890 as any));
+  });
+});
+
+describe('validateScreenLightSettings', () => {
+  const valid = {
+    nightStartHour: 22,
+    nightStartMinute: 0,
+    nightEndHour: 7,
+    nightEndMinute: 0,
+    nightLevel: 2,
+    dayLevel: 4,
+    autoAdjust: false,
+    maxLevel: 5,
+  };
+
+  it('passes for a typical schedule', () => {
+    expect(() => validateScreenLightSettings(valid)).not.toThrow();
+  });
+
+  it('throws when maxLevel out of range', () => {
+    expectInvalidArgument(() => validateScreenLightSettings({ ...valid, maxLevel: 0 }), 'maxLevel');
+  });
+});
+
+describe('validateScreenLightDurationSeconds', () => {
+  it('passes for in-range seconds', () => {
+    expect(() => validateScreenLightDurationSeconds(10)).not.toThrow();
+  });
+
+  it('throws for zero', () => {
+    expectInvalidArgument(() => validateScreenLightDurationSeconds(0), 'seconds');
   });
 });

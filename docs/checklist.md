@@ -134,7 +134,7 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 
 ### Group C — Device personalization (not in public API yet)
 - [x] **Anti-loss / find device** — [#96](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/96) shipped: `startFindDevice`, `stopFindDevice`; `findDeviceState`. Flag: `findDeviceByPhoneFunction`.
-- [ ] **Screen settings** — [#97](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/97) stub. Flags: `screenLight`, `screenLightTime`. No brightness/duration read/write methods.
+- [x] **Screen settings** — [#97](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/97) shipped: `readScreenLightSettings`, `setScreenLightSettings`, `readScreenLightDuration`, `setScreenLightDuration`. Flags: `screenLight`, `screenLightTime`.
 - [ ] **Sedentary reminder** — [#98](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/98) stub. Flag: `sedentaryRemind`. No `LongSeatSetting` read/write.
 - [ ] **Wrist-flip wake** — [#99](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/99) stub. Flags: `nightTurnSetting`, `isOpenNightTurnWrist`. No dedicated read/write settings API.
 
