@@ -9,6 +9,7 @@ import {
   validateHeartRateAlarm,
   validateScreenLightDurationSeconds,
   validateScreenLightSettings,
+  validateSedentaryReminderSettings,
   validateDeviceTime,
 } from '../../validators/index';
 
@@ -367,5 +368,27 @@ describe('validateScreenLightDurationSeconds', () => {
 
   it('throws for zero', () => {
     expectInvalidArgument(() => validateScreenLightDurationSeconds(0), 'seconds');
+  });
+});
+
+describe('validateSedentaryReminderSettings', () => {
+  const valid = {
+    startHour: 9,
+    startMinute: 0,
+    endHour: 18,
+    endMinute: 0,
+    thresholdMinutes: 60,
+    enabled: true,
+  };
+
+  it('passes for typical window', () => {
+    expect(() => validateSedentaryReminderSettings(valid)).not.toThrow();
+  });
+
+  it('throws when threshold below vendor minimum', () => {
+    expectInvalidArgument(
+      () => validateSedentaryReminderSettings({ ...valid, thresholdMinutes: 20 }),
+      'thresholdMinutes',
+    );
   });
 });

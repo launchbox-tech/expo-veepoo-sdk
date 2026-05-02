@@ -35,6 +35,7 @@ export type {
   FindDevicePhase,
   ScreenLightSettings,
   ScreenLightDuration,
+  SedentaryReminderSettings,
   DeviceData,
 } from './device.js';
 

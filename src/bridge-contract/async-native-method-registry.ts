@@ -68,6 +68,8 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "setScreenLightSettings",
   "readScreenLightDuration",
   "setScreenLightDuration",
+  "readSedentaryReminder",
+  "setSedentaryReminder",
 ] as const satisfies readonly NativeAsyncMethodName[];
 
 export type NativeAsyncRegistryUnion =

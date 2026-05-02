@@ -1,7 +1,7 @@
 # 98 — feat(settings): Sedentary reminder — bridge stub (#95)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/98
-> Status: open | Labels: needs-triage
+> Status: open | Labels: (update when #98 closed on GitHub)
 
 ## Parent
 
@@ -15,11 +15,16 @@ End state: full tracer bullet per `docs/templates/feature-issue.md` — Kotlin +
 
 ## Acceptance criteria
 
-- [ ] Stub replaced or supplemented with vendor research notes (wiki/SDK symbols, iOS vs Android entry points) in a PR or issue comment before merge of implementation PR.
-- [ ] Public JS API + native implementations (or documented **Partial** with `CAPABILITY_UNSUPPORTED` on the gap platform).
-- [ ] Types, validators, normalizers, and unit tests for new payloads / methods.
-- [ ] `docs/vendor-api/vendor-parity-matrix.md` updated for this capability row.
-- [ ] `npm run typecheck` (or project equivalent) and tests green.
+- [x] Stub replaced or supplemented with vendor research notes (wiki/SDK symbols, iOS vs Android entry points) in a PR or issue comment before merge of implementation PR.
+- [x] Public JS API + native implementations (or documented **Partial** with `CAPABILITY_UNSUPPORTED` on the gap platform).
+- [x] Types, validators, normalizers, and unit tests for new payloads / methods.
+- [x] `docs/vendor-api/vendor-parity-matrix.md` updated for this capability row.
+- [x] `npm run typecheck` (or project equivalent) and tests green.
+
+## Shipped API
+
+- `readSedentaryReminder()` → `SedentaryReminderSettings`
+- `setSedentaryReminder(settings)` — validates `thresholdMinutes` 30–240
 
 ## Blocked by
 

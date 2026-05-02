@@ -8,6 +8,7 @@ import type {
   OperationStatus,
   PersonalInfo,
   ScreenLightSettings,
+  SedentaryReminderSettings,
   VeepooEvent,
   ScanOptions,
   ConnectOptions,
@@ -79,6 +80,8 @@ export interface NativeVeepooSDKInterface {
   setScreenLightSettings(settings: ScreenLightSettings): Promise<void>;
   readScreenLightDuration(): Promise<unknown>;
   setScreenLightDuration(seconds: number): Promise<void>;
+  readSedentaryReminder(): Promise<unknown>;
+  setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
   addListener(event: VeepooEvent, listener: (payload: unknown) => void): EventSubscription;
   removeListeners(count: number): void;
 }

@@ -31,6 +31,7 @@ export default function Index() {
   const [findPhase, setFindPhase] = useState<string | null>(null);
   const [screenLightInfo, setScreenLightInfo] = useState<string>("—");
   const [screenDurationInfo, setScreenDurationInfo] = useState<string>("—");
+  const [sedentaryInfo, setSedentaryInfo] = useState<string>("—");
   const { permissions } = useSDKInit(dispatch);
   const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
   const {
@@ -271,6 +272,32 @@ export default function Index() {
                 accessibilityRole="button"
               >
                 <Text style={styles.buttonTextSecondary}>Read on-time</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* ── Sedentary reminder (#98) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Sedentary reminder</Text>
+            <Text style={styles.findPhase} numberOfLines={6}>
+              {sedentaryInfo}
+            </Text>
+            <View style={styles.findRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk
+                    .readSedentaryReminder()
+                    .then(s => setSedentaryInfo(JSON.stringify(s)))
+                    .catch(() => setSedentaryInfo("(unsupported or error)"));
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Read</Text>
               </Pressable>
             </View>
           </View>

@@ -16,6 +16,7 @@ import type {
   HeartRateAlarm,
   ScreenLightDuration,
   ScreenLightSettings,
+  SedentaryReminderSettings,
   SleepData,
   SportStepData,
   OriginData,
@@ -85,6 +86,8 @@ export interface VeepooSDKModuleInterface {
   setScreenLightSettings(settings: ScreenLightSettings): Promise<void>;
   readScreenLightDuration(): Promise<ScreenLightDuration>;
   setScreenLightDuration(seconds: number): Promise<void>;
+  readSedentaryReminder(): Promise<SedentaryReminderSettings>;
+  setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
   setLogEnabled(enabled: boolean): this;
   isLogEnabled(): boolean;
   setLogger(logger: LogListener | null): this;

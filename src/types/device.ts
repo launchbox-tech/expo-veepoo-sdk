@@ -199,6 +199,17 @@ export interface ScreenLightDuration {
   recommendSeconds?: number;
 }
 
+/** Sedentary / long-sit reminder window and threshold. Vendor `LongSeatSetting` / `VPDeviceLongSeatModel`. */
+export interface SedentaryReminderSettings {
+  startHour: number;
+  startMinute: number;
+  endHour: number;
+  endMinute: number;
+  /** Minutes still before the Band reminds (vendor gate; typically 30–240). */
+  thresholdMinutes: number;
+  enabled: boolean;
+}
+
 export interface DeviceData {
   deviceId: string;
   data: unknown;

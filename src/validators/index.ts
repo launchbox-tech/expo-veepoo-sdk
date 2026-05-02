@@ -8,5 +8,6 @@ export {
   validateHeartRateAlarm,
   validateScreenLightSettings,
   validateScreenLightDurationSeconds,
+  validateSedentaryReminderSettings,
   validateDeviceTime,
 } from './device-settings.js';

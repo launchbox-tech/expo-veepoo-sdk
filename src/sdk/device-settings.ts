@@ -5,6 +5,7 @@ import {
   normalizeHeartRateAlarm,
   normalizeScreenLightDuration,
   normalizeScreenLightSettings,
+  normalizeSedentaryReminderSettings,
 } from "../normalizers/index.js";
 import {
   validatePersonalInfo,
@@ -15,6 +16,7 @@ import {
   validateHeartRateAlarm,
   validateScreenLightDurationSeconds,
   validateScreenLightSettings,
+  validateSedentaryReminderSettings,
 } from "../validators/index.js";
 import type {
   AutoMeasureSetting,
@@ -25,6 +27,7 @@ import type {
   PersonalInfo,
   ScreenLightDuration,
   ScreenLightSettings,
+  SedentaryReminderSettings,
 } from "../types/index.js";
 import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
 
@@ -239,6 +242,26 @@ export class DeviceSettings {
     return invokeNative({
       validate: () => validateScreenLightDurationSeconds(seconds),
       invoke: () => this.rt.native.setScreenLightDuration(seconds),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  readSedentaryReminder(): Promise<SedentaryReminderSettings> {
+    return invokeNative({
+      invoke: () => this.rt.native.readSedentaryReminder(),
+      normalize: normalizeSedentaryReminderSettings,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void> {
+    return invokeNative({
+      validate: () => validateSedentaryReminderSettings(settings),
+      invoke: () => this.rt.native.setSedentaryReminder(settings),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),

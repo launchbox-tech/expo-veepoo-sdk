@@ -824,6 +824,14 @@ public class VeepooSDKModule: Module {
       self.handleSetScreenLightDuration(seconds, promise: promise)
     }
 
+    AsyncFunction("readSedentaryReminder") { (promise: Promise) in
+      self.handleReadSedentaryReminder(promise: promise)
+    }
+
+    AsyncFunction("setSedentaryReminder") { (settings: [String: Any], promise: Promise) in
+      self.handleSetSedentaryReminder(settings, promise: promise)
+    }
+
     // MARK: Tests
     AsyncFunction("startHeartRateTest") { (promise: Promise) in
       #if targetEnvironment(simulator)

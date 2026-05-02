@@ -18,6 +18,7 @@ import type {
   HeartRateAlarm,
   ScreenLightDuration,
   ScreenLightSettings,
+  SedentaryReminderSettings,
   ScanOptions,
   ConnectOptions,
   ConnectionStatus,
@@ -189,6 +190,12 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   setScreenLightDuration = (seconds: number): Promise<void> =>
     this.deviceSettings.setScreenLightDuration(seconds);
+
+  readSedentaryReminder = (): Promise<SedentaryReminderSettings> =>
+    this.deviceSettings.readSedentaryReminder();
+
+  setSedentaryReminder = (settings: SedentaryReminderSettings): Promise<void> =>
+    this.deviceSettings.setSedentaryReminder(settings);
 
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 

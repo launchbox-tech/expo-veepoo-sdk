@@ -7,6 +7,7 @@ import type {
   HeartRateAlarm,
   ScreenLightDuration,
   ScreenLightSettings,
+  SedentaryReminderSettings,
   SocialMsgData,
 } from '../types/index.js';
 import { isRecord, toInt, toBoolean, toStringValue, normalizeFunctionStatus } from './shared.js';
@@ -246,6 +247,20 @@ export function normalizeScreenLightDuration(value: unknown): ScreenLightDuratio
     out.recommendSeconds = toInt(record.recommendSeconds);
   }
   return out;
+}
+
+export function normalizeSedentaryReminderSettings(
+  value: unknown,
+): SedentaryReminderSettings {
+  const record = isRecord(value) ? value : {};
+  return {
+    startHour: toInt(record.startHour),
+    startMinute: toInt(record.startMinute),
+    endHour: toInt(record.endHour),
+    endMinute: toInt(record.endMinute),
+    thresholdMinutes: toInt(record.thresholdMinutes, 60),
+    enabled: toBoolean(record.enabled, false),
+  };
 }
 
 export function normalizeFindDeviceStatePayload(value: unknown): {

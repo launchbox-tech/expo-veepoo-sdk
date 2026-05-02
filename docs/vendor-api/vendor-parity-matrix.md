@@ -49,10 +49,13 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Heart rate alarm thresholds | `readHeartRateAlarm`, `setHeartRateAlarm`; `heartRateAlarmData` | Shipped | TBD |
 | Find Band (phone → Band) | `startFindDevice`, `stopFindDevice`; `findDeviceState` | Shipped | TBD |
 | Screen brightness & on-time | `readScreenLightSettings`, `setScreenLightSettings`, `readScreenLightDuration`, `setScreenLightDuration` | Shipped | TBD |
+| Sedentary (long-sit) reminder | `readSedentaryReminder`, `setSedentaryReminder` | Shipped | TBD |
 
 **Find device:** Gate with `readDeviceFunctions().findDeviceByPhoneFunction`. **Android** uses `startFindDeviceByPhone` / `stopFindDeviceByPhone` (`IFindDevicelistener`). **iOS** uses `veepooSDK_searchDeviceFuntionWithState` + `peripheralModel.searchDeviceFunction`; callback states map to `searching` / `stopped` / `timeout` (no separate `found` phase on iOS — see `rawState`).
 
 **Screen light:** Gate with `readDeviceFunctions().screenLight` / `screenLightTime` where applicable. **Android:** `readScreenLight` / `settingScreenLight` (`ScreenSetting`), `readScreenLightTime` / `setScreenLightTime` (seconds); `VpSpGetUtil.isSupportScreenlight` / `isSupportScreenlightTime`. **iOS:** `veepooSDKSettingBrightWithBrightModel` (mode 2 read / 1 set), `veepooSDKSettingScreenDuration` (mode 2 read / 1 set); duration requires `peripheralModel.screenDurationType == 1`.
+
+**Sedentary reminder:** Gate with `readDeviceFunctions().sedentaryRemind`. **Android:** `readLongSeat` / `settingLongSeat` (`LongSeatSetting`); `VpSpGetUtil.isSupportLongseat`. **iOS:** `veepooSDKSettingDeviceLongSeatWithLongSeatModel` (read `settingMode` 2, on `1` / off `0`); threshold (gate) 30–240 minutes per vendor model.
 
 ---
 

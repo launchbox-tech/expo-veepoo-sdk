@@ -11,6 +11,7 @@ export {
   normalizeHeartRateAlarm,
   normalizeScreenLightDuration,
   normalizeScreenLightSettings,
+  normalizeSedentaryReminderSettings,
   normalizeSocialMsgData,
   normalizeDeviceVersion,
 } from './device.js';

@@ -74,6 +74,7 @@ export type {
   FindDevicePhase,
   ScreenLightSettings,
   ScreenLightDuration,
+  SedentaryReminderSettings,
   DeviceData,
   PermissionsResult,
   PermissionStatus,

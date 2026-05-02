@@ -7,6 +7,7 @@ import {
   normalizeReadOriginProgressPayload,
   normalizeScreenLightDuration,
   normalizeScreenLightSettings,
+  normalizeSedentaryReminderSettings,
 } from '../normalizers';
 
 describe('normalizeAlarmList', () => {
@@ -482,5 +483,21 @@ describe('normalizeScreenLightDuration', () => {
     });
     expect(r.currentSeconds).toBe(10);
     expect(r.recommendSeconds).toBe(10);
+  });
+});
+
+describe('normalizeSedentaryReminderSettings', () => {
+  it('coerces fields from native map', () => {
+    const r = normalizeSedentaryReminderSettings({
+      startHour: 8,
+      startMinute: 30,
+      endHour: 20,
+      endMinute: 15,
+      thresholdMinutes: 45,
+      enabled: 1,
+    });
+    expect(r.startHour).toBe(8);
+    expect(r.thresholdMinutes).toBe(45);
+    expect(r.enabled).toBe(true);
   });
 });
