@@ -1,7 +1,7 @@
 # 93 — feat: GitHub Actions — tests with coverage and artifact (#90)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/93  
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: —
 
 ## Parent
 
@@ -13,12 +13,12 @@ Tracer bullet from PRD #90: add a **GitHub Actions** workflow triggered on **pul
 
 ## Acceptance criteria
 
-- [ ] Workflow runs on **pull_request** and **push** to **main**.
-- [ ] Install uses **frozen** lockfile consistent with **bun.lock**.
-- [ ] Runs **tests with coverage** and uploads a **coverage** artifact reviewers can download.
-- [ ] **Concurrency** cancels in-progress runs for the same PR ref (or equivalent deduplication).
-- [ ] Artifact upload runs even when the job fails, and does not fail when **coverage/** is absent.
-- [ ] No third-party coverage host in this slice.
+- [x] Workflow runs on **pull_request** and **push** to **main**.
+- [x] Install uses **frozen** lockfile consistent with **bun.lock**.
+- [x] Runs **tests with coverage** and uploads a **coverage** artifact reviewers can download.
+- [x] **Concurrency** cancels in-progress runs for the same PR ref (or equivalent deduplication).
+- [x] Artifact upload runs even when the job fails, and does not fail when **coverage/** is absent.
+- [x] No third-party coverage host in this slice.
 
 ## Blocked by
 

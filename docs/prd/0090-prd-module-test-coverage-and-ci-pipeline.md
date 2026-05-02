@@ -1,7 +1,7 @@
 # PRD: Module test coverage reports and CI quality pipeline
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/90
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: — | Delivered: #91–#94
 
 ## Problem Statement
 

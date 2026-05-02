@@ -1,7 +1,7 @@
 # 91 — feat: Informational Jest coverage for module TypeScript (#90)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/91  
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: —
 
 ## Parent
 
@@ -15,12 +15,12 @@ End-to-end: a contributor runs the coverage script locally and opens the HTML re
 
 ## Acceptance criteria
 
-- [ ] Jest config defines **collectCoverageFrom** for module sources with appropriate exclusions (e.g. `__tests__`, `*.d.ts`).
-- [ ] Coverage reporters include at least **text-summary**, **html**, and **lcov**; output directory is gitignored where applicable.
-- [ ] **package.json** exposes a one-shot **`test:coverage`** (or documented equivalent) suitable for CI (no watch).
-- [ ] No **coverageThreshold** / percentage gates in this slice.
-- [ ] Default **`test`** / **`expo-module test`** behavior unchanged unless the project already standardizes on a flag (coverage only when using the coverage script).
-- [ ] All existing Jest suites pass.
+- [x] Jest config defines **collectCoverageFrom** for module sources with appropriate exclusions (e.g. `__tests__`, `*.d.ts`).
+- [x] Coverage reporters include at least **text-summary**, **html**, and **lcov**; output directory is gitignored where applicable.
+- [x] **package.json** exposes a one-shot **`test:coverage`** (or documented equivalent) suitable for CI (no watch).
+- [x] No **coverageThreshold** / percentage gates in this slice.
+- [x] Default **`test`** / **`expo-module test`** behavior unchanged unless the project already standardizes on a flag (coverage only when using the coverage script).
+- [x] All existing Jest suites pass.
 
 ## Blocked by
 

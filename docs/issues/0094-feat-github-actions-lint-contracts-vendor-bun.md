@@ -1,7 +1,7 @@
 # 94 — feat: GitHub Actions — lint, contracts, vendor, Bun pin, cache (#90)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/94  
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: —
 
 ## Parent
 
@@ -13,12 +13,12 @@ Tracer bullet from PRD #90: extend the CI workflow with **lint**, **typecheck**,
 
 ## Acceptance criteria
 
-- [ ] **lint** and **typecheck** run and fail the job on error.
-- [ ] **build** runs once; contract CLIs consume emitted output without redundant full **tsc** per CLI.
-- [ ] Separate named steps for **events contract**, **rejection contract**, and **vendor check**.
-- [ ] **packageManager** pins Bun; **setup-bun** resolves the toolchain from **package.json** (no floating **latest** in CI).
-- [ ] **actions/cache** (or equivalent) caches **Bun** install cache with a lockfile-scoped primary key.
-- [ ] **Vendor** check fails when **git ls-remote** cannot run or remotes are unreachable (no silent pass).
+- [x] **lint** and **typecheck** run and fail the job on error.
+- [x] **build** runs once; contract CLIs consume emitted output without redundant full **tsc** per CLI.
+- [x] Separate named steps for **events contract**, **rejection contract**, and **vendor check**.
+- [x] **packageManager** pins Bun; **setup-bun** resolves the toolchain from **package.json** (no floating **latest** in CI).
+- [x] **actions/cache** (or equivalent) caches **Bun** install cache with a lockfile-scoped primary key.
+- [x] **Vendor** check fails when **git ls-remote** cannot run or remotes are unreachable (no silent pass).
 
 ## Blocked by
 

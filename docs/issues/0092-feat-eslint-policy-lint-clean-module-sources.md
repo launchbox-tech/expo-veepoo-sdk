@@ -1,7 +1,7 @@
 # 92 — feat: ESLint policy and lint-clean module sources (#90)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/92  
-> Status: open | Labels: needs-triage
+> Status: closed | Labels: —
 
 ## Parent
 
@@ -13,10 +13,10 @@ Tracer bullet from PRD #90: make **`lint`** reliable for CI by adding an ESLint 
 
 ## Acceptance criteria
 
-- [ ] **`bun run lint`** / **`npm run lint`** passes on the repo.
-- [ ] Test-only ESLint override is scoped to test paths and documents why **`any`** is allowed there.
-- [ ] Production fixes are lint-driven and consistent with **ADR 0003** and **`CONTEXT.md`** (no opportunistic behavior changes).
-- [ ] All existing Jest suites pass.
+- [x] **`bun run lint`** / **`npm run lint`** passes on the repo.
+- [x] Test-only ESLint override is scoped to test paths and documents why **`any`** is allowed there.
+- [x] Production fixes are lint-driven and consistent with **ADR 0003** and **`CONTEXT.md`** (no opportunistic behavior changes).
+- [x] All existing Jest suites pass.
 
 ## Blocked by
 
