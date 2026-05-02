@@ -13,14 +13,14 @@ Refactor the **`VeepooSDK`** **implementation** into **internal domain modules**
 
 ## Acceptance criteria
 
-- [ ] Public **`VeepooSDK`** API and default export unchanged for host apps.
-- [ ] Internal structure groups methods by domain concern; **facade** is thin delegation + shared construction.
-- [ ] **Subscription** / teardown paths have a **single** obvious owner module.
-- [ ] Regression suite passes; **tree-shaking** / bundle impact neutral or improved for default import.
+- [x] Public **`VeepooSDK`** API and default export unchanged for host apps.
+- [x] Internal structure groups methods by domain concern; **facade** is thin delegation + shared construction.
+- [x] **Subscription** / teardown paths have a **single** obvious owner module (`VeepooSDKRuntime`: native subscriptions + `teardownNativeListeners`).
+- [x] Regression suite passes; **tree-shaking** / bundle impact neutral or improved for default import.
 
 ## Blocked by
 
-- #87 (all methods already on pipeline)
+- ~~#87~~ (closed — unblocked)
 
 ## Type
 

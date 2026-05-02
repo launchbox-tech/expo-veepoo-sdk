@@ -49,15 +49,17 @@ export function sliceSwiftEventsHeader(swiftSource: string): string {
   return swiftSource.slice(0, idx);
 }
 
-/** `setupEventListeners` string literals in VeepooSDK.ts */
+/** `setupEventListeners` string literals in `veepoo-sdk-runtime.ts` */
 export function extractVeepooSDKListenerEvents(source: string): Set<string> {
   const start = source.indexOf("const events: VeepooEvent[] = [");
   if (start === -1) {
-    throw new Error("src/VeepooSDK.ts: missing events array");
+    throw new Error("src/sdk/veepoo-sdk-runtime.ts: missing events array");
   }
   const sub = source.slice(start);
   const close = sub.indexOf("];");
-  if (close === -1) throw new Error("src/VeepooSDK.ts: unclosed events array");
+  if (close === -1) {
+    throw new Error("src/sdk/veepoo-sdk-runtime.ts: unclosed events array");
+  }
   const block = sub.slice(0, close);
   const out = new Set<string>();
   for (const m of block.matchAll(/"([a-z][a-zA-Z0-9]*)"/g)) {
@@ -115,7 +117,7 @@ export function verifyVeepooEventsContract(repoRoot: string): string[] {
   const swift = extractSwiftNativeEvents(
     sliceSwiftEventsHeader(readFileSync(swiftPath, "utf8")),
   );
-  const sdkPath = join(repoRoot, "src/VeepooSDK.ts");
+  const sdkPath = join(repoRoot, "src/sdk/veepoo-sdk-runtime.ts");
   const listeners = extractVeepooSDKListenerEvents(readFileSync(sdkPath, "utf8"));
   const typesPath = join(repoRoot, "src/types/events.ts");
   const tsUnion = extractTsVeepooEventUnion(readFileSync(typesPath, "utf8"));
@@ -123,7 +125,7 @@ export function verifyVeepooEventsContract(repoRoot: string): string[] {
   const checks: Array<[string, Set<string>, Set<string>]> = [
     ["Kotlin VeepooSDKConstants.kt", expectedNative, kotlin],
     ["Swift VeepooSDK.swift (header)", expectedNative, swift],
-    ["VeepooSDK.ts setupEventListeners", expectedNative, listeners],
+    ["veepoo-sdk-runtime.ts setupEventListeners", expectedNative, listeners],
     ["TypeScript VeepooEvent ∪ contract", expectedUnion, tsUnion],
   ];
 
