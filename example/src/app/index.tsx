@@ -829,105 +829,18 @@ export default function Index() {
     );
   }
 
-  // ─── Idle / Scanning ──────────────────────────────────────────────────────
+    // ─── Idle / Scanning ──────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
-      <View style={styles.header}>
-        <Text style={styles.title}>HBand Connect</Text>
-        <Text style={styles.version}>@gaozh1024/expo-veepoo-sdk v1.2.11</Text>
-      </View>
-
-      <View style={styles.scanControls}>
-        {!permissionsGranted && permissions?.canAskAgain === false ? (
-          <>
-            <Text style={styles.permissionHint}>
-              Bluetooth access was permanently denied. Open Settings to grant
-              permission.
-            </Text>
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.buttonPrimary,
-                pressed && styles.buttonPressed,
-              ]}
-              onPress={() => Linking.openSettings()}
-              accessibilityRole="button"
-              accessibilityLabel="Open app settings to grant Bluetooth permission"
-            >
-              <Text style={styles.buttonText}>Open Settings</Text>
-            </Pressable>
-          </>
-        ) : !permissionsGranted ? (
-          <Text style={styles.permissionHint}>
-            Bluetooth permission is required to scan for devices.
-          </Text>
-        ) : null}
-
-        {appState === "scanning" ? (
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              styles.buttonStop,
-              pressed && styles.buttonPressed,
-            ]}
-            onPress={stopScan}
-            accessibilityRole="button"
-          >
-            <ActivityIndicator
-              size="small"
-              color="#fff"
-              style={styles.spinnerInline}
-            />
-            <Text style={styles.buttonText}>Stop Scan</Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              permissionsGranted ? styles.buttonPrimary : styles.buttonDisabled,
-              pressed && permissionsGranted && styles.buttonPressed,
-            ]}
-            disabled={!permissionsGranted}
-            onPress={startScan}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !permissionsGranted }}
-          >
-            <Text
-              style={[
-                styles.buttonText,
-                !permissionsGranted && styles.buttonTextDisabled,
-              ]}
-            >
-              Start Scan
-            </Text>
-          </Pressable>
-        )}
-      </View>
-
-      {(appState === "scanning" || devices.length > 0) && (
-        <FlatList
-          data={devices}
-          keyExtractor={item => item.id}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              Scanning for nearby HBand devices…
-            </Text>
-          }
-          renderItem={({ item }) => (
-            <DeviceRow device={item} onConnect={() => connect(item)} />
-          )}
-        />
-      )}
-    </SafeAreaView>
-  );
-}
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
+    <ScanScreen
+      permissions={permissions}
+      appState={appState}
+      devices={devices}
+      startScan={startScan}
+      stopScan={stopScan}
+      connect={connect}
+    />
+  );// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   centered: {
