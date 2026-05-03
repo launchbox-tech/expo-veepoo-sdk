@@ -819,6 +819,11 @@ public class VeepooSDKModule: Module {
       self.handleSetHeartRateAlarm(alarm, promise: promise)
     }
 
+    // MARK: Time
+    AsyncFunction("setDeviceTime") { (time: [String: Any]?, promise: Promise) in
+      self.handleSetDeviceTime(time, promise: promise)
+    }
+
     AsyncFunction("startFindDevice") { (promise: Promise) in
       self.handleStartFindDevice(promise: promise)
     }

@@ -66,6 +66,7 @@ class VeepooSDKModule : Module() {
     defineWriteData(this@VeepooSDKModule)
     defineAlarms(this@VeepooSDKModule)
     defineHeartRateAlarm(this@VeepooSDKModule)
+    defineTime(this@VeepooSDKModule)
     defineFindDevice(this@VeepooSDKModule)
     defineScreenLight(this@VeepooSDKModule)
     defineSedentary(this@VeepooSDKModule)
