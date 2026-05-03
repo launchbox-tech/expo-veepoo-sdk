@@ -13,6 +13,7 @@ import {
   normalizeWatchFaceStyle,
   normalizeContactList,
   normalizeSosCallTimesSettings,
+  normalizeWeatherSettings,
 } from '../normalizers';
 
 describe('normalizeAlarmList', () => {
@@ -617,7 +618,6 @@ describe('normalizeWomenHealthSettings', () => {
 });
 
 describe('normalizeWeatherSettings', () => {
-  const { normalizeWeatherSettings } = require('../normalizers');
 
   it('normalizes a valid weather settings object', () => {
     const r = normalizeWeatherSettings({ isOpen: true, unit: 'C', crc: 99 });

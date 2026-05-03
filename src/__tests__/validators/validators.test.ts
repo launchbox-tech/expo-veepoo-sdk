@@ -16,6 +16,11 @@ import {
   validateReadWatchFaceStyleOptions,
   validateWatchFaceStyleSettings,
   validateDeviceTime,
+  validateWeatherSettings,
+  validateWeatherData,
+  validateNewContact,
+  validateContactId,
+  validateSosCallTimes,
 } from '../../validators/index';
 
 function expectInvalidArgument(fn: () => void, fieldHint?: string): void {
@@ -500,7 +505,6 @@ describe('validateWomenHealthSettings', () => {
 });
 
 describe('validateWeatherSettings', () => {
-  const { validateWeatherSettings } = require('../../validators/index');
 
   it('passes for valid Celsius settings', () => {
     expect(() => validateWeatherSettings({ isOpen: true, unit: 'C', crc: 0 })).not.toThrow();
@@ -524,7 +528,6 @@ describe('validateWeatherSettings', () => {
 });
 
 describe('validateWeatherData', () => {
-  const { validateWeatherData } = require('../../validators/index');
 
   const validHourly = [{
     time: '2026-05-02 12:00',
@@ -604,7 +607,6 @@ describe('validateWeatherData', () => {
 });
 
 describe('validateNewContact', () => {
-  const { validateNewContact } = require('../../validators/index');
 
   it('passes for a valid contact', () => {
     expect(() => validateNewContact({ name: 'Alice', phoneNumber: '+1234567890' })).not.toThrow();
@@ -636,7 +638,6 @@ describe('validateNewContact', () => {
 });
 
 describe('validateContactId', () => {
-  const { validateContactId } = require('../../validators/index');
 
   it('passes for zero', () => {
     expect(() => validateContactId(0)).not.toThrow();
@@ -656,7 +657,6 @@ describe('validateContactId', () => {
 });
 
 describe('validateSosCallTimes', () => {
-  const { validateSosCallTimes } = require('../../validators/index');
 
   it('passes for 1', () => {
     expect(() => validateSosCallTimes(1)).not.toThrow();
