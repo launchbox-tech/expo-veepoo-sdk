@@ -1,4 +1,3 @@
-import type { EventSubscription } from "expo-modules-core";
 import { Platform } from "react-native";
 
 import type {
@@ -16,22 +15,34 @@ import { normalizeEventPayload } from "../normalizers/index.js";
 import { mapNativeRejection } from "../errors/map-native-rejection.js";
 import { VeepooSdkState } from "./veepoo-sdk-state.js";
 import { OriginReadProgressFilter } from "../bridge/origin-read-progress-filter.js";
-
-export type EventListener = (payload: unknown) => void;
+import { EventBus } from "../bridge/event-bus.js";
 
 /**
- * Shared **Session** / scan / init state (`state`), logging, native subscriptions, and JS event hub.
- * Single owner for `nativeSubscriptions` teardown (see `teardownNativeListeners`).
+ * Shared **Session** / scan / init state (`state`), logging, and wiring between
+ * the native module, `EventBus`, and domain subsystems.
  */
 export class VeepooSDKRuntime {
   readonly native: NativeVeepooSDKInterface;
   readonly state = new VeepooSdkState();
   private readonly originProgressFilter = new OriginReadProgressFilter();
-  private eventListenersSetup = false;
+  private readonly bus = new EventBus(
+    (error, event, payload) => {
+      this.log(
+        "error",
+        "listener",
+        `listener.${event}.failed`,
+        `Event listener for ${event} threw`,
+        {
+          deviceId: this.getPayloadDeviceId(payload),
+          error,
+          data: payload,
+        },
+      );
+      console.error(`Error in event listener for ${event}:`, error);
+    },
+  );
   private logEnabled = false;
   private logger: LogListener | null = null;
-  private listeners: Map<VeepooEvent, Set<EventListener>> = new Map();
-  private nativeSubscriptions: EventSubscription[] = [];
 
   constructor(native: NativeVeepooSDKInterface) {
     this.native = native;
@@ -110,76 +121,9 @@ export class VeepooSDKRuntime {
   }
 
   setupEventListeners(): void {
-    if (this.eventListenersSetup) return;
-    this.eventListenersSetup = true;
-
-    const events: VeepooEvent[] = [
-      "deviceFound",
-      "deviceConnected",
-      "deviceDisconnected",
-      "deviceConnectStatus",
-      "deviceReady",
-      "bluetoothStateChanged",
-      "deviceFunction",
-      "deviceVersion",
-      "passwordData",
-      "socialMsgData",
-      "readOriginProgress",
-      "readOriginComplete",
-      "originFiveMinuteData",
-      "originHalfHourData",
-      "sleepData",
-      "sportStepData",
-      "heartRateTestResult",
-      "bloodPressureTestResult",
-      "bloodOxygenTestResult",
-      "temperatureTestResult",
-      "stressData",
-      "bloodGlucoseData",
-      "hrvTestResult",
-      "ecgTestResult",
-      "fatigueTestResult",
-      "breathingTestResult",
-      "bodyCompositionTestResult",
-      "batteryData",
-      "connectionStatusChanged",
-      "originSpo2Data",
-      "alarmData",
-      "findDeviceState",
-      "firmwareDfuProgress",
-      "contactsData",
-      "sosCallTimesData",
-      "cameraShutter",
-      "musicRemoteCommand",
-      "deviceBTStateChanged",
-      "deviceSosTriggered",
-      "customSettingsData",
-      "healthRemindData",
-      "apneaRemindData",
-      "sportModeData",
-      "bloodAnalysisTestResult",
-      "gsrTestResult",
-      "exerciseSessionData",
-      "accurateSleepData",
-      "storedTemperatureData",
-      "storedBloodGlucoseData",
-      "storedHrvData",
-      "storedEcgData",
-      "storedBodyCompositionData",
-      "pttTestResult",
-      "pttStateChanged",
-      "error",
-    ];
-
-    events.forEach(event => {
-      const subscription = this.native.addListener(
-        event,
-        (payload: unknown) => {
-          this.emitLocal(event, payload);
-        },
-      );
-      this.nativeSubscriptions.push(subscription);
-    });
+    this.bus.setupEventListeners(this.native, (event, payload) =>
+      this.emitLocal(event, payload),
+    );
   }
 
   emitLocal(event: VeepooEvent, payload: unknown): void {
@@ -247,27 +191,7 @@ export class VeepooSDKRuntime {
       }
     }
 
-    const eventListeners = this.listeners.get(event);
-    if (eventListeners) {
-      eventListeners.forEach(listener => {
-        try {
-          listener(normalizedPayload);
-        } catch (e) {
-          this.log(
-            "error",
-            "listener",
-            `listener.${event}.failed`,
-            `Event listener for ${event} threw`,
-            {
-              deviceId: this.getPayloadDeviceId(normalizedPayload),
-              error: e,
-              data: normalizedPayload,
-            },
-          );
-          console.error(`Error in event listener for ${event}:`, e);
-        }
-      });
-    }
+    this.bus.emit(event, normalizedPayload);
   }
 
   private getEventScope(event: VeepooEvent): LogScope {
@@ -375,52 +299,33 @@ export class VeepooSDKRuntime {
     event: K,
     listener: (payload: VeepooEventPayload[K]) => void,
   ): void {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set());
-    }
-    this.listeners.get(event)!.add(listener as EventListener);
+    this.bus.on(event, listener);
   }
 
   off<K extends VeepooEvent>(
     event: K,
     listener: (payload: VeepooEventPayload[K]) => void,
   ): void {
-    const eventListeners = this.listeners.get(event);
-    if (eventListeners) {
-      eventListeners.delete(listener as EventListener);
-    }
+    this.bus.off(event, listener);
   }
 
   once<K extends VeepooEvent>(
     event: K,
     listener: (payload: VeepooEventPayload[K]) => void,
   ): void {
-    const wrapper: EventListener = payload => {
-      this.listeners.get(event)?.delete(wrapper);
-      (listener as EventListener)(payload);
-    };
-    if (!this.listeners.has(event)) this.listeners.set(event, new Set());
-    this.listeners.get(event)!.add(wrapper);
+    this.bus.once(event, listener);
   }
 
   removeAllListeners(event?: VeepooEvent): void {
-    if (event) {
-      this.listeners.delete(event);
-    } else {
-      this.listeners.clear();
-    }
+    this.bus.removeAllListeners(event);
   }
 
   teardownNativeListeners(): void {
-    this.nativeSubscriptions.forEach(subscription => {
-      subscription.remove();
-    });
-    this.nativeSubscriptions = [];
-    this.eventListenersSetup = false;
+    this.bus.teardownNativeListeners();
   }
 
   resetAfterDestroy(): void {
-    this.listeners.clear();
+    this.bus.removeAllListeners();
     this.state.reset();
     this.logger = null;
     this.logEnabled = false;
