@@ -1,8 +1,8 @@
 import { invokeNative } from "../bridge/native-invoke-pipeline.js";
-import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
+import type { LifecycleRuntime } from "./subsystem-interfaces.js";
 
 export class SdkLifecycle {
-  constructor(private readonly rt: VeepooSDKRuntime) {}
+  constructor(private readonly rt: LifecycleRuntime) {}
 
   async init(): Promise<void> {
     if (this.rt.state.isInitialized) return;

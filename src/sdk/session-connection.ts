@@ -9,11 +9,11 @@ import type {
   ConnectionStatus,
   PasswordData,
 } from "../types/index.js";
-import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
+import type { SessionInterface, SubsystemRuntime } from "./subsystem-interfaces.js";
 
 /** Session-oriented connection: connect, disconnect, password, status. */
-export class SessionConnection {
-  constructor(private readonly rt: VeepooSDKRuntime) {}
+export class SessionConnection implements SessionInterface {
+  constructor(private readonly rt: SubsystemRuntime) {}
 
   async connect(deviceId: string, options?: ConnectOptions): Promise<void> {
     validateDeviceId(deviceId);

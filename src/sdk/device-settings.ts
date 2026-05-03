@@ -61,11 +61,11 @@ import type {
   WeatherSettings,
   WeatherData,
 } from "../types/index.js";
-import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
+import type { DeviceSettingsInterface, SubsystemRuntime } from "./subsystem-interfaces.js";
 
 /** Device configuration: personal info, auto-measure, language, time, alarms. */
-export class DeviceSettings {
-  constructor(private readonly rt: VeepooSDKRuntime) {}
+export class DeviceSettings implements DeviceSettingsInterface {
+  constructor(private readonly rt: SubsystemRuntime) {}
 
   syncPersonalInfo(info: PersonalInfo): Promise<boolean> {
     return invokeNative({

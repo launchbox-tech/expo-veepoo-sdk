@@ -21,11 +21,11 @@ import type {
   SocialMsgData,
   SportStepData,
 } from "../types/index.js";
-import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
+import type { HealthDataInterface, SubsystemRuntime } from "./subsystem-interfaces.js";
 
 /** Historical and device read APIs (battery, functions, origin, sleep, sport, social). */
-export class HealthData {
-  constructor(private readonly rt: VeepooSDKRuntime) {}
+export class HealthData implements HealthDataInterface {
+  constructor(private readonly rt: SubsystemRuntime) {}
 
   async readBattery(): Promise<BatteryInfo> {
     this.rt.log("debug", "device", "battery.read.start", "Reading battery info", {

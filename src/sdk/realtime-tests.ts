@@ -1,10 +1,10 @@
 import { invokeNative } from "../bridge/native-invoke-pipeline.js";
 import type { LogScope, EcgTestOptions } from "../types/index.js";
-import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
+import type { RealtimeTestsInterface, SubsystemRuntime } from "./subsystem-interfaces.js";
 
 /** Realtime manual tests (vitals modalities). */
-export class RealtimeTests {
-  constructor(private readonly rt: VeepooSDKRuntime) {}
+export class RealtimeTests implements RealtimeTestsInterface {
+  constructor(private readonly rt: SubsystemRuntime) {}
 
   private invokeRealtimeTestVoid(
     scope: LogScope,

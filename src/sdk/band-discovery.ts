@@ -3,11 +3,11 @@ import {
   normalizePermissionsResult,
 } from "../normalizers/index.js";
 import type { ScanOptions, PermissionsResult } from "../types/index.js";
-import type { VeepooSDKRuntime } from "./veepoo-sdk-runtime.js";
+import type { BandDiscoveryInterface, SubsystemRuntime } from "./subsystem-interfaces.js";
 
 /** Band Discovery: Bluetooth, permissions, scan start/stop. */
-export class BandDiscovery {
-  constructor(private readonly rt: VeepooSDKRuntime) {}
+export class BandDiscovery implements BandDiscoveryInterface {
+  constructor(private readonly rt: SubsystemRuntime) {}
 
   async checkBluetoothStatus(): Promise<boolean> {
     return invokeNative({
