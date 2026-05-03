@@ -21,6 +21,7 @@ import type {
 } from './device.js';
 import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings.js';
 import type {
+  AccurateSleepSession,
   BloodGlucoseData,
   ExerciseSession,
   HalfHourData,
@@ -153,6 +154,8 @@ export type VeepooEventPayload = {
   gsrTestResult: { deviceId: string; result: GsrTestResult };
   /** Emitted once per session as exercise history syncs from Band. */
   exerciseSessionData: { deviceId: string; session: ExerciseSession };
+  /** Emitted per accurate sleep session (one per night). Gate: sleepType > 0 (iOS) / isSupportPreciseSleep (Android). */
+  accurateSleepData: { deviceId: string; date: string; data: AccurateSleepSession };
   error: VeepooError;
 };
 

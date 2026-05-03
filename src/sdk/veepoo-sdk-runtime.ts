@@ -158,6 +158,7 @@ export class VeepooSDKRuntime {
       "bloodAnalysisTestResult",
       "gsrTestResult",
       "exerciseSessionData",
+      "accurateSleepData",
       "error",
     ];
 

@@ -47,7 +47,8 @@
     "sportModeData",
     "bloodAnalysisTestResult",
     "gsrTestResult",
-    "exerciseSessionData"
+    "exerciseSessionData",
+    "accurateSleepData"
   ],
   "jsLocalOnly": ["heartRateAlarmData"]
 }

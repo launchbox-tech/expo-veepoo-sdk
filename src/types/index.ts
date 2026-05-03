@@ -79,6 +79,9 @@ export type {
   Spo2OriginData,
   ExerciseMinuteData,
   ExerciseSession,
+  SleepMinuteState,
+  SleepMinutePoint,
+  AccurateSleepSession,
 } from './health-data.js';
 
 export type {

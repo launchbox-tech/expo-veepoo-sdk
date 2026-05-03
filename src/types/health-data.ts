@@ -165,6 +165,46 @@ export interface Spo2OriginData {
   currentPackNumber: number;
 }
 
+/** Sleep state for a single minute point in the detailed sleep curve. */
+export type SleepMinuteState = 'deep' | 'light' | 'rem' | 'insomnia' | 'awake';
+
+export interface SleepMinutePoint {
+  /** 0-based minute index from sleep start. */
+  index: number;
+  state: SleepMinuteState;
+}
+
+/** Detailed sleep session from the accurate-sleep read path. */
+export interface AccurateSleepSession {
+  /** Timestamp string "YYYY-MM-DD HH:MM:SS" */
+  sleepTime: string;
+  wakeTime: string;
+  /** Deep sleep duration in minutes */
+  deepDuration: number;
+  /** Light sleep duration in minutes */
+  lightDuration: number;
+  /** REM duration in minutes (otherDuration on Android) */
+  remDuration: number;
+  /** Wake/getUp duration in minutes */
+  getUpDuration: number;
+  /** Total sleep duration in minutes */
+  sleepDuration: number;
+  /** Number of wake-ups */
+  getUpTimes: number;
+  /** Sleep quality 0–4 (0=worst, 4=best) */
+  sleepQuality: number;
+  /** Insomnia score */
+  insomniaScore: number;
+  /** Number of insomnia events */
+  insomniaTimes: number;
+  /** Fall-asleep efficiency score */
+  fallAsleepScore: number;
+  /** Sleep efficiency score */
+  sleepEfficiencyScore: number;
+  /** Per-minute sleep state curve */
+  curve: SleepMinutePoint[];
+}
+
 export interface ExerciseMinuteData {
   heartRate: number;
   distance: number;
