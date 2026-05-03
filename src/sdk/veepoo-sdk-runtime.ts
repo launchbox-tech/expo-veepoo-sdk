@@ -15,6 +15,7 @@ import type { LogListener } from "../VeepooSDKModule.js";
 import { normalizeEventPayload } from "../normalizers/index.js";
 import { mapNativeRejection } from "../errors/map-native-rejection.js";
 import { VeepooSdkState } from "./veepoo-sdk-state.js";
+import { OriginReadProgressFilter } from "../bridge/origin-read-progress-filter.js";
 
 export type EventListener = (payload: unknown) => void;
 
@@ -25,6 +26,7 @@ export type EventListener = (payload: unknown) => void;
 export class VeepooSDKRuntime {
   readonly native: NativeVeepooSDKInterface;
   readonly state = new VeepooSdkState();
+  private readonly originProgressFilter = new OriginReadProgressFilter();
   private eventListenersSetup = false;
   private logEnabled = false;
   private logger: LogListener | null = null;
@@ -190,22 +192,13 @@ export class VeepooSDKRuntime {
     ) {
       const deviceId =
         this.getPayloadDeviceId(normalizedPayload) ?? "__default__";
-      const progressValue = normalizedPayload.progress.progress;
-      const readState = normalizedPayload.progress.readState;
-      const lastProgress = this.state.getLastReadOriginProgress(deviceId);
+      const progressValue = normalizedPayload.progress.progress as number;
+      const readState = normalizedPayload.progress.readState as
+        | string
+        | undefined;
 
-      if (typeof progressValue === "number" && Number.isFinite(progressValue)) {
-        if (
-          readState === "start" ||
-          lastProgress === undefined ||
-          progressValue < lastProgress
-        ) {
-          this.state.recordReadOriginProgress(deviceId, progressValue);
-        } else if (progressValue === lastProgress) {
-          return;
-        } else {
-          this.state.recordReadOriginProgress(deviceId, progressValue);
-        }
+      if (!this.originProgressFilter.shouldEmit(deviceId, readState, progressValue)) {
+        return;
       }
     }
 
@@ -229,20 +222,15 @@ export class VeepooSDKRuntime {
 
     if (event === "deviceConnected") {
       const device = normalizedPayload as { deviceId?: string };
-      if (typeof device.deviceId === "string" && device.deviceId.length > 0) {
-        this.state.setConnectedDeviceId(device.deviceId);
-      }
+      this.state.onDeviceConnected(device.deviceId ?? "");
     }
 
     if (event === "deviceDisconnected") {
       const device = normalizedPayload as { deviceId?: string };
-      if (!device.deviceId || this.state.connectedDeviceId === device.deviceId) {
-        this.state.setConnectedDeviceId(null);
-      }
+      this.state.onDeviceDisconnected(device.deviceId);
       if (device.deviceId) {
-        this.state.clearReadOriginProgressForDevice(device.deviceId);
+        this.originProgressFilter.clearDevice(device.deviceId);
       }
-      this.state.setScanning(false);
     }
 
     if (
@@ -253,12 +241,8 @@ export class VeepooSDKRuntime {
         deviceId?: string;
         status?: ConnectionStatus;
       };
-      if (
-        connection.status === "disconnected" &&
-        (!connection.deviceId ||
-          this.state.connectedDeviceId === connection.deviceId)
-      ) {
-        this.state.setConnectedDeviceId(null);
+      if (connection.status) {
+        this.state.onConnectionStatusChanged(connection.deviceId, connection.status);
       }
     }
 
