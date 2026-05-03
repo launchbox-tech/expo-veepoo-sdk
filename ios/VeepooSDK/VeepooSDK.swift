@@ -34,6 +34,7 @@ enum VeepooEvent {
   static let cameraShutter = "cameraShutter"
   static let musicRemoteCommand = "musicRemoteCommand"
   static let deviceBTStateChanged = "deviceBTStateChanged"
+  static let deviceSosTriggered = "deviceSosTriggered"
   static let error = "error"
 }
 
@@ -67,6 +68,7 @@ let FIRMWARE_DFU_PROGRESS = VeepooEvent.firmwareDfuProgress
 let CAMERA_SHUTTER = VeepooEvent.cameraShutter
 let MUSIC_REMOTE_COMMAND = VeepooEvent.musicRemoteCommand
 let DEVICE_BT_STATE_CHANGED = VeepooEvent.deviceBTStateChanged
+let DEVICE_SOS_TRIGGERED = VeepooEvent.deviceSosTriggered
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -227,6 +229,7 @@ public class VeepooSDKModule: Module {
       CAMERA_SHUTTER,
       MUSIC_REMOTE_COMMAND,
       DEVICE_BT_STATE_CHANGED,
+      DEVICE_SOS_TRIGGERED,
       ERROR
     )
 

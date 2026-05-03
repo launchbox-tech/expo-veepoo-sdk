@@ -39,7 +39,8 @@
     "musicRemoteCommand",
     "deviceBTStateChanged",
     "stressData",
-    "temperatureTestResult"
+    "temperatureTestResult",
+    "deviceSosTriggered"
   ],
   "jsLocalOnly": ["heartRateAlarmData"]
 }

@@ -150,6 +150,7 @@ export class VeepooSDKRuntime {
       "cameraShutter",
       "musicRemoteCommand",
       "deviceBTStateChanged",
+      "deviceSosTriggered",
       "error",
     ];
 

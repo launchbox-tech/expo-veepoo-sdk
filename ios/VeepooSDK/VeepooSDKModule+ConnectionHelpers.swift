@@ -302,6 +302,13 @@ extension VeepooSDKModule {
         }
       }
     }
+
+    self.peripheralManage?.ReceiveDeviceSOSCommand = { [weak self] in
+      guard let self = self else { return }
+      self.sendEvent(DEVICE_SOS_TRIGGERED, [
+        "deviceId": self.connectedDeviceId ?? ""
+      ])
+    }
     #endif
   }
 

@@ -135,6 +135,8 @@ export type VeepooEventPayload = {
     btSwitchOpen: boolean;
     mediaSwitchOpen: boolean;
   };
+  /** Fired when the Band triggers its hardware SOS button. iOS only — no vendor Android callback documented. */
+  deviceSosTriggered: { deviceId: string };
   error: VeepooError;
 };
 
