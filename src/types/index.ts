@@ -108,7 +108,10 @@ export type {
   CustomSettings,
   ApneaRemindSettings,
   OperationStatus,
+  SportMode,
+  SportModeStatus,
 } from './settings.js';
+export { SPORT_MODE_ORDINALS } from './settings.js';
 
 export type {
   VeepooEvent,

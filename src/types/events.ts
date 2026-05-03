@@ -19,7 +19,7 @@ import type {
   SocialMsgData,
   SosCallTimesSettings,
 } from './device.js';
-import type { ApneaRemindSettings, CustomSettings } from './settings.js';
+import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings.js';
 import type {
   BloodGlucoseData,
   HalfHourData,
@@ -143,6 +143,8 @@ export type VeepooEventPayload = {
   healthRemindData: { deviceId: string; data: HealthReminder };
   /** iOS only — emitted on read response. Android vendor has no equivalent. */
   apneaRemindData: { deviceId: string; data: ApneaRemindSettings };
+  /** Fired when the Band finishes/stops a sport session. Android: SportModelStateData; iOS: deviceSportDidFinishBlock. */
+  sportModeData: { deviceId: string; mode: SportMode | null };
   error: VeepooError;
 };
 

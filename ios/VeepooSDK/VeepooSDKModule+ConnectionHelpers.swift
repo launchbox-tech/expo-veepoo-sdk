@@ -309,6 +309,45 @@ extension VeepooSDKModule {
         "deviceId": self.connectedDeviceId ?? ""
       ])
     }
+
+    self.peripheralManage?.deviceSportDidFinishBlock = { [weak self] runningMode in
+      guard let self = self else { return }
+      let ordinals: [String] = [
+        "common",
+        "outdoorRun", "outdoorWalk", "indoorRun", "indoorWalk", "hiking",
+        "stairStepper", "outdoorCycle", "stationaryBike", "elliptical", "rowingMachine",
+        "mountaineering", "swimming", "sitUps", "skiing", "jumpRope",
+        "yoga", "tableTennis", "basketball", "volleyball", "football",
+        "badminton", "tennis", "climbStairs", "fitness", "weightlifting",
+        "diving", "boxing", "gymBall", "squatTraining", "triathlon",
+        "dance", "hiit", "rockClimbing", "sports", "balls",
+        "fitnessGame", "freeTime", "aerobics", "gymnastics", "floorExercise",
+        "horizontalBar", "parallelBars", "trampoline", "trackAndField", "marathon",
+        "pushUps", "dumbbell", "rugby", "handball", "baseballSoftball",
+        "baseball", "hockey", "golf", "bowling", "billiards",
+        "rowing", "sailboat", "skating", "curling", "icePuck",
+        "sled", "strongWalk", "treadmill", "trailRunning", "raceWalking",
+        "mountainBiking", "bmx", "orienteering", "fishing", "hunting",
+        "skateboard", "rollerSkating", "parkour", "atv", "motocross",
+        "climbingMachine", "spinningBike", "indoorFitness", "mixedAerobic", "crossTraining",
+        "bodybuildingExercise", "groupGymnastics", "kickboxing", "strengthTraining", "steppingTraining",
+        "coreTraining", "flexibilityTraining", "freeTraining", "pilates", "battleRope",
+        "squareDance", "ballroomDancing", "bellyDance", "ballet", "hipHop",
+        "zumba", "latinDance", "jazz", "hipHopDance", "poleDancing",
+        "breakDance", "nationalDance", "modernDance", "disco", "tapDance",
+        "wrestling", "martialArts", "taiChi", "muayThai", "judo",
+        "taekwondo", "karate", "freeSparring", "swordsmanship", "jujitsu",
+        "fencing", "beachSoccer", "beachVolleyball", "softball", "squash",
+        "croquet", "cricket", "polo", "wallball", "takrawBall",
+        "dodgeball", "waterPolo",
+      ]
+      let idx = runningMode.rawValue
+      let modeName: String? = (idx >= 1 && idx < ordinals.count) ? ordinals[idx] : nil
+      self.sendEvent(SPORT_MODE_DATA, [
+        "deviceId": self.connectedDeviceId ?? "",
+        "mode": modeName as Any
+      ])
+    }
     #endif
   }
 

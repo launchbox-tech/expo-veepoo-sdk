@@ -43,7 +43,8 @@
     "deviceSosTriggered",
     "customSettingsData",
     "healthRemindData",
-    "apneaRemindData"
+    "apneaRemindData",
+    "sportModeData"
   ],
   "jsLocalOnly": ["heartRateAlarmData"]
 }

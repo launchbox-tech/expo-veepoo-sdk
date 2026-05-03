@@ -154,6 +154,7 @@ export class VeepooSDKRuntime {
       "customSettingsData",
       "healthRemindData",
       "apneaRemindData",
+      "sportModeData",
       "error",
     ];
 
