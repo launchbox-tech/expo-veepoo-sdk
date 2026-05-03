@@ -133,7 +133,7 @@ export function attachSessionBaseline(
 ): SessionBaselineHandle {
   let destroyed = false;
 
-  const listener = (_payload: { deviceId: string }) => {
+  const listener = () => {
     if (destroyed) return;
     void runSessionBaseline(sdk, config).then((result) => {
       if (!destroyed) {
@@ -142,13 +142,15 @@ export function attachSessionBaseline(
     });
   };
 
-  sdk.on('deviceReady', listener as any);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sdk.on('deviceReady', listener as (payload: any) => void);
 
   return {
     destroy() {
       if (destroyed) return;
       destroyed = true;
-      sdk.off('deviceReady', listener as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sdk.off('deviceReady', listener as (payload: any) => void);
     },
   };
 }

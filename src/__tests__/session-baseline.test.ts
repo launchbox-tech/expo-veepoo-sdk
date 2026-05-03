@@ -11,7 +11,7 @@ import {
 } from '../bridge-contract/async-native-method-registry';
 import { VeepooSDK } from '../VeepooSDK';
 import type { NativeVeepooSDKInterface } from '../NativeVeepooSDK';
-import type { PersonalInfo, BatteryInfo, DeviceVersion } from '../types/index';
+import type { PersonalInfo } from '../types/index';
 import {
   runSessionBaseline,
   attachSessionBaseline,
@@ -95,8 +95,7 @@ const PERSONAL_INFO: PersonalInfo = {
   sleepAim: 480,
 };
 
-const BATTERY: BatteryInfo = { level: 80, state: 'charging' };
-const VERSION: DeviceVersion = { version: '1.2.3' } as DeviceVersion;
+
 
 // ── Tests ───────────────────────────────────────────────────────────
 
