@@ -41,6 +41,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Battery | `readBattery`; `batteryData` | Shipped | TBD |
 | Firmware / device version | `readDeviceVersion`; `deviceVersion` | Shipped | TBD |
 | Capability flags | `readDeviceFunctions`; `deviceFunction` | Shipped | TBD |
+| Device function package reporting (v1.1.8+) | `readDeviceFunctions`; `deviceFunction` | Shipped — bridge merges all five `DeviceFunctionPackage` objects into `DeviceFunction`; Android-only (iOS uses `VPPeripheralModel`) | TBD |
 | Language | `setLanguage` | Shipped | TBD |
 | Notification prefs (social) | `readSocialMsgData`, `writeSocialMsgData`; `socialMsgData` | Shipped | TBD |
 | Auto measurement windows | `readAutoMeasureSetting`, `modifyAutoMeasureSetting` | Shipped | TBD |
@@ -116,11 +117,13 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Fatigue (manual realtime) | `startFatigueTest`, `stopFatigueTest`; `fatigueTestResult` | Shipped | TBD |
 | Breathing rate (manual realtime) | `startBreathingTest`, `stopBreathingTest`; `breathingTestResult` | Shipped | TBD |
 | Body composition (manual realtime) | `startBodyCompositionTest`, `stopBodyCompositionTest`; `bodyCompositionTestResult` | Shipped | TBD |
+| Mini-checkup (comprehensive 10-param health assessment) | — | Not in JS | — |
+| GSR / galvanic skin response (skin conductance) | — | Not in JS | — |
 
 ### Further notes (realtime vitals, PRD #66)
 
 - **Single active realtime test:** Starting any supported `start*Test` while another realtime test is active rejects with **`REALTIME_TEST_IN_PROGRESS`** ([issue #67](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/67)). Eligibility errors may use **`DEVICE_NOT_READY`**, **`DEVICE_NOT_CONNECTED`**, or **`CAPABILITY_UNSUPPORTED`** ([`VeepooErrorCode`](../src/types/errors.ts) in source).
-- **HRV:** **Android** uses `readDeviceManualData` + `DeviceManualDataType.HRV` with `IDeviceManualDetectDataListener.onHrvManualDataChange` (polling loop in `VeepooSDKModuleHelpers.kt`). **iOS** (`VPPeripheralBaseManage.h`): `VPManualTestDataType` defines only blood pressure and heart rate bits—no HRV; `readManualTestDataWithTimestamp` returns `VPManualTestDataModel` (manual BP). Historical HRV uses `veepooSdkStartReadDeviceHrvData` / DB helpers, not an app-driven manual realtime test. There is no `veepooSDKTestHrvStart`-style entry point alongside stress/temperature/ECG. **`startHrvTest`** therefore rejects with **`CAPABILITY_UNSUPPORTED`** with a message pointing here; use **historical HRV** or **Android** for this modality until the vendor ships a documented iOS equivalent.
+- **HRV:** **Android** uses `readDeviceManualData` + `DeviceManualDataType.HRV` with `IDeviceManualDetectDataListener.onHrvManualDataChange` (polling loop in `VeepooSDKModuleHelpers.kt`). **iOS** (through v1.1.4): `VPManualTestDataType` defines only blood pressure and heart rate bits—no HRV; `readManualTestDataWithTimestamp` returns `VPManualTestDataModel` (manual BP). Historical HRV uses `veepooSdkStartReadDeviceHrvData` / DB helpers, not an app-driven manual realtime test. **iOS v1.2.0** adds a dedicated HRV measurement API (not yet documented in this offline snapshot — consult live iOS wiki). **`startHrvTest`** currently rejects with **`CAPABILITY_UNSUPPORTED`** on iOS with a message pointing here; update this bridge once the iOS v1.2.0 HRV API is documented.
 - **ECG:** Summary-style fields are always emitted on `ecgTestResult`. **`startEcgTest({ includeWaveform: true })`** may populate `result.waveform` when the Band and native stack support it; payloads can be large.
 - **Breathing:** **iOS** uses `veepooSDKTestBreathingRateStart`; **Android** uses `startDetectBreath` / `stopDetectBreath` with `BreathData` (maps `deviceState` / progress / value into the same `breathingTestResult` shape as iOS).
 - **Body composition:** Gate with `readDeviceFunctions().bodyComponent` where applicable. **Android:** `startDetectBodyComponent` / `stopDetectBodyComponent` (`IBodyComponentDetectListener`, `BodyComponent`); `VpSpGetUtil.isSupportBodyComponent`. **iOS:** `veepooSDKTestBodyCompositionStart` (progress + `VPDeviceBodyCompositionState` / `VPBodyCompositionValueModel`); `peripheralModel.bodyCompositionType`. **Partial:** historical `readBodyComponentData` / DB offline lists are **not** bridged in this slice.
@@ -144,6 +147,16 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 - Server / marketplace dial transfer, custom photo push pipelines, video dials (beyond slot read/set)  
 - AGPS ephemeris transfer, device-initiated live GPS feed, KAABA direction APIs  
 - Advanced Band BT controls (auto-reconnect, audio routing, clear pairing, manual connect/disconnect)
+- Mini-checkup comprehensive health assessment (`startMiniCheckup` / `stopMiniCheckup` Android v1.1.7; iOS equivalent TBD)
+- GSR / galvanic skin response detection (`startGsrDetect` / `stopGsrDetect` Android v1.1.9; iOS `veepooSDK_gsrDetectStart` v1.1.5)
+- Multi-type manual measurement data retrieval (Android v1.2.2 — 12 types; iOS v1.1.8 — 6 types via `readManualTestDataWithTimestamp`)
+- Nordic OTA (Android v1.2.4; iOS v1.1.9) — `startLocalFirmwareDfu` currently covers JL/Jerry path only
+- Health Assistance, Health Glance (iOS v1.1.5)
+- AI function (iOS v1.1.7); sport-control set/read/report, device rename (Android v1.2.6)
+- App-side HRV detection (Android v1.2.8; iOS v1.2.0); ECG diagnosis (Android v1.2.7)
+- Connection confirmation pop-up (Android v1.2.3; iOS v1.1.9)
+- QX17 IMU/GPS/HR flow control + vibration motor (Android v1.2.9)
+- JE136P TCM data distribution (iOS v1.2.0)
 
 Treat gaps as **Not in JS** until a PR adds methods **and** updates this matrix.
 

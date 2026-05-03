@@ -20,7 +20,22 @@
 | 1.1.1 | 1. Personal info API weight parameter<br />2. Skin tone levels (device-dependent) | 2024.11.30 |
 | 1.1.2 | Sport mode read: removed packet-position comments | 2024.12.12 |
 | 1.1.3 | 1. Auto-measure read/write (`0xB3`)<br />2. Manual BP measurement reads | 2025.06.10 |
-| 1.1.4 | Rich push (image + text) | 2025.10.27 |
+| 1.1.4 | Blood glucose stop measurement interface fix | 2025.06.16 |
+| 1.1.5 | Text & image push function | 2025.10.27 |
+| 1.1.6 | JH58 PPG & acceleration raw data reporting | 2025.10.31 |
+| 1.1.7 | Mini-checkup (comprehensive health assessment) | 2025.11.04 |
+| 1.1.8 | Device function package reporting; deprecated `onFunctionSupportDataChange` | 2025.11.19 |
+| 1.1.9 | GSR (galvanic skin response) start/stop APIs | 2025.11.24 |
+| 1.2.0 | ZT163 always-off-screen function | 2025.12.27 |
+| 1.2.1 | Micro-Physical-Exam V2; health reminders; 4G functionality | 2026.01.09 |
+| 1.2.2 | Manual measurement data — 12 types; device-supported-types list | 2026.04.08 |
+| 1.2.3 | Connection confirmation (pop-up) | 2026.04.16 |
+| 1.2.4 | Nordic OTA upgrade | 2026.04.17 |
+| 1.2.5 | SDK import documentation | 2026.04.21 |
+| 1.2.6 | Sport control (set/read/report); device rename | 2026.04.22 |
+| 1.2.7 | ECG diagnosis interface | 2026.04.22 |
+| 1.2.8 | App-side HRV detection | 2026.04.23 |
+| 1.2.9 | QX17 IMU/GPS/HR flow control; vibration motor control | 2026.04.29 |
 
 ## General interface class
 
@@ -9459,5 +9474,370 @@ VPOperateManager.getInstance().pushImageMsg(pushImagePath, new IImageMsgPushList
     }
 });
 ```
+
+## Mini-checkup function (v1.1.7)
+
+Performs a unified comprehensive health assessment combining multiple sensor measurements in a single ~60-second test cycle. Covers cardiovascular, metabolic, psychological, and body-composition data.
+
+Prerequisite: device must support the mini-checkup feature:
+
+```kotlin
+VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportMiniCheckup
+```
+
+Note: All interfaces below are only callable when the device supports this function.
+
+### Start mini-checkup
+
+###### API
+
+```java
+public void startMiniCheckup(IBleWriteResponse bleWriteResponse, IMiniCheckupOptListener listener)
+```
+
+###### Parameters
+
+| Parameter name   | Type                    | Description |
+| ---------------- | ----------------------- | ----------- |
+| bleWriteResponse | IBleWriteResponse       | BLE write-operation monitoring (BLE transport success only; measurement outcome comes via listener) |
+| listener         | IMiniCheckupOptListener | Measurement event callbacks |
+
+### Stop mini-checkup
+
+###### API
+
+```java
+public void stopMiniCheckup(IBleWriteResponse bleWriteResponse, IMiniCheckupOptListener listener)
+```
+
+###### Parameters
+
+Same parameters as `startMiniCheckup`.
+
+### IMiniCheckupOptListener
+
+Listener interface for all mini-checkup callbacks:
+
+```java
+public interface IMiniCheckupOptListener {
+
+    /**
+     * Measurement step progress (0–100).
+     */
+    void onMiniCheckupProgress(int progress);
+
+    /**
+     * Basic 10-parameter result available.
+     */
+    void onMiniCheckupSuccess(MiniCheckupResultData data);
+
+    /**
+     * Extended detail result available (includes sub-component breakdown).
+     * Fired after onMiniCheckupSuccess when detail data is supported.
+     */
+    void onMiniCheckupDetailSuccess(MiniCheckupDetailData data);
+
+    /**
+     * Measurement failed.
+     */
+    void onMiniCheckupTestFailed(EMiniCheckupTestErrorCode errorCode);
+
+    /**
+     * Stop command acknowledged successfully.
+     */
+    void onMiniCheckupStopSuccess();
+}
+```
+
+### MiniCheckupResultData
+
+Basic 10-parameter summary accessible via getter methods:
+
+| Getter | Unit | Description |
+| ------ | ---- | ----------- |
+| `getHeartRate()` | bpm | Heart rate |
+| `getBloodOxygen()` | % | Blood oxygen saturation (SpO2) |
+| `getStress()` | score | Psychological stress index |
+| `getEmotion()` | score | Emotional state index |
+| `getFatigue()` | score | Fatigue level |
+| `getBloodGlucose()` | mmol/L | Blood glucose (type 0 = unsupported; type 1 = mmol/L value; type 2 = risk level) |
+| `getBodyTemperature()` | °C | Body temperature (`-273.15f` = unsupported) |
+| `getSystolicBloodPressure()` | mmHg | Systolic blood pressure |
+| `getDiastolicBloodPressure()` | mmHg | Diastolic blood pressure |
+| `getHrv()` | ms | Heart rate variability |
+
+### MiniCheckupDetailData
+
+Extended result with sub-component objects (each may be `null` when unsupported by the connected Band):
+
+**MiniCheckupBasePersonalInfo** — echoed personal data used for body-composition calculations:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| gender | int | 0 = female, 1 = male |
+| age | int | Age (years) |
+| height | int | Height (cm) |
+| weight | int | Weight (kg) |
+
+**MiniCheckupBPAirPump** — air-pump blood pressure:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| systolic | int | Systolic BP (mmHg) |
+| diastolic | int | Diastolic BP (mmHg) |
+
+**MiniCheckupBPPhotoelectric** — PPG-based (photoelectric) blood pressure:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| systolic | int | Systolic BP (mmHg) |
+| diastolic | int | Diastolic BP (mmHg) |
+
+**MiniCheckupBloodComponent** — blood chemistry panel:
+
+| Getter | Unit | Description |
+| ------ | ---- | ----------- |
+| `getUricAcid()` | µmol/L | Uric acid (gout/kidney indicator) |
+| `gettCHO()` | mmol/L | Total cholesterol |
+| `gettAG()` | mmol/L | Triglycerides |
+| `gethDL()` | mmol/L | HDL cholesterol |
+| `getlDL()` | mmol/L | LDL cholesterol |
+
+**MiniCheckupBodyComponent** — body composition:
+
+| Getter | Unit | Description |
+| ------ | ---- | ----------- |
+| `getBMI()` | kg/m² | Body Mass Index |
+| `getBodyFatPercentage()` | % | Body fat percentage |
+| `getFatMass()` | kg | Fat mass |
+| `getMusclePercentage()` | % | Muscle percentage |
+| `getMuscleMass()` | kg | Muscle mass |
+| `getSkeletalMusclePercentage()` | % | Skeletal muscle percentage |
+| `getSubcutaneousFat()` | % | Subcutaneous fat ratio |
+| `getBodyWaterPercentage()` | % | Body water percentage |
+| `getWaterContent()` | kg | Water content |
+| `getBoneMass()` | kg | Bone mass |
+| `getProteinProportion()` | % | Protein proportion |
+| `getProteinMass()` | kg | Protein mass |
+| `getBasalMetabolicRate()` | kcal/day | Basal metabolic rate |
+
+**MiniCheckupSkinElectricity** — galvanic skin response / psychophysiological panel:
+
+| Getter | Description |
+| ------ | ----------- |
+| `getEmotion()` | Emotional state score |
+| `getSkinMoistureContent()` | Skin hydration level |
+| `getDepressionRisk()` | Mental health indicator |
+| `getSympathetic()` | Autonomic nervous system (sympathetic) activation |
+| `getCortisol()` | Estimated cortisol (stress hormone) level |
+
+### EMiniCheckupStep
+
+Enumeration of measurement phases reported during progress callbacks:
+
+```kotlin
+enum class EMiniCheckupStep {
+    STEP_PREPARE,           // Preparation / calibration phase
+    STEP_HEART_RATE,        // Measuring heart rate
+    STEP_BLOOD_OXYGEN,      // Measuring SpO2
+    STEP_BLOOD_PRESSURE,    // Measuring blood pressure
+    STEP_HRV,               // Measuring HRV
+    STEP_STRESS,            // Analyzing stress level
+    STEP_EMOTION,           // Analyzing emotional state
+    STEP_FATIGUE,           // Measuring fatigue
+    STEP_BLOOD_GLUCOSE,     // Measuring blood glucose
+    STEP_TEMPERATURE,       // Measuring body temperature
+    STEP_BLOOD_COMPONENT,   // Analyzing blood chemistry
+    STEP_BODY_COMPONENT,    // Analyzing body composition
+    STEP_SKIN_ELECTRICITY,  // Measuring skin conductance (GSR)
+    STEP_COMPLETE           // All measurements complete
+}
+```
+
+### EMiniCheckupTestErrorCode
+
+Error codes delivered via `onMiniCheckupTestFailed`:
+
+| Code | Description |
+| ---- | ----------- |
+| `SENSOR_ERROR` | Hardware sensor failure |
+| `TIMEOUT` | Measurement timed out |
+| `MOVEMENT_DETECTED` | User motion interrupted measurement |
+| `DISCONNECTED` | BLE connection lost during test |
+| `LOW_BATTERY` | Battery insufficient to complete test |
+
+###### Sample code
+
+```kotlin
+VPOperateManager.getInstance().startMiniCheckup(
+    { code ->
+        if (code != Code.REQUEST_SUCCESS) {
+            Log.e("TAG", "BLE write failed: $code")
+        }
+    },
+    object : IMiniCheckupOptListener {
+        override fun onMiniCheckupProgress(progress: Int) {
+            Log.d("TAG", "Mini-checkup progress: $progress%")
+        }
+
+        override fun onMiniCheckupSuccess(data: MiniCheckupResultData) {
+            Log.d("TAG", "HR=${data.heartRate} SpO2=${data.bloodOxygen} Stress=${data.stress}")
+        }
+
+        override fun onMiniCheckupDetailSuccess(data: MiniCheckupDetailData) {
+            val bodyComp = data.bodyComponent
+            if (bodyComp != null) {
+                Log.d("TAG", "BMI=${bodyComp.bmi} BodyFat=${bodyComp.bodyFatPercentage}%")
+            }
+            val skinElec = data.skinElectricity
+            if (skinElec != null) {
+                Log.d("TAG", "Emotion=${skinElec.emotion} Depression=${skinElec.depressionRisk}")
+            }
+        }
+
+        override fun onMiniCheckupTestFailed(errorCode: EMiniCheckupTestErrorCode) {
+            Log.e("TAG", "Mini-checkup failed: $errorCode")
+        }
+
+        override fun onMiniCheckupStopSuccess() {
+            Log.d("TAG", "Mini-checkup stopped")
+        }
+    }
+)
+```
+
+---
+
+## GSR detection function (v1.1.9)
+
+Measures galvanic skin response (skin electrical conductance) for stress and emotional-state assessment.
+
+Prerequisite: device must support GSR measurement:
+
+```kotlin
+VpSpGetUtil.getVpSpVariInstance(applicationContext).isSupportGsrDetect
+```
+
+### Start GSR detection
+
+###### API
+
+```kotlin
+VPOperateManager.getInstance().startGsrDetect(bleWriteResponse, listener)
+```
+
+###### Parameters
+
+| Parameter name   | Type                  | Description |
+| ---------------- | --------------------- | ----------- |
+| bleWriteResponse | IBleWriteResponse     | BLE write monitoring |
+| listener         | IGsrDetectListener    | GSR result callbacks |
+
+### Stop GSR detection
+
+###### API
+
+```kotlin
+VPOperateManager.getInstance().stopGsrDetect(bleWriteResponse)
+```
+
+###### Parameters
+
+| Parameter name   | Type              | Description |
+| ---------------- | ----------------- | ----------- |
+| bleWriteResponse | IBleWriteResponse | BLE write monitoring |
+
+### IGsrDetectListener
+
+```kotlin
+interface IGsrDetectListener {
+
+    /**
+     * Called each time a GSR measurement result arrives.
+     */
+    fun onGsrDetectResult(result: GsrDetectResult)
+}
+```
+
+### GsrDetectResult
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| gsrValue | Int | GSR measurement value (skin conductance) |
+| ack | GsrDetectAck | Detection acknowledgment / phase |
+
+### GsrDetectAck
+
+```kotlin
+enum class GsrDetectAck {
+    ACK_START,     // Detection initiated on device
+    ACK_COMPLETE,  // Detection cycle finished, result valid
+    ACK_FAIL       // Detection unsuccessful
+}
+```
+
+###### Sample code
+
+```kotlin
+VPOperateManager.getInstance().startGsrDetect(
+    { code ->
+        if (code != Code.REQUEST_SUCCESS) Log.e("TAG", "GSR write failed: $code")
+    },
+    object : IGsrDetectListener {
+        override fun onGsrDetectResult(result: GsrDetectResult) {
+            when (result.ack) {
+                GsrDetectAck.ACK_START    -> Log.d("TAG", "GSR started on device")
+                GsrDetectAck.ACK_COMPLETE -> Log.d("TAG", "GSR value: ${result.gsrValue}")
+                GsrDetectAck.ACK_FAIL     -> Log.e("TAG", "GSR detection failed")
+            }
+        }
+    }
+)
+
+// Stop detection when done:
+VPOperateManager.getInstance().stopGsrDetect { code ->
+    Log.d("TAG", "GSR stop ack: $code")
+}
+```
+
+---
+
+## Device function package reporting (v1.1.8)
+
+Version 1.1.8 deprecated the monolithic `onFunctionSupportDataChange(FunctionDeviceSupportData)` callback (still present for backwards compatibility) and replaced it with five typed package callbacks on `IDeviceDataListener`:
+
+```kotlin
+// New — preferred
+fun onDeviceFunctionPackage1Report(pkg: DeviceFunctionPackage1)
+fun onDeviceFunctionPackage2Report(pkg: DeviceFunctionPackage2)
+fun onDeviceFunctionPackage3Report(pkg: DeviceFunctionPackage3)
+fun onDeviceFunctionPackage4Report(pkg: DeviceFunctionPackage4)
+fun onDeviceFunctionPackage5Report(pkg: DeviceFunctionPackage5)
+
+// Deprecated — may be removed in a future SDK version
+@Deprecated
+fun onFunctionSupportDataChange(functionSupport: FunctionDeviceSupportData)
+```
+
+Each `DeviceFunctionPackageN` object exposes the same `EFunctionStatus`-typed fields as before, partitioned into five groups to avoid the 256-byte protocol limit. Refer to the vendor wiki for the field list per package; the bridge currently reads all flags via `readDeviceFunctions()` which merges all five packages into `DeviceFunction`.
+
+---
+
+## Notes on versions 1.2.x (not yet fully documented in this snapshot)
+
+The following capabilities were added in the 1.2.x line and are not yet reflected in this offline snapshot. Consult the live [Android API wiki](https://github.com/HBandSDK/Android_Ble_SDK/wiki/VeepooSDK-Android-API-Document) for details.
+
+| Version | Feature | Notes |
+| ------- | ------- | ----- |
+| 1.2.0 | ZT163 always-off-screen | Likely mirrors the iOS `veepooSDK_ZT163*` APIs |
+| 1.2.1 | Micro-Physical-Exam V2; health reminders; 4G | Extended micro-exam with health reminder scheduling; 4G network band config |
+| 1.2.2 | Manual measurement data — 12 types; type list | Expands `readDeviceManualData` to 12 `DeviceManualDataType` values; adds query API for which types the device supports |
+| 1.2.3 | Connection confirmation (pop-up) | Device shows a pairing/connection confirmation pop-up; app must respond |
+| 1.2.4 | Nordic OTA | Adds the Nordic DFU path alongside the existing JL (Jerry) OTA path |
+| 1.2.5 | SDK import docs | Documentation only |
+| 1.2.6 | Sport control (set/read/report); device rename | App can set active sport mode on the Band and rename the device |
+| 1.2.7 | ECG diagnosis | On-device ECG analysis with diagnostic output |
+| 1.2.8 | App-side HRV detection | HRV measurement initiated from the app (not from Band gesture) |
+| 1.2.9 | QX17 IMU/GPS/HR flow control; vibration motor | QX17 custom device: start/stop IMU, GPS, HR streams; vibration motor control |
 
 ###

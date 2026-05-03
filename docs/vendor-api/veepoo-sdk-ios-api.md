@@ -21,6 +21,12 @@
 | 1.1.2 | Micro physical exam on/off; manual micro-exam data | 2025.11.03 |
 | 1.1.3 | ZT163 always-off display | 2025.12.26 |
 | 1.1.4 | MET and stress features | 2025.12.27 |
+| 1.1.5 | Health Assistance; GSR detection; Health Glance | 2025.12.30 |
+| 1.1.6 | 4G function; activate ring sports mode from app | 2026.01.05 |
+| 1.1.7 | AI function | 2026.01.07 |
+| 1.1.8 | Manual measurement data retrieval for HR, BP, temperature, SpO2, blood components, blood glucose | 2026.04.02 |
+| 1.1.9 | Nordic OTA; connection confirmation (device pop-up) | 2026.04.16 |
+| 1.2.0 | JE136P customized TCM data; HRV measurement; Bluetooth name change | 2026.04.23 |
 
 # SDK initialization
 
@@ -5689,3 +5695,92 @@ VPBleCentralManage.sharedBleManager().peripheralManage.veepooSDK_stressTestStart
             
  }
 ```
+
+---
+
+## GSR detection (v1.1.5)
+
+Measures galvanic skin response (skin electrical conductance). Added alongside Health Assistance and Health Glance in v1.1.5.
+
+### Prerequisites
+
+Device supports this function. Gate with `peripheralModel` (specific flag TBD in this snapshot — consult [live iOS wiki](https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document) for the `gsrType` property name).
+
+### Class
+
+`VPPeripheralBaseManage`
+
+### API
+
+```objective-c
+/// Start or stop GSR detection
+/// - Parameters:
+/// - open: YES to start, NO to stop
+/// - result: callback with GSR state and value
+- (void)veepooSDK_gsrDetectStart:(BOOL)open
+                          result:(void(^)(VPDeviceGSRState state, NSInteger gsrValue))result;
+```
+
+### Parameters
+
+VPDeviceGSRState
+
+| State | Description |
+| ----- | ----------- |
+| `VPDeviceGSRStateStart` | Detection started on device |
+| `VPDeviceGSRStateTesting` | Measurement in progress |
+| `VPDeviceGSRStateComplete` | Measurement complete, `gsrValue` is valid |
+| `VPDeviceGSRStateFail` | Detection failed |
+
+### Sample code
+
+```swift
+VPBleCentralManage.sharedBleManager().peripheralManage.veepooSDK_gsrDetectStart(true) { [weak self] state, gsrValue in
+    guard let self = self else { return }
+    switch state {
+    case .complete:
+        print("GSR value: \(gsrValue)")
+    case .fail:
+        print("GSR detection failed")
+    default:
+        break
+    }
+}
+```
+
+---
+
+## VPManualTestDataType enum
+
+The `readManualTestDataWithTimestamp:dataType:result:` API accepts a `VPManualTestDataType` value to select which stored manual measurement data to retrieve. Known values (as of v1.1.8; earlier versions only supported `.bloodPressure`):
+
+| Enum value | Description |
+| ---------- | ----------- |
+| `VPManualTestDataTypeBloodPressure` | Air-pump blood pressure measurements |
+| `VPManualTestDataTypeHeartRate` | Heart rate measurements |
+| `VPManualTestDataTypeTemperature` | Body temperature measurements |
+| `VPManualTestDataTypeBloodOxygen` | Blood oxygen (SpO2) measurements |
+| `VPManualTestDataTypeBloodComponent` | Blood component (cholesterol, uric acid, etc.) |
+| `VPManualTestDataTypeBloodGlucose` | Blood glucose measurements |
+
+Note: v1.1.8 extended `VPManualTestDataModel` to carry arrays for all six types above. Query each type separately and merge in the app layer. See live iOS wiki for the complete field list of each data model.
+
+---
+
+## Notes on versions 1.1.5–1.2.0 (not yet fully documented in this snapshot)
+
+The following capabilities were added after v1.1.4 and are not yet fully reflected in this offline snapshot. Consult the live [iOS API wiki](https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document) for method signatures and parameters.
+
+| Version | Feature | Notes |
+| ------- | ------- | ----- |
+| 1.1.5 | Health Assistance | Configures automated health guidance / wellness coaching on the Band |
+| 1.1.5 | Health Glance | Quick-read summary of recent health metrics; single API call, multiple metric types |
+| 1.1.6 | 4G function | Band with 4G radio — SIM config, network info |
+| 1.1.6 | Ring sports activation | App can activate/deactivate sport-mode on a ring-form-factor Band |
+| 1.1.7 | AI function | On-device AI inference — nature of prompts/responses TBD |
+| 1.1.8 | Multi-type manual data | Extends `readManualTestDataWithTimestamp` to 6 data types (see `VPManualTestDataType` table above) |
+| 1.1.9 | Nordic OTA | Nordic Semiconductor DFU path (`veepooSDKStartNordicDfuWithFilePath` or similar) |
+| 1.1.9 | Connection confirmation | Device displays a pop-up asking user to confirm connection; app must listen and respond |
+| 1.2.0 | JE136P TCM data | Customized Traditional Chinese Medicine measurement data for JE136P model |
+| 1.2.0 | HRV measurement | App-initiated HRV test (distinct from historical HRV in daily origin data) |
+| 1.2.0 | Bluetooth name change | App can update the Band's advertised BLE name |
