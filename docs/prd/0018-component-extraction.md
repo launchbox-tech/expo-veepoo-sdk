@@ -1,8 +1,8 @@
 # 0018 — PRD: extract presentational components from index.tsx
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/18
-> Labels: enhancement, ready-for-human
-> Status: open (partially fulfilled — index.tsx is 1115 lines, not ~200; see issue #109 for completion)
+> Labels: enhancement
+> Status: closed (fully fulfilled — index.tsx is 183 lines after issue #109 slices 110–117)
 
 ## Problem Statement
 
@@ -26,7 +26,7 @@ Extract each presentational sub-component into its own file under `example/src/c
 6. As a developer scanning the `src/` directory, I want a `components/` directory alongside `hooks/`, so that the project structure communicates the separation between state logic and presentation. ✅ FULFILLED
 7. As a developer looking for color constants, I want them in `components/theme.ts`, so that I have one authoritative place to update brand colors. ✅ FULFILLED
 8. As a developer adding a new presentational component, I want an established `components/` directory with a consistent pattern, so that I know where to add it and how to structure its file. ✅ FULFILLED
-9. As a developer reading `index.tsx`, I want it to contain only hook calls, stale-state derivations, and JSX, so that I can understand the screen's data flow without wading through component implementations. ❌ **NOT FULFILLED** — index.tsx is 1115 lines (see issue #109)
+9. As a developer reading `index.tsx`, I want it to contain only hook calls, stale-state derivations, and JSX, so that I can understand the screen's data flow without wading through component implementations. ✅ FULFILLED — index.tsx is 183 lines (completed via issue #109 slices 110–117)
 10. As a developer running TypeScript checks, I want the extraction to produce zero `tsc` errors, so that I can trust the types are correct after the refactor. ✅ FULFILLED
 
 ## Implementation Decisions
@@ -37,7 +37,7 @@ Extract each presentational sub-component into its own file under `example/src/c
 - **Barrel export**: `components/index.ts` re-exports all three components. ✅ Done
 - **`unit` prop dropped from `HealthTestCard`**: ✅ Done
 - **No new abstractions**: No new hooks, HOCs, or context providers. ✅ Done
-- **`index.tsx` after extraction**: ❌ **NOT DONE** — promised ~200 lines, actual: 1115 lines. See issue #109 for completion.
+- **`index.tsx` after extraction**: ✅ DONE — 183 lines (completed via issue #109 slices 110–117).
 
 ## Testing Decisions
 
@@ -55,6 +55,4 @@ Extract each presentational sub-component into its own file under `example/src/c
 ## Further Notes
 
 - The extraction follows the same directory convention established by the `hooks/` refactor in issues #11–#17: one concern per file, grouped by type under `src/`. The `components/` directory will sit alongside `hooks/` under `example/src/`.
-- **Remaining work**: `index.tsx` is 1115 lines. PRD #18 promised ~200 lines. See **issue #109** for the completion PRD that extracts all remaining inline JSX into sub-components.
-
-(End of file - updated to reflect partial fulfillment)
+- All work completed via issue #109 (slices #110–#117). index.tsx is 183 lines.
