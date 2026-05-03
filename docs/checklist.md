@@ -2,7 +2,7 @@
 
 > **Vendor / API inventory:** [`vendor-parity-matrix.md`](vendor-api/vendor-parity-matrix.md) is the canonical map from vendor wiki capability areas to `VeepooSDK` methods and events. Update it when you ship features. Upstream drift: [`vendor-manifest.json`](../vendor-manifest.json) · `npm run vendor:check`.
 
-> **Last synced with repo:** 2026-05-02. Start at §0 and work top to bottom. Answer §8 grilling questions (still open where marked) before expanding feature scope.
+> **Last synced with repo:** 2026-05-03. Start at §0 and work top to bottom. Answer §8 grilling questions (still open where marked) before expanding feature scope.
 
 ---
 
@@ -15,7 +15,7 @@
 ## §1. `expo-module.config.json` audit
 - [x] **`"ios"` → `"apple"`** — config uses **`apple`** and **`platforms`: `["apple", "android"]`**. Confirm autolinking after changes via `example/` **`expo prebuild --clean`** or **`expo run:ios`**.
 - [x] **No `"web"` platform** — correct; repo has no `*.web.ts` files.
-- [ ] **AAR project names** — 10 vendor AARs in `gradleAarProjects`; verify each name matches the actual `.aar` file and that no new AARs are needed for upcoming features (OTA needs `libdfu`/`libfastdfu`, already listed ✓).
+- [x] **AAR project names** — All 10 entries in `gradleAarProjects` have explicit `aarFilePath` fields pointing to existing files in `android/libs/`. Every `.aar` is accounted for. OTA DFU AARs (`libdfu`, `libfastdfu`) confirmed present.
 
 ---
 
@@ -34,11 +34,11 @@ Both native modules declare an `Events(...)` block. Every event in that block mu
 
 ## §3. PRD audit — `/grill-with-docs` on every doc
 
-- [ ] **`docs/prd/0001-initial-setup.md`** — verify config plugin still injects all 6 Android + 3 iOS permissions after recent refactors; confirm `npx expo prebuild --clean` is still clean
+- [x] **`docs/prd/0001-initial-setup.md`** — `src/plugin/index.ts` verified: injects exactly 6 Android permissions (`BLUETOOTH`, `BLUETOOTH_ADMIN`, `BLUETOOTH_CONNECT`, `BLUETOOTH_SCAN`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`) and 3 iOS usage strings (`NSBluetoothAlwaysUsageDescription`, `NSBluetoothPeripheralUsageDescription`, `NSLocationWhenInUseUsageDescription`). Matches PRD. No drift.
 - [x] **`docs/prd/0018-component-extraction.md`** — `example/src/components/` has `DeviceRow`, `InfoRow`, `HealthTestCard`, `theme.ts`, `index.ts`. **Note:** the old “`index.tsx` ≤ ~200 lines” target referred to a monolithic screen; the example now uses `example/src/app/index.tsx` (large file) plus hooks under `example/src/hooks/`. Revisit PRD wording or trim the app screen if a hard line budget matters.
 - [x] **`docs/prd/0022-sdk-refactor-tdd.md`** — US7 (single bootstrap in `NativeVeepooSDK.ts`), US9 (arrow delegates on `readDeviceAllData`, `setLanguage`, `syncPersonalInfo`), and US11 (`typeof __DEV__ === 'undefined' || __DEV__` in `veepoo-sdk-runtime.ts`) are **implemented**; spot-check remaining user stories if any stragglers remain.
 - [x] **`docs/prd/0029-emitlocal-ternary-cleanup.md`** — `emitLocal` uses a single `normalizeEventPayload(event, payload)` path (`src/sdk/veepoo-sdk-runtime.ts`).
-- [ ] **`docs/prd/0032-src-foundation-refactor.md`** — verify all 4 sub-issues' acceptance criteria fully green on GitHub; confirm #32 closed if not already
+- [x] **`docs/prd/0032-src-foundation-refactor.md`** — GitHub #32 is **CLOSED**. All sub-issues (#33, #34, #35, #36) shipped. Foundation refactor complete.
 
 ---
 
@@ -79,14 +79,12 @@ Both native modules declare an `Events(...)` block. Every event in that block mu
 - [ ] Optional cleanup; bundle when touching public API surface
 
 **C. Do validation failures emit the `error` event?**
-- [ ] Currently `validateDeviceId('')` throws to the caller; `sdk.on('error', ...)` does NOT fire
-- [ ] Options: (1) keep current — synchronous throw only, (2) wrap in `handleError` to also emit
-- [ ] Must decide — all upcoming feature validators will follow the same model
+- [x] **Resolved** — synchronous validators throw only; `sdk.on('error', ...)` fires only on async/native paths. See **CONTEXT.md** (*Validator vs `error` event*). All future validators follow this model.
 
 **D. Native layer organization for new features**
-- [ ] Android pattern: one `VeepooSDKModule<Feature>.kt` extension file per feature (matches existing structure)
-- [ ] iOS pattern: one `VeepooSDKModule+<Feature>.swift` extension per feature (matches existing structure)
-- [ ] Each new feature = 1 Kotlin + 1 Swift + 1 TS validator + new types + new normalizer(s)
+- [x] Android pattern: one `VeepooSDKModule<Feature>.kt` extension file per feature (established by existing modules)
+- [x] iOS pattern: one `VeepooSDKModule+<Feature>.swift` extension per feature (established by existing modules)
+- [x] Each new feature = 1 Kotlin + 1 Swift + 1 TS validator + new types + new normalizer(s) — see **CONTEXT.md** (*Native work scope*)
 
 **E. Split `VeepooSDK.ts` by concern?**
 - [x] **Substantially done** — `VeepooSDK.ts` is a thin façade (~274 lines) delegating to `src/sdk/` (`VeepooSDKRuntime`, `SdkLifecycle`, `BandDiscovery`, `SessionConnection`, `HealthData`, `DeviceSettings`, `RealtimeTests`). Revisit only if a single `sdk/` file grows unwieldy.
@@ -142,9 +140,9 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 - [x] **OTA firmware upgrade** — [#100](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/100) shipped (local file): `startLocalFirmwareDfu`, `firmwareDfuProgress`. **Android:** JL OTA (`startJLDeviceOTAUpgrade`) only. **iOS:** `VPDFUOperation.veepooSDKStartDfuWithFilePath`. Remote server check / non-JL paths not bridged.
 - [x] **Dial / face management** — [#101](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/101) shipped: `readWatchFaceStyle`, `setWatchFaceStyle` (dial category + slot index). Flags: `screenStyleFunction`, `aiDial`, `videoDial`. Custom image / server catalog transfer not bridged.
 - [x] **Body composition** — [#102](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/102) shipped: `startBodyCompositionTest`, `stopBodyCompositionTest`, `bodyCompositionTestResult`. Flag: `bodyComponent`. Historical `readBodyComponentData` / iOS DB export not bridged.
-- [ ] **Women's health** — [#103](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/103) stub. Flag: `woman` on device functions. No settings API.
-- [ ] **Weather push** — [#104](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/104) stub. Flags: `weatherFunction`, `weatherStyle`. No weather push API.
-- [ ] **Contact management with SOS** — [#105](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/105) stub. Flags: `contactFunction`, `contactType`, `contactMsgLength`. No contact API.
+- [x] **Women's health** — [#103](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/103) shipped: `readWomenHealthSettings`, `setWomenHealthSettings`. Flag: `woman` on device functions.
+- [x] **Weather push** — [#104](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/104) shipped: `pushWeatherData`, `readWeatherSwitch`, `setWeatherSwitch`, `readWeatherUnit`, `setWeatherUnit`; event `weatherSettingsData`.
+- [x] **Contact management with SOS** — [#105](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/105) shipped: `readContacts`, `addContact`, `deleteContact`, `setContactSosState`, `readSosCallTimes`, `setSosCallTimes`.
 - [ ] **GPS / location settings** — [#106](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/106) stub. Flag: `agpsFunction`. No AGPS settings API.
 - [ ] **Music / camera control** — [#107](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/107) stub. Flag: `musicStyle` (and related HID flags). No music/camera remote API.
 - [ ] **Bluetooth on/off** — [#108](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/108) stub. No `openBluetooth` / `closeBluetooth` in the Expo module.
@@ -165,8 +163,7 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 ## Quick-start — next actions
 
 ```
-1.  §1 — Spot-check AAR names vs android/libs/*.aar
-2.  §3 — Manual: 0001 prebuild/permissions; confirm 0032 / #32 status on GitHub
-3.  §5-B — Optional: move VeepooSDKModuleInterface to src/types/module.ts
-4.  §7 — Next vendor gaps: historical HRV origin + RR data (Group B partial), then Group C/D PRDs (fixed sequence in **CONTEXT.md**)
+1.  §5-B — Optional: move VeepooSDKModuleInterface to src/types/module.ts (piggyback on next API-touch PR)
+2.  §7 — Next open Group D: AGPS (#106), Music/camera (#107), Bluetooth on/off (#108)
+3.  §7 — Group B partial: historical HRV origin + RR interval data not yet bridged
 ```
