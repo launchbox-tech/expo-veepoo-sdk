@@ -20,4 +20,5 @@ export {
   validateNewContact,
   validateContactId,
   validateSosCallTimes,
+  validateMusicData,
 } from './device-settings.js';

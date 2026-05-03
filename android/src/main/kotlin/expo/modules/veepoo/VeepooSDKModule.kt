@@ -75,6 +75,7 @@ class VeepooSDKModule : Module() {
     defineContacts(this@VeepooSDKModule)
     defineFirmwareDfu(this@VeepooSDKModule)
     defineWatchFaceStyle(this@VeepooSDKModule)
+    defineMedia(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

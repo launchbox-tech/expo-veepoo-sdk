@@ -2,6 +2,7 @@ import type {
   ConnectionStatus,
   DeviceAlarm,
   DeviceContact,
+  MusicData,
   NewDeviceContact,
   OperationStatus,
   ScanOptions,
@@ -113,6 +114,10 @@ export interface VeepooSDKModuleInterface {
   setContactSosState(contactId: number, isOpen: boolean): Promise<void>;
   readSosCallTimes(): Promise<SosCallTimesSettings>;
   setSosCallTimes(times: number): Promise<void>;
+  enterCameraMode(): Promise<void>;
+  exitCameraMode(): Promise<void>;
+  setMusicControlEnabled(enabled: boolean): Promise<void>;
+  pushMusicData(data: MusicData): Promise<void>;
   startLocalFirmwareDfu(filePath: string): Promise<void>;
   readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle>;
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;

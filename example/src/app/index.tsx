@@ -35,6 +35,9 @@ export default function Index() {
   const [wristFlipInfo, setWristFlipInfo] = useState<string>("—");
   const [womenHealthInfo, setWomenHealthInfo] = useState<string>("—");
   const [watchFaceInfo, setWatchFaceInfo] = useState<string>("—");
+  const [cameraInfo, setCameraInfo] = useState<string>("—");
+  const [musicCommandInfo, setMusicCommandInfo] = useState<string>("—");
+  const [musicEnabled, setMusicEnabled] = useState(false);
   const { permissions } = useSDKInit(dispatch);
   const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
   const {
@@ -96,6 +99,23 @@ export default function Index() {
     "findDeviceState",
     ({ deviceId: _, phase }) => {
       setFindPhase(phase);
+    },
+    appState === "ready"
+  );
+
+  useSDKEvent(
+    "cameraShutter",
+    ({ deviceId: _, status }) => {
+      setCameraInfo(`shutter: ${status}`);
+    },
+    appState === "ready"
+  );
+
+  useSDKEvent(
+    "musicRemoteCommand",
+    ({ deviceId: _, command }) => {
+      const ts = new Date().toISOString().slice(11, 19);
+      setMusicCommandInfo(`[${ts}] ${command}`);
     },
     appState === "ready"
   );
@@ -384,6 +404,82 @@ export default function Index() {
               >
                 <Text style={styles.buttonTextSecondary}>Read</Text>
               </Pressable>
+            </View>
+          </View>
+
+          {/* ── Camera remote & Music control (#107) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Camera remote &amp; Music (#107)</Text>
+            <Text style={styles.findPhase}>Shutter: {cameraInfo}</Text>
+            <Text style={styles.findPhase}>Music cmd: {musicCommandInfo}</Text>
+            <View style={styles.findRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk.enterCameraMode().catch(() => setCameraInfo("enterCameraMode error"));
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Enter camera</Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  void sdk.exitCameraMode().then(() => setCameraInfo("—")).catch(() => {});
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Exit camera</Text>
+              </Pressable>
+            </View>
+            <View style={styles.findRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.buttonSecondary,
+                  pressed && styles.buttonPressed,
+                ]}
+                onPress={() => {
+                  const next = !musicEnabled;
+                  setMusicEnabled(next);
+                  void sdk.setMusicControlEnabled(next).catch(() => {});
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>
+                  Music control: {musicEnabled ? "ON" : "OFF"}
+                </Text>
+              </Pressable>
+              {Platform.OS === "android" && (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.button,
+                    styles.buttonSecondary,
+                    pressed && styles.buttonPressed,
+                  ]}
+                  onPress={() => {
+                    void sdk
+                      .pushMusicData({
+                        name: "Test Track",
+                        artist: "Test Artist",
+                        isPlaying: true,
+                        volume: 50,
+                      })
+                      .catch(() => {});
+                  }}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.buttonTextSecondary}>Push track</Text>
+                </Pressable>
+              )}
             </View>
           </View>
 

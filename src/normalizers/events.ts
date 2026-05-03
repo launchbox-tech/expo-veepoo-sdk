@@ -8,11 +8,13 @@ import { normalizeBluetoothStatus, normalizePasswordData } from './connection.js
 import {
   normalizeAlarmList,
   normalizeBatteryInfo,
+  normalizeCameraShutterStatus,
   normalizeContactList,
   normalizeDeviceFunctions,
   normalizeDeviceVersion,
   normalizeHeartRateAlarm,
   normalizeFindDeviceStatePayload,
+  normalizeMusicRemoteCommand,
   normalizeSocialMsgData,
   normalizeSosCallTimesSettings,
 } from './device.js';
@@ -162,6 +164,10 @@ export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unk
       return normalizeFindDeviceStatePayload(p);
     case 'firmwareDfuProgress':
       return normalizeFirmwareDfuProgressPayload(p);
+    case 'cameraShutter':
+      return { ...p, status: normalizeCameraShutterStatus(p.status) };
+    case 'musicRemoteCommand':
+      return { ...p, command: normalizeMusicRemoteCommand(p.command) };
     case 'hrvTestResult':
       return { ...p, result: normalizeHrvTestResult(p.result) };
     case 'ecgTestResult':

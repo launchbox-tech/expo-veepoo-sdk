@@ -52,6 +52,9 @@ export type {
   DeviceContact,
   NewDeviceContact,
   SosCallTimesSettings,
+  CameraShutterStatus,
+  MusicData,
+  MusicRemoteCommand,
 } from './device.js';
 
 export type {

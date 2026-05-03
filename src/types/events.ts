@@ -6,12 +6,14 @@ import type {
 } from './connection.js';
 import type {
   BatteryInfo,
+  CameraShutterStatus,
   DeviceAlarm,
   DeviceContact,
   DeviceFunctions,
   DeviceVersion,
   HeartRateAlarm,
   FindDevicePhase,
+  MusicRemoteCommand,
   SocialMsgData,
   SosCallTimesSettings,
 } from './device.js';
@@ -121,6 +123,10 @@ export type VeepooEventPayload = {
   firmwareDfuProgress: FirmwareDfuProgress;
   contactsData: { deviceId: string; contacts: DeviceContact[] };
   sosCallTimesData: { deviceId: string; data: SosCallTimesSettings };
+  /** Fired when the Band triggers a camera photo action. Cross-platform. */
+  cameraShutter: { deviceId: string; status: CameraShutterStatus };
+  /** Fired when the Band sends a music remote command. Android only. */
+  musicRemoteCommand: { deviceId: string; command: MusicRemoteCommand };
   error: VeepooError;
 };
 

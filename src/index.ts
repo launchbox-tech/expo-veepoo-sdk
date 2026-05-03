@@ -94,6 +94,9 @@ export type {
   DeviceData,
   PermissionsResult,
   PermissionStatus,
+  CameraShutterStatus,
+  MusicData,
+  MusicRemoteCommand,
 } from './types/index.js';
 
 export type { VeepooSDKModuleInterface, LogListener } from './VeepooSDKModule.js';

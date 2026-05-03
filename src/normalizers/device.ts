@@ -1,11 +1,13 @@
 import type {
   BatteryInfo,
+  CameraShutterStatus,
   DeviceAlarm,
   DeviceContact,
   DeviceFunctions,
   DeviceVersion,
   FindDevicePhase,
   HeartRateAlarm,
+  MusicRemoteCommand,
   ScreenLightDuration,
   ScreenLightSettings,
   SedentaryReminderSettings,
@@ -446,4 +448,23 @@ export function normalizeSosCallTimesSettings(value: unknown): SosCallTimesSetti
     minTimes: toInt(record.minTimes),
     maxTimes: toInt(record.maxTimes),
   };
+}
+
+/**
+ * Normalizes camera shutter status from native.
+ * Android: ECameraStatus string (TAKEPHOTO_CAN / TAKEPHOTO_CAN_NOT or already mapped).
+ * iOS: 'canTake' / 'cannotTake' passed directly.
+ */
+export function normalizeCameraShutterStatus(value: unknown): CameraShutterStatus {
+  const s = typeof value === 'string' ? value : '';
+  if (s === 'canTake' || s === 'TAKEPHOTO_CAN') return 'canTake';
+  return 'cannotTake';
+}
+
+/** Normalizes a music remote command string from native. */
+export function normalizeMusicRemoteCommand(value: unknown): MusicRemoteCommand {
+  const s = typeof value === 'string' ? value : '';
+  if (s === 'next') return 'next';
+  if (s === 'previous') return 'previous';
+  return 'pausePlay';
 }

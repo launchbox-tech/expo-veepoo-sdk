@@ -1,8 +1,10 @@
 import {
   normalizeAlarmList,
   normalizeBluetoothStatus,
+  normalizeCameraShutterStatus,
   normalizeEventPayload,
   normalizeHeartRateAlarm,
+  normalizeMusicRemoteCommand,
   normalizePermissionsResult,
   normalizeReadOriginProgressPayload,
   normalizeScreenLightDuration,
@@ -711,5 +713,83 @@ describe('normalizeSosCallTimesSettings', () => {
   it('coerces string numbers', () => {
     const r = normalizeSosCallTimesSettings({ times: '5', minTimes: '1', maxTimes: '9' });
     expect(r.times).toBe(5);
+  });
+});
+
+describe('normalizeCameraShutterStatus', () => {
+  it('maps "canTake" → "canTake"', () => {
+    expect(normalizeCameraShutterStatus('canTake')).toBe('canTake');
+  });
+
+  it('maps Android ECameraStatus "TAKEPHOTO_CAN" → "canTake"', () => {
+    expect(normalizeCameraShutterStatus('TAKEPHOTO_CAN')).toBe('canTake');
+  });
+
+  it('maps "cannotTake" → "cannotTake"', () => {
+    expect(normalizeCameraShutterStatus('cannotTake')).toBe('cannotTake');
+  });
+
+  it('maps "TAKEPHOTO_CAN_NOT" → "cannotTake"', () => {
+    expect(normalizeCameraShutterStatus('TAKEPHOTO_CAN_NOT')).toBe('cannotTake');
+  });
+
+  it('maps unknown string → "cannotTake"', () => {
+    expect(normalizeCameraShutterStatus('UNKNOWN')).toBe('cannotTake');
+  });
+
+  it('maps null → "cannotTake"', () => {
+    expect(normalizeCameraShutterStatus(null)).toBe('cannotTake');
+  });
+});
+
+describe('normalizeMusicRemoteCommand', () => {
+  it('maps "next" → "next"', () => {
+    expect(normalizeMusicRemoteCommand('next')).toBe('next');
+  });
+
+  it('maps "previous" → "previous"', () => {
+    expect(normalizeMusicRemoteCommand('previous')).toBe('previous');
+  });
+
+  it('maps "pausePlay" → "pausePlay"', () => {
+    expect(normalizeMusicRemoteCommand('pausePlay')).toBe('pausePlay');
+  });
+
+  it('maps unknown string → "pausePlay"', () => {
+    expect(normalizeMusicRemoteCommand('UNKNOWN')).toBe('pausePlay');
+  });
+
+  it('maps null → "pausePlay"', () => {
+    expect(normalizeMusicRemoteCommand(null)).toBe('pausePlay');
+  });
+});
+
+describe('normalizeEventPayload — cameraShutter', () => {
+  it('normalizes canTake status', () => {
+    const r = normalizeEventPayload('cameraShutter', { deviceId: 'd1', status: 'TAKEPHOTO_CAN' }) as any;
+    expect(r.status).toBe('canTake');
+    expect(r.deviceId).toBe('d1');
+  });
+
+  it('normalizes cannotTake status', () => {
+    const r = normalizeEventPayload('cameraShutter', { deviceId: 'd1', status: 'TAKEPHOTO_CAN_NOT' }) as any;
+    expect(r.status).toBe('cannotTake');
+  });
+});
+
+describe('normalizeEventPayload — musicRemoteCommand', () => {
+  it('normalizes next command', () => {
+    const r = normalizeEventPayload('musicRemoteCommand', { deviceId: 'd1', command: 'next' }) as any;
+    expect(r.command).toBe('next');
+  });
+
+  it('normalizes previous command', () => {
+    const r = normalizeEventPayload('musicRemoteCommand', { deviceId: 'd1', command: 'previous' }) as any;
+    expect(r.command).toBe('previous');
+  });
+
+  it('normalizes pausePlay command', () => {
+    const r = normalizeEventPayload('musicRemoteCommand', { deviceId: 'd1', command: 'pausePlay' }) as any;
+    expect(r.command).toBe('pausePlay');
   });
 });

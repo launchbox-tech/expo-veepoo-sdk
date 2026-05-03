@@ -56,6 +56,8 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Watch face / screen style (dial slot) | `readWatchFaceStyle`, `setWatchFaceStyle` | Shipped | TBD |
 | Contacts (emergency contact list) | `readContacts`, `addContact`, `deleteContact`, `setContactSosState`; `contactsData` | Shipped | TBD |
 | SOS call times | `readSosCallTimes`, `setSosCallTimes`; `sosCallTimesData` | Shipped | TBD |
+| Camera remote (Band shutter trigger) | `enterCameraMode`, `exitCameraMode`; `cameraShutter` | Shipped | TBD |
+| Music control toggle & metadata push | `setMusicControlEnabled`, `pushMusicData`; `musicRemoteCommand` | Shipped — `pushMusicData` Android-only (`CAPABILITY_UNSUPPORTED` on iOS); `musicRemoteCommand` Android-only | TBD |
 | Local firmware DFU (OTA file on disk) | `startLocalFirmwareDfu`; `firmwareDfuProgress` | Partial | TBD |
 
 **Find device:** Gate with `readDeviceFunctions().findDeviceByPhoneFunction`. **Android** uses `startFindDeviceByPhone` / `stopFindDeviceByPhone` (`IFindDevicelistener`). **iOS** uses `veepooSDK_searchDeviceFuntionWithState` + `peripheralModel.searchDeviceFunction`; callback states map to `searching` / `stopped` / `timeout` (no separate `found` phase on iOS — see `rawState`).
@@ -73,6 +75,10 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 **Watch face / screen style:** Gate with `readDeviceFunctions().screenStyleFunction` (and related `aiDial` / `videoDial` hints where applicable). **Android:** `readScreenStyle` / `settingScreenStyle` (`ScreenStyleData`, `EScreenStyle`); `VpSpGetUtil.isSupportScreenStyle`. **iOS:** `veepooSDKSettingDeviceScreenStyle` (read `settingMode` 2 / set 1, `VPDeviceDialType`). **Partial scope:** this bridge exposes **read/set of the active dial category + slot index** only — custom image transfer, marketplace sync, and video dials are **not** implemented here.
 
 **Contacts & SOS:** Gate with `readDeviceFunctions().package3.contactFunction` (`"support"` or better). SOS-specific operations (`setContactSosState`, `readSosCallTimes`, `setSosCallTimes`) additionally require `contactType >= 2`; both reject with `CAPABILITY_UNSUPPORTED` otherwise. **Android:** `VPOperateManager` — `readContact(crc, IContactOptListener, IBleWriteResponse)` (CRC optimization: `onContactReadASSameCRC` returns empty list when device CRC matches), `addContact`, `deleteContact`, `setContactSOSState` (`IContactOptListener`); SOS call times via `readSOSCallTimes` / `setSOSCallTimes` (`ISOSCallTimesListener`). **iOS:** single entry point `veepooSDKSettingDeviceContactsWithOpCode:opModel:toID:resultBlock:` with `VPDeviceContactsOpCode` enum (`.read`, `.add`, `.delete`, `.edit`); SOS call times via `veepooSDKSettingDeviceContactsSOSInfoWithOpCode:times:resultBlock:` (`VPSOSOperationType.read` / `.setting`). **Contact model:** `name` (Android) / `nickName` (iOS) ≤ 20 bytes UTF-8; `phoneNumber` ≤ 20 chars; `isSOS` / `isSettingSOS` flag. **Not bridged:** `moveContact` / `VPDeviceContactsOpCodeMove` (reorder), device-initiated SOS command callback (`ReceiveDeviceSOSCommand`).
+
+**Camera remote:** Gate with `readDeviceFunctions().camera` (non-zero). **Android:** `VPOperateManager.startCamera` / `exitCamera` + `ICameraDataListener`; `TAKEPHOTO_CAN` → `canTake`, `TAKEPHOTO_CAN_NOT` → `cannotTake`. **iOS:** `veepooSDKSettingCameraType` (`.enter` / `.exit` / `.photo`); `VPCameraType`. `cameraShutter` emits only while in camera mode (`.photo` callback).
+
+**Music control:** Gate with `readDeviceFunctions().musicFunction`. **iOS:** `setMusicControlEnabled` uses `veepooSDKSettingBaseFunctionType(.musicControl, settingState:)` (on/off toggle). **Android:** no documented setter — `setMusicControlEnabled` resolves immediately as no-op. `pushMusicData` is Android-only (`settingMusicData` + `IMusicControlListener`; emits `musicRemoteCommand` for next/previous/pausePlay). `pushMusicData` on iOS rejects with `CAPABILITY_UNSUPPORTED`.
 
 **Local firmware DFU:** High-risk — host apps must gate UX (e.g. battery > 30%). **iOS:** `VPDFUOperation` `veepooSDKStartDfuWithFilePath` (+ `DeviceDFUState` in `firmwareDfuProgress`). **Android:** `VPOperateManager.startJLDeviceOTAUpgrade` when `isJLDevice` (Jerry / JL path only). Remote `checkDeviceOTAInfo` / `getOadVersion` and non-JL DFU are **not** in this bridge yet.
 
@@ -132,7 +138,7 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 
 - Remote OTA metadata / download (`checkDeviceOTAInfo`, `getOadVersion`, `veepooSDKStartDfu` server path) and non-JL Android DFU  
 - Server / marketplace dial transfer, custom photo push pipelines, video dials (beyond slot read/set)  
-- AGPS, music/camera remote  
+- AGPS  
 - Platform-specific extras (e.g. toggling OS Bluetooth from SDK)
 
 Treat gaps as **Not in JS** until a PR adds methods **and** updates this matrix.

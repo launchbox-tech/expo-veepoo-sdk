@@ -3,6 +3,7 @@
   "nativeEmitted": [
     "alarmData",
     "batteryData",
+    "cameraShutter",
     "contactsData",
     "sosCallTimesData",
     "bloodGlucoseData",
@@ -35,6 +36,7 @@
     "sleepData",
     "socialMsgData",
     "sportStepData",
+    "musicRemoteCommand",
     "stressData",
     "temperatureTestResult"
   ],

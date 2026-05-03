@@ -7,8 +7,10 @@ export {
 export {
   normalizeAlarmList,
   normalizeBatteryInfo,
+  normalizeCameraShutterStatus,
   normalizeDeviceFunctions,
   normalizeHeartRateAlarm,
+  normalizeMusicRemoteCommand,
   normalizeScreenLightDuration,
   normalizeScreenLightSettings,
   normalizeSedentaryReminderSettings,

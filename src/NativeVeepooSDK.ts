@@ -23,6 +23,7 @@ import type {
   AutoMeasureSetting,
   PermissionsResult,
   SocialMsgData,
+  MusicData,
 } from "./types/index.js";
 
 const LINKING_ERROR =
@@ -111,6 +112,10 @@ export interface NativeVeepooSDKInterface {
   setContactSosState(contactId: number, isOpen: boolean): Promise<void>;
   readSosCallTimes(): Promise<unknown>;
   setSosCallTimes(times: number): Promise<void>;
+  enterCameraMode(): Promise<void>;
+  exitCameraMode(): Promise<void>;
+  setMusicControlEnabled(enabled: boolean): Promise<void>;
+  pushMusicData(data: MusicData): Promise<void>;
   addListener(
     event: VeepooEvent,
     listener: (payload: unknown) => void,

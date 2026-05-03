@@ -353,3 +353,21 @@ export interface SosCallTimesSettings {
   minTimes: number;
   maxTimes: number;
 }
+
+/** Camera shutter status emitted when the Band triggers a photo (`cameraShutter` event). */
+export type CameraShutterStatus = 'canTake' | 'cannotTake';
+
+/** Track metadata pushed to the Band display via `pushMusicData`. Android only. */
+export interface MusicData {
+  /** Optional music app identifier (vendor `musicAppId`). */
+  appId?: string;
+  album?: string;
+  name: string;
+  artist: string;
+  isPlaying: boolean;
+  /** Volume level 1–100 (vendor `musicVoiceLevel`). */
+  volume: number;
+}
+
+/** Remote command emitted when the Band sends a music control action (`musicRemoteCommand` event). Android only. */
+export type MusicRemoteCommand = 'next' | 'previous' | 'pausePlay';

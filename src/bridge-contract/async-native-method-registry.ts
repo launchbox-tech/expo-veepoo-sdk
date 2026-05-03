@@ -88,6 +88,10 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "setContactSosState",
   "readSosCallTimes",
   "setSosCallTimes",
+  "enterCameraMode",
+  "exitCameraMode",
+  "setMusicControlEnabled",
+  "pushMusicData",
 ] as const satisfies readonly NativeAsyncMethodName[];
 
 export type NativeAsyncRegistryUnion =

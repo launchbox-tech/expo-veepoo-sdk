@@ -31,6 +31,8 @@ enum VeepooEvent {
   static let socialMsgData = "socialMsgData"
   static let findDeviceState = "findDeviceState"
   static let firmwareDfuProgress = "firmwareDfuProgress"
+  static let cameraShutter = "cameraShutter"
+  static let musicRemoteCommand = "musicRemoteCommand"
   static let error = "error"
 }
 
@@ -61,6 +63,8 @@ let ORIGIN_SPO2_DATA = VeepooEvent.originSpo2Data
 let SOCIAL_MSG_DATA = VeepooEvent.socialMsgData
 let FIND_DEVICE_STATE = VeepooEvent.findDeviceState
 let FIRMWARE_DFU_PROGRESS = VeepooEvent.firmwareDfuProgress
+let CAMERA_SHUTTER = VeepooEvent.cameraShutter
+let MUSIC_REMOTE_COMMAND = VeepooEvent.musicRemoteCommand
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -218,6 +222,8 @@ public class VeepooSDKModule: Module {
       FIRMWARE_DFU_PROGRESS,
       CONTACTS_DATA,
       SOS_CALL_TIMES_DATA,
+      CAMERA_SHUTTER,
+      MUSIC_REMOTE_COMMAND,
       ERROR
     )
 
@@ -892,6 +898,23 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("setSosCallTimes") { (times: Int, promise: Promise) in
       self.handleSetSosCallTimes(times: times, promise: promise)
+    }
+
+    // MARK: Media (camera + music remote)
+    AsyncFunction("enterCameraMode") { (promise: Promise) in
+      self.handleEnterCameraMode(promise: promise)
+    }
+
+    AsyncFunction("exitCameraMode") { (promise: Promise) in
+      self.handleExitCameraMode(promise: promise)
+    }
+
+    AsyncFunction("setMusicControlEnabled") { (enabled: Bool, promise: Promise) in
+      self.handleSetMusicControlEnabled(enabled, promise: promise)
+    }
+
+    AsyncFunction("pushMusicData") { (data: [String: Any], promise: Promise) in
+      self.handlePushMusicData(data, promise: promise)
     }
 
     AsyncFunction("startLocalFirmwareDfu") { (filePath: String, promise: Promise) in

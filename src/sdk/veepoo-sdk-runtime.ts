@@ -147,6 +147,8 @@ export class VeepooSDKRuntime {
       "firmwareDfuProgress",
       "contactsData",
       "sosCallTimesData",
+      "cameraShutter",
+      "musicRemoteCommand",
       "error",
     ];
 

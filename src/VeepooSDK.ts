@@ -29,6 +29,7 @@ import type {
   WatchFaceStyleSettings,
   WeatherSettings,
   WeatherData,
+  MusicData,
   ScanOptions,
   ConnectOptions,
   ConnectionStatus,
@@ -254,6 +255,18 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   setSosCallTimes = (times: number): Promise<void> =>
     this.deviceSettings.setSosCallTimes(times);
+
+  enterCameraMode = (): Promise<void> =>
+    this.deviceSettings.enterCameraMode();
+
+  exitCameraMode = (): Promise<void> =>
+    this.deviceSettings.exitCameraMode();
+
+  setMusicControlEnabled = (enabled: boolean): Promise<void> =>
+    this.deviceSettings.setMusicControlEnabled(enabled);
+
+  pushMusicData = (data: MusicData): Promise<void> =>
+    this.deviceSettings.pushMusicData(data);
 
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 

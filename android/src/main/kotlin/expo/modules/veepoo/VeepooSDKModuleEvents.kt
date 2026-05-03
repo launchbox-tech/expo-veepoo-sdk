@@ -40,6 +40,8 @@ fun ModuleDefinitionBuilder.defineEvents() {
     FIRMWARE_DFU_PROGRESS,
     CONTACTS_DATA,
     SOS_CALL_TIMES_DATA,
+    CAMERA_SHUTTER,
+    MUSIC_REMOTE_COMMAND,
     ERROR
   )
 }

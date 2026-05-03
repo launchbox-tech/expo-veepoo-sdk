@@ -33,6 +33,7 @@ import {
   validateNewContact,
   validateContactId,
   validateSosCallTimes,
+  validateMusicData,
 } from "../validators/index.js";
 import type {
   AutoMeasureSetting,
@@ -40,6 +41,7 @@ import type {
   DeviceContact,
   HeartRateAlarm,
   Language,
+  MusicData,
   NewDeviceContact,
   OperationStatus,
   PersonalInfo,
@@ -472,6 +474,43 @@ export class DeviceSettings {
     return invokeNative({
       validate: () => validateSosCallTimes(times),
       invoke: () => this.rt.native.setSosCallTimes(times),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  enterCameraMode(): Promise<void> {
+    return invokeNative({
+      invoke: () => this.rt.native.enterCameraMode(),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  exitCameraMode(): Promise<void> {
+    return invokeNative({
+      invoke: () => this.rt.native.exitCameraMode(),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setMusicControlEnabled(enabled: boolean): Promise<void> {
+    return invokeNative({
+      invoke: () => this.rt.native.setMusicControlEnabled(enabled),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  pushMusicData(data: MusicData): Promise<void> {
+    return invokeNative({
+      validate: () => validateMusicData(data),
+      invoke: () => this.rt.native.pushMusicData(data),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
