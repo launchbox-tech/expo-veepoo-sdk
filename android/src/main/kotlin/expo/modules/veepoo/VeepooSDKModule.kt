@@ -83,6 +83,7 @@ class VeepooSDKModule : Module() {
     defineHealthReminders(this@VeepooSDKModule)
     defineApneaRemind(this@VeepooSDKModule)
     defineSportMode(this@VeepooSDKModule)
+    defineBloodAnalysis(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

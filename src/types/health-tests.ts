@@ -126,6 +126,26 @@ export interface BodyCompositionTestResult {
   composition?: BodyCompositionMetrics;
 }
 
+/** Blood lipid panel + uric acid from the blood analysis (blood component) test. */
+export interface BloodAnalysisValues {
+  /** Uric acid μmol/L (1 decimal place) */
+  uricAcid: number;
+  /** Total cholesterol mmol/L (2 decimal places) */
+  totalCholesterol: number;
+  /** Triglyceride mmol/L (2 decimal places) */
+  triglyceride: number;
+  /** HDL cholesterol mmol/L (2 decimal places) */
+  highDensityLipoprotein: number;
+  /** LDL cholesterol mmol/L (2 decimal places) */
+  lowDensityLipoprotein: number;
+}
+
+export interface BloodAnalysisTestResult {
+  state: TestState | string;
+  progress: number;
+  values: BloodAnalysisValues | null;
+}
+
 export type ReadState = 'idle' | 'start' | 'reading' | 'complete' | 'invalid';
 
 export interface ReadOriginProgress {

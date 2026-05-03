@@ -93,6 +93,8 @@ export type {
   BreathingTestResult,
   BodyCompositionMetrics,
   BodyCompositionTestResult,
+  BloodAnalysisValues,
+  BloodAnalysisTestResult,
   ReadState,
   ReadOriginProgress,
 } from './health-tests.js';

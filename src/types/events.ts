@@ -30,6 +30,7 @@ import type {
   StressData,
 } from './health-data.js';
 import type {
+  BloodAnalysisTestResult,
   BloodOxygenTestResult,
   BloodPressureTestResult,
   BodyCompositionTestResult,
@@ -145,6 +146,7 @@ export type VeepooEventPayload = {
   apneaRemindData: { deviceId: string; data: ApneaRemindSettings };
   /** Fired when the Band finishes/stops a sport session. Android: SportModelStateData; iOS: deviceSportDidFinishBlock. */
   sportModeData: { deviceId: string; mode: SportMode | null };
+  bloodAnalysisTestResult: { deviceId: string; result: BloodAnalysisTestResult };
   error: VeepooError;
 };
 
