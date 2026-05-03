@@ -143,9 +143,9 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 - [x] **Women's health** — [#103](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/103) shipped: `readWomenHealthSettings`, `setWomenHealthSettings`. Flag: `woman` on device functions.
 - [x] **Weather push** — [#104](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/104) shipped: `pushWeatherData`, `readWeatherSwitch`, `setWeatherSwitch`, `readWeatherUnit`, `setWeatherUnit`; event `weatherSettingsData`.
 - [x] **Contact management with SOS** — [#105](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/105) shipped: `readContacts`, `addContact`, `deleteContact`, `setContactSosState`, `readSosCallTimes`, `setSosCallTimes`.
-- [ ] **GPS / location settings** — [#106](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/106) stub. Flag: `agpsFunction`. No AGPS settings API.
+- [x] **GPS / location settings** — [#106](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/106) shipped: `setDeviceGPSAndTimezone` (iOS via `veepooSDK_setDeviceGPSAndTimezoneWithModel`; Android rejects `CAPABILITY_UNSUPPORTED`). `agpsFunction` capability flag now emitted in `package3` on both platforms. AGPS ephemeris transfer, live GPS feed, KAABA APIs deferred.
 - [x] **Music / camera control** — [#107](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/107) shipped: `enterCameraMode`, `exitCameraMode`, `setMusicControlEnabled`, `pushMusicData`; events `cameraShutter`, `musicRemoteCommand`. Camera remote cross-platform; `pushMusicData` Android-only; `setMusicControlEnabled` iOS base-function toggle (Android no-op).
-- [ ] **Bluetooth on/off** — [#108](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/108) stub. No `openBluetooth` / `closeBluetooth` in the Expo module.
+- [x] **Bluetooth on/off** — [#108](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/108) shipped: `readDeviceBTStatus`, `setDeviceBTSwitch`; event `deviceBTStateChanged`. Controls the Band's classic BT radio (phone-call audio). Android: full open+close via `setBTSwitchStatus`/`readBTInfo`. iOS: open only (`veepooSDK_openDeviceBTSwitch`); close rejects `CAPABILITY_UNSUPPORTED`. Gate: `CPUType == 1` (Jerry series).
 
 ---
 
@@ -164,6 +164,6 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 
 ```
 1.  §5-B — Optional: move VeepooSDKModuleInterface to src/types/module.ts (piggyback on next API-touch PR)
-2.  §7 — Next open Group D: AGPS (#106), Bluetooth on/off (#108)
+2.  §7 — All Group C + D items shipped. PRD #95 complete.
 3.  §7 — Group B partial: historical HRV origin + RR interval data not yet bridged
 ```
