@@ -185,20 +185,21 @@ export class VeepooSDKRuntime {
   emitLocal(event: VeepooEvent, payload: unknown): void {
     const normalizedPayload = normalizeEventPayload(event, payload);
 
-    if (
-      event === "readOriginProgress" &&
-      this.isEventRecord(normalizedPayload) &&
-      this.isEventRecord(normalizedPayload.progress)
-    ) {
-      const deviceId =
-        this.getPayloadDeviceId(normalizedPayload) ?? "__default__";
-      const progressValue = normalizedPayload.progress.progress as number;
-      const readState = normalizedPayload.progress.readState as
-        | string
-        | undefined;
+    if (event === "readOriginProgress") {
+      const originPayload =
+        normalizedPayload as VeepooEventPayload["readOriginProgress"];
+      if (
+        this.isEventRecord(originPayload) &&
+        this.isEventRecord(originPayload.progress)
+      ) {
+        const deviceId =
+          this.getPayloadDeviceId(originPayload) ?? "__default__";
+        const progressValue = originPayload.progress.progress as number;
+        const readState = originPayload.progress.readState as string | undefined;
 
-      if (!this.originProgressFilter.shouldEmit(deviceId, readState, progressValue)) {
-        return;
+        if (!this.originProgressFilter.shouldEmit(deviceId, readState, progressValue)) {
+          return;
+        }
       }
     }
 
