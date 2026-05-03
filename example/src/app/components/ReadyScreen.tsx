@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { BLUE, GREEN, RED } from "../../components/theme";
-import { DeviceRow, HealthTestCard, InfoRow, ReadyHeader, DeviceInfoCard } from "../../components";
+import { DeviceRow, HealthTestCard, InfoRow, ReadyHeader, DeviceInfoCard, FindBandCard, WatchFaceCard, ScreenLightCard, SedentaryCard, WristFlipCard, WomenHealthCard } from "../../components";
 import type { HeartRateTestResult, BloodPressureTestResult, BloodOxygenTestResult, HrvTestResult, EcgTestResult, FatigueTestResult, BreathingTestResult, BodyCompositionTestResult, ReadOriginProgress, SleepData, SportStepData } from "@gaozh1024/expo-veepoo-sdk";
 import type { PermissionResult } from "../hooks/useSDKInit";
 
@@ -282,196 +282,34 @@ const syncPct = dataSyncProgress?.progress ?? 0;
             deviceVersion={deviceVersion}
           />
 
-          {/* ── Find Band (phone → Band) (#96) ── */}
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Find Band</Text>
-            <Text style={styles.findPhase}>
-              Last state: {findPhase ?? "—"}
-            </Text>
-            <View style={styles.findRow}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.buttonSecondary,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={() => {
-                  void sdk.startFindDevice().catch(() => {});
-                }}
-                accessibilityRole="button"
-              >
-                <Text style={styles.buttonTextSecondary}>Start find</Text>
-              </Pressable>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.buttonSecondary,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={() => {
-                  void sdk.stopFindDevice().catch(() => {});
-                }}
-                accessibilityRole="button"
-              >
-                <Text style={styles.buttonTextSecondary}>Stop find</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* ── Watch face / dial (#101) — read only in example */}
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Watch face (dial)</Text>
-            <Text style={styles.findPhase} numberOfLines={5}>
-              {watchFaceInfo}
-            </Text>
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.buttonSecondary,
-                pressed && styles.buttonPressed,
-              ]}
-              onPress={() => {
-                void sdk
-                  .readWatchFaceStyle()
-                  .then(s => setWatchFaceInfo(JSON.stringify(s)))
-                  .catch(() =>
-                    setWatchFaceInfo("(unsupported or error — gate with screenStyleFunction)")
-                  );
-              }}
-              accessibilityRole="button"
-            >
-              <Text style={styles.buttonTextSecondary}>Read dial</Text>
-            </Pressable>
-          </View>
-
-          {/* ── Screen light & duration (#97) ── */}
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Screen (brightness / on-time)</Text>
-            <Text style={styles.findPhase} numberOfLines={4}>
-              Brightness: {screenLightInfo}
-            </Text>
-            <Text style={styles.findPhase} numberOfLines={3}>
-              On-time: {screenDurationInfo}
-            </Text>
-            <View style={styles.findRow}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.buttonSecondary,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={() => {
-                  void sdk
-                    .readScreenLightSettings()
-                    .then(s => setScreenLightInfo(JSON.stringify(s)))
-                    .catch(() =>
-                      setScreenLightInfo("(unsupported or error)")
-                    );
-                }}
-                accessibilityRole="button"
-              >
-                <Text style={styles.buttonTextSecondary}>Read brightness</Text>
-              </Pressable>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.buttonSecondary,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={() => {
-                  void sdk
-                    .readScreenLightDuration()
-                    .then(d => setScreenDurationInfo(JSON.stringify(d)))
-                    .catch(() =>
-                      setScreenDurationInfo("(unsupported or error)")
-                    );
-                }}
-                accessibilityRole="button"
-              >
-                <Text style={styles.buttonTextSecondary}>Read on-time</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* ── Sedentary reminder (#98) ── */}
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Sedentary reminder</Text>
-            <Text style={styles.findPhase} numberOfLines={6}>
-              {sedentaryInfo}
-            </Text>
-            <View style={styles.findRow}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.buttonSecondary,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={() => {
-                  void sdk
-                    .readSedentaryReminder()
-                    .then(s => setSedentaryInfo(JSON.stringify(s)))
-                    .catch(() => setSedentaryInfo("(unsupported or error)"));
-                }}
-                accessibilityRole="button"
-              >
-                <Text style={styles.buttonTextSecondary}>Read</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* ── Wrist-flip wake (#99) ── */}
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Wrist-flip wake</Text>
-            <Text style={styles.findPhase} numberOfLines={6}>
-              {wristFlipInfo}
-            </Text>
-            <View style={styles.findRow}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.buttonSecondary,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={() => {
-                  void sdk
-                    .readWristFlipWakeSettings()
-                    .then(s => setWristFlipInfo(JSON.stringify(s)))
-                    .catch(() => setWristFlipInfo("(unsupported or error)"));
-                }}
-                accessibilityRole="button"
-              >
-                <Text style={styles.buttonTextSecondary}>Read</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* ── Women's health (#103) — gate with readDeviceFunctions().woman ── */}
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Women&apos;s health</Text>
-            <Text style={styles.findPhase} numberOfLines={8}>
-              {womenHealthInfo}
-            </Text>
-            <View style={styles.findRow}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.buttonSecondary,
-                  pressed && styles.buttonPressed,
-                ]}
-                onPress={() => {
-                  void sdk
-                    .readWomenHealthSettings()
-                    .then(s => setWomenHealthInfo(JSON.stringify(s)))
-                    .catch(() => setWomenHealthInfo("(unsupported or error)"));
-                }}
-                accessibilityRole="button"
-              >
-                <Text style={styles.buttonTextSecondary}>Read</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {/* ── Camera remote & Music control (#107) ── */}
+                    <FindBandCard
+            findPhase={findPhase}
+            setFindPhase={setFindPhase}
+          />
+          <WatchFaceCard
+            watchFaceInfo={watchFaceInfo}
+            setWatchFaceInfo={setWatchFaceInfo}
+          />
+          <ScreenLightCard
+            screenLightInfo={screenLightInfo}
+            setScreenLightInfo={setScreenLightInfo}
+            screenDurationInfo={screenDurationInfo}
+            setScreenDurationInfo={setScreenDurationInfo}
+          />
+          <SedentaryCard
+            sedentaryInfo={sedentaryInfo}
+            setSedentaryInfo={setSedentaryInfo}
+          />
+          <WristFlipCard
+            wristFlipInfo={wristFlipInfo}
+            setWristFlipInfo={setWristFlipInfo}
+          />
+          <WomenHealthCard
+            womenHealthInfo={womenHealthInfo}
+            setWomenHealthInfo={setWomenHealthInfo}
+          />
+          
+          {/* ── Camera remote & Music control (#107) ── */}}
           <View style={styles.card}>
             <Text style={styles.cardLabel}>Camera remote &amp; Music (#107)</Text>
             <Text style={styles.findPhase}>Shutter: {cameraInfo}</Text>
