@@ -1,5 +1,15 @@
 {
   "enabledPlugins": {
     "github@callstack-agent-skills": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc --noEmit 2>&1)",
+      "Bash(npx jest *)",
+      "Bash(npx expo-module *)",
+      "Bash(jar tf *)",
+      "Bash(unzip -p *)",
+      "Bash(javap *)"
+    ]
   }
 }
