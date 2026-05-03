@@ -48,7 +48,12 @@
     "bloodAnalysisTestResult",
     "gsrTestResult",
     "exerciseSessionData",
-    "accurateSleepData"
+    "accurateSleepData",
+    "storedTemperatureData",
+    "storedBloodGlucoseData",
+    "storedHrvData",
+    "storedEcgData",
+    "storedBodyCompositionData"
   ],
   "jsLocalOnly": ["heartRateAlarmData"]
 }

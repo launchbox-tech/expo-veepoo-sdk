@@ -87,6 +87,7 @@ class VeepooSDKModule : Module() {
     defineGsr(this@VeepooSDKModule)
     defineExercise(this@VeepooSDKModule)
     defineAccurateSleep(this@VeepooSDKModule)
+    defineStoredVitals(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

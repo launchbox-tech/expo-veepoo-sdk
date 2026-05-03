@@ -22,6 +22,11 @@ import type {
 import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings.js';
 import type {
   AccurateSleepSession,
+  StoredTemperatureData,
+  StoredBloodGlucoseData,
+  StoredHrvData,
+  StoredEcgData,
+  StoredBodyCompositionData,
   BloodGlucoseData,
   ExerciseSession,
   HalfHourData,
@@ -156,6 +161,16 @@ export type VeepooEventPayload = {
   exerciseSessionData: { deviceId: string; session: ExerciseSession };
   /** Emitted per accurate sleep session (one per night). Gate: sleepType > 0 (iOS) / isSupportPreciseSleep (Android). */
   accurateSleepData: { deviceId: string; date: string; data: AccurateSleepSession };
+  /** Emitted per stored temperature record. Prerequisite: call startReadOriginData first. */
+  storedTemperatureData: { deviceId: string; data: StoredTemperatureData };
+  /** Emitted per stored blood glucose record. Prerequisite: call startReadOriginData first. */
+  storedBloodGlucoseData: { deviceId: string; data: StoredBloodGlucoseData };
+  /** Emitted per stored HRV record. Prerequisite: call startReadOriginData first. */
+  storedHrvData: { deviceId: string; data: StoredHrvData };
+  /** Emitted per stored offline ECG record. Prerequisite: call startReadOriginData first. */
+  storedEcgData: { deviceId: string; data: StoredEcgData };
+  /** Emitted per stored body composition record. Prerequisite: call startReadOriginData first. */
+  storedBodyCompositionData: { deviceId: string; data: StoredBodyCompositionData };
   error: VeepooError;
 };
 

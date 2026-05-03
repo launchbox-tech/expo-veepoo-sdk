@@ -43,6 +43,11 @@ enum VeepooEvent {
   static let gsrTestResult = "gsrTestResult"
   static let exerciseSessionData = "exerciseSessionData"
   static let accurateSleepData = "accurateSleepData"
+  static let storedTemperatureData = "storedTemperatureData"
+  static let storedBloodGlucoseData = "storedBloodGlucoseData"
+  static let storedHrvData = "storedHrvData"
+  static let storedEcgData = "storedEcgData"
+  static let storedBodyCompositionData = "storedBodyCompositionData"
   static let error = "error"
 }
 
@@ -85,6 +90,11 @@ let BLOOD_ANALYSIS_TEST_RESULT = VeepooEvent.bloodAnalysisTestResult
 let GSR_TEST_RESULT = VeepooEvent.gsrTestResult
 let EXERCISE_SESSION_DATA = VeepooEvent.exerciseSessionData
 let ACCURATE_SLEEP_DATA = VeepooEvent.accurateSleepData
+let STORED_TEMPERATURE_DATA = VeepooEvent.storedTemperatureData
+let STORED_BLOOD_GLUCOSE_DATA = VeepooEvent.storedBloodGlucoseData
+let STORED_HRV_DATA = VeepooEvent.storedHrvData
+let STORED_ECG_DATA = VeepooEvent.storedEcgData
+let STORED_BODY_COMPOSITION_DATA = VeepooEvent.storedBodyCompositionData
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -254,6 +264,11 @@ public class VeepooSDKModule: Module {
       GSR_TEST_RESULT,
       EXERCISE_SESSION_DATA,
       ACCURATE_SLEEP_DATA,
+      STORED_TEMPERATURE_DATA,
+      STORED_BLOOD_GLUCOSE_DATA,
+      STORED_HRV_DATA,
+      STORED_ECG_DATA,
+      STORED_BODY_COMPOSITION_DATA,
       ERROR
     )
 
@@ -921,6 +936,26 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("readAccurateSleepData") { (date: String?, promise: Promise) in
       self.handleReadAccurateSleepData(date: date, promise: promise)
+    }
+
+    AsyncFunction("readStoredTemperatureData") { (date: String?, promise: Promise) in
+      self.handleReadStoredTemperatureData(date: date, promise: promise)
+    }
+
+    AsyncFunction("readStoredBloodGlucoseData") { (date: String?, promise: Promise) in
+      self.handleReadStoredBloodGlucoseData(date: date, promise: promise)
+    }
+
+    AsyncFunction("readStoredHrvData") { (date: String?, promise: Promise) in
+      self.handleReadStoredHrvData(date: date, promise: promise)
+    }
+
+    AsyncFunction("readStoredEcgData") { (date: String?, promise: Promise) in
+      self.handleReadStoredEcgData(date: date, promise: promise)
+    }
+
+    AsyncFunction("readStoredBodyCompositionData") { (date: String?, promise: Promise) in
+      self.handleReadStoredBodyCompositionData(date: date, promise: promise)
     }
 
     AsyncFunction("startGsrTest") { (promise: Promise) in

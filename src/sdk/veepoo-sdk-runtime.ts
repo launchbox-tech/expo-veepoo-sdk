@@ -159,6 +159,11 @@ export class VeepooSDKRuntime {
       "gsrTestResult",
       "exerciseSessionData",
       "accurateSleepData",
+      "storedTemperatureData",
+      "storedBloodGlucoseData",
+      "storedHrvData",
+      "storedEcgData",
+      "storedBodyCompositionData",
       "error",
     ];
 

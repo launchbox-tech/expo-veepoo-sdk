@@ -82,6 +82,11 @@ export type {
   SleepMinuteState,
   SleepMinutePoint,
   AccurateSleepSession,
+  StoredTemperatureData,
+  StoredBloodGlucoseData,
+  StoredHrvData,
+  StoredEcgData,
+  StoredBodyCompositionData,
 } from './health-data.js';
 
 export type {

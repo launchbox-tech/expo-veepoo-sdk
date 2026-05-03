@@ -214,6 +214,62 @@ export interface ExerciseMinuteData {
   isPaused: boolean;
 }
 
+export interface StoredTemperatureData {
+  /** "YYYY-MM-DD HH:MM" */
+  timestamp: string;
+  /** Body temperature °C */
+  temperature: number;
+  /** Skin/surface temperature °C */
+  bodyTemperature?: number;
+}
+
+export interface StoredBloodGlucoseData {
+  /** "YYYY-MM-DD HH:MM" */
+  timestamp: string;
+  bloodGlucose: number;
+  /** Risk level: "low" | "normal" | "high" */
+  level?: string;
+}
+
+export interface StoredHrvData {
+  /** "YYYY-MM-DD HH:MM" */
+  timestamp: string;
+  hrv: number;
+  /** RR interval values (each × 10 = milliseconds) */
+  rrIntervals: number[];
+}
+
+export interface StoredEcgData {
+  /** "YYYY-MM-DD HH:MM:SS" */
+  timestamp: string;
+  /** Duration in seconds */
+  duration: number;
+  aveHeart: number;
+  aveHrv: number;
+  aveResRate: number;
+  aveQT?: number;
+  filterSignals: number[];
+}
+
+export interface StoredBodyCompositionData {
+  /** "YYYY-MM-DD HH:MM:SS" */
+  timestamp: string;
+  bmi: number;
+  bodyFatPercentage: number;
+  fatMass: number;
+  leanBodyMass: number;
+  muscleRate: number;
+  muscleMass: number;
+  subcutaneousFat: number;
+  bodyMoisture: number;
+  waterContent: number;
+  skeletalMuscleRate: number;
+  boneMass: number;
+  proportionOfProtein: number;
+  proteinAmount: number;
+  basalMetabolicRate: number;
+}
+
 export interface ExerciseSession {
   /** Sport mode — null if ordinal is out of range or unknown. */
   type: SportMode | null;
