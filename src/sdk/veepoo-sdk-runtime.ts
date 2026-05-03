@@ -152,6 +152,7 @@ export class VeepooSDKRuntime {
       "deviceBTStateChanged",
       "deviceSosTriggered",
       "customSettingsData",
+      "healthRemindData",
       "error",
     ];
 

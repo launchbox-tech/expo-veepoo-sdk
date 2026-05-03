@@ -58,6 +58,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | SOS call times | `readSosCallTimes`, `setSosCallTimes`; `sosCallTimesData` | Shipped | TBD |
 | Band-initiated SOS trigger | `deviceSosTriggered` | Shipped — **iOS only** (`ReceiveDeviceSOSCommand` callback); no vendor Android callback documented | TBD |
 | Custom measurement units & skin tone | `readCustomSettings`, `writeCustomSettings`; `customSettingsData` | Shipped — temperature unit (°C/°F), blood glucose unit (mmol/L / mg/dL), skin-tone level 1–6 | TBD |
+| Health reminders (multi-type) | `readHealthReminder(type)`, `setHealthReminder(reminder)`; `healthRemindData` | Shipped — 8 types: sedentary, drinkWater, lookFarAway, sport, takeMedicine, read, trip, washHands | TBD |
 | Camera remote (Band shutter trigger) | `enterCameraMode`, `exitCameraMode`; `cameraShutter` | Shipped | TBD |
 | Music control toggle & metadata push | `setMusicControlEnabled`, `pushMusicData`; `musicRemoteCommand` | Shipped — `pushMusicData` Android-only (`CAPABILITY_UNSUPPORTED` on iOS); `musicRemoteCommand` Android-only | TBD |
 | Local firmware DFU (OTA file on disk) | `startLocalFirmwareDfu`; `firmwareDfuProgress` | Partial | TBD |

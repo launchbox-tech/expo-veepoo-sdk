@@ -58,6 +58,8 @@ export type {
   GPSAndTimezoneData,
   DeviceBTState,
   DeviceBTStatus,
+  HealthReminderType,
+  HealthReminder,
 } from './device.js';
 
 export type {

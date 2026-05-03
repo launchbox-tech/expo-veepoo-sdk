@@ -14,6 +14,7 @@ import type {
   DeviceVersion,
   HeartRateAlarm,
   FindDevicePhase,
+  HealthReminder,
   MusicRemoteCommand,
   SocialMsgData,
   SosCallTimesSettings,
@@ -139,6 +140,7 @@ export type VeepooEventPayload = {
   /** Fired when the Band triggers its hardware SOS button. iOS only — no vendor Android callback documented. */
   deviceSosTriggered: { deviceId: string };
   customSettingsData: { deviceId: string; data: CustomSettings };
+  healthRemindData: { deviceId: string; data: HealthReminder };
   error: VeepooError;
 };
 

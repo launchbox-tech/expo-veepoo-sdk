@@ -80,6 +80,7 @@ class VeepooSDKModule : Module() {
     defineGPS(this@VeepooSDKModule)
     defineBluetooth(this@VeepooSDKModule)
     defineCustomSettings(this@VeepooSDKModule)
+    defineHealthReminders(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

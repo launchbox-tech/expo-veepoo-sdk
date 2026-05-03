@@ -407,3 +407,25 @@ export interface DeviceBTStatus {
   /** Current connection state. */
   state: DeviceBTState;
 }
+
+/** Reminder type passed to `readHealthReminder` / `setHealthReminder`. */
+export type HealthReminderType =
+  | 'sedentary'
+  | 'drinkWater'
+  | 'lookFarAway'
+  | 'sport'
+  | 'takeMedicine'
+  | 'read'
+  | 'trip'
+  | 'washHands';
+
+export interface HealthReminder {
+  type: HealthReminderType;
+  startHour: number;
+  startMinute: number;
+  endHour: number;
+  endMinute: number;
+  /** Reminder interval in minutes. */
+  interval: number;
+  enabled: boolean;
+}

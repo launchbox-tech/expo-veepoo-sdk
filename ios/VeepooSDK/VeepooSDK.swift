@@ -36,6 +36,7 @@ enum VeepooEvent {
   static let deviceBTStateChanged = "deviceBTStateChanged"
   static let deviceSosTriggered = "deviceSosTriggered"
   static let customSettingsData = "customSettingsData"
+  static let healthRemindData = "healthRemindData"
   static let error = "error"
 }
 
@@ -71,6 +72,7 @@ let MUSIC_REMOTE_COMMAND = VeepooEvent.musicRemoteCommand
 let DEVICE_BT_STATE_CHANGED = VeepooEvent.deviceBTStateChanged
 let DEVICE_SOS_TRIGGERED = VeepooEvent.deviceSosTriggered
 let CUSTOM_SETTINGS_DATA = VeepooEvent.customSettingsData
+let HEALTH_REMIND_DATA = VeepooEvent.healthRemindData
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -233,6 +235,7 @@ public class VeepooSDKModule: Module {
       DEVICE_BT_STATE_CHANGED,
       DEVICE_SOS_TRIGGERED,
       CUSTOM_SETTINGS_DATA,
+      HEALTH_REMIND_DATA,
       ERROR
     )
 
@@ -876,6 +879,14 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("writeCustomSettings") { (settings: [String: Any], promise: Promise) in
       self.handleWriteCustomSettings(settings, promise: promise)
+    }
+
+    AsyncFunction("readHealthReminder") { (type: String, promise: Promise) in
+      self.handleReadHealthReminder(type: type, promise: promise)
+    }
+
+    AsyncFunction("setHealthReminder") { (reminder: [String: Any], promise: Promise) in
+      self.handleSetHealthReminder(reminder, promise: promise)
     }
 
     AsyncFunction("readWomenHealthSettings") { (promise: Promise) in
