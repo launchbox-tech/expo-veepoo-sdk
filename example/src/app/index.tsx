@@ -38,6 +38,8 @@ export default function Index() {
   const [cameraInfo, setCameraInfo] = useState<string>("—");
   const [musicCommandInfo, setMusicCommandInfo] = useState<string>("—");
   const [musicEnabled, setMusicEnabled] = useState(false);
+  const [gpsInfo, setGpsInfo] = useState<string>("—");
+  const [btInfo, setBtInfo] = useState<string>("—");
   const { permissions } = useSDKInit(dispatch);
   const { devices, startScan, stopScan } = useBandScan(appState, dispatch);
   const {
@@ -480,6 +482,83 @@ export default function Index() {
                   <Text style={styles.buttonTextSecondary}>Push track</Text>
                 </Pressable>
               )}
+            </View>
+          </View>
+
+          {/* ── GPS / AGPS (#106) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>GPS / AGPS (#106)</Text>
+            <Text style={styles.findPhase}>Status: {gpsInfo}</Text>
+            <View style={styles.testCardRow}>
+              <Pressable
+                style={styles.buttonSecondary}
+                onPress={() => {
+                  setGpsInfo("sending…");
+                  void sdk
+                    .setDeviceGPSAndTimezone({
+                      latitude: 27.7172,
+                      longitude: 85.324,
+                      altitude: 1400,
+                      timezoneOffsetMinutes: 345,
+                    })
+                    .then(() => setGpsInfo("sent OK"))
+                    .catch((e: any) => setGpsInfo(e?.message ?? "error"));
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Push GPS</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* ── Band Bluetooth (#108) ── */}
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Band Bluetooth (#108)</Text>
+            <Text style={styles.findPhase}>Status: {btInfo}</Text>
+            <View style={styles.testCardRow}>
+              <Pressable
+                style={styles.buttonSecondary}
+                onPress={() => {
+                  setBtInfo("reading…");
+                  void sdk
+                    .readDeviceBTStatus()
+                    .then((s) =>
+                      setBtInfo(
+                        `open=${s.isBTOpen} state=${s.state}`
+                      )
+                    )
+                    .catch((e: any) => setBtInfo(e?.message ?? "error"));
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Read BT</Text>
+              </Pressable>
+              <Pressable
+                style={styles.buttonSecondary}
+                onPress={() => {
+                  setBtInfo("opening…");
+                  void sdk
+                    .setDeviceBTSwitch(true)
+                    .then(() => setBtInfo("opened"))
+                    .catch((e: any) => setBtInfo(e?.message ?? "error"));
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Open BT</Text>
+              </Pressable>
+              <Pressable
+                style={styles.buttonSecondary}
+                onPress={() => {
+                  setBtInfo("closing…");
+                  void sdk
+                    .setDeviceBTSwitch(false)
+                    .then(() => setBtInfo("closed"))
+                    .catch((e: any) => setBtInfo(e?.message ?? "error"));
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.buttonTextSecondary}>Close BT</Text>
+              </Pressable>
             </View>
           </View>
 

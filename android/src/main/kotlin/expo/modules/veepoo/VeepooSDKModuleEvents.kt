@@ -42,6 +42,7 @@ fun ModuleDefinitionBuilder.defineEvents() {
     SOS_CALL_TIMES_DATA,
     CAMERA_SHUTTER,
     MUSIC_REMOTE_COMMAND,
+    DEVICE_BT_STATE_CHANGED,
     ERROR
   )
 }

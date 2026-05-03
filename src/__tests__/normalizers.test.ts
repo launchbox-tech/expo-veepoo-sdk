@@ -2,6 +2,8 @@ import {
   normalizeAlarmList,
   normalizeBluetoothStatus,
   normalizeCameraShutterStatus,
+  normalizeDeviceBTState,
+  normalizeDeviceBTStatus,
   normalizeEventPayload,
   normalizeHeartRateAlarm,
   normalizeMusicRemoteCommand,
@@ -791,5 +793,79 @@ describe('normalizeEventPayload — musicRemoteCommand', () => {
   it('normalizes pausePlay command', () => {
     const r = normalizeEventPayload('musicRemoteCommand', { deviceId: 'd1', command: 'pausePlay' }) as any;
     expect(r.command).toBe('pausePlay');
+  });
+});
+
+describe('normalizeDeviceBTState', () => {
+  it('maps 0 to disconnected', () => {
+    expect(normalizeDeviceBTState(0)).toBe('disconnected');
+  });
+  it('maps 1 to connected', () => {
+    expect(normalizeDeviceBTState(1)).toBe('connected');
+  });
+  it('maps 2 to pairing', () => {
+    expect(normalizeDeviceBTState(2)).toBe('pairing');
+  });
+  it('maps string "connected" to connected', () => {
+    expect(normalizeDeviceBTState('connected')).toBe('connected');
+  });
+  it('maps string "pairing" to pairing', () => {
+    expect(normalizeDeviceBTState('pairing')).toBe('pairing');
+  });
+  it('falls back to disconnected for unknown', () => {
+    expect(normalizeDeviceBTState(99)).toBe('disconnected');
+    expect(normalizeDeviceBTState(undefined)).toBe('disconnected');
+  });
+});
+
+describe('normalizeDeviceBTStatus', () => {
+  it('normalizes a full Android BTInfo record', () => {
+    const result = normalizeDeviceBTStatus({
+      isBTOpen: true,
+      isAutoCon: true,
+      isAudioOpen: false,
+      isHavePairInfo: true,
+      status: 1,
+    });
+    expect(result).toEqual({
+      isBTOpen: true,
+      isAutoConnect: true,
+      isAudioOpen: false,
+      hasPairInfo: true,
+      state: 'connected',
+    });
+  });
+
+  it('handles missing/undefined fields gracefully', () => {
+    const result = normalizeDeviceBTStatus({});
+    expect(result.isBTOpen).toBe(false);
+    expect(result.isAutoConnect).toBe(false);
+    expect(result.isAudioOpen).toBe(false);
+    expect(result.hasPairInfo).toBe(false);
+    expect(result.state).toBe('disconnected');
+  });
+
+  it('handles non-object input', () => {
+    const result = normalizeDeviceBTStatus(null);
+    expect(result.isBTOpen).toBe(false);
+    expect(result.state).toBe('disconnected');
+  });
+});
+
+describe('normalizeEventPayload — deviceBTStateChanged', () => {
+  it('normalizes numeric state', () => {
+    const r = normalizeEventPayload('deviceBTStateChanged', {
+      deviceId: 'd1', state: 1, btSwitchOpen: true, mediaSwitchOpen: false,
+    }) as any;
+    expect(r.state).toBe('connected');
+    expect(r.btSwitchOpen).toBe(true);
+    expect(r.mediaSwitchOpen).toBe(false);
+  });
+
+  it('normalizes string state via btState fallback', () => {
+    const r = normalizeEventPayload('deviceBTStateChanged', {
+      deviceId: 'd1', btState: 'pairing', btSwitchOpen: false, mediaSwitchOpen: false,
+    }) as any;
+    expect(r.state).toBe('pairing');
   });
 });

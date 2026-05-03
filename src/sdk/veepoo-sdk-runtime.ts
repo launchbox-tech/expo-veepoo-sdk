@@ -149,6 +149,7 @@ export class VeepooSDKRuntime {
       "sosCallTimesData",
       "cameraShutter",
       "musicRemoteCommand",
+      "deviceBTStateChanged",
       "error",
     ];
 

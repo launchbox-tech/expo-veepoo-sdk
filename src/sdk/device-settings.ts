@@ -2,6 +2,7 @@ import { invokeNative } from "../bridge/native-invoke-pipeline.js";
 import {
   normalizeAlarmList,
   normalizeAutoMeasureSettings,
+  normalizeDeviceBTStatus,
   normalizeHeartRateAlarm,
   normalizeScreenLightDuration,
   normalizeScreenLightSettings,
@@ -33,12 +34,15 @@ import {
   validateNewContact,
   validateContactId,
   validateSosCallTimes,
+  validateGPSAndTimezoneData,
   validateMusicData,
 } from "../validators/index.js";
 import type {
   AutoMeasureSetting,
   DeviceAlarm,
+  DeviceBTStatus,
   DeviceContact,
+  GPSAndTimezoneData,
   HeartRateAlarm,
   Language,
   MusicData,
@@ -511,6 +515,35 @@ export class DeviceSettings {
     return invokeNative({
       validate: () => validateMusicData(data),
       invoke: () => this.rt.native.pushMusicData(data),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void> {
+    return invokeNative({
+      validate: () => validateGPSAndTimezoneData(data),
+      invoke: () => this.rt.native.setDeviceGPSAndTimezone(data),
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  readDeviceBTStatus(): Promise<DeviceBTStatus> {
+    return invokeNative({
+      invoke: () => this.rt.native.readDeviceBTStatus(),
+      normalize: normalizeDeviceBTStatus,
+      fallbackCode: "OPERATION_FAILED",
+      deviceId: this.rt.state.connectedDeviceId ?? undefined,
+      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+    });
+  }
+
+  setDeviceBTSwitch(open: boolean): Promise<void> {
+    return invokeNative({
+      invoke: () => this.rt.native.setDeviceBTSwitch(open),
       fallbackCode: "OPERATION_FAILED",
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),

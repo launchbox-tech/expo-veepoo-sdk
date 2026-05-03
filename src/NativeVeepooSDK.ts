@@ -24,6 +24,7 @@ import type {
   PermissionsResult,
   SocialMsgData,
   MusicData,
+  GPSAndTimezoneData,
 } from "./types/index.js";
 
 const LINKING_ERROR =
@@ -116,6 +117,9 @@ export interface NativeVeepooSDKInterface {
   exitCameraMode(): Promise<void>;
   setMusicControlEnabled(enabled: boolean): Promise<void>;
   pushMusicData(data: MusicData): Promise<void>;
+  setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void>;
+  readDeviceBTStatus(): Promise<unknown>;
+  setDeviceBTSwitch(open: boolean): Promise<void>;
   addListener(
     event: VeepooEvent,
     listener: (payload: unknown) => void,

@@ -8,6 +8,8 @@ export {
   normalizeAlarmList,
   normalizeBatteryInfo,
   normalizeCameraShutterStatus,
+  normalizeDeviceBTState,
+  normalizeDeviceBTStatus,
   normalizeDeviceFunctions,
   normalizeHeartRateAlarm,
   normalizeMusicRemoteCommand,

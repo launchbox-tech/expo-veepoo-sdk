@@ -139,6 +139,7 @@ fun VeepooSDKModule.updateFunctionsFromSupportData(data: FunctionDeviceSupportDa
   )
   val package3 = mapOf(
     "stressFunction" to toSupportedStatus(data.stress),
+    "agps" to toSupportedStatus(data.agps),
     "bloodGlucose" to "unsupported",
     "bloodComponent" to "unsupported",
     "bodyComponent" to "unsupported"

@@ -80,6 +80,10 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 
 **Music control:** Gate with `readDeviceFunctions().musicFunction`. **iOS:** `setMusicControlEnabled` uses `veepooSDKSettingBaseFunctionType(.musicControl, settingState:)` (on/off toggle). **Android:** no documented setter — `setMusicControlEnabled` resolves immediately as no-op. `pushMusicData` is Android-only (`settingMusicData` + `IMusicControlListener`; emits `musicRemoteCommand` for next/previous/pausePlay). `pushMusicData` on iOS rejects with `CAPABILITY_UNSUPPORTED`.
 
+**GPS / AGPS:** Gate with `readDeviceFunctions().package3.agpsFunction`. `setDeviceGPSAndTimezone` pushes lat/lon/altitude/timezone to the Band. **iOS:** `veepooSDK_setDeviceGPSAndTimezoneWithModel:result:` (result 0=unsupported, 1=success, 2=failed). **Android:** no documented GPS data-transfer API — rejects with `CAPABILITY_UNSUPPORTED`. **Not bridged:** AGPS ephemeris transfer (`veepooSDK_AGPSTransformWithFileUrl`), device-initiated live GPS feed (`veepooSDK_sendGPSDataToDeviceWithBlock`), KAABA direction APIs.
+
+**Band Bluetooth toggle:** Controls the Band's **classic BT radio** (for phone-call audio forwarding), not the phone's BLE adapter. `readDeviceBTStatus` returns `DeviceBTStatus`; `setDeviceBTSwitch(open)` toggles the radio; `deviceBTStateChanged` event fires on state changes. **Android:** full API — `readBTInfo` / `setBTSwitchStatus` / `IDeviceBTInfoListener` (supports both open and close). **iOS:** `veepooSDK_openDeviceBTSwitch` (open only); `VPBTConnectStateChangeBlock` for events. Gate: `CPUType == 1` (Jerry series). `setDeviceBTSwitch(false)` on iOS rejects with `CAPABILITY_UNSUPPORTED` (no vendor close API). **Not bridged:** advanced `setBTStatus` (auto-reconnect, audio routing, clear pairing), manual `connectBT`/`disconnectBT`.
+
 **Local firmware DFU:** High-risk — host apps must gate UX (e.g. battery > 30%). **iOS:** `VPDFUOperation` `veepooSDKStartDfuWithFilePath` (+ `DeviceDFUState` in `firmwareDfuProgress`). **Android:** `VPOperateManager.startJLDeviceOTAUpgrade` when `isJLDevice` (Jerry / JL path only). Remote `checkDeviceOTAInfo` / `getOadVersion` and non-JL DFU are **not** in this bridge yet.
 
 ---
@@ -138,8 +142,8 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 
 - Remote OTA metadata / download (`checkDeviceOTAInfo`, `getOadVersion`, `veepooSDKStartDfu` server path) and non-JL Android DFU  
 - Server / marketplace dial transfer, custom photo push pipelines, video dials (beyond slot read/set)  
-- AGPS  
-- Platform-specific extras (e.g. toggling OS Bluetooth from SDK)
+- AGPS ephemeris transfer, device-initiated live GPS feed, KAABA direction APIs  
+- Advanced Band BT controls (auto-reconnect, audio routing, clear pairing, manual connect/disconnect)
 
 Treat gaps as **Not in JS** until a PR adds methods **and** updates this matrix.
 

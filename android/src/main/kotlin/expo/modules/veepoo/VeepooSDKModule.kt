@@ -76,6 +76,8 @@ class VeepooSDKModule : Module() {
     defineFirmwareDfu(this@VeepooSDKModule)
     defineWatchFaceStyle(this@VeepooSDKModule)
     defineMedia(this@VeepooSDKModule)
+    defineGPS(this@VeepooSDKModule)
+    defineBluetooth(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

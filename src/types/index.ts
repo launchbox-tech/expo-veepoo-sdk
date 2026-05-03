@@ -55,6 +55,9 @@ export type {
   CameraShutterStatus,
   MusicData,
   MusicRemoteCommand,
+  GPSAndTimezoneData,
+  DeviceBTState,
+  DeviceBTStatus,
 } from './device.js';
 
 export type {

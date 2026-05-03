@@ -10,6 +10,7 @@ import {
   normalizeBatteryInfo,
   normalizeCameraShutterStatus,
   normalizeContactList,
+  normalizeDeviceBTState,
   normalizeDeviceFunctions,
   normalizeDeviceVersion,
   normalizeHeartRateAlarm,
@@ -168,6 +169,13 @@ export function normalizeEventPayload(event: VeepooEvent, payload: unknown): unk
       return { ...p, status: normalizeCameraShutterStatus(p.status) };
     case 'musicRemoteCommand':
       return { ...p, command: normalizeMusicRemoteCommand(p.command) };
+    case 'deviceBTStateChanged':
+      return {
+        ...p,
+        state: normalizeDeviceBTState(p.state ?? p.btState),
+        btSwitchOpen: p.btSwitchOpen === true,
+        mediaSwitchOpen: p.mediaSwitchOpen === true,
+      };
     case 'hrvTestResult':
       return { ...p, result: normalizeHrvTestResult(p.result) };
     case 'ecgTestResult':

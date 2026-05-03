@@ -30,6 +30,8 @@ import type {
   WeatherSettings,
   WeatherData,
   MusicData,
+  GPSAndTimezoneData,
+  DeviceBTStatus,
   ScanOptions,
   ConnectOptions,
   ConnectionStatus,
@@ -267,6 +269,15 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
 
   pushMusicData = (data: MusicData): Promise<void> =>
     this.deviceSettings.pushMusicData(data);
+
+  setDeviceGPSAndTimezone = (data: GPSAndTimezoneData): Promise<void> =>
+    this.deviceSettings.setDeviceGPSAndTimezone(data);
+
+  readDeviceBTStatus = (): Promise<DeviceBTStatus> =>
+    this.deviceSettings.readDeviceBTStatus();
+
+  setDeviceBTSwitch = (open: boolean): Promise<void> =>
+    this.deviceSettings.setDeviceBTSwitch(open);
 
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 

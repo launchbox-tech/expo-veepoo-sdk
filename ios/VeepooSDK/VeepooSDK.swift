@@ -33,6 +33,7 @@ enum VeepooEvent {
   static let firmwareDfuProgress = "firmwareDfuProgress"
   static let cameraShutter = "cameraShutter"
   static let musicRemoteCommand = "musicRemoteCommand"
+  static let deviceBTStateChanged = "deviceBTStateChanged"
   static let error = "error"
 }
 
@@ -65,6 +66,7 @@ let FIND_DEVICE_STATE = VeepooEvent.findDeviceState
 let FIRMWARE_DFU_PROGRESS = VeepooEvent.firmwareDfuProgress
 let CAMERA_SHUTTER = VeepooEvent.cameraShutter
 let MUSIC_REMOTE_COMMAND = VeepooEvent.musicRemoteCommand
+let DEVICE_BT_STATE_CHANGED = VeepooEvent.deviceBTStateChanged
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -224,6 +226,7 @@ public class VeepooSDKModule: Module {
       SOS_CALL_TIMES_DATA,
       CAMERA_SHUTTER,
       MUSIC_REMOTE_COMMAND,
+      DEVICE_BT_STATE_CHANGED,
       ERROR
     )
 
@@ -915,6 +918,20 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("pushMusicData") { (data: [String: Any], promise: Promise) in
       self.handlePushMusicData(data, promise: promise)
+    }
+
+    // MARK: GPS / Location
+    AsyncFunction("setDeviceGPSAndTimezone") { (data: [String: Any], promise: Promise) in
+      self.handleSetDeviceGPSAndTimezone(data, promise: promise)
+    }
+
+    // MARK: Band Bluetooth
+    AsyncFunction("readDeviceBTStatus") { (promise: Promise) in
+      self.handleReadDeviceBTStatus(promise: promise)
+    }
+
+    AsyncFunction("setDeviceBTSwitch") { (open: Bool, promise: Promise) in
+      self.handleSetDeviceBTSwitch(open, promise: promise)
     }
 
     AsyncFunction("startLocalFirmwareDfu") { (filePath: String, promise: Promise) in

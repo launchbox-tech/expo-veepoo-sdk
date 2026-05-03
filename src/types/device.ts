@@ -371,3 +371,39 @@ export interface MusicData {
 
 /** Remote command emitted when the Band sends a music control action (`musicRemoteCommand` event). Android only. */
 export type MusicRemoteCommand = 'next' | 'previous' | 'pausePlay';
+
+/**
+ * GPS + timezone data pushed to the Band via `setDeviceGPSAndTimezone`.
+ * iOS only — Android rejects with `CAPABILITY_UNSUPPORTED`.
+ * Gate: check `readDeviceFunctions().package3.agpsFunction` before calling.
+ */
+export interface GPSAndTimezoneData {
+  /** Latitude in decimal degrees (e.g. 39.904987). Range: -90 to 90. */
+  latitude: number;
+  /** Longitude in decimal degrees (e.g. 116.405289). Range: -180 to 180. */
+  longitude: number;
+  /** Altitude in meters. Optional. */
+  altitude?: number;
+  /** Timezone offset from UTC in minutes (must be multiple of 15). E.g. 480 for UTC+8. */
+  timezoneOffsetMinutes: number;
+}
+
+/** Band's classic Bluetooth connection state (used in `deviceBTStateChanged` event). */
+export type DeviceBTState = 'disconnected' | 'connected' | 'pairing';
+
+/**
+ * Band's classic Bluetooth status returned by `readDeviceBTStatus`.
+ * Classic BT is the secondary radio used for phone-call audio forwarding.
+ */
+export interface DeviceBTStatus {
+  /** Whether the Band's classic BT radio is on. */
+  isBTOpen: boolean;
+  /** Whether the Band auto-reconnects classic BT. */
+  isAutoConnect: boolean;
+  /** Whether multimedia audio is routed through the Band. */
+  isAudioOpen: boolean;
+  /** Whether pairing info exists on the Band. */
+  hasPairInfo: boolean;
+  /** Current connection state. */
+  state: DeviceBTState;
+}

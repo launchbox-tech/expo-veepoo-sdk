@@ -8,6 +8,7 @@ import type {
   BatteryInfo,
   CameraShutterStatus,
   DeviceAlarm,
+  DeviceBTState,
   DeviceContact,
   DeviceFunctions,
   DeviceVersion,
@@ -127,6 +128,13 @@ export type VeepooEventPayload = {
   cameraShutter: { deviceId: string; status: CameraShutterStatus };
   /** Fired when the Band sends a music remote command. Android only. */
   musicRemoteCommand: { deviceId: string; command: MusicRemoteCommand };
+  /** Fired when the Band's classic BT state changes. */
+  deviceBTStateChanged: {
+    deviceId: string;
+    state: DeviceBTState;
+    btSwitchOpen: boolean;
+    mediaSwitchOpen: boolean;
+  };
   error: VeepooError;
 };
 

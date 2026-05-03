@@ -3,6 +3,8 @@ import type {
   DeviceAlarm,
   DeviceContact,
   MusicData,
+  GPSAndTimezoneData,
+  DeviceBTStatus,
   NewDeviceContact,
   OperationStatus,
   ScanOptions,
@@ -118,6 +120,9 @@ export interface VeepooSDKModuleInterface {
   exitCameraMode(): Promise<void>;
   setMusicControlEnabled(enabled: boolean): Promise<void>;
   pushMusicData(data: MusicData): Promise<void>;
+  setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void>;
+  readDeviceBTStatus(): Promise<DeviceBTStatus>;
+  setDeviceBTSwitch(open: boolean): Promise<void>;
   startLocalFirmwareDfu(filePath: string): Promise<void>;
   readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle>;
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;

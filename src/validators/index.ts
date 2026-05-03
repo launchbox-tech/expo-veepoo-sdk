@@ -20,5 +20,6 @@ export {
   validateNewContact,
   validateContactId,
   validateSosCallTimes,
+  validateGPSAndTimezoneData,
   validateMusicData,
 } from './device-settings.js';

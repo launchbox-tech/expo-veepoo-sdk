@@ -353,6 +353,7 @@ extension VeepooSDKModule {
     let package3: [String: Any] = [
       "type": "DeviceFunctionPackage3",
       "stressFunction": device.stressType > 1 ? "support" : "unsupported",
+      "agpsFunction": device.agpsFunction > 0 ? "support" : "unsupported",
       "bloodGlucose": device.bloodGlucoseType > 0 ? "support" : "unsupported",
       "bloodComponent": device.bloodAnalysisType > 0 ? "support" : "unsupported",
       "bodyComponent": device.bodyCompositionType > 0 ? "support" : "unsupported"

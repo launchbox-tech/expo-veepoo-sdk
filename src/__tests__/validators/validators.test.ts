@@ -22,6 +22,7 @@ import {
   validateContactId,
   validateSosCallTimes,
   validateMusicData,
+  validateGPSAndTimezoneData,
 } from '../../validators/index';
 
 function expectInvalidArgument(fn: () => void, fieldHint?: string): void {
@@ -721,5 +722,49 @@ describe('validateMusicData', () => {
 
   it('throws for non-integer volume', () => {
     expectInvalidArgument(() => validateMusicData({ ...valid, volume: 50.5 }), 'volume');
+  });
+});
+
+describe('validateGPSAndTimezoneData', () => {
+  const valid = { latitude: 39.904987, longitude: 116.405289, timezoneOffsetMinutes: 480 };
+
+  it('accepts valid GPS data', () => {
+    expect(() => validateGPSAndTimezoneData(valid)).not.toThrow();
+  });
+
+  it('accepts valid GPS data with altitude', () => {
+    expect(() => validateGPSAndTimezoneData({ ...valid, altitude: 50 })).not.toThrow();
+  });
+
+  it('throws for latitude out of range (> 90)', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, latitude: 91 }), 'latitude');
+  });
+
+  it('throws for latitude out of range (< -90)', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, latitude: -91 }), 'latitude');
+  });
+
+  it('throws for longitude out of range (> 180)', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, longitude: 181 }), 'longitude');
+  });
+
+  it('throws for longitude out of range (< -180)', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, longitude: -181 }), 'longitude');
+  });
+
+  it('throws for NaN latitude', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, latitude: NaN }), 'latitude');
+  });
+
+  it('throws for non-finite altitude', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, altitude: Infinity }), 'altitude');
+  });
+
+  it('throws for non-multiple-of-15 timezoneOffsetMinutes', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, timezoneOffsetMinutes: 481 }), 'timezoneOffsetMinutes');
+  });
+
+  it('throws for non-integer timezoneOffsetMinutes', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, timezoneOffsetMinutes: 480.5 }), 'timezoneOffsetMinutes');
   });
 });

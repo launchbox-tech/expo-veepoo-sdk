@@ -92,6 +92,9 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "exitCameraMode",
   "setMusicControlEnabled",
   "pushMusicData",
+  "setDeviceGPSAndTimezone",
+  "readDeviceBTStatus",
+  "setDeviceBTSwitch",
 ] as const satisfies readonly NativeAsyncMethodName[];
 
 export type NativeAsyncRegistryUnion =

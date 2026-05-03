@@ -97,6 +97,9 @@ export type {
   CameraShutterStatus,
   MusicData,
   MusicRemoteCommand,
+  GPSAndTimezoneData,
+  DeviceBTState,
+  DeviceBTStatus,
 } from './types/index.js';
 
 export type { VeepooSDKModuleInterface, LogListener } from './VeepooSDKModule.js';
