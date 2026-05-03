@@ -18,3 +18,7 @@ export { default as CameraMusicCard } from '../app/components/CameraMusicCard';
 export { default as GpsAgpsCard } from '../app/components/GpsAgpsCard';
 export { default as BandBluetoothCard } from '../app/components/BandBluetoothCard';
 export { default as FirmwareDfuCard } from '../app/components/FirmwareDfuCard';
+export { default as PersonalInfoSync } from '../app/components/PersonalInfoSync';
+export { default as HealthTestsSection } from '../app/components/HealthTestsSection';
+export { default as VitalsLabSection } from '../app/components/VitalsLabSection';
+export { default as EventLogCard } from '../app/components/EventLogCard';

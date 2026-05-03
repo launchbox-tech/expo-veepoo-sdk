@@ -16,19 +16,16 @@ import type {
 } from "@gaozh1024/expo-veepoo-sdk";
 import {
   ActivityIndicator,
-  Platform,
   Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
-  Switch,
   Text,
   View,
 } from "react-native";
-import { BLUE, GREEN, RED } from "../../components/theme";
+import { BLUE, RED } from "../../components/theme";
 import {
-  HealthTestCard,
   ReadyHeader,
   DeviceInfoCard,
   FindBandCard,
@@ -41,6 +38,10 @@ import {
   GpsAgpsCard,
   BandBluetoothCard,
   FirmwareDfuCard,
+  PersonalInfoSync,
+  HealthTestsSection,
+  VitalsLabSection,
+  EventLogCard,
 } from "../../components";
 
 const styles = StyleSheet.create({
@@ -69,9 +70,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.6,
   },
-  syncRow: { flexDirection: "row", alignItems: "center" },
-  syncDone: { fontSize: 15, color: GREEN, fontWeight: "600" },
-  syncPending: { fontSize: 15, color: "#666" },
   testCardRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -111,31 +109,6 @@ const styles = StyleSheet.create({
   },
   dataSummaryValue: { fontSize: 22, fontWeight: "700", color: "#111" },
   dataSummaryMeta: { fontSize: 12, color: "#888" },
-  ecgWaveformRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingTop: 6,
-    borderTopWidth: 1,
-    borderTopColor: "#E5EDF7",
-  },
-  ecgWaveformLabel: { fontSize: 13, color: "#555" },
-  labLogHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 6,
-  },
-  labLogClear: { fontSize: 13, fontWeight: "600", color: BLUE },
-  labLogScroll: { maxHeight: 200 },
-  labLogEmpty: { fontSize: 12, color: "#888", lineHeight: 18 },
-  labLogLine: {
-    fontSize: 11,
-    lineHeight: 16,
-    color: "#333",
-    fontFamily: Platform.select({ ios: "Menlo", default: "monospace" }),
-    marginBottom: 4,
-  },
   button: {
     height: 52,
     borderRadius: 12,
@@ -297,176 +270,43 @@ export default function ReadyScreen({
         <BandBluetoothCard />
         <FirmwareDfuCard />
 
-        {/* ── Personal Info Sync ── */}
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Personal Info Sync</Text>
-          <View style={styles.syncRow}>
-            {syncDone ? (
-              <Text style={styles.syncDone}>✓ Synced</Text>
-            ) : (
-              <>
-                <ActivityIndicator size="small" color={BLUE} />
-                <Text style={styles.syncPending}> Syncing…</Text>
-              </>
-            )}
-          </View>
-        </View>
+        <PersonalInfoSync syncDone={syncDone} />
 
-        {/* ── Health Tests (#8) ── */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Health Tests</Text>
-        </View>
-        <HealthTestCard
-          label="Heart Rate"
-          isActive={activeTest === "hr"}
-          disabled={activeTest !== null && activeTest !== "hr"}
-          progress={hrResult?.progress}
-          state={hrResult?.state}
-          resultLine={hrResult?.value != null ? `${hrResult.value} bpm` : null}
-          onStart={startHR}
-          onStop={stopHR}
-        />
-        <HealthTestCard
-          label="Blood Pressure"
-          isActive={activeTest === "bp"}
-          disabled={activeTest !== null && activeTest !== "bp"}
-          progress={bpResult?.progress}
-          state={bpResult?.state}
-          resultLine={
-            bpResult?.systolic != null
-              ? `${bpResult.systolic}/${bpResult.diastolic} mmHg · ${bpResult.pulse} bpm`
-              : null
-          }
-          onStart={startBP}
-          onStop={stopBP}
-        />
-        <HealthTestCard
-          label="Blood Oxygen (SpO₂)"
-          isActive={activeTest === "spo2"}
-          disabled={activeTest !== null && activeTest !== "spo2"}
-          progress={spo2Result?.progress}
-          state={spo2Result?.state}
-          resultLine={spo2Result?.value != null ? `${spo2Result.value}% SpO₂` : null}
-          onStart={startSpo2}
-          onStop={stopSpo2}
+        <HealthTestsSection
+          activeTest={activeTest}
+          hrResult={hrResult}
+          bpResult={bpResult}
+          spo2Result={spo2Result}
+          startHR={startHR}
+          stopHR={stopHR}
+          startBP={startBP}
+          stopBP={stopBP}
+          startSpo2={startSpo2}
+          stopSpo2={stopSpo2}
         />
 
-        {/* ── Vitals lab (#66 / #72) ── */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Vitals lab</Text>
-        </View>
-        <HealthTestCard
-          label="HRV (manual)"
-          isActive={activeTest === "hrv"}
-          disabled={activeTest !== null && activeTest !== "hrv"}
-          progress={hrvResult?.progress}
-          state={typeof hrvResult?.state === "string" ? hrvResult.state : undefined}
-          resultLine={hrvResult?.value != null ? `${hrvResult.value}` : null}
-          onStart={startHrv}
-          onStop={stopHrv}
-        />
-        <HealthTestCard
-          label="ECG"
-          isActive={activeTest === "ecg"}
-          disabled={activeTest !== null && activeTest !== "ecg"}
-          progress={ecgResult?.progress}
-          state={typeof ecgResult?.state === "string" ? ecgResult.state : undefined}
-          resultLine={
-            ecgResult?.heartRate != null
-              ? `HR ${ecgResult.heartRate}${
-                  ecgResult.hrv != null ? ` · HRV ${ecgResult.hrv}` : ""
-                }${
-                  ecgResult.waveform?.length
-                    ? ` · ${ecgResult.waveform.length} waveform samples`
-                    : ""
-                }`
-              : null
-          }
-          footer={
-            <View style={styles.ecgWaveformRow}>
-              <Text style={styles.ecgWaveformLabel}>Include waveform</Text>
-              <Switch
-                value={ecgIncludeWaveform}
-                onValueChange={setEcgIncludeWaveform}
-                disabled={activeTest === "ecg"}
-              />
-            </View>
-          }
-          onStart={startEcg}
-          onStop={stopEcg}
-        />
-        <HealthTestCard
-          label="Fatigue"
-          isActive={activeTest === "fatigue"}
-          disabled={activeTest !== null && activeTest !== "fatigue"}
-          progress={fatigueResult?.progress}
-          state={typeof fatigueResult?.state === "string" ? fatigueResult.state : undefined}
-          resultLine={fatigueResult?.level != null ? `Level ${fatigueResult.level}` : null}
-          onStart={startFatigue}
-          onStop={stopFatigue}
-        />
-        <HealthTestCard
-          label="Breathing rate"
-          isActive={activeTest === "breathing"}
-          disabled={activeTest !== null && activeTest !== "breathing"}
-          progress={breathingResult?.progress}
-          state={typeof breathingResult?.state === "string" ? breathingResult.state : undefined}
-          resultLine={breathingResult?.rate != null ? `${breathingResult.rate} bpm` : null}
-          onStart={startBreathing}
-          onStop={stopBreathing}
-        />
-        <HealthTestCard
-          label="Body composition (#102)"
-          isActive={activeTest === "bodyComposition"}
-          disabled={activeTest !== null && activeTest !== "bodyComposition"}
-          progress={bodyCompositionResult?.progress}
-          state={
-            typeof bodyCompositionResult?.state === "string"
-              ? bodyCompositionResult.state
-              : undefined
-          }
-          resultLine={
-            bodyCompositionResult?.composition?.bmi != null
-              ? `BMI ${bodyCompositionResult.composition.bmi.toFixed(1)}`
-              : bodyCompositionResult?.composition?.bodyFatPercentage != null
-              ? `Fat ${bodyCompositionResult.composition.bodyFatPercentage}%`
-              : null
-          }
-          onStart={startBodyComposition}
-          onStop={stopBodyComposition}
+        <VitalsLabSection
+          activeTest={activeTest}
+          hrvResult={hrvResult}
+          ecgResult={ecgResult}
+          fatigueResult={fatigueResult}
+          breathingResult={breathingResult}
+          bodyCompositionResult={bodyCompositionResult}
+          ecgIncludeWaveform={ecgIncludeWaveform}
+          setEcgIncludeWaveform={setEcgIncludeWaveform}
+          startHrv={startHrv}
+          stopHrv={stopHrv}
+          startEcg={startEcg}
+          stopEcg={stopEcg}
+          startFatigue={startFatigue}
+          stopFatigue={stopFatigue}
+          startBreathing={startBreathing}
+          stopBreathing={stopBreathing}
+          startBodyComposition={startBodyComposition}
+          stopBodyComposition={stopBodyComposition}
         />
 
-        {/* ── Event log ── */}
-        <View style={styles.card}>
-          <View style={styles.labLogHeader}>
-            <Text style={styles.cardLabel}>Event log</Text>
-            <Pressable
-              onPress={clearLabLog}
-              accessibilityRole="button"
-              accessibilityLabel="Clear event log"
-            >
-              <Text style={styles.labLogClear}>Clear</Text>
-            </Pressable>
-          </View>
-          <ScrollView
-            style={styles.labLogScroll}
-            nestedScrollEnabled
-            keyboardShouldPersistTaps="handled"
-          >
-            {labLog.length === 0 ? (
-              <Text style={styles.labLogEmpty}>
-                Vitals events, errors from start/stop, and `error` events appear
-                here (mutex: one realtime test at a time).
-              </Text>
-            ) : (
-              labLog.map((line, i) => (
-                <Text key={`log-${i}`} style={styles.labLogLine} selectable>
-                  {line}
-                </Text>
-              ))
-            )}
-          </ScrollView>
-        </View>
+        <EventLogCard labLog={labLog} clearLabLog={clearLabLog} />
 
         {/* ── Historical Data Sync (#9) ── */}
         <View style={styles.sectionHeader}>
