@@ -1,8 +1,8 @@
 # 0118 — PRD: Feature parity gaps — health reminders, exercise data, offline vitals, accurate sleep, SOS event, units, sport mode, apnea, electrode tests
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/118
-> Labels: needs-triage
-> Status: open
+> Labels: (none)
+> Status: closed (fully fulfilled — all 11 implementation issues #119–#129 shipped)
 
 ## Problem Statement
 
