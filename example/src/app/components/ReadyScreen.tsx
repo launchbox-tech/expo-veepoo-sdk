@@ -42,6 +42,8 @@ import {
   HealthTestsSection,
   VitalsLabSection,
   EventLogCard,
+  HistoricalDataSection,
+  DisconnectButton,
 } from "../../components";
 
 const styles = StyleSheet.create({
@@ -308,88 +310,15 @@ export default function ReadyScreen({
 
         <EventLogCard labLog={labLog} clearLabLog={clearLabLog} />
 
-        {/* ── Historical Data Sync (#9) ── */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Historical Data</Text>
-        </View>
-        <View style={styles.card}>
-          <View style={styles.testCardRow}>
-            <Text style={styles.testLabel}>Sync Data</Text>
-            <Pressable
-              style={({ pressed }) => [
-                styles.testBtn,
-                dataSyncing ? styles.testBtnDisabled : styles.testBtnIdle,
-                pressed && !dataSyncing && styles.buttonPressed,
-              ]}
-              disabled={dataSyncing}
-              onPress={syncData}
-              accessibilityRole="button"
-              accessibilityLabel="Sync historical data from device"
-              accessibilityState={{ disabled: dataSyncing }}
-            >
-              {dataSyncing ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.testBtnText}>Sync</Text>
-              )}
-            </Pressable>
-          </View>
+        <HistoricalDataSection
+          dataSyncing={dataSyncing}
+          dataSyncProgress={dataSyncProgress}
+          sleepSummary={sleepSummary}
+          stepData={stepData}
+          syncData={syncData}
+        />
 
-          {dataSyncing && dataSyncProgress && (
-            <>
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${syncPct}%` }]} />
-              </View>
-              <Text style={styles.syncProgressLabel}>
-                Day {dataSyncProgress.currentDay}/{dataSyncProgress.totalDays} ·{" "}
-                {Math.round(syncPct)}%
-              </Text>
-            </>
-          )}
-
-          {!dataSyncing && stepData && (
-            <View style={styles.dataSummary}>
-              <Text style={styles.dataSummaryTitle}>Today&apos;s Steps</Text>
-              <Text style={styles.dataSummaryValue}>
-                {stepData.stepCount.toLocaleString()}
-              </Text>
-              <Text style={styles.dataSummaryMeta}>
-                {(stepData.distance / 1000).toFixed(2)} km ·{" "}
-                {Math.round(stepData.calories)} kcal
-              </Text>
-            </View>
-          )}
-
-          {!dataSyncing && sleepSummary && (
-            <View style={styles.dataSummary}>
-              <Text style={styles.dataSummaryTitle}>Last Night&apos;s Sleep</Text>
-              <Text style={styles.dataSummaryValue}>
-                {Math.floor(sleepSummary.totalSleepMinutes / 60)}h{" "}
-                {sleepSummary.totalSleepMinutes % 60}m
-              </Text>
-              <Text style={styles.dataSummaryMeta}>
-                Deep {sleepSummary.totalDeepSleepMinutes}m · Light{" "}
-                {sleepSummary.totalLightSleepMinutes}m · Woke{" "}
-                {sleepSummary.totalWakeUpCount}×
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* ── Disconnect ── */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            styles.buttonStop,
-            pressed && styles.buttonPressed,
-            styles.disconnectBtn,
-          ]}
-          onPress={disconnect}
-          accessibilityRole="button"
-          accessibilityLabel="Disconnect from device"
-        >
-          <Text style={styles.buttonText}>Disconnect</Text>
-        </Pressable>
+        <DisconnectButton disconnect={disconnect} />
 
       </ScrollView>
     </SafeAreaView>

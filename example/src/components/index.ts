@@ -22,3 +22,5 @@ export { default as PersonalInfoSync } from '../app/components/PersonalInfoSync'
 export { default as HealthTestsSection } from '../app/components/HealthTestsSection';
 export { default as VitalsLabSection } from '../app/components/VitalsLabSection';
 export { default as EventLogCard } from '../app/components/EventLogCard';
+export { default as HistoricalDataSection } from '../app/components/HistoricalDataSection';
+export { default as DisconnectButton } from '../app/components/DisconnectButton';
