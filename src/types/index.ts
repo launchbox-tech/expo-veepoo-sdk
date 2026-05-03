@@ -95,6 +95,7 @@ export type {
   BodyCompositionTestResult,
   BloodAnalysisValues,
   BloodAnalysisTestResult,
+  GsrTestResult,
   ReadState,
   ReadOriginProgress,
 } from './health-tests.js';

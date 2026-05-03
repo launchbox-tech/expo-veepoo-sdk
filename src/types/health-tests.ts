@@ -146,6 +146,20 @@ export interface BloodAnalysisTestResult {
   values: BloodAnalysisValues | null;
 }
 
+/** GSR (Galvanic Skin Response) test result. Android only — iOS stubs CAPABILITY_UNSUPPORTED. */
+export interface GsrTestResult {
+  state: TestState | string;
+  progress: number;
+  /** Emotion level 0–10 */
+  emotionLevel: number | null;
+  /** Skin moisture percentage 0–100 */
+  skinMoisture: number | null;
+  /** Sympathetic nervous system activation 0–100 */
+  snsActivation: number | null;
+  /** Raw cortisol value from device */
+  cortisolValue: number | null;
+}
+
 export type ReadState = 'idle' | 'start' | 'reading' | 'complete' | 'invalid';
 
 export interface ReadOriginProgress {

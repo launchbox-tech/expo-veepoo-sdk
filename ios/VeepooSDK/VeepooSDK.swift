@@ -40,6 +40,7 @@ enum VeepooEvent {
   static let apneaRemindData = "apneaRemindData"
   static let sportModeData = "sportModeData"
   static let bloodAnalysisTestResult = "bloodAnalysisTestResult"
+  static let gsrTestResult = "gsrTestResult"
   static let error = "error"
 }
 
@@ -79,6 +80,7 @@ let HEALTH_REMIND_DATA = VeepooEvent.healthRemindData
 let APNEA_REMIND_DATA = VeepooEvent.apneaRemindData
 let SPORT_MODE_DATA = VeepooEvent.sportModeData
 let BLOOD_ANALYSIS_TEST_RESULT = VeepooEvent.bloodAnalysisTestResult
+let GSR_TEST_RESULT = VeepooEvent.gsrTestResult
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -245,6 +247,7 @@ public class VeepooSDKModule: Module {
       APNEA_REMIND_DATA,
       SPORT_MODE_DATA,
       BLOOD_ANALYSIS_TEST_RESULT,
+      GSR_TEST_RESULT,
       ERROR
     )
 
@@ -904,6 +907,14 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("setApneaRemindSettings") { (settings: [String: Any], promise: Promise) in
       self.handleSetApneaRemindSettings(settings, promise: promise)
+    }
+
+    AsyncFunction("startGsrTest") { (promise: Promise) in
+      promise.reject("CAPABILITY_UNSUPPORTED", "GSR test is not supported on iOS — Android only")
+    }
+
+    AsyncFunction("stopGsrTest") { (promise: Promise) in
+      promise.resolve(nil)
     }
 
     AsyncFunction("startBloodAnalysisTest") { (promise: Promise) in

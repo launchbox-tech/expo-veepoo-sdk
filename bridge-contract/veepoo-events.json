@@ -45,7 +45,8 @@
     "healthRemindData",
     "apneaRemindData",
     "sportModeData",
-    "bloodAnalysisTestResult"
+    "bloodAnalysisTestResult",
+    "gsrTestResult"
   ],
   "jsLocalOnly": ["heartRateAlarmData"]
 }

@@ -32,6 +32,7 @@ import type {
 import type {
   BloodAnalysisTestResult,
   BloodOxygenTestResult,
+  GsrTestResult,
   BloodPressureTestResult,
   BodyCompositionTestResult,
   BreathingTestResult,
@@ -147,6 +148,8 @@ export type VeepooEventPayload = {
   /** Fired when the Band finishes/stops a sport session. Android: SportModelStateData; iOS: deviceSportDidFinishBlock. */
   sportModeData: { deviceId: string; mode: SportMode | null };
   bloodAnalysisTestResult: { deviceId: string; result: BloodAnalysisTestResult };
+  /** GSR (Galvanic Skin Response) test. Android only — iOS rejects CAPABILITY_UNSUPPORTED. */
+  gsrTestResult: { deviceId: string; result: GsrTestResult };
   error: VeepooError;
 };
 
