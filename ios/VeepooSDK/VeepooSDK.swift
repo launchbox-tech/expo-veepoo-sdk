@@ -35,6 +35,7 @@ enum VeepooEvent {
   static let musicRemoteCommand = "musicRemoteCommand"
   static let deviceBTStateChanged = "deviceBTStateChanged"
   static let deviceSosTriggered = "deviceSosTriggered"
+  static let customSettingsData = "customSettingsData"
   static let error = "error"
 }
 
@@ -69,6 +70,7 @@ let CAMERA_SHUTTER = VeepooEvent.cameraShutter
 let MUSIC_REMOTE_COMMAND = VeepooEvent.musicRemoteCommand
 let DEVICE_BT_STATE_CHANGED = VeepooEvent.deviceBTStateChanged
 let DEVICE_SOS_TRIGGERED = VeepooEvent.deviceSosTriggered
+let CUSTOM_SETTINGS_DATA = VeepooEvent.customSettingsData
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -230,6 +232,7 @@ public class VeepooSDKModule: Module {
       MUSIC_REMOTE_COMMAND,
       DEVICE_BT_STATE_CHANGED,
       DEVICE_SOS_TRIGGERED,
+      CUSTOM_SETTINGS_DATA,
       ERROR
     )
 
@@ -865,6 +868,14 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("setWristFlipWakeSettings") { (settings: [String: Any], promise: Promise) in
       self.handleSetWristFlipWakeSettings(settings, promise: promise)
+    }
+
+    AsyncFunction("readCustomSettings") { (promise: Promise) in
+      self.handleReadCustomSettings(promise: promise)
+    }
+
+    AsyncFunction("writeCustomSettings") { (settings: [String: Any], promise: Promise) in
+      self.handleWriteCustomSettings(settings, promise: promise)
     }
 
     AsyncFunction("readWomenHealthSettings") { (promise: Promise) in

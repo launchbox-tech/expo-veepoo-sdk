@@ -40,7 +40,8 @@
     "deviceBTStateChanged",
     "stressData",
     "temperatureTestResult",
-    "deviceSosTriggered"
+    "deviceSosTriggered",
+    "customSettingsData"
   ],
   "jsLocalOnly": ["heartRateAlarmData"]
 }

@@ -151,6 +151,7 @@ export class VeepooSDKRuntime {
       "musicRemoteCommand",
       "deviceBTStateChanged",
       "deviceSosTriggered",
+      "customSettingsData",
       "error",
     ];
 

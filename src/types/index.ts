@@ -102,6 +102,8 @@ export type {
   DistanceUnit,
   TimeFormat,
   BloodGlucoseUnit,
+  SkinTone,
+  CustomSettings,
   OperationStatus,
 } from './settings.js';
 

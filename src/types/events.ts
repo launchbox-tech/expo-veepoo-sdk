@@ -18,6 +18,7 @@ import type {
   SocialMsgData,
   SosCallTimesSettings,
 } from './device.js';
+import type { CustomSettings } from './settings.js';
 import type {
   BloodGlucoseData,
   HalfHourData,
@@ -137,6 +138,7 @@ export type VeepooEventPayload = {
   };
   /** Fired when the Band triggers its hardware SOS button. iOS only — no vendor Android callback documented. */
   deviceSosTriggered: { deviceId: string };
+  customSettingsData: { deviceId: string; data: CustomSettings };
   error: VeepooError;
 };
 

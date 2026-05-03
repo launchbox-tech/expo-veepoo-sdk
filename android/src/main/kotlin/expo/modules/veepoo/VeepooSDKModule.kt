@@ -79,6 +79,7 @@ class VeepooSDKModule : Module() {
     defineMedia(this@VeepooSDKModule)
     defineGPS(this@VeepooSDKModule)
     defineBluetooth(this@VeepooSDKModule)
+    defineCustomSettings(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)
