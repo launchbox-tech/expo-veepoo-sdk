@@ -1,7 +1,11 @@
 # 109 — PRD: shrink example `index.tsx` to ~200 lines (fulfill PRD #18)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/109
-> Status: open | Labels: enhancement, ready-for-agent
+> Status: closed | Labels: enhancement
+
+All 35 user stories fulfilled. Final `index.tsx`: **183 lines**. All 26 components
+exported from barrel. `tsc --noEmit`: zero errors. Implemented across 8 slices
+(issues #110–#117), committed and pushed per issue.
 
 ## Problem Statement
 

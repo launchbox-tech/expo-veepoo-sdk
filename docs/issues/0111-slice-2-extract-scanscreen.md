@@ -1,7 +1,7 @@
 # 111 — Slice 2: Extract ScanScreen (idle/scanning + device list)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/111
-> Status: open | Labels: needs-triage, enhancement
+> Status: closed | Labels: needs-triage, enhancement
 
 ## Parent
 #109

@@ -1,7 +1,7 @@
 # 110 — Slice 1: Extract InitializingScreen, ConnectingScreen, DisconnectedScreen
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/110
-> Status: open | Labels: needs-triage, enhancement
+> Status: closed | Labels: needs-triage, enhancement
 
 ## Parent
 #109

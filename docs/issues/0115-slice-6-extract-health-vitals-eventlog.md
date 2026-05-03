@@ -1,7 +1,7 @@
 # 115 — Slice 6: Extract health + vitals + event log (PersonalInfoSync, HealthTestsSection, VitalsLabSection, EventLogCard)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/115
-> Status: open | Labels: needs-triage, enhancement
+> Status: closed | Labels: enhancement, ready-for-agent
 
 ## Parent
 #109

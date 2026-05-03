@@ -1,7 +1,7 @@
 # 114 — Slice 5: Extract remote control cards (CameraMusic, GpsAgps, BandBluetooth, FirmwareDfu)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/114
-> Status: open | Labels: needs-triage, enhancement
+> Status: closed | Labels: enhancement, ready-for-agent
 
 ## Parent
 #109

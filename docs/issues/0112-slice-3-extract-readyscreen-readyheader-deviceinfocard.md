@@ -1,7 +1,7 @@
 # 112 — Slice 3: Extract ReadyScreen shell + ReadyHeader + DeviceInfoCard
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/112
-> Status: open | Labels: needs-triage, enhancement
+> Status: closed | Labels: needs-triage, enhancement
 
 ## Parent
 #109

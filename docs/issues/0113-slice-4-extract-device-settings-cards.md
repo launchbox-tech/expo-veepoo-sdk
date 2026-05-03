@@ -1,7 +1,7 @@
 # 113 — Slice 4: Extract device settings cards (FindBand, WatchFace, ScreenLight, Sedentary, WristFlip, WomenHealth)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/113
-> Status: open | Labels: needs-triage, enhancement
+> Status: closed | Labels: needs-triage, enhancement
 
 ## Parent
 #109

@@ -1,7 +1,7 @@
 # 116 — Slice 7: Extract historical data + disconnect (HistoricalDataSection, DisconnectButton)
 
 > GitHub: https://github.com/launchbox-tech/expo-veepoo-sdk/issues/116
-> Status: open | Labels: needs-triage, enhancement
+> Status: closed | Labels: enhancement, ready-for-agent
 
 ## Parent
 #109
