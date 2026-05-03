@@ -1,5 +1,6 @@
-import type { VeepooDevice } from "@gaozh1024/expo-veepoo-sdk";
+import type { VeepooDevice, PermissionsResult } from "@gaozh1024/expo-veepoo-sdk";
 import {
+  ActivityIndicator,
   FlatList,
   Linking,
   Pressable,
@@ -11,7 +12,6 @@ import {
 } from "react-native";
 import { BLUE, RED } from "../../components/theme";
 import { DeviceRow } from "../../components";
-import type { PermissionResult } from "../hooks/useSDKInit";
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
@@ -58,7 +58,7 @@ export default function ScanScreen({
   stopScan,
   connect,
 }: {
-  permissions: PermissionResult | null;
+  permissions: PermissionsResult | null;
   appState: string;
   devices: VeepooDevice[];
   startScan: () => Promise<void>;

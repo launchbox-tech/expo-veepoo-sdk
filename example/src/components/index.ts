@@ -14,3 +14,7 @@ export { default as ScreenLightCard } from '../app/components/ScreenLightCard';
 export { default as SedentaryCard } from '../app/components/SedentaryCard';
 export { default as WristFlipCard } from '../app/components/WristFlipCard';
 export { default as WomenHealthCard } from '../app/components/WomenHealthCard';
+export { default as CameraMusicCard } from '../app/components/CameraMusicCard';
+export { default as GpsAgpsCard } from '../app/components/GpsAgpsCard';
+export { default as BandBluetoothCard } from '../app/components/BandBluetoothCard';
+export { default as FirmwareDfuCard } from '../app/components/FirmwareDfuCard';

@@ -1,6 +1,6 @@
 import type { VeepooDevice } from "@gaozh1024/expo-veepoo-sdk";
 import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, Text } from "react-native";
-import { BLUE } from "../components/theme";
+import { BLUE } from "../../components/theme";
 
 const styles = StyleSheet.create({
   centered: {
