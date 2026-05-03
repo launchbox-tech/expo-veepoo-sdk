@@ -2,7 +2,6 @@
 
 An Expo SDK for integrating HBand wearable devices into React Native / Expo applications.
 
-[![npm version](https://badge.fury.io/js/@gaozh1024%2Fexpo-veepoo-sdk.svg)](https://badge.fury.io/js/@gaozh1024%2Fexpo-veepoo-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey.svg)](https://github.com/launchbox-tech/expo-veepoo-sdk)
 
@@ -30,19 +29,21 @@ Design goals:
 
 ## Installation
 
+Private, GitHub-only distribution:
+
 ```bash
-npm install @gaozh1024/expo-veepoo-sdk
+npm install github:launchbox-tech/expo-veepoo-sdk
 ```
 
 or
 
 ```bash
-yarn add @gaozh1024/expo-veepoo-sdk
+yarn add github:launchbox-tech/expo-veepoo-sdk
 ```
 
 ## Expo configuration
 
-**Metro:** After `npm install @gaozh1024/expo-veepoo-sdk`, you do **not** need a custom `metro.config.js`. Metro resolves the package from `node_modules` using `package.json` `main` and `exports` (including the `react-native` condition used by Metro 0.82+).
+**Metro:** After installing, you do **not** need a custom `metro.config.js`. Metro resolves the package from `node_modules` using `package.json` `main` and `exports` (including the `react-native` condition used by Metro 0.82+).
 
 ### iOS
 
@@ -168,7 +169,7 @@ Do not rely on `NativeVeepooSDK` directly. `VeepooSDK` normalizes returns from:
 - `readAutoMeasureSetting`
 - `modifyAutoMeasureSetting`
 
-…and normalizes payloads for:
+…and normalizes payloads for events including:
 
 - `bluetoothStateChanged`
 - `readOriginProgress`
@@ -176,8 +177,12 @@ Do not rely on `NativeVeepooSDK` directly. `VeepooSDK` normalizes returns from:
 - `deviceVersion`
 - `passwordData`
 - `socialMsgData`
+- `batteryData`
+- `alarmData`
+- `heartRateAlarmData`
 - `originFiveMinuteData`
 - `originHalfHourData`
+- `originSpo2Data`
 - `sleepData`
 - `sportStepData`
 - `heartRateTestResult`
@@ -186,7 +191,17 @@ Do not rely on `NativeVeepooSDK` directly. `VeepooSDK` normalizes returns from:
 - `temperatureTestResult`
 - `stressData`
 - `bloodGlucoseData`
-- `batteryData`
+- `hrvTestResult`
+- `ecgTestResult`
+- `fatigueTestResult`
+- `breathingTestResult`
+- `bodyCompositionTestResult`
+- `findDeviceState`
+- `cameraShutter`
+- `musicRemoteCommand`
+- `deviceBTStateChanged`
+- `contactsData`
+- `sosCallTimesData`
 
 For `readOriginProgress`, `progress` means:
 
@@ -260,6 +275,7 @@ Subscribe to all three to cover device drops and Bluetooth toggling off.
 ### Initialization
 
 - `init(): Promise<void>`
+- `destroy(): void`
 - `isSDKInitialized(): boolean`
 - `checkBluetoothStatus(): Promise<boolean>`
 - `requestPermissions(): Promise<PermissionsResult>`
@@ -271,19 +287,27 @@ Subscribe to all three to cover device drops and Bluetooth toggling off.
 
 - `startScan(options?: ScanOptions): Promise<void>`
 - `stopScan(): Promise<void>`
+- `isScanningActive(): boolean`
 - `connect(deviceId: string, options?: ConnectOptions): Promise<void>`
 - `disconnect(deviceId?: string): Promise<void>`
 - `getConnectionStatus(deviceId?: string): Promise<ConnectionStatus>`
 - `getConnectedDeviceId(): string | null`
-- `isScanningActive(): boolean`
+- `verifyPassword(password?: string, is24Hour?: boolean): Promise<PasswordData>`
+
+### Event listeners
+
+- `on<K>(event: K, listener: (payload: VeepooEventPayload[K]) => void): VeepooSDK`
+- `off<K>(event: K, listener: (payload: VeepooEventPayload[K]) => void): VeepooSDK`
+- `once<K>(event: K, listener: (payload: VeepooEventPayload[K]) => void): VeepooSDK`
+- `removeAllListeners(event?: VeepooEvent): VeepooSDK`
 
 ### Band info
 
-- `verifyPassword(password?: string, is24Hour?: boolean): Promise<PasswordData>`
 - `readBattery(): Promise<BatteryInfo>`
 - `readDeviceFunctions(): Promise<DeviceFunctions>`
-- `readSocialMsgData(): Promise<SocialMsgData>`
 - `readDeviceVersion(): Promise<DeviceVersion>`
+- `readSocialMsgData(): Promise<SocialMsgData>`
+- `writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus>`
 - `syncPersonalInfo(info: PersonalInfo): Promise<boolean>`
 - `setLanguage(language: Language): Promise<boolean>`
 
@@ -308,20 +332,90 @@ VeepooSDK.on('readOriginProgress', ({ progress }) => {
 
 ### Health tests
 
-- `startHeartRateTest(): Promise<void>`
-- `stopHeartRateTest(): Promise<void>`
-- `startBloodPressureTest(): Promise<void>`
-- `stopBloodPressureTest(): Promise<void>`
-- `startBloodOxygenTest(): Promise<void>`
-- `stopBloodOxygenTest(): Promise<void>`
-- `startTemperatureTest(): Promise<void>`
-- `stopTemperatureTest(): Promise<void>`
-- `startStressTest(): Promise<void>`
-- `stopStressTest(): Promise<void>`
-- `startBloodGlucoseTest(): Promise<void>`
-- `stopBloodGlucoseTest(): Promise<void>`
+- `startHeartRateTest(): Promise<void>` / `stopHeartRateTest(): Promise<void>`
+- `startBloodPressureTest(): Promise<void>` / `stopBloodPressureTest(): Promise<void>`
+- `startBloodOxygenTest(): Promise<void>` / `stopBloodOxygenTest(): Promise<void>`
+- `startTemperatureTest(): Promise<void>` / `stopTemperatureTest(): Promise<void>`
+- `startStressTest(): Promise<void>` / `stopStressTest(): Promise<void>`
+- `startBloodGlucoseTest(): Promise<void>` / `stopBloodGlucoseTest(): Promise<void>`
+- `startHrvTest(): Promise<void>` / `stopHrvTest(): Promise<void>`
+- `startEcgTest(options?: EcgTestOptions): Promise<void>` / `stopEcgTest(): Promise<void>`
+- `startFatigueTest(): Promise<void>` / `stopFatigueTest(): Promise<void>`
+- `startBreathingTest(): Promise<void>` / `stopBreathingTest(): Promise<void>`
+- `startBodyCompositionTest(): Promise<void>` / `stopBodyCompositionTest(): Promise<void>`
+
+### Device settings
+
+Time and display:
+
+- `setDeviceTime(time?: Date): Promise<boolean>`
+- `readScreenLightSettings(): Promise<ScreenLightSettings>`
+- `setScreenLightSettings(settings: ScreenLightSettings): Promise<void>`
+- `readScreenLightDuration(): Promise<ScreenLightDuration>`
+- `setScreenLightDuration(seconds: number): Promise<void>`
+
+Alarms:
+
+- `readAlarms(): Promise<DeviceAlarm[]>`
+- `setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>`
+- `deleteAlarm(alarmId: number): Promise<OperationStatus>`
+- `readHeartRateAlarm(): Promise<HeartRateAlarm>`
+- `setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>`
+
+Reminders:
+
+- `readSedentaryReminder(): Promise<SedentaryReminderSettings>`
+- `setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>`
+- `readWristFlipWakeSettings(): Promise<WristFlipWakeSettings>`
+- `setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>`
+- `readWomenHealthSettings(): Promise<WomenHealthSettings>`
+- `setWomenHealthSettings(settings: WomenHealthSettings): Promise<void>`
+
+Weather:
+
+- `readWeatherSettings(): Promise<WeatherSettings>`
+- `setWeatherSettings(settings: WeatherSettings): Promise<void>`
+- `pushWeatherData(data: WeatherData): Promise<void>`
+
+Contacts and SOS:
+
+- `readContacts(crc?: number): Promise<DeviceContact[]>`
+- `addContact(contact: NewDeviceContact): Promise<void>`
+- `deleteContact(contactId: number): Promise<void>`
+- `setContactSosState(contactId: number, isOpen: boolean): Promise<void>`
+- `readSosCallTimes(): Promise<SosCallTimesSettings>`
+- `setSosCallTimes(times: number): Promise<void>`
+
+Camera and music:
+
+- `enterCameraMode(): Promise<void>`
+- `exitCameraMode(): Promise<void>`
+- `setMusicControlEnabled(enabled: boolean): Promise<void>`
+- `pushMusicData(data: MusicData): Promise<void>`
+
+Connectivity and location:
+
+- `setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void>`
+- `readDeviceBTStatus(): Promise<DeviceBTStatus>`
+- `setDeviceBTSwitch(open: boolean): Promise<void>`
+
+Find device:
+
+- `startFindDevice(): Promise<void>`
+- `stopFindDevice(): Promise<void>`
+
+Watch face:
+
+- `readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle>`
+- `setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>`
+
+Firmware:
+
+- `startLocalFirmwareDfu(filePath: string): Promise<void>`
 
 ## Events
+
+### Session and connectivity
 
 - `deviceFound`
 - `deviceConnected`
@@ -329,24 +423,76 @@ VeepooSDK.on('readOriginProgress', ({ progress }) => {
 - `deviceConnectStatus`
 - `connectionStatusChanged`
 - `deviceReady`
+
+### Bluetooth
+
 - `bluetoothStateChanged`
+- `deviceBTStateChanged`
+
+### Band metadata
+
 - `deviceFunction`
 - `deviceVersion`
 - `passwordData`
 - `socialMsgData`
 - `batteryData`
+- `customSettingsData`
+
+### Historical data reads
+
 - `readOriginProgress`
 - `readOriginComplete`
 - `originFiveMinuteData`
 - `originHalfHourData`
+- `originSpo2Data`
 - `sleepData`
+- `accurateSleepData`
 - `sportStepData`
+
+### Realtime health tests
+
 - `heartRateTestResult`
 - `bloodPressureTestResult`
 - `bloodOxygenTestResult`
 - `temperatureTestResult`
 - `stressData`
 - `bloodGlucoseData`
+- `hrvTestResult`
+- `ecgTestResult`
+- `fatigueTestResult`
+- `breathingTestResult`
+- `bodyCompositionTestResult`
+- `bloodAnalysisTestResult`
+- `gsrTestResult`
+- `pttTestResult`
+- `pttStateChanged`
+
+### Stored vitals
+
+- `storedTemperatureData`
+- `storedBloodGlucoseData`
+- `storedHrvData`
+- `storedEcgData`
+- `storedBodyCompositionData`
+
+### Device settings and alerts
+
+- `alarmData`
+- `heartRateAlarmData` *(JS-local — emitted by `readHeartRateAlarm` / `setHeartRateAlarm`)*
+- `findDeviceState`
+- `firmwareDfuProgress`
+- `contactsData`
+- `sosCallTimesData`
+- `deviceSosTriggered`
+- `cameraShutter`
+- `musicRemoteCommand`
+- `healthRemindData`
+- `apneaRemindData`
+- `sportModeData`
+- `exerciseSessionData`
+
+### SDK
+
 - `error`
 
 ## Usage tips
@@ -372,12 +518,6 @@ npm run typecheck
 npm test -- --runInBand
 npm run build
 npm pack --dry-run
-```
-
-Publishing:
-
-```bash
-npm publish
 ```
 
 ## Reference documentation
