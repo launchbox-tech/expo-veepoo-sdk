@@ -160,6 +160,18 @@ export interface GsrTestResult {
   cortisolValue: number | null;
 }
 
+export type PttState = 'active' | 'inactive';
+
+/** PTT (Pulse Transit Time) electrode test result. iOS only — Android stubs CAPABILITY_UNSUPPORTED. */
+export interface PttTestResult {
+  heartRate: number;
+  hrv: number;
+  qtInterval: number;
+  /** Signal quality: 100 = normal, 0 = lead fail or device busy */
+  signalQuality: number;
+  progress: number;
+}
+
 export type ReadState = 'idle' | 'start' | 'reading' | 'complete' | 'invalid';
 
 export interface ReadOriginProgress {

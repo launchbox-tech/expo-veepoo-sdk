@@ -164,6 +164,8 @@ export class VeepooSDKRuntime {
       "storedHrvData",
       "storedEcgData",
       "storedBodyCompositionData",
+      "pttTestResult",
+      "pttStateChanged",
       "error",
     ];
 

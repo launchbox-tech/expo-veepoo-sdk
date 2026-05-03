@@ -310,6 +310,15 @@ extension VeepooSDKModule {
       ])
     }
 
+    self.peripheralManage?.veepooSDKAddPTTStateListener { [weak self] pttState in
+      guard let self = self else { return }
+      let state = pttState == 1 ? "active" : "inactive"
+      self.sendEvent(PTT_STATE_CHANGED, [
+        "deviceId": self.connectedDeviceId ?? "",
+        "state": state
+      ])
+    }
+
     self.peripheralManage?.deviceSportDidFinishBlock = { [weak self] runningMode in
       guard let self = self else { return }
       let ordinals: [String] = [

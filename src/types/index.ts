@@ -106,6 +106,8 @@ export type {
   BloodAnalysisValues,
   BloodAnalysisTestResult,
   GsrTestResult,
+  PttState,
+  PttTestResult,
   ReadState,
   ReadOriginProgress,
 } from './health-tests.js';

@@ -48,6 +48,8 @@ enum VeepooEvent {
   static let storedHrvData = "storedHrvData"
   static let storedEcgData = "storedEcgData"
   static let storedBodyCompositionData = "storedBodyCompositionData"
+  static let pttTestResult = "pttTestResult"
+  static let pttStateChanged = "pttStateChanged"
   static let error = "error"
 }
 
@@ -95,6 +97,8 @@ let STORED_BLOOD_GLUCOSE_DATA = VeepooEvent.storedBloodGlucoseData
 let STORED_HRV_DATA = VeepooEvent.storedHrvData
 let STORED_ECG_DATA = VeepooEvent.storedEcgData
 let STORED_BODY_COMPOSITION_DATA = VeepooEvent.storedBodyCompositionData
+let PTT_TEST_RESULT = VeepooEvent.pttTestResult
+let PTT_STATE_CHANGED = VeepooEvent.pttStateChanged
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -269,6 +273,8 @@ public class VeepooSDKModule: Module {
       STORED_HRV_DATA,
       STORED_ECG_DATA,
       STORED_BODY_COMPOSITION_DATA,
+      PTT_TEST_RESULT,
+      PTT_STATE_CHANGED,
       ERROR
     )
 
@@ -956,6 +962,14 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("readStoredBodyCompositionData") { (date: String?, promise: Promise) in
       self.handleReadStoredBodyCompositionData(date: date, promise: promise)
+    }
+
+    AsyncFunction("startPttTest") { (promise: Promise) in
+      self.handleStartPttTest(promise: promise)
+    }
+
+    AsyncFunction("stopPttTest") { (promise: Promise) in
+      self.handleStopPttTest(promise: promise)
     }
 
     AsyncFunction("startGsrTest") { (promise: Promise) in

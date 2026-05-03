@@ -40,6 +40,8 @@ import type {
   BloodAnalysisTestResult,
   BloodOxygenTestResult,
   GsrTestResult,
+  PttTestResult,
+  PttState,
   BloodPressureTestResult,
   BodyCompositionTestResult,
   BreathingTestResult,
@@ -171,6 +173,10 @@ export type VeepooEventPayload = {
   storedEcgData: { deviceId: string; data: StoredEcgData };
   /** Emitted per stored body composition record. Prerequisite: call startReadOriginData first. */
   storedBodyCompositionData: { deviceId: string; data: StoredBodyCompositionData };
+  /** Fired on each PTT measurement update. iOS only. */
+  pttTestResult: { deviceId: string; result: PttTestResult };
+  /** Fired when device autonomously enters or exits PTT mode. iOS only. */
+  pttStateChanged: { deviceId: string; state: PttState };
   error: VeepooError;
 };
 

@@ -93,4 +93,13 @@ fun ModuleDefinitionBuilder.defineGsr(module: VeepooSDKModule) {
             promise.resolve(null)
         }
     }
+
+    // PTT is iOS-only — no Android vendor API
+    AsyncFunction("startPttTest") { promise: Promise ->
+        promise.reject("CAPABILITY_UNSUPPORTED", "PTT test is not supported on Android — iOS only")
+    }
+
+    AsyncFunction("stopPttTest") { promise: Promise ->
+        promise.resolve(null)
+    }
 }

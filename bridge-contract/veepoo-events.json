@@ -53,7 +53,9 @@
     "storedBloodGlucoseData",
     "storedHrvData",
     "storedEcgData",
-    "storedBodyCompositionData"
+    "storedBodyCompositionData",
+    "pttTestResult",
+    "pttStateChanged"
   ],
   "jsLocalOnly": ["heartRateAlarmData"]
 }
