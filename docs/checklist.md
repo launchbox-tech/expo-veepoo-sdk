@@ -144,7 +144,7 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 - [x] **Weather push** — [#104](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/104) shipped: `pushWeatherData`, `readWeatherSwitch`, `setWeatherSwitch`, `readWeatherUnit`, `setWeatherUnit`; event `weatherSettingsData`.
 - [x] **Contact management with SOS** — [#105](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/105) shipped: `readContacts`, `addContact`, `deleteContact`, `setContactSosState`, `readSosCallTimes`, `setSosCallTimes`.
 - [ ] **GPS / location settings** — [#106](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/106) stub. Flag: `agpsFunction`. No AGPS settings API.
-- [ ] **Music / camera control** — [#107](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/107) stub. Flag: `musicStyle` (and related HID flags). No music/camera remote API.
+- [x] **Music / camera control** — [#107](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/107) shipped: `enterCameraMode`, `exitCameraMode`, `setMusicControlEnabled`, `pushMusicData`; events `cameraShutter`, `musicRemoteCommand`. Camera remote cross-platform; `pushMusicData` Android-only; `setMusicControlEnabled` iOS base-function toggle (Android no-op).
 - [ ] **Bluetooth on/off** — [#108](https://github.com/launchbox-tech/expo-veepoo-sdk/issues/108) stub. No `openBluetooth` / `closeBluetooth` in the Expo module.
 
 ---
@@ -164,6 +164,6 @@ For new work in §7, still run `/grill-with-docs` against `docs/vendor-api/veepo
 
 ```
 1.  §5-B — Optional: move VeepooSDKModuleInterface to src/types/module.ts (piggyback on next API-touch PR)
-2.  §7 — Next open Group D: AGPS (#106), Music/camera (#107), Bluetooth on/off (#108)
+2.  §7 — Next open Group D: AGPS (#106), Bluetooth on/off (#108)
 3.  §7 — Group B partial: historical HRV origin + RR interval data not yet bridged
 ```
