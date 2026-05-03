@@ -4,11 +4,11 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Local `@gaozh1024/expo-veepoo-sdk` (this monorepo)
 
-The example depends on the parent package via **`"@gaozh1024/expo-veepoo-sdk": "file:.."`** — same **package name** as on npm, so imports and the **config plugin** match what host apps use.
+The example depends on the parent package via **`"@gaozh1024/expo-veepoo-sdk": "file:.."`** — same **package name** as the published package, so imports and the **config plugin** match what host apps use.
 
-**Host apps** that install from npm only need:
+**Host apps** install from GitHub:
 
-1. `npm install @gaozh1024/expo-veepoo-sdk`
+1. `npm install github:launchbox-tech/expo-veepoo-sdk`
 2. Add **`"@gaozh1024/expo-veepoo-sdk"`** to **`expo.plugins`** in `app.json` / `app.config.*` (see repo `README.md`).
 3. No custom **`metro.config.js`** is required — Metro resolves the published package under `node_modules` using `main` / `exports`.
 
