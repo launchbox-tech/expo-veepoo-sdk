@@ -77,6 +77,8 @@ export type {
   OriginData,
   HalfHourData,
   Spo2OriginData,
+  ExerciseMinuteData,
+  ExerciseSession,
 } from './health-data.js';
 
 export type {

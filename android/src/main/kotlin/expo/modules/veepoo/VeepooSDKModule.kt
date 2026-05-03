@@ -85,6 +85,7 @@ class VeepooSDKModule : Module() {
     defineSportMode(this@VeepooSDKModule)
     defineBloodAnalysis(this@VeepooSDKModule)
     defineGsr(this@VeepooSDKModule)
+    defineExercise(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

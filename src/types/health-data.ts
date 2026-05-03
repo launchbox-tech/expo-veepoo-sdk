@@ -1,4 +1,5 @@
 import type { TestState } from './health-tests.js';
+import type { SportMode } from './settings.js';
 
 export interface HeartRateData {
   value: number;
@@ -163,3 +164,33 @@ export interface Spo2OriginData {
   allPackNumber: number;
   currentPackNumber: number;
 }
+
+export interface ExerciseMinuteData {
+  heartRate: number;
+  distance: number;
+  calories: number;
+  steps: number;
+  sportValue: number;
+  isPaused: boolean;
+}
+
+export interface ExerciseSession {
+  /** Sport mode — null if ordinal is out of range or unknown. */
+  type: SportMode | null;
+  /** ISO-like timestamp string "YYYY-MM-DD HH:MM:SS" */
+  beginTime: string;
+  endTime: string;
+  totalSteps: number;
+  totalDistance: number;
+  totalCalories: number;
+  /** Total active time in seconds */
+  totalTime: number;
+  averageHeartRate: number;
+  /** Average pace in seconds per km */
+  averagePace: number;
+  pauseCount: number;
+  /** Total paused time in seconds */
+  pauseTotalTime: number;
+  minuteData: ExerciseMinuteData[];
+}
+

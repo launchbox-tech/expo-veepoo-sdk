@@ -157,6 +157,7 @@ export class VeepooSDKRuntime {
       "sportModeData",
       "bloodAnalysisTestResult",
       "gsrTestResult",
+      "exerciseSessionData",
       "error",
     ];
 

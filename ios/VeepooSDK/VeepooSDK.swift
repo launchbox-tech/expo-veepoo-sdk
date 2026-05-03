@@ -41,6 +41,7 @@ enum VeepooEvent {
   static let sportModeData = "sportModeData"
   static let bloodAnalysisTestResult = "bloodAnalysisTestResult"
   static let gsrTestResult = "gsrTestResult"
+  static let exerciseSessionData = "exerciseSessionData"
   static let error = "error"
 }
 
@@ -81,6 +82,7 @@ let APNEA_REMIND_DATA = VeepooEvent.apneaRemindData
 let SPORT_MODE_DATA = VeepooEvent.sportModeData
 let BLOOD_ANALYSIS_TEST_RESULT = VeepooEvent.bloodAnalysisTestResult
 let GSR_TEST_RESULT = VeepooEvent.gsrTestResult
+let EXERCISE_SESSION_DATA = VeepooEvent.exerciseSessionData
 let ALARM_DATA = "alarmData"
 let HRV_TEST_RESULT = "hrvTestResult"
 let ECG_TEST_RESULT = "ecgTestResult"
@@ -248,6 +250,7 @@ public class VeepooSDKModule: Module {
       SPORT_MODE_DATA,
       BLOOD_ANALYSIS_TEST_RESULT,
       GSR_TEST_RESULT,
+      EXERCISE_SESSION_DATA,
       ERROR
     )
 
@@ -907,6 +910,10 @@ public class VeepooSDKModule: Module {
 
     AsyncFunction("setApneaRemindSettings") { (settings: [String: Any], promise: Promise) in
       self.handleSetApneaRemindSettings(settings, promise: promise)
+    }
+
+    AsyncFunction("startReadExerciseData") { (promise: Promise) in
+      self.handleStartReadExerciseData(promise: promise)
     }
 
     AsyncFunction("startGsrTest") { (promise: Promise) in

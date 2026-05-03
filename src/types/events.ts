@@ -22,6 +22,7 @@ import type {
 import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings.js';
 import type {
   BloodGlucoseData,
+  ExerciseSession,
   HalfHourData,
   OriginData,
   SleepData,
@@ -150,6 +151,8 @@ export type VeepooEventPayload = {
   bloodAnalysisTestResult: { deviceId: string; result: BloodAnalysisTestResult };
   /** GSR (Galvanic Skin Response) test. Android only — iOS rejects CAPABILITY_UNSUPPORTED. */
   gsrTestResult: { deviceId: string; result: GsrTestResult };
+  /** Emitted once per session as exercise history syncs from Band. */
+  exerciseSessionData: { deviceId: string; session: ExerciseSession };
   error: VeepooError;
 };
 
