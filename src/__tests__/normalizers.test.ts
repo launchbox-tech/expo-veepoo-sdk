@@ -197,6 +197,102 @@ describe('normalizeEventPayload', () => {
     expect(normalizeEventPayload('error', payload)).toBe(payload);
   });
 
+  it('deviceConnectStatus: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', status: 'connected', code: 0 };
+    expect(normalizeEventPayload('deviceConnectStatus', raw)).toBe(raw);
+  });
+
+  it('connectionStatusChanged: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', status: 'disconnected' };
+    expect(normalizeEventPayload('connectionStatusChanged', raw)).toBe(raw);
+  });
+
+  it('deviceSosTriggered: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1' };
+    expect(normalizeEventPayload('deviceSosTriggered', raw)).toBe(raw);
+  });
+
+  it('customSettingsData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', data: { wristOnBright: true } };
+    expect(normalizeEventPayload('customSettingsData', raw)).toBe(raw);
+  });
+
+  it('healthRemindData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', data: { drinkEnabled: true } };
+    expect(normalizeEventPayload('healthRemindData', raw)).toBe(raw);
+  });
+
+  it('apneaRemindData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', data: { enabled: true, threshold: 10 } };
+    expect(normalizeEventPayload('apneaRemindData', raw)).toBe(raw);
+  });
+
+  it('sportModeData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', mode: 'walking' };
+    expect(normalizeEventPayload('sportModeData', raw)).toBe(raw);
+  });
+
+  it('bloodAnalysisTestResult: passes through raw payload unchanged', () => {
+    const raw = {
+      deviceId: 'd1',
+      result: { state: 'over', progress: 100, values: null },
+    };
+    expect(normalizeEventPayload('bloodAnalysisTestResult', raw)).toBe(raw);
+  });
+
+  it('gsrTestResult: passes through raw payload unchanged', () => {
+    const raw = {
+      deviceId: 'd1',
+      result: { state: 'over', progress: 100, emotionLevel: 5, skinMoisture: 60, snsActivation: 40, cortisolValue: null },
+    };
+    expect(normalizeEventPayload('gsrTestResult', raw)).toBe(raw);
+  });
+
+  it('exerciseSessionData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', session: { type: 'running', beginTime: '2024-01-01 08:00:00', endTime: '2024-01-01 09:00:00', totalSteps: 6000, totalDistance: 5000, totalCalories: 400, totalTime: 3600, averageHeartRate: 145, averagePace: 360, pauseCount: 0, pauseTotalTime: 0, minuteData: [] } };
+    expect(normalizeEventPayload('exerciseSessionData', raw)).toBe(raw);
+  });
+
+  it('accurateSleepData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', date: '2024-01-01', data: { sleepTime: '2024-01-01 22:00:00', wakeTime: '2024-01-02 06:00:00', deepDuration: 90, lightDuration: 120, remDuration: 60, getUpDuration: 10, sleepDuration: 480, getUpTimes: 2, sleepQuality: 3, insomniaScore: 5, insomniaTimes: 1, fallAsleepScore: 80, sleepEfficiencyScore: 85, curve: [] } };
+    expect(normalizeEventPayload('accurateSleepData', raw)).toBe(raw);
+  });
+
+  it('storedTemperatureData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00', temperature: 36.5 } };
+    expect(normalizeEventPayload('storedTemperatureData', raw)).toBe(raw);
+  });
+
+  it('storedBloodGlucoseData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00', bloodGlucose: 5.4, level: 'normal' } };
+    expect(normalizeEventPayload('storedBloodGlucoseData', raw)).toBe(raw);
+  });
+
+  it('storedHrvData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00', hrv: 42, rrIntervals: [820, 830, 810] } };
+    expect(normalizeEventPayload('storedHrvData', raw)).toBe(raw);
+  });
+
+  it('storedEcgData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00:00', duration: 30, aveHeart: 72, aveHrv: 40, aveResRate: 16, filterSignals: [100, 200, 150] } };
+    expect(normalizeEventPayload('storedEcgData', raw)).toBe(raw);
+  });
+
+  it('storedBodyCompositionData: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00:00', bmi: 22.5, bodyFatPercentage: 18.0, fatMass: 12.0, leanBodyMass: 55.0, muscleRate: 40.0, muscleMass: 38.0, subcutaneousFat: 14.0, bodyMoisture: 55.0, waterContent: 36.0, skeletalMuscleRate: 36.0, boneMass: 2.5, proportionOfProtein: 18.0, proteinAmount: 12.0, basalMetabolicRate: 1600 } };
+    expect(normalizeEventPayload('storedBodyCompositionData', raw)).toBe(raw);
+  });
+
+  it('pttTestResult: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', result: { heartRate: 72, hrv: 45, qtInterval: 380, signalQuality: 100, progress: 50 } };
+    expect(normalizeEventPayload('pttTestResult', raw)).toBe(raw);
+  });
+
+  it('pttStateChanged: passes through raw payload unchanged', () => {
+    const raw = { deviceId: 'd1', state: 'active' };
+    expect(normalizeEventPayload('pttStateChanged', raw)).toBe(raw);
+  });
+
   it('bluetoothStateChanged: normalizes numeric state and authorization', () => {
     const result = normalizeEventPayload('bluetoothStateChanged', {
       state: 5, authorization: 3, isScanning: false, pendingScanStart: false,
@@ -435,6 +531,48 @@ describe('normalizeEventPayload', () => {
       phase: 'nope',
     }) as any;
     expect(result.phase).toBe('unsupported');
+  });
+
+  it('contactsData: normalizes contact list', () => {
+    const result = normalizeEventPayload('contactsData', {
+      deviceId: 'd1',
+      contacts: [{ contactID: 1, name: 'Alice', phoneNumber: '+1234', isSOS: true }],
+    }) as any;
+    expect(result.deviceId).toBe('d1');
+    expect(result.contacts[0].name).toBe('Alice');
+    expect(result.contacts[0].phoneNumber).toBe('+1234');
+    expect(result.contacts[0].isSOS).toBe(true);
+  });
+
+  it('sosCallTimesData: normalizes SOS call times', () => {
+    const result = normalizeEventPayload('sosCallTimesData', {
+      deviceId: 'd1',
+      data: { times: 3, minTimes: 1, maxTimes: 9 },
+    }) as any;
+    expect(result.deviceId).toBe('d1');
+    expect(result.data.times).toBe(3);
+    expect(result.data.minTimes).toBe(1);
+    expect(result.data.maxTimes).toBe(9);
+  });
+
+  it('fatigueTestResult: normalizes fatigue level alias', () => {
+    const result = normalizeEventPayload('fatigueTestResult', {
+      deviceId: 'd1',
+      result: { rawState: 'over', fatigueLevel: 2, progress: 100 },
+    }) as any;
+    expect(result.result.state).toBe('over');
+    expect(result.result.level).toBe(2);
+    expect(result.result.progress).toBe(100);
+  });
+
+  it('breathingTestResult: normalizes breathing rate alias', () => {
+    const result = normalizeEventPayload('breathingTestResult', {
+      deviceId: 'd1',
+      result: { rawState: 'testing', breathingRate: 18, progress: 50 },
+    }) as any;
+    expect(result.result.state).toBe('testing');
+    expect(result.result.rate).toBe(18);
+    expect(result.result.progress).toBe(50);
   });
 });
 

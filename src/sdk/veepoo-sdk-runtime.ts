@@ -183,28 +183,31 @@ export class VeepooSDKRuntime {
   emitLocal(event: VeepooEvent, payload: unknown): void {
     const normalizedPayload = normalizeEventPayload(event, payload);
 
-    if (
-      event === "readOriginProgress" &&
-      this.isEventRecord(normalizedPayload) &&
-      this.isEventRecord(normalizedPayload.progress)
-    ) {
-      const deviceId =
-        this.getPayloadDeviceId(normalizedPayload) ?? "__default__";
-      const progressValue = normalizedPayload.progress.progress;
-      const readState = normalizedPayload.progress.readState;
-      const lastProgress = this.state.getLastReadOriginProgress(deviceId);
+    if (event === "readOriginProgress") {
+      const originPayload =
+        normalizedPayload as VeepooEventPayload["readOriginProgress"];
+      if (
+        this.isEventRecord(originPayload) &&
+        this.isEventRecord(originPayload.progress)
+      ) {
+        const deviceId =
+          this.getPayloadDeviceId(originPayload) ?? "__default__";
+        const progressValue = originPayload.progress.progress;
+        const readState = originPayload.progress.readState;
+        const lastProgress = this.state.getLastReadOriginProgress(deviceId);
 
-      if (typeof progressValue === "number" && Number.isFinite(progressValue)) {
-        if (
-          readState === "start" ||
-          lastProgress === undefined ||
-          progressValue < lastProgress
-        ) {
-          this.state.recordReadOriginProgress(deviceId, progressValue);
-        } else if (progressValue === lastProgress) {
-          return;
-        } else {
-          this.state.recordReadOriginProgress(deviceId, progressValue);
+        if (typeof progressValue === "number" && Number.isFinite(progressValue)) {
+          if (
+            readState === "start" ||
+            lastProgress === undefined ||
+            progressValue < lastProgress
+          ) {
+            this.state.recordReadOriginProgress(deviceId, progressValue);
+          } else if (progressValue === lastProgress) {
+            return;
+          } else {
+            this.state.recordReadOriginProgress(deviceId, progressValue);
+          }
         }
       }
     }
