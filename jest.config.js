@@ -5,6 +5,7 @@ module.exports = {
   moduleNameMapper: {
     '^(\\.{1,2}/.+)\\.js$': '$1',
   },
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/src/__tests__/helpers/'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
