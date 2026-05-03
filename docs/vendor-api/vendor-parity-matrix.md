@@ -40,8 +40,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 |----------------------|---------------------|--------|---------------|
 | Battery | `readBattery`; `batteryData` | Shipped | TBD |
 | Firmware / device version | `readDeviceVersion`; `deviceVersion` | Shipped | TBD |
-| Capability flags | `readDeviceFunctions`; `deviceFunction` | Shipped | TBD |
-| Device function package reporting (v1.1.8+) | `readDeviceFunctions`; `deviceFunction` | Shipped — bridge merges all five `DeviceFunctionPackage` objects into `DeviceFunction`; Android-only (iOS uses `VPPeripheralModel`) | TBD |
+| Capability flags | `readDeviceFunctions`; `deviceFunction` | Shipped — Android v1.1.8+ uses five typed `DeviceFunctionPackage` callbacks internally; bridge merges them transparently | TBD |
 | Language | `setLanguage` | Shipped | TBD |
 | Notification prefs (social) | `readSocialMsgData`, `writeSocialMsgData`; `socialMsgData` | Shipped | TBD |
 | Auto measurement windows | `readAutoMeasureSetting`, `modifyAutoMeasureSetting` | Shipped | TBD |
@@ -57,6 +56,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Watch face / screen style (dial slot) | `readWatchFaceStyle`, `setWatchFaceStyle` | Shipped | TBD |
 | Contacts (emergency contact list) | `readContacts`, `addContact`, `deleteContact`, `setContactSosState`; `contactsData` | Shipped | TBD |
 | SOS call times | `readSosCallTimes`, `setSosCallTimes`; `sosCallTimesData` | Shipped | TBD |
+| Band-initiated SOS trigger | `deviceSosTriggered` | Shipped — **iOS only** (`ReceiveDeviceSOSCommand` callback); no vendor Android callback documented | TBD |
 | Camera remote (Band shutter trigger) | `enterCameraMode`, `exitCameraMode`; `cameraShutter` | Shipped | TBD |
 | Music control toggle & metadata push | `setMusicControlEnabled`, `pushMusicData`; `musicRemoteCommand` | Shipped — `pushMusicData` Android-only (`CAPABILITY_UNSUPPORTED` on iOS); `musicRemoteCommand` Android-only | TBD |
 | Local firmware DFU (OTA file on disk) | `startLocalFirmwareDfu`; `firmwareDfuProgress` | Partial | TBD |
@@ -147,6 +147,9 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 - Server / marketplace dial transfer, custom photo push pipelines, video dials (beyond slot read/set)  
 - AGPS ephemeris transfer, device-initiated live GPS feed, KAABA direction APIs  
 - Advanced Band BT controls (auto-reconnect, audio routing, clear pairing, manual connect/disconnect)
+- Text / image push to Band display (`pushTextMsg` / `pushImageMsg` Android v1.1.5; iOS `veepooSDKSendStartTransmissionMessage` / image transfer v1.1.1)
+- JH58 PPG + acceleration raw-data streaming (Android v1.1.6; iOS v1.1.1 `veepooSDK_JH58*`)
+- World clock CRUD (`veepooSDKWorldClockReadWithModels` / `veepooSDKWorldClockWriteWithModels`; `worldClock` flag is exposed in `DeviceFunctions` but the read/write operations are not bridged)
 - Mini-checkup comprehensive health assessment (`startMiniCheckup` / `stopMiniCheckup` Android v1.1.7; iOS equivalent TBD)
 - GSR / galvanic skin response detection (`startGsrDetect` / `stopGsrDetect` Android v1.1.9; iOS `veepooSDK_gsrDetectStart` v1.1.5)
 - Multi-type manual measurement data retrieval (Android v1.2.2 — 12 types; iOS v1.1.8 — 6 types via `readManualTestDataWithTimestamp`)
