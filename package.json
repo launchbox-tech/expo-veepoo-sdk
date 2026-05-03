@@ -12,6 +12,13 @@
       "require": "./build/index.js",
       "default": "./build/index.js"
     },
+    "./session": {
+      "types": "./build/session/index.d.ts",
+      "react-native": "./build/session/index.js",
+      "import": "./build/session/index.js",
+      "require": "./build/session/index.js",
+      "default": "./build/session/index.js"
+    },
     "./app.plugin": "./app.plugin.js",
     "./app.plugin.js": "./app.plugin.js",
     "./package.json": "./package.json"

@@ -36,4 +36,10 @@ Vocabulary for **Band**, **Session**, **Band Discovery**, and **Pairing** follow
 
 **`expo-module.config.json` platform key:** Use the canonical **`apple`** key (and **`"apple"`** in **`platforms`**) per Expo autolinking docs — not legacy **`ios`**. After changing, run **`npx expo prebuild --clean`** (or **`expo run:ios`**) in a consuming app (e.g. **`example/`**) to confirm autolinking; physical Band not required for that check.
 
+## Session baseline
+
+**Session baseline:** The documented set of SDK calls that a host app runs immediately after every **`deviceReady`** event: **`syncPersonalInfo`** (per **`AGENTS.md`**: "called on every `deviceReady`, not tracked for changes"), **`readBattery`**, and **`readDeviceVersion`**. All three run in parallel via `Promise.allSettled`; individual failures are captured but do not block the others.
+
+**Optional helper (`expo-veepoo-sdk/session`):** `runSessionBaseline(sdk, config)` executes a single baseline run; `attachSessionBaseline(sdk, config)` auto-subscribes to `deviceReady` and returns a disposable handle. Both are **tree-shakeable**—importing only from `expo-veepoo-sdk` adds zero bytes for the session module. The helper **does not** implement **reconnection**, **retry loops**, **Band Discovery**, or stored **`deviceId`** / **Pairing** policy; the host app owns those flows.
+
 _(Grill-with-docs #4 — Q1–Q6.)_
