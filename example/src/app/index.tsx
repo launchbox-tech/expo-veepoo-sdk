@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { VeepooDevice } from "@gaozh1024/expo-veepoo-sdk";
 import sdk from "@gaozh1024/expo-veepoo-sdk";
 import { BLUE, GREEN, RED } from "../components/theme";
-import { DeviceRow, HealthTestCard, InfoRow } from "../components";
+import { DeviceRow, HealthTestCard, InfoRow, InitializingScreen, ConnectingScreen, DisconnectedScreen } from "../components";
 import { appStateReducer } from "../hooks/appStateReducer";
 import { useSDKInit } from "../hooks/useSDKInit";
 import { useBandScan } from "../hooks/useBandScan";
@@ -127,56 +127,20 @@ export default function Index() {
   // ─── Render ───────────────────────────────────────────────────────────────
 
   if (appState === "initializing") {
-    return (
-      <SafeAreaView style={styles.centered}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <ActivityIndicator size="large" color={BLUE} />
-        <Text style={styles.statusText}>Initializing SDK…</Text>
-      </SafeAreaView>
-    );
+    return <InitializingScreen />;
   }
 
   if (appState === "connecting") {
-    return (
-      <SafeAreaView style={styles.centered}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <ActivityIndicator size="large" color={BLUE} />
-        <Text style={styles.statusText}>
-          Connecting to {connectingDevice?.name ?? "device"}…
-        </Text>
-      </SafeAreaView>
-    );
+    return <ConnectingScreen connectingDevice={connectingDevice} />;
   }
 
   if (appState === "disconnected") {
-    const isFailedAttempt = connectError != null;
     return (
-      <SafeAreaView style={styles.centered}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-        <Text style={styles.disconnectedTitle}>
-          {isFailedAttempt ? "Connection Failed" : "Device Disconnected"}
-        </Text>
-        <Text style={styles.statusText}>
-          {isFailedAttempt
-            ? connectError
-            : `${
-                connectedDevice?.name ?? "The device"
-              } dropped the connection.`}
-        </Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            styles.buttonPrimary,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={reconnect}
-          accessibilityRole="button"
-        >
-          <Text style={styles.buttonText}>
-            {isFailedAttempt ? "Try Again" : "Reconnect"}
-          </Text>
-        </Pressable>
-      </SafeAreaView>
+      <DisconnectedScreen
+        connectError={connectError}
+        connectedDevice={connectedDevice}
+        reconnect={reconnect}
+      />
     );
   }
 
