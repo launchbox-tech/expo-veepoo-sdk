@@ -153,6 +153,7 @@ export class VeepooSDKRuntime {
       "deviceSosTriggered",
       "customSettingsData",
       "healthRemindData",
+      "apneaRemindData",
       "error",
     ];
 

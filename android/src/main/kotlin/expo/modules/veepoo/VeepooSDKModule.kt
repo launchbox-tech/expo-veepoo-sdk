@@ -81,6 +81,7 @@ class VeepooSDKModule : Module() {
     defineBluetooth(this@VeepooSDKModule)
     defineCustomSettings(this@VeepooSDKModule)
     defineHealthReminders(this@VeepooSDKModule)
+    defineApneaRemind(this@VeepooSDKModule)
     defineTests(this@VeepooSDKModule)
     defineVitals(this@VeepooSDKModule)
     defineLifecycle(this@VeepooSDKModule)

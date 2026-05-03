@@ -42,7 +42,8 @@
     "temperatureTestResult",
     "deviceSosTriggered",
     "customSettingsData",
-    "healthRemindData"
+    "healthRemindData",
+    "apneaRemindData"
   ],
   "jsLocalOnly": ["heartRateAlarmData"]
 }

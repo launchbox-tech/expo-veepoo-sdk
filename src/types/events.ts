@@ -19,7 +19,7 @@ import type {
   SocialMsgData,
   SosCallTimesSettings,
 } from './device.js';
-import type { CustomSettings } from './settings.js';
+import type { ApneaRemindSettings, CustomSettings } from './settings.js';
 import type {
   BloodGlucoseData,
   HalfHourData,
@@ -141,6 +141,8 @@ export type VeepooEventPayload = {
   deviceSosTriggered: { deviceId: string };
   customSettingsData: { deviceId: string; data: CustomSettings };
   healthRemindData: { deviceId: string; data: HealthReminder };
+  /** iOS only — emitted on read response. Android vendor has no equivalent. */
+  apneaRemindData: { deviceId: string; data: ApneaRemindSettings };
   error: VeepooError;
 };
 

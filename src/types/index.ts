@@ -106,6 +106,7 @@ export type {
   BloodGlucoseUnit,
   SkinTone,
   CustomSettings,
+  ApneaRemindSettings,
   OperationStatus,
 } from './settings.js';
 
