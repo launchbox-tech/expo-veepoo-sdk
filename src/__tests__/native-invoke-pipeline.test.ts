@@ -63,7 +63,7 @@ describe("invokeWithRecovery", () => {
   });
 
   it("error path — recover called, fallback returned, no exception thrown", async () => {
-    const recover = jest.fn((_err: unknown) => 99);
+    const recover = jest.fn(() => 99);
     const out = await invokeWithRecovery({
       invoke: async () => {
         throw new Error("transient failure");
