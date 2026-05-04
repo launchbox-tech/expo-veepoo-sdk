@@ -1,18 +1,21 @@
 import type {
   BatteryInfo,
-  DeviceVersion,
-  VeepooDevice,
-  HeartRateTestResult,
-  BloodPressureTestResult,
+  BloodGlucoseData,
   BloodOxygenTestResult,
-  HrvTestResult,
+  BloodPressureTestResult,
+  BodyCompositionTestResult,
+  BreathingTestResult,
+  DeviceVersion,
   EcgTestResult,
   FatigueTestResult,
-  BreathingTestResult,
-  BodyCompositionTestResult,
+  HeartRateTestResult,
+  HrvTestResult,
   ReadOriginProgress,
   SleepData,
   SportStepData,
+  StressData,
+  TemperatureTestResult,
+  VeepooDevice,
 } from "@gaozh1024/expo-veepoo-sdk";
 import {
   ActivityIndicator,
@@ -154,6 +157,9 @@ export default function ReadyScreen({
   hrResult,
   bpResult,
   spo2Result,
+  tempResult,
+  stressResult,
+  bloodGlucoseResult,
   hrvResult,
   ecgResult,
   fatigueResult,
@@ -170,6 +176,12 @@ export default function ReadyScreen({
   stopBP,
   startSpo2,
   stopSpo2,
+  startTemp,
+  stopTemp,
+  startStress,
+  stopStress,
+  startBloodGlucose,
+  stopBloodGlucose,
   startHrv,
   stopHrv,
   startEcg,
@@ -211,6 +223,9 @@ export default function ReadyScreen({
   hrResult: HeartRateTestResult | null;
   bpResult: BloodPressureTestResult | null;
   spo2Result: BloodOxygenTestResult | null;
+  tempResult: TemperatureTestResult | null;
+  stressResult: StressData | null;
+  bloodGlucoseResult: BloodGlucoseData | null;
   hrvResult: HrvTestResult | null;
   ecgResult: EcgTestResult | null;
   fatigueResult: FatigueTestResult | null;
@@ -227,6 +242,12 @@ export default function ReadyScreen({
   stopBP: () => Promise<void>;
   startSpo2: () => Promise<void>;
   stopSpo2: () => Promise<void>;
+  startTemp: () => Promise<void>;
+  stopTemp: () => Promise<void>;
+  startStress: () => Promise<void>;
+  stopStress: () => Promise<void>;
+  startBloodGlucose: () => Promise<void>;
+  stopBloodGlucose: () => Promise<void>;
   startHrv: () => Promise<void>;
   stopHrv: () => Promise<void>;
   startEcg: () => Promise<void>;
@@ -289,6 +310,9 @@ export default function ReadyScreen({
 
         <VitalsLabSection
           activeTest={activeTest}
+          tempResult={tempResult}
+          stressResult={stressResult}
+          bloodGlucoseResult={bloodGlucoseResult}
           hrvResult={hrvResult}
           ecgResult={ecgResult}
           fatigueResult={fatigueResult}
@@ -296,6 +320,12 @@ export default function ReadyScreen({
           bodyCompositionResult={bodyCompositionResult}
           ecgIncludeWaveform={ecgIncludeWaveform}
           setEcgIncludeWaveform={setEcgIncludeWaveform}
+          startTemp={startTemp}
+          stopTemp={stopTemp}
+          startStress={startStress}
+          stopStress={stopStress}
+          startBloodGlucose={startBloodGlucose}
+          stopBloodGlucose={stopBloodGlucose}
           startHrv={startHrv}
           stopHrv={stopHrv}
           startEcg={startEcg}

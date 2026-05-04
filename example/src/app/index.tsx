@@ -47,6 +47,9 @@ export default function Index() {
   const hrResult = appState === "ready" ? healthTests.hrResult : null;
   const bpResult = appState === "ready" ? healthTests.bpResult : null;
   const spo2Result = appState === "ready" ? healthTests.spo2Result : null;
+  const tempResult = appState === "ready" ? healthTests.tempResult : null;
+  const stressResult = appState === "ready" ? healthTests.stressResult : null;
+  const bloodGlucoseResult = appState === "ready" ? healthTests.bloodGlucoseResult : null;
   const hrvResult = appState === "ready" ? healthTests.hrvResult : null;
   const ecgResult = appState === "ready" ? healthTests.ecgResult : null;
   const fatigueResult = appState === "ready" ? healthTests.fatigueResult : null;
@@ -65,6 +68,9 @@ export default function Index() {
     startHR, stopHR,
     startBP, stopBP,
     startSpo2, stopSpo2,
+    startTemp, stopTemp,
+    startStress, stopStress,
+    startBloodGlucose, stopBloodGlucose,
     startHrv, stopHrv,
     startEcg, stopEcg,
     startFatigue, stopFatigue,
@@ -138,6 +144,9 @@ export default function Index() {
         hrResult={hrResult}
         bpResult={bpResult}
         spo2Result={spo2Result}
+        tempResult={tempResult}
+        stressResult={stressResult}
+        bloodGlucoseResult={bloodGlucoseResult}
         hrvResult={hrvResult}
         ecgResult={ecgResult}
         fatigueResult={fatigueResult}
@@ -154,6 +163,12 @@ export default function Index() {
         stopBP={stopBP}
         startSpo2={startSpo2}
         stopSpo2={stopSpo2}
+        startTemp={startTemp}
+        stopTemp={stopTemp}
+        startStress={startStress}
+        stopStress={stopStress}
+        startBloodGlucose={startBloodGlucose}
+        stopBloodGlucose={stopBloodGlucose}
         startHrv={startHrv}
         stopHrv={stopHrv}
         startEcg={startEcg}

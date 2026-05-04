@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import sdk, { RealtimeTest } from "@gaozh1024/expo-veepoo-sdk";
 import type {
+  BloodGlucoseData,
   BloodOxygenTestResult,
   BloodPressureTestResult,
   BodyCompositionTestResult,
@@ -9,6 +10,8 @@ import type {
   FatigueTestResult,
   HeartRateTestResult,
   HrvTestResult,
+  StressData,
+  TemperatureTestResult,
 } from "@gaozh1024/expo-veepoo-sdk";
 import type { AppState } from './appStateReducer';
 import { useSDKEvent } from './useSDKEvent';
@@ -18,6 +21,9 @@ export type ActiveRealtimeTest =
   | 'hr'
   | 'bp'
   | 'spo2'
+  | 'temperature'
+  | 'stress'
+  | 'bloodGlucose'
   | 'hrv'
   | 'ecg'
   | 'fatigue'
@@ -59,6 +65,9 @@ export function useHealthTests(appState: AppState): {
   hrResult: HeartRateTestResult | null;
   bpResult: BloodPressureTestResult | null;
   spo2Result: BloodOxygenTestResult | null;
+  tempResult: TemperatureTestResult | null;
+  stressResult: StressData | null;
+  bloodGlucoseResult: BloodGlucoseData | null;
   hrvResult: HrvTestResult | null;
   ecgResult: EcgTestResult | null;
   fatigueResult: FatigueTestResult | null;
@@ -75,6 +84,12 @@ export function useHealthTests(appState: AppState): {
   stopBP: () => Promise<void>;
   startSpo2: () => Promise<void>;
   stopSpo2: () => Promise<void>;
+  startTemp: () => Promise<void>;
+  stopTemp: () => Promise<void>;
+  startStress: () => Promise<void>;
+  stopStress: () => Promise<void>;
+  startBloodGlucose: () => Promise<void>;
+  stopBloodGlucose: () => Promise<void>;
   startHrv: () => Promise<void>;
   stopHrv: () => Promise<void>;
   startEcg: () => Promise<void>;
@@ -89,6 +104,9 @@ export function useHealthTests(appState: AppState): {
   const [hrResult, setHrResult] = useState<HeartRateTestResult | null>(null);
   const [bpResult, setBpResult] = useState<BloodPressureTestResult | null>(null);
   const [spo2Result, setSpo2Result] = useState<BloodOxygenTestResult | null>(null);
+  const [tempResult, setTempResult] = useState<TemperatureTestResult | null>(null);
+  const [stressResult, setStressResult] = useState<StressData | null>(null);
+  const [bloodGlucoseResult, setBloodGlucoseResult] = useState<BloodGlucoseData | null>(null);
   const [hrvResult, setHrvResult] = useState<HrvTestResult | null>(null);
   const [ecgResult, setEcgResult] = useState<EcgTestResult | null>(null);
   const [fatigueResult, setFatigueResult] = useState<FatigueTestResult | null>(null);
@@ -139,6 +157,42 @@ export function useHealthTests(appState: AppState): {
       appendLog(`bloodOxygenTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
         setActiveTest(prev => (prev === 'spo2' ? null : prev));
+      }
+    },
+    isReady
+  );
+
+  useSDKEvent(
+    'temperatureTestResult',
+    ({ deviceId: _, result }) => {
+      setTempResult(result);
+      appendLog(`temperatureTestResult ${clipJson(result)}`);
+      if (isTerminalState(result.state)) {
+        setActiveTest(prev => (prev === 'temperature' ? null : prev));
+      }
+    },
+    isReady
+  );
+
+  useSDKEvent(
+    'stressData',
+    ({ deviceId: _, data }) => {
+      setStressResult(data);
+      appendLog(`stressData ${clipJson(data)}`);
+      if (data.isEnd === true) {
+        setActiveTest(prev => (prev === 'stress' ? null : prev));
+      }
+    },
+    isReady
+  );
+
+  useSDKEvent(
+    'bloodGlucoseData',
+    ({ deviceId: _, data }) => {
+      setBloodGlucoseResult(data);
+      appendLog(`bloodGlucoseData ${clipJson(data)}`);
+      if (data.isEnd === true) {
+        setActiveTest(prev => (prev === 'bloodGlucose' ? null : prev));
       }
     },
     isReady
@@ -279,6 +333,69 @@ export function useHealthTests(appState: AppState): {
     }
   }
 
+  async function startTemp() {
+    setTempResult(null);
+    try {
+      setActiveTest('temperature');
+      await sdk.startTest(RealtimeTest.TEMPERATURE);
+      appendLog('startTest(temperature) ok');
+    } catch (e) {
+      setActiveTest(null);
+      appendLog(`startTest(temperature) ${formatErr(e)}`);
+    }
+  }
+
+  async function stopTemp() {
+    try {
+      await sdk.stopTest(RealtimeTest.TEMPERATURE);
+      appendLog('stopTest(temperature) ok');
+    } finally {
+      setActiveTest(null);
+    }
+  }
+
+  async function startStress() {
+    setStressResult(null);
+    try {
+      setActiveTest('stress');
+      await sdk.startTest(RealtimeTest.STRESS);
+      appendLog('startTest(stress) ok');
+    } catch (e) {
+      setActiveTest(null);
+      appendLog(`startTest(stress) ${formatErr(e)}`);
+    }
+  }
+
+  async function stopStress() {
+    try {
+      await sdk.stopTest(RealtimeTest.STRESS);
+      appendLog('stopTest(stress) ok');
+    } finally {
+      setActiveTest(null);
+    }
+  }
+
+  async function startBloodGlucose() {
+    setBloodGlucoseResult(null);
+    try {
+      setActiveTest('bloodGlucose');
+      await sdk.startTest(RealtimeTest.BLOOD_GLUCOSE);
+      appendLog('startTest(bloodGlucose) ok');
+    } catch (e) {
+      setActiveTest(null);
+      appendLog(`startTest(bloodGlucose) ${formatErr(e)}`);
+    }
+  }
+
+  async function stopBloodGlucose() {
+    try {
+      await sdk.stopTest(RealtimeTest.BLOOD_GLUCOSE);
+      appendLog('stopTest(bloodGlucose) ok');
+    } finally {
+      setActiveTest(null);
+    }
+  }
+
   async function startHrv() {
     setHrvResult(null);
     try {
@@ -388,6 +505,9 @@ export function useHealthTests(appState: AppState): {
     hrResult,
     bpResult,
     spo2Result,
+    tempResult,
+    stressResult,
+    bloodGlucoseResult,
     hrvResult,
     ecgResult,
     fatigueResult,
@@ -404,6 +524,12 @@ export function useHealthTests(appState: AppState): {
     stopBP,
     startSpo2,
     stopSpo2,
+    startTemp,
+    stopTemp,
+    startStress,
+    stopStress,
+    startBloodGlucose,
+    stopBloodGlucose,
     startHrv,
     stopHrv,
     startEcg,

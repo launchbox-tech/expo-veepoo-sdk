@@ -1,9 +1,12 @@
 import type {
-  HrvTestResult,
+  BloodGlucoseData,
+  BodyCompositionTestResult,
+  BreathingTestResult,
   EcgTestResult,
   FatigueTestResult,
-  BreathingTestResult,
-  BodyCompositionTestResult,
+  HrvTestResult,
+  StressData,
+  TemperatureTestResult,
 } from "@gaozh1024/expo-veepoo-sdk";
 import { StyleSheet, Switch, Text, View } from "react-native";
 import { BLUE } from "../../components/theme";
@@ -31,6 +34,9 @@ const styles = StyleSheet.create({
 
 export default function VitalsLabSection({
   activeTest,
+  tempResult,
+  stressResult,
+  bloodGlucoseResult,
   hrvResult,
   ecgResult,
   fatigueResult,
@@ -38,6 +44,12 @@ export default function VitalsLabSection({
   bodyCompositionResult,
   ecgIncludeWaveform,
   setEcgIncludeWaveform,
+  startTemp,
+  stopTemp,
+  startStress,
+  stopStress,
+  startBloodGlucose,
+  stopBloodGlucose,
   startHrv,
   stopHrv,
   startEcg,
@@ -50,6 +62,9 @@ export default function VitalsLabSection({
   stopBodyComposition,
 }: {
   activeTest: string | null;
+  tempResult: TemperatureTestResult | null;
+  stressResult: StressData | null;
+  bloodGlucoseResult: BloodGlucoseData | null;
   hrvResult: HrvTestResult | null;
   ecgResult: EcgTestResult | null;
   fatigueResult: FatigueTestResult | null;
@@ -57,6 +72,12 @@ export default function VitalsLabSection({
   bodyCompositionResult: BodyCompositionTestResult | null;
   ecgIncludeWaveform: boolean;
   setEcgIncludeWaveform: (v: boolean) => void;
+  startTemp: () => Promise<void>;
+  stopTemp: () => Promise<void>;
+  startStress: () => Promise<void>;
+  stopStress: () => Promise<void>;
+  startBloodGlucose: () => Promise<void>;
+  stopBloodGlucose: () => Promise<void>;
   startHrv: () => Promise<void>;
   stopHrv: () => Promise<void>;
   startEcg: () => Promise<void>;
@@ -73,6 +94,32 @@ export default function VitalsLabSection({
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Vitals lab</Text>
       </View>
+      <HealthTestCard
+        label="Temperature"
+        isActive={activeTest === "temperature"}
+        disabled={activeTest !== null && activeTest !== "temperature"}
+        progress={tempResult?.progress}
+        state={tempResult?.state}
+        resultLine={tempResult?.value != null ? `${tempResult.value} °C` : null}
+        onStart={startTemp}
+        onStop={stopTemp}
+      />
+      <HealthTestCard
+        label="Stress"
+        isActive={activeTest === "stress"}
+        disabled={activeTest !== null && activeTest !== "stress"}
+        resultLine={stressResult?.stress != null ? `Stress ${stressResult.stress}` : null}
+        onStart={startStress}
+        onStop={stopStress}
+      />
+      <HealthTestCard
+        label="Blood Glucose"
+        isActive={activeTest === "bloodGlucose"}
+        disabled={activeTest !== null && activeTest !== "bloodGlucose"}
+        resultLine={bloodGlucoseResult?.glucose != null ? `${bloodGlucoseResult.glucose} mmol/L` : null}
+        onStart={startBloodGlucose}
+        onStop={stopBloodGlucose}
+      />
       <HealthTestCard
         label="HRV (manual)"
         isActive={activeTest === "hrv"}
