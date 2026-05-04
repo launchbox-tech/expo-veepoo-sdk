@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useIsSessionReady } from '@gaozh1024/expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
 
@@ -20,10 +19,9 @@ export function usePassiveEvents(
 ): void {
   const isReady = useIsSessionReady();
 
-  const log = useCallback(
-    (name: string, payload: unknown) => appendLog(`${name} ${clipJson(payload)}`),
-    [appendLog],
-  );
+  function log(name: string, payload: unknown) {
+    appendLog(`${name} ${clipJson(payload)}`);
+  }
 
   useSDKEvent('deviceConnected', p => log('deviceConnected', p), isReady);
   useSDKEvent('deviceVersion', p => log('deviceVersion', p), isReady);

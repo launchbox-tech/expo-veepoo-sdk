@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
 import type { BatteryInfo, DeviceVersion, PersonalInfo, VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
@@ -94,14 +94,14 @@ export function useBandSession(
     appState === 'ready'
   );
 
-  const connect = useCallback(async (device: VeepooDevice) => {
+  async function connect(device: VeepooDevice) {
     await stopScan();
     setConnectingDevice(device);
     setConnectedDevice(device);
     await sdk.session.connect(device.id);
-  }, [sdk, stopScan]);
+  }
 
-  const disconnect = useCallback(async () => {
+  async function disconnect() {
     onIntentionalDisconnect();
     await sdk.session.disconnect();
     setConnectedDevice(null);
@@ -109,13 +109,13 @@ export function useBandSession(
     setConnectError(null);
     setBatteryInfo(null);
     setDeviceVersion(null);
-  }, [sdk, onIntentionalDisconnect]);
+  }
 
-  const reconnect = useCallback(async () => {
+  async function reconnect() {
     setConnectingDevice(null);
     setConnectError(null);
     await sdk.discovery.startScan();
-  }, [sdk]);
+  }
 
   return {
     connectedDevice,

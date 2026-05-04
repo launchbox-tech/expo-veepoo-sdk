@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSDKState } from '@gaozh1024/expo-veepoo-sdk';
 
 export type AppState =
@@ -38,12 +38,12 @@ export function useAppState(): {
     }
   }, [isReady, isConnected]);
 
-  const onIntentionalDisconnect = useCallback(() => {
+  function onIntentionalDisconnect() {
     suppressRef.current = true;
     wasReadyRef.current = false;
     setSessionLost(false);
     setTimeout(() => { suppressRef.current = false; }, 500);
-  }, []);
+  }
 
   const appState: AppState =
     !initialized ? 'initializing' :

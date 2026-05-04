@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useVeepooSDK, useIsSessionReady } from '@gaozh1024/expo-veepoo-sdk';
 import type { ReadOriginProgress, SleepData, SportStepData } from '@gaozh1024/expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
@@ -22,13 +22,13 @@ export function useDataSync(): {
   useSDKEvent('sleepData', ({ data }) => setSleepSummary(data.summary), isReady);
   useSDKEvent('sportStepData', ({ data }) => setStepData(data), isReady);
 
-  const syncData = useCallback(async () => {
+  async function syncData() {
     setDataSyncing(true);
     setDataSyncProgress(null);
     setSleepSummary(null);
     setStepData(null);
     await sdk.historicalQuery.startReadOriginData();
-  }, [sdk]);
+  }
 
   return { dataSyncing, dataSyncProgress, sleepSummary, stepData, syncData };
 }
