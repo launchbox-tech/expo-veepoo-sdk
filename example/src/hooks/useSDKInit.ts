@@ -12,7 +12,7 @@ export function useSDKInit(dispatch: React.Dispatch<AppAction>): {
     let cancelled = false;
     async function setup() {
       await sdk.init();
-      const result = await sdk.requestPermissions();
+      const result = await sdk.discovery.requestPermissions();
       if (!cancelled) {
         setPermissions(result);
         dispatch({ type: 'SDK_READY' });

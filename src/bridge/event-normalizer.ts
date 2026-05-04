@@ -2,34 +2,29 @@ import type {
   ReadOriginProgress,
   VeepooEvent,
   VeepooEventPayload,
-  FirmwareDfuState,
 } from '../types/index.js';
-import { isRecord, clamp, toInt, toStringValue } from './primitives.js';
-import { normalizeBluetoothStatus, normalizePasswordData } from './connection.js';
+import { isRecord, clamp } from '../normalizers/primitives.js';
+import { normalizeBluetoothStatus, normalizePasswordData } from '../capabilities/session/normalizers.js';
+import { normalizeAlarmList, normalizeHeartRateAlarm } from '../capabilities/alarms/normalizers.js';
+import { normalizeBatteryInfo } from '../capabilities/battery/normalizers.js';
+import { normalizeCameraShutterStatus } from '../capabilities/camera/normalizers.js';
+import { normalizeContactList } from '../capabilities/contacts/normalizers.js';
+import { normalizeDeviceBTState } from '../capabilities/bt-status/normalizers.js';
+import { normalizeDeviceFunctions } from '../capabilities/device-functions/normalizers/index.js';
+import { normalizeDeviceVersion } from '../capabilities/device-version/normalizers.js';
+import { normalizeFindDeviceStatePayload } from '../capabilities/find-device/normalizers.js';
+import { normalizeMusicRemoteCommand } from '../capabilities/music/normalizers.js';
+import { normalizeSocialMsgData } from '../capabilities/social-msg/normalizers.js';
+import { normalizeSosCallTimesSettings } from '../capabilities/sos/normalizers.js';
 import {
-  normalizeAlarmList,
-  normalizeBatteryInfo,
-  normalizeCameraShutterStatus,
-  normalizeContactList,
-  normalizeDeviceBTState,
-  normalizeDeviceFunctions,
-  normalizeDeviceVersion,
-  normalizeHeartRateAlarm,
-  normalizeFindDeviceStatePayload,
-  normalizeMusicRemoteCommand,
-  normalizeSocialMsgData,
-  normalizeSosCallTimesSettings,
-} from './device.js';
-import {
-  normalizeBloodGlucoseData,
   normalizeHalfHourData,
   normalizeOriginDataList,
-  normalizeSleepDataList,
   normalizeSpo2OriginData,
-  normalizeSportStepData,
-  normalizeStressData,
-} from './health-data.js';
+} from '../capabilities/origin-data/normalizers.js';
+import { normalizeSleepDataList } from '../capabilities/sleep-data/normalizers.js';
+import { normalizeSportStepData } from '../capabilities/sport-steps/normalizers.js';
 import {
+  normalizeBloodGlucoseData,
   normalizeBloodOxygenTestResult,
   normalizeBloodPressureTestResult,
   normalizeBodyCompositionTestResult,
@@ -38,45 +33,10 @@ import {
   normalizeFatigueTestResult,
   normalizeHeartRateTestResult,
   normalizeHrvTestResult,
+  normalizeStressData,
   normalizeTemperatureTestResult,
-} from './health-tests.js';
-
-const FIRMWARE_DFU_STATES: readonly FirmwareDfuState[] = [
-  'fileNotExist',
-  'start',
-  'updating',
-  'success',
-  'failure',
-  'prepared',
-  'reboot',
-  'reconnecting',
-  'dfuLangConnectSuccess',
-  'dfuLangConnectFailed',
-  'unknown',
-];
-
-export function normalizeFirmwareDfuProgressPayload(value: unknown): VeepooEventPayload['firmwareDfuProgress'] {
-  const p = isRecord(value) ? value : {};
-  const stateRaw = toStringValue(p.state, 'unknown');
-  const state: FirmwareDfuState = (FIRMWARE_DFU_STATES as readonly string[]).includes(
-    stateRaw
-  )
-    ? (stateRaw as FirmwareDfuState)
-    : 'unknown';
-  let message: string | undefined;
-  if (p.message !== undefined && p.message !== null) {
-    message = String(p.message);
-  }
-  const out: VeepooEventPayload['firmwareDfuProgress'] = {
-    deviceId: toStringValue(p.deviceId) ?? '',
-    progress: clamp(toInt(p.progress) ?? 0, 0, 100),
-    state,
-  };
-  if (message !== undefined) {
-    out.message = message;
-  }
-  return out;
-}
+} from '../capabilities/realtime-tests/normalizers.js';
+import { normalizeFirmwareDfuProgress } from '../capabilities/dfu/normalizers.js';
 
 export function normalizeReadOriginProgressPayload(value: unknown): VeepooEventPayload['readOriginProgress'] {
   if (!isRecord(value) || !isRecord(value.progress)) {
@@ -240,7 +200,7 @@ const EVENT_NORMALIZERS: {
     const p = isRecord(raw) ? raw : {};
     return normalizeFindDeviceStatePayload(p);
   },
-  firmwareDfuProgress: (raw) => normalizeFirmwareDfuProgressPayload(raw),
+  firmwareDfuProgress: (raw) => normalizeFirmwareDfuProgress(raw),
   cameraShutter: (raw) => {
     const p = isRecord(raw) ? raw : {};
     return { ...p, status: normalizeCameraShutterStatus(p.status) } as VeepooEventPayload['cameraShutter'];

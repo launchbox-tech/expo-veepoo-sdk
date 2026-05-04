@@ -55,7 +55,7 @@ export default function WeatherCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setInfo("reading…");
-          void sdk.readWeatherSettings()
+          void sdk.weather.readWeatherSettings()
             .then(s => setInfo(JSON.stringify(s)))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -63,7 +63,7 @@ export default function WeatherCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setInfo("setting…");
-          void sdk.setWeatherSettings({ isOpen: true, unit: "celsius", crc: 0 })
+          void sdk.weather.setWeatherSettings({ isOpen: true, unit: "celsius", crc: 0 })
             .then(() => setInfo("weather enabled (celsius)"))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -73,7 +73,7 @@ export default function WeatherCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setInfo("pushing…");
-          void sdk.pushWeatherData(SAMPLE_WEATHER)
+          void sdk.weather.pushWeatherData(SAMPLE_WEATHER)
             .then(() => setInfo("weather pushed"))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

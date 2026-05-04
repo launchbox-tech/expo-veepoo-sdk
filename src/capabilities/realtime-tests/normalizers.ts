@@ -1,4 +1,5 @@
 import type {
+  BloodGlucoseData,
   BloodOxygenTestResult,
   BloodPressureTestResult,
   BodyCompositionMetrics,
@@ -8,9 +9,10 @@ import type {
   FatigueTestResult,
   HeartRateTestResult,
   HrvTestResult,
+  StressData,
   TemperatureTestResult,
-} from '../types/index.js';
-import { isRecord, toInt, toNumber, normalizeTestState } from './primitives.js';
+} from "../../types/index.js";
+import { isRecord, toInt, toNumber, toStringValue, normalizeTestState } from "../../normalizers/primitives.js";
 
 export function normalizeHeartRateTestResult(value: unknown): HeartRateTestResult {
   const record = isRecord(value) ? value : {};
@@ -156,5 +158,36 @@ export function normalizeBodyCompositionTestResult(value: unknown): BodyComposit
     rawState: typeof raw === 'string' || typeof raw === 'number' ? raw : undefined,
     isEnd: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
     composition: normalizeBodyCompositionMetrics(record.composition),
+  };
+}
+
+export function normalizeStressData(value: unknown): StressData {
+  const record = isRecord(value) ? value : {};
+  return {
+    stress: toInt(record.stress ?? record.value),
+    timestamp: toInt(record.timestamp, Date.now()),
+    progress: toInt(record.progress),
+    status: toStringValue(record.status || normalizeTestState(record.rawState ?? record.state)),
+    isEnd: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
+  };
+}
+
+export function normalizeBloodGlucoseData(value: unknown): BloodGlucoseData {
+  const record = isRecord(value) ? value : {};
+  return {
+    glucose: toNumber(record.glucose ?? record.bloodGlucose),
+    progress: toInt(record.progress),
+    level:
+      record.level === undefined || typeof record.level === 'number' || typeof record.level === 'string'
+        ? (record.level as string | number | undefined)
+        : undefined,
+    state:
+      record.state === undefined
+        ? normalizeTestState(record.rawState ?? record.status)
+        : normalizeTestState(record.rawState ?? record.state),
+    status: toStringValue(record.status),
+    timestamp: toInt(record.timestamp, Date.now()),
+    isEnd: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
+    error: toStringValue(record.error),
   };
 }

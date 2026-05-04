@@ -56,7 +56,7 @@ export default function ContactsCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setContactsInfo("reading…");
-          void sdk.readContacts()
+          void sdk.contacts.readContacts()
             .then(c => setContactsInfo(`${c.length} contacts: ${JSON.stringify(c)}`))
             .catch((e: unknown) => setContactsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -64,7 +64,7 @@ export default function ContactsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setContactsInfo("adding…");
-          void sdk.addContact({ name: "Test", phone: "1234567890" })
+          void sdk.contacts.addContact({ name: "Test", phone: "1234567890" })
             .then(() => setContactsInfo("added Test / 1234567890"))
             .catch((e: unknown) => setContactsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -72,7 +72,7 @@ export default function ContactsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setContactsInfo("deleting…");
-          void sdk.deleteContact(1)
+          void sdk.contacts.deleteContact(1)
             .then(() => setContactsInfo("deleted id=1"))
             .catch((e: unknown) => setContactsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -80,7 +80,7 @@ export default function ContactsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setContactsInfo("setting SOS…");
-          void sdk.setContactSosState(1, true)
+          void sdk.contacts.setContactSosState(1, true)
             .then(() => setContactsInfo("SOS enabled id=1"))
             .catch((e: unknown) => setContactsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -90,7 +90,7 @@ export default function ContactsCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setSosInfo("reading…");
-          void sdk.readSosCallTimes()
+          void sdk.sos.readSosCallTimes()
             .then(s => setSosInfo(JSON.stringify(s)))
             .catch((e: unknown) => setSosInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -98,7 +98,7 @@ export default function ContactsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setSosInfo("setting…");
-          void sdk.setSosCallTimes(3)
+          void sdk.sos.setSosCallTimes(3)
             .then(() => setSosInfo("set to 3"))
             .catch((e: unknown) => setSosInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

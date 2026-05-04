@@ -58,7 +58,7 @@ export default function FirmwareDfuCard() {
           <View style={styles.row}>
             <Pressable style={styles.button} onPress={() => {
               setDfuInfo("starting…");
-              void sdk.startLocalFirmwareDfu("/path/to/firmware.bin")
+              void sdk.dfu.startLocalFirmwareDfu("/path/to/firmware.bin")
                 .then(() => setDfuInfo("DFU started"))
                 .catch((e: unknown) => setDfuInfo((e as Error)?.message ?? "error"));
             }} accessibilityRole="button">

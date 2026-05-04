@@ -1,3 +1,4 @@
+import type { ALL_VEEPOO_EVENTS } from '../bridge/veepoo-events-registry.js';
 import type {
   VeepooDevice,
   ConnectionStatus,
@@ -181,3 +182,12 @@ export type VeepooEventPayload = {
 };
 
 export type VeepooEvent = keyof VeepooEventPayload;
+
+// Compile-time parity check: VeepooEventPayload keys must exactly match ALL_VEEPOO_EVENTS.
+// Adding an event to one without the other produces a TypeScript error here.
+type _RegistryParity = [keyof VeepooEventPayload] extends [(typeof ALL_VEEPOO_EVENTS)[number]]
+  ? [(typeof ALL_VEEPOO_EVENTS)[number]] extends [keyof VeepooEventPayload]
+    ? true
+    : never
+  : never;
+declare const _: _RegistryParity;

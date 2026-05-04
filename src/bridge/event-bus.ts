@@ -1,5 +1,6 @@
 import type { EventSubscription } from "expo-modules-core";
 import type { VeepooEvent, VeepooEventPayload } from "../types/index.js";
+import { NATIVE_EMITTED_EVENTS } from "./veepoo-events-registry.js";
 
 export type EventListener = (payload: unknown) => void;
 
@@ -23,63 +24,7 @@ export class EventBus {
     if (this.listenersSetup) return;
     this.listenersSetup = true;
 
-    const events: VeepooEvent[] = [
-      "deviceFound",
-      "deviceConnected",
-      "deviceDisconnected",
-      "deviceConnectStatus",
-      "deviceReady",
-      "bluetoothStateChanged",
-      "deviceFunction",
-      "deviceVersion",
-      "passwordData",
-      "socialMsgData",
-      "readOriginProgress",
-      "readOriginComplete",
-      "originFiveMinuteData",
-      "originHalfHourData",
-      "sleepData",
-      "sportStepData",
-      "heartRateTestResult",
-      "bloodPressureTestResult",
-      "bloodOxygenTestResult",
-      "temperatureTestResult",
-      "stressData",
-      "bloodGlucoseData",
-      "hrvTestResult",
-      "ecgTestResult",
-      "fatigueTestResult",
-      "breathingTestResult",
-      "bodyCompositionTestResult",
-      "batteryData",
-      "connectionStatusChanged",
-      "originSpo2Data",
-      "alarmData",
-      "findDeviceState",
-      "firmwareDfuProgress",
-      "contactsData",
-      "sosCallTimesData",
-      "cameraShutter",
-      "musicRemoteCommand",
-      "deviceBTStateChanged",
-      "deviceSosTriggered",
-      "customSettingsData",
-      "healthRemindData",
-      "apneaRemindData",
-      "sportModeData",
-      "bloodAnalysisTestResult",
-      "gsrTestResult",
-      "exerciseSessionData",
-      "accurateSleepData",
-      "storedTemperatureData",
-      "storedBloodGlucoseData",
-      "storedHrvData",
-      "storedEcgData",
-      "storedBodyCompositionData",
-      "pttTestResult",
-      "pttStateChanged",
-      "error",
-    ];
+    const events: VeepooEvent[] = [...NATIVE_EMITTED_EVENTS];
 
     events.forEach(event => {
       const subscription = native.addListener(event, (payload: unknown) => {

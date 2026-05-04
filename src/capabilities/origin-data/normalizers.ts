@@ -1,4 +1,4 @@
-import type { OriginData } from "../../types/index.js";
+import type { HalfHourData, OriginData, Spo2OriginData } from "../../types/index.js";
 import { isRecord, toInt, toNumber, toStringValue } from "../../normalizers/primitives.js";
 
 function normalizeOriginItem(value: Record<string, unknown>): OriginData {
@@ -42,4 +42,43 @@ export function normalizeOriginDataList(value: unknown): OriginData[] {
     .filter(isRecord)
     .map((item) => normalizeOriginItem(item))
     .sort((a, b) => a.time.localeCompare(b.time));
+}
+
+export function normalizeHalfHourData(value: unknown): HalfHourData {
+  const record = isRecord(value) ? value : {};
+  return {
+    time: toStringValue(record.time),
+    heartValue: toInt(record.heartValue),
+    sportValue: toInt(record.sportValue),
+    stepValue: toInt(record.stepValue),
+    calValue: toNumber(record.calValue) ?? 0,
+    disValue: toNumber(record.disValue) ?? 0,
+    diastolic: toInt(record.diastolic),
+    systolic: toInt(record.systolic),
+    spo2Value: toInt(record.spo2Value),
+    tempValue: toNumber(record.tempValue),
+    stressValue: toInt(record.stressValue),
+    met: toNumber(record.met),
+  };
+}
+
+export function normalizeSpo2OriginData(value: unknown): Spo2OriginData {
+  const record = isRecord(value) ? value : {};
+  return {
+    time: toStringValue(record.time),
+    date: toStringValue(record.date),
+    heartValue: toInt(record.heartValue),
+    value: toInt(record.value),
+    rate: toInt(record.rate),
+    isHypoxia: toInt(record.isHypoxia),
+    cardiacLoad: toInt(record.cardiacLoad),
+    temp1: toInt(record.temp1),
+    sportValue: toInt(record.sportValue),
+    apneaResult: toInt(record.apneaResult),
+    hypoxiaTime: toInt(record.hypoxiaTime),
+    hypopnea: toInt(record.hypopnea),
+    stepValue: toInt(record.stepValue),
+    allPackNumber: toInt(record.allPackNumber),
+    currentPackNumber: toInt(record.currentPackNumber),
+  };
 }

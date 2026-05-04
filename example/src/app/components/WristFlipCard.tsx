@@ -64,7 +64,7 @@ export default function WristFlipCard({
           ]}
           onPress={() => {
             void sdk
-              .readWristFlipWakeSettings()
+              .wristFlip.readWristFlipWakeSettings()
               .then(s => { setLastSettings(s); setWristFlipInfo(JSON.stringify(s)); })
               .catch(() => setWristFlipInfo("(unsupported or error)"));
           }}
@@ -81,7 +81,7 @@ export default function WristFlipCard({
           onPress={() => {
             if (!lastSettings) { setWristFlipInfo("read first"); return; }
             void sdk
-              .setWristFlipWakeSettings(lastSettings)
+              .wristFlip.setWristFlipWakeSettings(lastSettings)
               .then(() => setWristFlipInfo(`applied: ${JSON.stringify(lastSettings)}`))
               .catch(() => setWristFlipInfo("(set failed)"));
           }}

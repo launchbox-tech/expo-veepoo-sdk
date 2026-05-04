@@ -1,24 +1,17 @@
-import {
-  normalizeAlarmList,
-  normalizeBluetoothStatus,
-  normalizeCameraShutterStatus,
-  normalizeDeviceBTState,
-  normalizeDeviceBTStatus,
-  normalizeEventPayload,
-  normalizeHeartRateAlarm,
-  normalizeMusicRemoteCommand,
-  normalizePermissionsResult,
-  normalizeReadOriginProgressPayload,
-  normalizeScreenLightDuration,
-  normalizeScreenLightSettings,
-  normalizeSedentaryReminderSettings,
-  normalizeWristFlipWakeSettings,
-  normalizeWomenHealthSettings,
-  normalizeWatchFaceStyle,
-  normalizeContactList,
-  normalizeSosCallTimesSettings,
-  normalizeWeatherSettings,
-} from '../normalizers';
+import { normalizeAlarmList, normalizeHeartRateAlarm } from '../capabilities/alarms/normalizers.js';
+import { normalizeBluetoothStatus, normalizePermissionsResult } from '../capabilities/session/normalizers.js';
+import { normalizeCameraShutterStatus } from '../capabilities/camera/normalizers.js';
+import { normalizeDeviceBTState, normalizeDeviceBTStatus } from '../capabilities/bt-status/normalizers.js';
+import { normalizeEventPayload, normalizeReadOriginProgressPayload } from '../bridge/event-normalizer.js';
+import { normalizeMusicRemoteCommand } from '../capabilities/music/normalizers.js';
+import { normalizeScreenLightDuration, normalizeScreenLightSettings } from '../capabilities/screen-light/normalizers.js';
+import { normalizeSedentaryReminderSettings } from '../capabilities/sedentary-reminder/normalizers.js';
+import { normalizeWristFlipWakeSettings } from '../capabilities/wrist-flip/normalizers.js';
+import { normalizeWomenHealthSettings } from '../capabilities/women-health/normalizers.js';
+import { normalizeWatchFaceStyle } from '../capabilities/watch-face/normalizers.js';
+import { normalizeContactList } from '../capabilities/contacts/normalizers.js';
+import { normalizeSosCallTimesSettings } from '../capabilities/sos/normalizers.js';
+import { normalizeWeatherSettings } from '../capabilities/weather/normalizers.js';
 
 describe('normalizeAlarmList', () => {
   it('returns empty array for non-array input', () => {

@@ -53,7 +53,7 @@ export default function BandBluetoothCard() {
           onPress={() => {
             setBtInfo("reading…");
             void sdk
-              .readDeviceBTStatus()
+              .btStatus.readDeviceBTStatus()
               .then((s) => setBtInfo(`open=${s.isBTOpen} state=${s.state}`))
               .catch((e: unknown) => setBtInfo((e as Error)?.message ?? "error"));
           }}
@@ -66,7 +66,7 @@ export default function BandBluetoothCard() {
           onPress={() => {
             setBtInfo("opening…");
             void sdk
-              .setDeviceBTSwitch(true)
+              .btStatus.setDeviceBTSwitch(true)
               .then(() => setBtInfo("opened"))
               .catch((e: unknown) => setBtInfo((e as Error)?.message ?? "error"));
           }}
@@ -79,7 +79,7 @@ export default function BandBluetoothCard() {
           onPress={() => {
             setBtInfo("closing…");
             void sdk
-              .setDeviceBTSwitch(false)
+              .btStatus.setDeviceBTSwitch(false)
               .then(() => setBtInfo("closed"))
               .catch((e: unknown) => setBtInfo((e as Error)?.message ?? "error"));
           }}

@@ -49,7 +49,7 @@ export default function SocialMsgCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setInfo("reading…");
-          void sdk.readSocialMsgData()
+          void sdk.socialMsg.readSocialMsgData()
             .then(s => setInfo(JSON.stringify(s)))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -57,7 +57,7 @@ export default function SocialMsgCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setInfo("writing…");
-          void sdk.writeSocialMsgData({ wechat: "open", qq: "open", sms: "open" })
+          void sdk.socialMsg.writeSocialMsgData({ wechat: "open", qq: "open", sms: "open" })
             .then(s => setInfo(`written: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

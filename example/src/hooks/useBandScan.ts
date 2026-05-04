@@ -33,11 +33,11 @@ export function useBandScan(
   async function startScan() {
     setDevices([]);
     dispatch({ type: 'SCAN_START' });
-    await sdk.startScan();
+    await sdk.discovery.startScan();
   }
 
   async function stopScan() {
-    await sdk.stopScan();
+    await sdk.discovery.stopScan();
     dispatch({ type: 'SCAN_STOP' });
   }
 

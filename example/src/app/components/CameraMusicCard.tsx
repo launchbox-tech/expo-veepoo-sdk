@@ -63,7 +63,7 @@ export default function CameraMusicCard({
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
-            void sdk.enterCameraMode().catch(() => setCameraInfo("enterCameraMode error"));
+            void sdk.camera.enterCameraMode().catch(() => setCameraInfo("enterCameraMode error"));
           }}
           accessibilityRole="button"
         >
@@ -76,7 +76,7 @@ export default function CameraMusicCard({
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
-            void sdk.exitCameraMode().then(() => setCameraInfo("—")).catch(() => {});
+            void sdk.camera.exitCameraMode().then(() => setCameraInfo("—")).catch(() => {});
           }}
           accessibilityRole="button"
         >
@@ -93,7 +93,7 @@ export default function CameraMusicCard({
           onPress={() => {
             const next = !musicEnabled;
             setMusicEnabled(next);
-            void sdk.setMusicControlEnabled(next).catch(() => {});
+            void sdk.music.setMusicControlEnabled(next).catch(() => {});
           }}
           accessibilityRole="button"
         >
@@ -110,7 +110,7 @@ export default function CameraMusicCard({
             ]}
             onPress={() => {
               void sdk
-                .pushMusicData({
+                .music.pushMusicData({
                   name: "Test Track",
                   artist: "Test Artist",
                   isPlaying: true,

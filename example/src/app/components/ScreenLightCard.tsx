@@ -72,7 +72,7 @@ export default function ScreenLightCard({
           ]}
           onPress={() => {
             void sdk
-              .readScreenLightSettings()
+              .screenLight.readScreenLightSettings()
               .then(s => { setLastSettings(s); setScreenLightInfo(JSON.stringify(s)); })
               .catch(() => setScreenLightInfo("(unsupported or error)"));
           }}
@@ -89,7 +89,7 @@ export default function ScreenLightCard({
           onPress={() => {
             if (!lastSettings) { setScreenLightInfo("read first"); return; }
             void sdk
-              .setScreenLightSettings(lastSettings)
+              .screenLight.setScreenLightSettings(lastSettings)
               .then(() => setScreenLightInfo(`applied: ${JSON.stringify(lastSettings)}`))
               .catch(() => setScreenLightInfo("(set failed)"));
           }}
@@ -107,7 +107,7 @@ export default function ScreenLightCard({
           ]}
           onPress={() => {
             void sdk
-              .readScreenLightDuration()
+              .screenLight.readScreenLightDuration()
               .then(d => { setLastDuration(d.currentSeconds); setScreenDurationInfo(JSON.stringify(d)); })
               .catch(() => setScreenDurationInfo("(unsupported or error)"));
           }}
@@ -124,7 +124,7 @@ export default function ScreenLightCard({
           onPress={() => {
             if (lastDuration == null) { setScreenDurationInfo("read first"); return; }
             void sdk
-              .setScreenLightDuration(lastDuration)
+              .screenLight.setScreenLightDuration(lastDuration)
               .then(() => setScreenDurationInfo(`applied: ${lastDuration}s`))
               .catch(() => setScreenDurationInfo("(set failed)"));
           }}

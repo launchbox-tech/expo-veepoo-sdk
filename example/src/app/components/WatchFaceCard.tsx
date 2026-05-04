@@ -63,7 +63,7 @@ export default function WatchFaceCard({
           ]}
           onPress={() => {
             void sdk
-              .readWatchFaceStyle()
+              .watchFace.readWatchFaceStyle()
               .then(s => { setLastStyle(s); setWatchFaceInfo(JSON.stringify(s)); })
               .catch(() =>
                 setWatchFaceInfo("(unsupported or error — gate with screenStyleFunction)")
@@ -82,7 +82,7 @@ export default function WatchFaceCard({
           onPress={() => {
             if (!lastStyle) { setWatchFaceInfo("read first"); return; }
             void sdk
-              .setWatchFaceStyle({ screenIndex: lastStyle.screenIndex, dialType: lastStyle.dialType })
+              .watchFace.setWatchFaceStyle({ screenIndex: lastStyle.screenIndex, dialType: lastStyle.dialType })
               .then(() => setWatchFaceInfo(`applied: ${JSON.stringify(lastStyle)}`))
               .catch(() => setWatchFaceInfo("(set failed)"));
           }}

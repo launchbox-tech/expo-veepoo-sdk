@@ -45,7 +45,7 @@ export default function HistoricalQueryCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setInfo("reading all data…");
-          void sdk.readDeviceAllData()
+          void sdk.historicalQuery.readDeviceAllData()
             .then(ok => setInfo(`readDeviceAllData: ${ok}`))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -53,7 +53,7 @@ export default function HistoricalQueryCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setInfo("reading sleep…");
-          void sdk.readSleepData()
+          void sdk.sleepData.readSleepData()
             .then(s => setInfo(`sleep: ${s.length} records`))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -61,7 +61,7 @@ export default function HistoricalQueryCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setInfo("reading steps…");
-          void sdk.readSportStepData()
+          void sdk.sportSteps.readSportStepData()
             .then(s => setInfo(`steps: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -71,7 +71,7 @@ export default function HistoricalQueryCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setInfo("reading day summary…");
-          void sdk.readDaySummaryData()
+          void sdk.daySummary.readDaySummaryData()
             .then(s => setInfo(`summary: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -79,7 +79,7 @@ export default function HistoricalQueryCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setInfo("reading origin…");
-          void sdk.readOriginData()
+          void sdk.originData.readOriginData()
             .then(d => setInfo(`origin: ${d.length} records`))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

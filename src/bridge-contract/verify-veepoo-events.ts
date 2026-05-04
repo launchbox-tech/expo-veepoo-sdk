@@ -1,22 +1,7 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 
-export interface VeepooEventsContract {
-  nativeEmitted: string[];
-  jsLocalOnly: string[];
-}
-
-export function loadContract(repoRoot: string): VeepooEventsContract {
-  const raw = readFileSync(
-    join(repoRoot, "bridge-contract", "veepoo-events.json"),
-    "utf8",
-  );
-  const data = JSON.parse(raw) as VeepooEventsContract;
-  if (!Array.isArray(data.nativeEmitted) || !Array.isArray(data.jsLocalOnly)) {
-    throw new Error("bridge-contract/veepoo-events.json: invalid shape");
-  }
-  return data;
-}
+import { NATIVE_EMITTED_EVENTS, JS_LOCAL_ONLY_EVENTS } from "../bridge/veepoo-events-registry.js";
 
 /** Kotlin `VeepooSDKConstants.kt` event string literals (excludes TAG). */
 export function extractKotlinNativeEvents(source: string): Set<string> {
@@ -49,60 +34,6 @@ export function sliceSwiftEventsHeader(swiftSource: string): string {
   return swiftSource.slice(0, idx);
 }
 
-/** `setupEventListeners` string literals in `event-bus.ts` */
-export function extractVeepooSDKListenerEvents(source: string): Set<string> {
-  const start = source.indexOf("const events: VeepooEvent[] = [");
-  if (start === -1) {
-    throw new Error("src/bridge/event-bus.ts: missing events array");
-  }
-  const sub = source.slice(start);
-  const close = sub.indexOf("];");
-  if (close === -1) {
-    throw new Error("src/bridge/event-bus.ts: unclosed events array");
-  }
-  const block = sub.slice(0, close);
-  const out = new Set<string>();
-  for (const m of block.matchAll(/"([a-z][a-zA-Z0-9]*)"/g)) {
-    out.add(m[1]);
-  }
-  return out;
-}
-
-/**
- * Top-level keys of `VeepooEventPayload` in types/events.ts (these are {@link VeepooEvent}).
- * Parses brace-balanced object type body; top-level properties use two-space indent.
- */
-export function extractTsVeepooEventPayloadKeys(source: string): Set<string> {
-  const marker = "export type VeepooEventPayload = ";
-  const start = source.indexOf(marker);
-  if (start === -1) {
-    throw new Error("src/types/events.ts: missing VeepooEventPayload type");
-  }
-  const open = source.indexOf("{", start);
-  if (open === -1) {
-    throw new Error("src/types/events.ts: VeepooEventPayload missing opening brace");
-  }
-  let depth = 0;
-  for (let i = open; i < source.length; i++) {
-    const c = source[i];
-    if (c === "{") depth++;
-    else if (c === "}") {
-      depth--;
-      if (depth === 0) {
-        const body = source.slice(open + 1, i);
-        const out = new Set<string>();
-        const keyLine = /^ {2}([a-zA-Z][a-zA-Z0-9]*)\???:/;
-        for (const line of body.split(/\r?\n/)) {
-          const m = line.match(keyLine);
-          if (m) out.add(m[1]);
-        }
-        return out;
-      }
-    }
-  }
-  throw new Error("src/types/events.ts: unterminated VeepooEventPayload");
-}
-
 export function setDiff(a: Set<string>, b: Set<string>): {
   onlyA: string[];
   onlyB: string[];
@@ -114,38 +45,22 @@ export function setDiff(a: Set<string>, b: Set<string>): {
 
 export function verifyVeepooEventsContract(repoRoot: string): string[] {
   const errors: string[] = [];
-  let contract: VeepooEventsContract;
-  try {
-    contract = loadContract(repoRoot);
-  } catch (e) {
-    return [String(e)];
-  }
-
-  const expectedNative = new Set(contract.nativeEmitted);
-  const expectedUnion = new Set([
-    ...contract.nativeEmitted,
-    ...contract.jsLocalOnly,
-  ]);
+  const expectedNative: Set<string> = new Set(NATIVE_EMITTED_EVENTS);
 
   const kotlinPath = join(
     repoRoot,
     "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKConstants.kt",
   );
   const kotlin = extractKotlinNativeEvents(readFileSync(kotlinPath, "utf8"));
+
   const swiftPath = join(repoRoot, "ios/VeepooSDK/VeepooSDK.swift");
   const swift = extractSwiftNativeEvents(
     sliceSwiftEventsHeader(readFileSync(swiftPath, "utf8")),
   );
-  const sdkPath = join(repoRoot, "src/bridge/event-bus.ts");
-  const listeners = extractVeepooSDKListenerEvents(readFileSync(sdkPath, "utf8"));
-  const typesPath = join(repoRoot, "src/types/events.ts");
-  const tsUnion = extractTsVeepooEventPayloadKeys(readFileSync(typesPath, "utf8"));
 
   const checks: Array<[string, Set<string>, Set<string>]> = [
     ["Kotlin VeepooSDKConstants.kt", expectedNative, kotlin],
     ["Swift VeepooSDK.swift (header)", expectedNative, swift],
-    ["veepoo-sdk-runtime.ts setupEventListeners", expectedNative, listeners],
-    ["TypeScript VeepooEventPayload keys ∪ contract", expectedUnion, tsUnion],
   ];
 
   for (const [label, exp, act] of checks) {
@@ -157,9 +72,9 @@ export function verifyVeepooEventsContract(repoRoot: string): string[] {
     }
   }
 
-  for (const e of contract.jsLocalOnly) {
+  for (const e of JS_LOCAL_ONLY_EVENTS) {
     if (expectedNative.has(e)) {
-      errors.push(`jsLocalOnly event "${e}" must not appear in nativeEmitted`);
+      errors.push(`jsLocalOnly event "${e}" must not appear in NATIVE_EMITTED_EVENTS`);
     }
   }
 

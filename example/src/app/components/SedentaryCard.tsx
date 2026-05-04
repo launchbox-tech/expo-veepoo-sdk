@@ -64,7 +64,7 @@ export default function SedentaryCard({
           ]}
           onPress={() => {
             void sdk
-              .readSedentaryReminder()
+              .sedentaryReminder.readSedentaryReminder()
               .then(s => { setLastSettings(s); setSedentaryInfo(JSON.stringify(s)); })
               .catch(() => setSedentaryInfo("(unsupported or error)"));
           }}
@@ -81,7 +81,7 @@ export default function SedentaryCard({
           onPress={() => {
             if (!lastSettings) { setSedentaryInfo("read first"); return; }
             void sdk
-              .setSedentaryReminder(lastSettings)
+              .sedentaryReminder.setSedentaryReminder(lastSettings)
               .then(() => setSedentaryInfo(`applied: ${JSON.stringify(lastSettings)}`))
               .catch(() => setSedentaryInfo("(set failed)"));
           }}

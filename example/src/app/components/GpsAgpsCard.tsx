@@ -53,7 +53,7 @@ export default function GpsAgpsCard() {
           onPress={() => {
             setGpsInfo("sending…");
             void sdk
-              .setDeviceGPSAndTimezone({
+              .gpsTimezone.setDeviceGPSAndTimezone({
                 latitude: 27.7172,
                 longitude: 85.324,
                 altitude: 1400,

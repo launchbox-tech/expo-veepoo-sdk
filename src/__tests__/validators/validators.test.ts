@@ -1,29 +1,19 @@
-import {
-  validateDeviceId,
-  validateConnectOptions,
-  validatePersonalInfo,
-  validateAutoMeasureSetting,
-  validateAlarm,
-  validateDeleteAlarm,
-  validateSocialMsgData,
-  validateHeartRateAlarm,
-  validateScreenLightDurationSeconds,
-  validateScreenLightSettings,
-  validateSedentaryReminderSettings,
-  validateWristFlipWakeSettings,
-  validateWomenHealthSettings,
-  validateFirmwareDfuFilePath,
-  validateReadWatchFaceStyleOptions,
-  validateWatchFaceStyleSettings,
-  validateDeviceTime,
-  validateWeatherSettings,
-  validateWeatherData,
-  validateNewContact,
-  validateContactId,
-  validateSosCallTimes,
-  validateMusicData,
-  validateGPSAndTimezoneData,
-} from '../../validators/index';
+import { validateDeviceId, validateConnectOptions, validatePersonalInfo } from '../../capabilities/session/validators.js';
+import { validateAutoMeasureSetting } from '../../capabilities/auto-measure/validators.js';
+import { validateAlarm, validateDeleteAlarm, validateHeartRateAlarm } from '../../capabilities/alarms/validators.js';
+import { validateSocialMsgData } from '../../capabilities/social-msg/validators.js';
+import { validateScreenLightDurationSeconds, validateScreenLightSettings } from '../../capabilities/screen-light/validators.js';
+import { validateSedentaryReminderSettings } from '../../capabilities/sedentary-reminder/validators.js';
+import { validateWristFlipWakeSettings } from '../../capabilities/wrist-flip/validators.js';
+import { validateWomenHealthSettings } from '../../capabilities/women-health/validators.js';
+import { validateFirmwareDfuFilePath } from '../../capabilities/dfu/validators.js';
+import { validateReadWatchFaceStyleOptions, validateWatchFaceStyleSettings } from '../../capabilities/watch-face/validators.js';
+import { validateDeviceTime } from '../../capabilities/device-time/validators.js';
+import { validateWeatherSettings, validateWeatherData } from '../../capabilities/weather/validators.js';
+import { validateNewContact, validateContactId } from '../../capabilities/contacts/validators.js';
+import { validateSosCallTimes } from '../../capabilities/sos/validators.js';
+import { validateMusicData } from '../../capabilities/music/validators.js';
+import { validateGPSAndTimezoneData } from '../../capabilities/gps-timezone/validators.js';
 
 function expectInvalidArgument(fn: () => void, fieldHint?: string): void {
   let thrown: unknown;

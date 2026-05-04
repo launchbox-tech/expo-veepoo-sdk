@@ -11,7 +11,7 @@ import type {
 } from "../types/index.js";
 import type { NativeVeepooSDKInterface } from "../NativeVeepooSDK.js";
 import type { LogListener } from "../VeepooSDKModule.js";
-import { normalizeEventPayload } from "../normalizers/index.js";
+import { normalizeEventPayload } from "../bridge/event-normalizer.js";
 import { mapNativeRejection } from "../errors/map-native-rejection.js";
 import { VeepooSdkState } from "./veepoo-sdk-state.js";
 import { OriginReadPipeline } from "../bridge/origin-read-pipeline.js";

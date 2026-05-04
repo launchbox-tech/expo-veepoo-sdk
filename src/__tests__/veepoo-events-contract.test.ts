@@ -3,18 +3,37 @@ import { join } from "path";
 import {
   extractKotlinNativeEvents,
   extractSwiftNativeEvents,
-  extractTsVeepooEventPayloadKeys,
-  extractVeepooSDKListenerEvents,
   setDiff,
   sliceSwiftEventsHeader,
   verifyVeepooEventsContract,
 } from "../bridge-contract/verify-veepoo-events.js";
+import {
+  NATIVE_EMITTED_EVENTS,
+  JS_LOCAL_ONLY_EVENTS,
+  ALL_VEEPOO_EVENTS,
+} from "../bridge/veepoo-events-registry.js";
 
 const repoRoot = join(__dirname, "..", "..");
 
 describe("VeepooEvent bridge contract", () => {
   it("repo satisfies contract (native + VeepooEventPayload keys)", () => {
     expect(verifyVeepooEventsContract(repoRoot)).toEqual([]);
+  });
+
+  it("registry: ALL_VEEPOO_EVENTS = NATIVE_EMITTED_EVENTS ∪ JS_LOCAL_ONLY_EVENTS", () => {
+    const all = new Set(ALL_VEEPOO_EVENTS);
+    const native = new Set(NATIVE_EMITTED_EVENTS);
+    const jsOnly = new Set(JS_LOCAL_ONLY_EVENTS);
+    for (const e of native) expect(all.has(e)).toBe(true);
+    for (const e of jsOnly) expect(all.has(e)).toBe(true);
+    expect(all.size).toBe(native.size + jsOnly.size);
+  });
+
+  it("registry: no overlap between NATIVE_EMITTED_EVENTS and JS_LOCAL_ONLY_EVENTS", () => {
+    const native = new Set(NATIVE_EMITTED_EVENTS);
+    for (const e of JS_LOCAL_ONLY_EVENTS) {
+      expect(native.has(e)).toBe(false);
+    }
   });
 
   it("setDiff reports drift", () => {
@@ -52,37 +71,5 @@ let X = "hrvTestResult"
 enum ConnectionState { case idle }`;
     expect(sliceSwiftEventsHeader(src)).toBe(`let A = "deviceFound"
 `);
-  });
-
-  it("extractTsVeepooEventPayloadKeys reads top-level keys from VeepooEventPayload", () => {
-    const src = `
-export type VeepooEventPayload = {
-  deviceFound: { x: number };
-  deviceConnected: {
-    deviceId: string;
-  };
-  error: Error;
-};
-export type VeepooEvent = keyof VeepooEventPayload;
-`;
-    expect([...extractTsVeepooEventPayloadKeys(src)].sort()).toEqual([
-      "deviceConnected",
-      "deviceFound",
-      "error",
-    ]);
-  });
-
-  it("extractVeepooSDKListenerEvents reads VeepooEvent array block", () => {
-    const src = `
-const events: VeepooEvent[] = [
-  "deviceFound",
-  "error",
-];
-other();
-`;
-    expect([...extractVeepooSDKListenerEvents(src)].sort()).toEqual([
-      "deviceFound",
-      "error",
-    ]);
   });
 });

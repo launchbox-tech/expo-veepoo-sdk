@@ -59,7 +59,7 @@ export default function FindBandCard({
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
-            void sdk.startFindDevice().catch(() => {});
+            void sdk.findDevice.startFindDevice().catch(() => {});
           }}
           accessibilityRole="button"
         >
@@ -72,7 +72,7 @@ export default function FindBandCard({
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
-            void sdk.stopFindDevice().catch(() => {});
+            void sdk.findDevice.stopFindDevice().catch(() => {});
           }}
           accessibilityRole="button"
         >

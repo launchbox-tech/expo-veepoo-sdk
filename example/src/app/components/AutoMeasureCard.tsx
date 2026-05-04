@@ -44,7 +44,7 @@ export default function AutoMeasureCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setInfo("reading…");
-          void sdk.readAutoMeasureSetting()
+          void sdk.autoMeasure.readAutoMeasureSetting()
             .then(s => setInfo(JSON.stringify(s)))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -52,7 +52,7 @@ export default function AutoMeasureCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setInfo("modifying…");
-          void sdk.modifyAutoMeasureSetting({ measureInterval: 30 })
+          void sdk.autoMeasure.modifyAutoMeasureSetting({ measureInterval: 30 })
             .then(s => setInfo(`modified: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

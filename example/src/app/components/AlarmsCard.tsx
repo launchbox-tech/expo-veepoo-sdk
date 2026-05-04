@@ -56,7 +56,7 @@ export default function AlarmsCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setAlarmsInfo("reading…");
-          void sdk.readAlarms()
+          void sdk.alarms.readAlarms()
             .then(a => setAlarmsInfo(JSON.stringify(a)))
             .catch((e: unknown) => setAlarmsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -64,7 +64,7 @@ export default function AlarmsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setAlarmsInfo("setting…");
-          void sdk.setAlarm({ id: 1, hour: 7, minute: 0, isOpen: true, cycle: 0b1111110 })
+          void sdk.alarms.setAlarm({ id: 1, hour: 7, minute: 0, isOpen: true, cycle: 0b1111110 })
             .then(s => setAlarmsInfo(`set: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setAlarmsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -72,7 +72,7 @@ export default function AlarmsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setAlarmsInfo("deleting…");
-          void sdk.deleteAlarm(1)
+          void sdk.alarms.deleteAlarm(1)
             .then(s => setAlarmsInfo(`deleted: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setAlarmsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -82,7 +82,7 @@ export default function AlarmsCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setHrAlarmInfo("reading…");
-          void sdk.readHeartRateAlarm()
+          void sdk.alarms.readHeartRateAlarm()
             .then(a => setHrAlarmInfo(JSON.stringify(a)))
             .catch((e: unknown) => setHrAlarmInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -90,7 +90,7 @@ export default function AlarmsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setHrAlarmInfo("setting…");
-          void sdk.setHeartRateAlarm({ enabled: true, highThreshold: 150, lowThreshold: 50 })
+          void sdk.alarms.setHeartRateAlarm({ enabled: true, highThreshold: 150, lowThreshold: 50 })
             .then(s => setHrAlarmInfo(`set: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setHrAlarmInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

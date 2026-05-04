@@ -28,7 +28,7 @@ export function useDataSync(appState: AppState): {
     setDataSyncProgress(null);
     setSleepSummary(null);
     setStepData(null);
-    await sdk.startReadOriginData();
+    await sdk.historicalQuery.startReadOriginData();
   }
 
   return { dataSyncing, dataSyncProgress, sleepSummary, stepData, syncData };

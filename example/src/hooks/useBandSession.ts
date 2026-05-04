@@ -46,9 +46,9 @@ export function useBandSession(
       dispatch({ type: 'SESSION_READY' });
 
       const [, battery, version] = await Promise.allSettled([
-        sdk.syncPersonalInfo(DEFAULT_PERSONAL_INFO),
-        sdk.readBattery(),
-        sdk.readDeviceVersion(),
+        sdk.personalInfo.syncPersonalInfo(DEFAULT_PERSONAL_INFO),
+        sdk.battery.readBattery(),
+        sdk.deviceVersion.readDeviceVersion(),
       ]);
 
       setSyncDone(true);
@@ -101,11 +101,11 @@ export function useBandSession(
     setConnectingDevice(device);
     setConnectedDevice(device);
     dispatch({ type: 'BAND_SELECTED' });
-    await sdk.connect(device.id);
+    await sdk.session.connect(device.id);
   }
 
   async function disconnect() {
-    await sdk.disconnect();
+    await sdk.session.disconnect();
     setConnectedDevice(null);
     setSyncDone(false);
     setConnectError(null);
@@ -118,7 +118,7 @@ export function useBandSession(
     setConnectingDevice(null);
     setConnectError(null);
     dispatch({ type: 'RECONNECT' });
-    await sdk.startScan();
+    await sdk.discovery.startScan();
   }
 
   return {

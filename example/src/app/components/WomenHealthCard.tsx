@@ -64,7 +64,7 @@ export default function WomenHealthCard({
           ]}
           onPress={() => {
             void sdk
-              .readWomenHealthSettings()
+              .womenHealth.readWomenHealthSettings()
               .then(s => { setLastSettings(s); setWomenHealthInfo(JSON.stringify(s)); })
               .catch(() => setWomenHealthInfo("(unsupported or error)"));
           }}
@@ -81,7 +81,7 @@ export default function WomenHealthCard({
           onPress={() => {
             if (!lastSettings) { setWomenHealthInfo("read first"); return; }
             void sdk
-              .setWomenHealthSettings(lastSettings)
+              .womenHealth.setWomenHealthSettings(lastSettings)
               .then(() => setWomenHealthInfo(`applied: ${JSON.stringify(lastSettings)}`))
               .catch(() => setWomenHealthInfo("(set failed)"));
           }}

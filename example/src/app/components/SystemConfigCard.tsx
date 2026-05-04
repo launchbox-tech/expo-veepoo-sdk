@@ -60,7 +60,7 @@ export default function SystemConfigCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setBtInfo("checking…");
-          void sdk.checkBluetoothStatus()
+          void sdk.discovery.checkBluetoothStatus()
             .then(ok => setBtInfo(`BT enabled: ${ok}`))
             .catch((e: unknown) => setBtInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -68,7 +68,7 @@ export default function SystemConfigCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setConnInfo("reading…");
-          void sdk.getConnectionStatus()
+          void sdk.session.getConnectionStatus()
             .then(s => setConnInfo(s))
             .catch((e: unknown) => setConnInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -76,7 +76,7 @@ export default function SystemConfigCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setFnInfo("reading…");
-          void sdk.readDeviceFunctions()
+          void sdk.deviceFunctions.readDeviceFunctions()
             .then(f => setFnInfo(JSON.stringify(f)))
             .catch((e: unknown) => setFnInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -86,7 +86,7 @@ export default function SystemConfigCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setSysInfo("setting lang…");
-          void sdk.setLanguage("en")
+          void sdk.language.setLanguage("en")
             .then(ok => setSysInfo(`setLanguage(en): ${ok}`))
             .catch((e: unknown) => setSysInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -94,7 +94,7 @@ export default function SystemConfigCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setSysInfo("syncing time…");
-          void sdk.setDeviceTime(new Date())
+          void sdk.deviceTime.setDeviceTime(new Date())
             .then(ok => setSysInfo(`setDeviceTime: ${ok}`))
             .catch((e: unknown) => setSysInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
