@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
 import type { VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
@@ -28,14 +28,14 @@ export function useBandScan(appState: AppState): {
     appState === 'scanning'
   );
 
-  async function startScan() {
+  const startScan = useCallback(async () => {
     setDevices([]);
     await sdk.discovery.startScan();
-  }
+  }, [sdk]);
 
-  async function stopScan() {
+  const stopScan = useCallback(async () => {
     await sdk.discovery.stopScan();
-  }
+  }, [sdk]);
 
   return { devices, startScan, stopScan };
 }

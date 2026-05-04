@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
 import type { VeepooEvent, VeepooEventPayload } from '@gaozh1024/expo-veepoo-sdk';
 
@@ -8,11 +8,15 @@ export function useSDKEvent<K extends VeepooEvent>(
   active: boolean
 ): void {
   const { sdk } = useVeepooSDK();
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
+
   useEffect(() => {
     if (!active) return;
-    sdk.on(event, handler);
+    const stable = (payload: VeepooEventPayload[K]) => handlerRef.current(payload);
+    sdk.on(event, stable);
     return () => {
-      sdk.off(event, handler);
+      sdk.off(event, stable);
     };
-  }, [sdk, event, active, handler]);
+  }, [sdk, event, active]);
 }

@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { useSyncExternalStore } from "react";
 import { VeepooSDKContext } from "./VeepooSDKContext.js";
 
 export function useVeepooSDK() {
@@ -10,6 +9,5 @@ export function useVeepooSDK() {
         "Wrap your app (or the relevant subtree) with <VeepooSDKProvider>.",
     );
   }
-  const status = useSyncExternalStore(ctx.store.subscribe, ctx.store.getSnapshot);
-  return { sdk: ctx.sdk, status, error: ctx.error };
+  return { sdk: ctx.sdk, error: ctx.error };
 }
