@@ -1,7 +1,7 @@
 # refactor(device-settings): add six sub-interfaces to subsystem-interfaces
 
 **Issue:** #144
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 **Parent:** #138
 

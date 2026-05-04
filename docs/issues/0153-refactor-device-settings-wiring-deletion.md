@@ -1,7 +1,7 @@
 # refactor(device-settings): wire sub-classes into VeepooSDK + delete DeviceSettings
 
 **Issue:** #153
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 **Parent:** #138
 

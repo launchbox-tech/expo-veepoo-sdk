@@ -1,7 +1,7 @@
 # refactor(device-settings): AlarmSettings sub-class + unit tests
 
 **Issue:** #147
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 **Parent:** #138
 

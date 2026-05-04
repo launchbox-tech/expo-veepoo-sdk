@@ -1,7 +1,7 @@
 # refactor(device-settings): SystemSettings sub-class + unit tests
 
 **Issue:** #152
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 **Parent:** #138
 

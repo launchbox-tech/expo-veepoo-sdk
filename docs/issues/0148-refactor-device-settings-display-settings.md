@@ -1,7 +1,7 @@
 # refactor(device-settings): DisplaySettings sub-class + unit tests
 
 **Issue:** #148
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 **Parent:** #138
 

@@ -1,7 +1,7 @@
 # refactor(device-settings): EmergencySettings sub-class + unit tests
 
 **Issue:** #150
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 **Parent:** #138
 

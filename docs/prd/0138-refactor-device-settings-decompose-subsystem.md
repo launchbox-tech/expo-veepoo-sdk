@@ -1,7 +1,7 @@
 # refactor(device-settings): decompose DeviceSettings into typed sub-interfaces
 
 **Issue:** #138
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 
 ## Problem Statement

@@ -1,7 +1,7 @@
 # refactor(device-settings): HealthConfig sub-class + unit tests
 
 **Issue:** #149
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 **Parent:** #138
 

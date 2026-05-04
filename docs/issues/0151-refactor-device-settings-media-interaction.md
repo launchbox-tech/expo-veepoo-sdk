@@ -1,7 +1,7 @@
 # refactor(device-settings): MediaInteraction sub-class + unit tests
 
 **Issue:** #151
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage, enhancement
 **Parent:** #138
 
