@@ -1,4 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { BLUE } from "../../components/theme";
+import sdk from "@gaozh1024/expo-veepoo-sdk";
+import { useSDKEvent } from "../../hooks/useSDKEvent";
 
 const styles = StyleSheet.create({
   card: {
@@ -18,19 +22,51 @@ const styles = StyleSheet.create({
   },
   info: { fontSize: 14, color: "#555" },
   bold: { fontWeight: "600" },
+  warn: { fontSize: 12, color: "#E06000" },
+  row: { flexDirection: "row", gap: 8 },
+  button: {
+    flex: 1,
+    backgroundColor: "#E8F0FE",
+    borderWidth: 1,
+    borderColor: "#C5D9F5",
+    borderRadius: 10,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: { fontSize: 13, fontWeight: "600", color: BLUE },
 });
 
 export default function FirmwareDfuCard() {
+  const [dfuInfo, setDfuInfo] = useState("—");
+
+  useSDKEvent("firmwareDfuProgress", ({ state, progress }) => {
+    setDfuInfo(`state=${state} progress=${progress}%`);
+  }, true);
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardLabel}>Firmware DFU (local file)</Text>
-      <Text style={styles.info} numberOfLines={8}>
-        Use{" "}
-        <Text style={styles.bold}>startLocalFirmwareDfu(path)</Text>{" "}
-        from your host app with a vendor OTA package. Subscribe to{" "}
-        <Text style={styles.bold}>firmwareDfuProgress</Text>. Android:
-        JL-platform Bands only. This example does not run DFU.
+      <Text style={styles.info}>Progress: {dfuInfo}</Text>
+      <Text style={styles.info} numberOfLines={4}>
+        Subscribe to <Text style={styles.bold}>firmwareDfuProgress</Text> for state/progress.
+        Android: JL-platform Bands only.
       </Text>
+      {__DEV__ && (
+        <>
+          <Text style={styles.warn}>Dev only — may brick Band. Use a real vendor OTA package path.</Text>
+          <View style={styles.row}>
+            <Pressable style={styles.button} onPress={() => {
+              setDfuInfo("starting…");
+              void sdk.startLocalFirmwareDfu("/path/to/firmware.bin")
+                .then(() => setDfuInfo("DFU started"))
+                .catch((e: unknown) => setDfuInfo((e as Error)?.message ?? "error"));
+            }} accessibilityRole="button">
+              <Text style={styles.buttonText}>Start DFU (dev)</Text>
+            </Pressable>
+          </View>
+        </>
+      )}
     </View>
   );
 }
