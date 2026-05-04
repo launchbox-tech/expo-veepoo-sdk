@@ -47,6 +47,7 @@ import {
   SystemConfigCard,
   WeatherCard,
   SocialMsgCard,
+  HistoricalQueryCard,
   PersonalInfoSync,
   HealthTestsSection,
   VitalsLabSection,
@@ -351,6 +352,8 @@ export default function ReadyScreen({
         />
 
         <EventLogCard labLog={labLog} clearLabLog={clearLabLog} />
+
+        <HistoricalQueryCard />
 
         <HistoricalDataSection
           dataSyncing={dataSyncing}

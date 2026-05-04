@@ -24,6 +24,7 @@ export { default as AutoMeasureCard } from '../app/components/AutoMeasureCard';
 export { default as SystemConfigCard } from '../app/components/SystemConfigCard';
 export { default as WeatherCard } from '../app/components/WeatherCard';
 export { default as SocialMsgCard } from '../app/components/SocialMsgCard';
+export { default as HistoricalQueryCard } from '../app/components/HistoricalQueryCard';
 export { default as PersonalInfoSync } from '../app/components/PersonalInfoSync';
 export { default as HealthTestsSection } from '../app/components/HealthTestsSection';
 export { default as VitalsLabSection } from '../app/components/VitalsLabSection';
