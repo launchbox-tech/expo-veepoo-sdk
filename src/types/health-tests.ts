@@ -172,6 +172,21 @@ export interface PttTestResult {
   progress: number;
 }
 
+export const RealtimeTest = {
+  HEART_RATE: 'heartRate',
+  BLOOD_PRESSURE: 'bloodPressure',
+  BLOOD_OXYGEN: 'bloodOxygen',
+  TEMPERATURE: 'temperature',
+  STRESS: 'stress',
+  BLOOD_GLUCOSE: 'bloodGlucose',
+  HRV: 'hrv',
+  FATIGUE: 'fatigue',
+  BREATHING: 'breathing',
+  BODY_COMPOSITION: 'bodyComposition',
+} as const;
+
+export type RealtimeTestModality = typeof RealtimeTest[keyof typeof RealtimeTest];
+
 export type ReadState = 'idle' | 'start' | 'reading' | 'complete' | 'invalid';
 
 export interface ReadOriginProgress {

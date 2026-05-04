@@ -111,6 +111,8 @@ export type {
   ReadState,
   ReadOriginProgress,
 } from './health-tests.js';
+export { RealtimeTest } from './health-tests.js';
+export type { RealtimeTestModality } from './health-tests.js';
 
 export type {
   AutoMeasureSetting,
