@@ -45,6 +45,7 @@ import {
   ContactsCard,
   AutoMeasureCard,
   SystemConfigCard,
+  WeatherCard,
   PersonalInfoSync,
   HealthTestsSection,
   VitalsLabSection,
@@ -299,6 +300,7 @@ export default function ReadyScreen({
         <ContactsCard />
         <AutoMeasureCard />
         <SystemConfigCard />
+        <WeatherCard />
         <FirmwareDfuCard />
 
         <PersonalInfoSync syncDone={syncDone} />
