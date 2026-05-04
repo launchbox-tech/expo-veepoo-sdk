@@ -37,6 +37,7 @@ import type {
   ConnectionStatus,
   DeviceAlarm,
   OperationStatus,
+  RealtimeTestModality,
 } from "./types/index.js";
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
@@ -296,51 +297,15 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   setDeviceBTSwitch = (open: boolean): Promise<void> =>
     this.systemSettings.setDeviceBTSwitch(open);
 
-  startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
+  startTest = (modality: RealtimeTestModality): Promise<void> => this.realtime.startTest(modality);
 
-  stopHeartRateTest = (): Promise<void> => this.realtime.stopHeartRateTest();
-
-  startBloodPressureTest = (): Promise<void> => this.realtime.startBloodPressureTest();
-
-  stopBloodPressureTest = (): Promise<void> => this.realtime.stopBloodPressureTest();
-
-  startBloodOxygenTest = (): Promise<void> => this.realtime.startBloodOxygenTest();
-
-  stopBloodOxygenTest = (): Promise<void> => this.realtime.stopBloodOxygenTest();
-
-  startTemperatureTest = (): Promise<void> => this.realtime.startTemperatureTest();
-
-  stopTemperatureTest = (): Promise<void> => this.realtime.stopTemperatureTest();
-
-  startStressTest = (): Promise<void> => this.realtime.startStressTest();
-
-  stopStressTest = (): Promise<void> => this.realtime.stopStressTest();
-
-  startBloodGlucoseTest = (): Promise<void> => this.realtime.startBloodGlucoseTest();
-
-  stopBloodGlucoseTest = (): Promise<void> => this.realtime.stopBloodGlucoseTest();
-
-  startHrvTest = (): Promise<void> => this.realtime.startHrvTest();
-
-  stopHrvTest = (): Promise<void> => this.realtime.stopHrvTest();
+  stopTest = (modality: RealtimeTestModality): Promise<void> => this.realtime.stopTest(modality);
 
   startEcgTest(options?: EcgTestOptions): Promise<void> {
     return this.realtime.startEcgTest(options);
   }
 
   stopEcgTest = (): Promise<void> => this.realtime.stopEcgTest();
-
-  startFatigueTest = (): Promise<void> => this.realtime.startFatigueTest();
-
-  stopFatigueTest = (): Promise<void> => this.realtime.stopFatigueTest();
-
-  startBreathingTest = (): Promise<void> => this.realtime.startBreathingTest();
-
-  stopBreathingTest = (): Promise<void> => this.realtime.stopBreathingTest();
-
-  startBodyCompositionTest = (): Promise<void> => this.realtime.startBodyCompositionTest();
-
-  stopBodyCompositionTest = (): Promise<void> => this.realtime.stopBodyCompositionTest();
 
   setLogEnabled(enabled: boolean): this {
     this.rt.setLogEnabled(enabled);

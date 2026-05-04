@@ -101,6 +101,8 @@ export type {
   DeviceBTState,
   DeviceBTStatus,
 } from './types/index.js';
+export { RealtimeTest } from './types/index.js';
+export type { RealtimeTestModality } from './types/index.js';
 
 export type { VeepooSDKModuleInterface, LogListener } from './VeepooSDKModule.js';
 
