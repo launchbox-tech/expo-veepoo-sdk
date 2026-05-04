@@ -190,4 +190,5 @@ type _RegistryParity = [keyof VeepooEventPayload] extends [(typeof ALL_VEEPOO_EV
     ? true
     : never
   : never;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const _: _RegistryParity;
