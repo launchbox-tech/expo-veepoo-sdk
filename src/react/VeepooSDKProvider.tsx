@@ -6,7 +6,7 @@ import type { LogListener } from "../VeepooSDKModule.js";
 import type { VeepooError } from "../types/index.js";
 
 type VeepooSDKProviderProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   logEnabled?: boolean;
   logger?: LogListener;
 };

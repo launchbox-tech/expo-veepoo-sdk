@@ -109,7 +109,7 @@ describe("useSDKState", () => {
   it("re-renders when the selected slice changes", async () => {
     const native = makeMockNative();
     native.init = jest.fn().mockResolvedValue(undefined);
-    const sdk = new VeepooSDK(native);
+    void new VeepooSDK(native);
 
     // Inject the SDK via a test-only Provider subclass
     const renderCount = { n: 0 };
@@ -121,9 +121,8 @@ describe("useSDKState", () => {
       return null;
     }
 
-    let renderer: ReturnType<typeof create>;
     act(() => {
-      renderer = create(
+      create(
         React.createElement(VeepooSDKProvider, {}, React.createElement(Inner)),
       );
     });

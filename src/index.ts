@@ -109,5 +109,14 @@ export type { VeepooSDKModuleInterface, LogListener } from './VeepooSDKModule.js
 export { mapNativeRejection, isVeepooErrorShape } from './errors/map-native-rejection.js';
 export type { MapNativeRejectionContext } from './errors/map-native-rejection.js';
 
-export { VeepooSDKProvider, useVeepooSDK, useSDKState } from './react/index.js';
+export {
+  VeepooSDKProvider,
+  useVeepooSDK,
+  useSDKState,
+  useIsConnected,
+  useIsSessionReady,
+  useIsScanning,
+  useConnectedDeviceId,
+  useSDKInitialized,
+} from './react/index.js';
 export type { SDKStateSnapshot } from './react/index.js';
