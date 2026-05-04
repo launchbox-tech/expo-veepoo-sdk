@@ -1,4 +1,4 @@
-import { invokeNative } from "../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow, invokeWithRecovery } from "../bridge/native-invoke-pipeline.js";
 import {
   normalizePermissionsResult,
 } from "../normalizers/index.js";
@@ -10,9 +10,8 @@ export class BandDiscovery implements BandDiscoveryInterface {
   constructor(private readonly rt: SubsystemRuntime) {}
 
   async checkBluetoothStatus(): Promise<boolean> {
-    return invokeNative({
+    return invokeWithRecovery({
       invoke: () => this.rt.native.isBluetoothEnabled(),
-      fallbackCode: "UNKNOWN",
       recover: (error: unknown) => {
         this.rt.handleError(error, "UNKNOWN");
         return false;
@@ -32,10 +31,9 @@ export class BandDiscovery implements BandDiscoveryInterface {
   }
 
   async requestPermissions(): Promise<PermissionsResult> {
-    return invokeNative({
+    return invokeWithRecovery({
       invoke: () => this.rt.native.requestPermissions(),
       normalize: normalizePermissionsResult,
-      fallbackCode: "PERMISSION_DENIED",
       recover: (error: unknown) => {
         this.rt.handleError(error, "PERMISSION_DENIED");
         return { granted: false, status: "denied", canAskAgain: true };
@@ -62,12 +60,9 @@ export class BandDiscovery implements BandDiscoveryInterface {
       this.rt.log("info", "scan", "scan.start", "Starting device scan", {
         data: options,
       });
-      await invokeNative({
+      await invokeOrThrow({
         invoke: () => this.rt.native.startScan(options),
-        fallbackCode: "UNKNOWN",
-        throwMapped: (error: unknown) => {
-          throw this.rt.handleError(error, "UNKNOWN");
-        },
+        mapError: (error: unknown) => this.rt.handleError(error, "UNKNOWN"),
       });
     } catch (e) {
       this.rt.state.setScanning(false);
@@ -79,12 +74,9 @@ export class BandDiscovery implements BandDiscoveryInterface {
     if (!this.rt.state.isScanning) return;
 
     try {
-      await invokeNative({
+      await invokeOrThrow({
         invoke: () => this.rt.native.stopScan(),
-        fallbackCode: "UNKNOWN",
-        throwMapped: (error: unknown) => {
-          throw this.rt.handleError(error, "UNKNOWN");
-        },
+        mapError: (error: unknown) => this.rt.handleError(error, "UNKNOWN"),
       });
       this.rt.state.setScanning(false);
       this.rt.log("info", "scan", "scan.stop", "Stopped device scan");

@@ -1,4 +1,4 @@
-import { invokeNative } from "../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow } from "../bridge/native-invoke-pipeline.js";
 import type { LifecycleRuntime } from "./subsystem-interfaces.js";
 
 export class SdkLifecycle {
@@ -8,12 +8,9 @@ export class SdkLifecycle {
     if (this.rt.state.isInitialized) return;
     this.rt.log("info", "sdk", "init.start", "Initializing SDK");
     this.rt.setupEventListeners();
-    await invokeNative({
+    await invokeOrThrow({
       invoke: () => this.rt.native.init(),
-      fallbackCode: "UNKNOWN",
-      throwMapped: (error: unknown) => {
-        throw this.rt.handleError(error, "UNKNOWN");
-      },
+      mapError: (error: unknown) => this.rt.handleError(error, "UNKNOWN"),
       afterSuccess: () => {
         this.rt.state.markInitialized(true);
         this.rt.log("info", "sdk", "init.success", "SDK initialized");

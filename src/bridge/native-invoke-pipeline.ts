@@ -1,42 +1,56 @@
-import type { VeepooErrorCode } from "../types/errors.js";
+import type { VeepooError } from "../types/errors.js";
 
 type BaseInvoke<T> = {
   /** Pure TypeScript preflight; must throw {@link VeepooError} from validators, not native errors. */
   validate?: () => void;
   invoke: () => Promise<unknown>;
   normalize?: (raw: unknown) => T;
-  fallbackCode: VeepooErrorCode;
-  deviceId?: string;
   afterSuccess?: (result: T) => void;
 };
 
-type ThrowingInvoke<T> = BaseInvoke<T> & {
-  throwMapped: (error: unknown) => never;
+export type ThrowingInvoke<T> = BaseInvoke<T> & {
+  mapError: (error: unknown) => VeepooError;
 };
 
-type RecoveringInvoke<T> = BaseInvoke<T> & {
+export type RecoveringInvoke<T> = BaseInvoke<T> & {
   recover: (error: unknown) => T;
 };
 
 /**
- * Shared path: **validate → await native → normalize → map rejection** (via `throwMapped` or `recover`).
- * Success logging belongs in `afterSuccess` so callers keep existing `this.log` messages.
+ * Runs **validate → await native → normalize → afterSuccess** and throws the
+ * `VeepooError` returned by `mapError` on failure. The pipeline owns the throw.
  */
-export async function invokeNative<T>(
-  options: ThrowingInvoke<T> | RecoveringInvoke<T>,
+export async function invokeOrThrow<T>(
+  options: ThrowingInvoke<T>,
 ): Promise<T> {
   options.validate?.();
   try {
     const raw = await options.invoke();
-    const out = options.normalize
-      ? options.normalize(raw)
-      : (raw as T);
+    const out = options.normalize ? options.normalize(raw) : (raw as T);
     options.afterSuccess?.(out);
     return out;
   } catch (error) {
-    if ("recover" in options) {
-      return options.recover(error);
-    }
-    return options.throwMapped(error);
+    throw options.mapError(error);
+  }
+}
+
+/**
+ * Runs **validate → await native → normalize → afterSuccess** and returns the
+ * fallback produced by `recover` on failure — no exception propagates.
+ *
+ * Use only when a safe default exists and partial results are valid.
+ * `recover` must log via `rt.handleError` before returning the fallback.
+ */
+export async function invokeWithRecovery<T>(
+  options: RecoveringInvoke<T>,
+): Promise<T> {
+  options.validate?.();
+  try {
+    const raw = await options.invoke();
+    const out = options.normalize ? options.normalize(raw) : (raw as T);
+    options.afterSuccess?.(out);
+    return out;
+  } catch (error) {
+    return options.recover(error);
   }
 }

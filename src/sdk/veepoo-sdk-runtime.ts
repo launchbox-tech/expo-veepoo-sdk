@@ -263,8 +263,8 @@ export class VeepooSDKRuntime {
     return veepooError;
   }
 
-  nativeOpFailed(error: unknown): never {
-    throw this.handleError(
+  nativeOpFailed(error: unknown): VeepooError {
+    return this.handleError(
       error,
       "OPERATION_FAILED",
       this.state.connectedDeviceId ?? undefined,

@@ -1,4 +1,4 @@
-import { invokeNative } from "../../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
 import {
   normalizeAlarmList,
   normalizeHeartRateAlarm,
@@ -20,12 +20,10 @@ export class AlarmSettings implements AlarmSettingsInterface {
   constructor(private readonly rt: SubsystemRuntime) {}
 
   async readAlarms(): Promise<DeviceAlarm[]> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readAlarms(),
       normalize: normalizeAlarmList,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (alarms: DeviceAlarm[]) => {
         this.rt.emitLocal("alarmData", { deviceId: this.rt.state.connectedDeviceId, alarms });
       },
@@ -33,32 +31,26 @@ export class AlarmSettings implements AlarmSettingsInterface {
   }
 
   async setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateAlarm(alarm),
       invoke: () => this.rt.native.setAlarm(alarm),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   async deleteAlarm(alarmId: number): Promise<OperationStatus> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateDeleteAlarm(alarmId),
       invoke: () => this.rt.native.deleteAlarm(alarmId),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   async readHeartRateAlarm(): Promise<HeartRateAlarm> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readHeartRateAlarm(),
       normalize: normalizeHeartRateAlarm,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (data: HeartRateAlarm) => {
         this.rt.emitLocal("heartRateAlarmData", {
           deviceId: this.rt.state.connectedDeviceId ?? "",
@@ -69,12 +61,10 @@ export class AlarmSettings implements AlarmSettingsInterface {
   }
 
   async setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateHeartRateAlarm(alarm),
       invoke: () => this.rt.native.setHeartRateAlarm(alarm),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: () => {
         this.rt.emitLocal("heartRateAlarmData", {
           deviceId: this.rt.state.connectedDeviceId ?? "",

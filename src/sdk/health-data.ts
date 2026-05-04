@@ -1,4 +1,4 @@
-import { invokeNative } from "../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow } from "../bridge/native-invoke-pipeline.js";
 import {
   normalizeBatteryInfo,
   normalizeDaySummaryData,
@@ -31,12 +31,10 @@ export class HealthData implements HealthDataInterface {
     this.rt.log("debug", "device", "battery.read.start", "Reading battery info", {
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
     });
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readBattery(),
       normalize: normalizeBatteryInfo,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: BatteryInfo) => {
         this.rt.log("debug", "device", "battery.read.result", "Battery info received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,
@@ -47,12 +45,10 @@ export class HealthData implements HealthDataInterface {
   }
 
   async readDeviceFunctions(): Promise<DeviceFunctions> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readDeviceFunctions(),
       normalize: normalizeDeviceFunctions,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: DeviceFunctions) => {
         this.rt.log("debug", "device", "device.functions.read", "Device functions received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,
@@ -63,12 +59,10 @@ export class HealthData implements HealthDataInterface {
   }
 
   async readSocialMsgData(): Promise<SocialMsgData> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readSocialMsgData(),
       normalize: normalizeSocialMsgData,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: SocialMsgData) => {
         this.rt.log("debug", "device", "device.social.read", "Social message settings received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,
@@ -79,22 +73,18 @@ export class HealthData implements HealthDataInterface {
   }
 
   async writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateSocialMsgData(data),
       invoke: () => this.rt.native.writeSocialMsgData(data),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   async readDeviceVersion(): Promise<DeviceVersion> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readDeviceVersion(),
       normalize: normalizeDeviceVersion,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: DeviceVersion) => {
         this.rt.log("debug", "device", "device.version.read", "Device version received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,
@@ -108,30 +98,24 @@ export class HealthData implements HealthDataInterface {
     this.rt.log("info", "read", "read.origin.start", "Starting origin data read", {
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
     });
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.startReadOriginData(),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   readDeviceAllData(): Promise<boolean> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readDeviceAllData(),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   async readSleepData(date?: string): Promise<SleepData[]> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readSleepData(date),
       normalize: normalizeSleepDataList,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: SleepData[]) => {
         this.rt.log("debug", "read", "read.sleep.result", "Sleep data received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,
@@ -142,12 +126,10 @@ export class HealthData implements HealthDataInterface {
   }
 
   async readSportStepData(date?: string): Promise<SportStepData> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readSportStepData(date),
       normalize: normalizeSportStepData,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: SportStepData) => {
         this.rt.log("debug", "read", "read.sport.result", "Sport step data received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,
@@ -158,12 +140,10 @@ export class HealthData implements HealthDataInterface {
   }
 
   async readOriginData(dayOffset: number = 0): Promise<OriginData[]> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readOriginData(dayOffset),
       normalize: normalizeOriginDataList,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: OriginData[]) => {
         this.rt.log("debug", "read", "read.origin.result", "Origin data received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,
@@ -174,12 +154,10 @@ export class HealthData implements HealthDataInterface {
   }
 
   async readDaySummaryData(dayOffset: number = 0): Promise<DaySummaryData> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readDaySummaryData(dayOffset),
       normalize: normalizeDaySummaryData,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: DaySummaryData) => {
         this.rt.log("debug", "read", "read.summary.result", "Day summary data received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,

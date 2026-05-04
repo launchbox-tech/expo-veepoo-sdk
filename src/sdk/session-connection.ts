@@ -1,4 +1,4 @@
-import { invokeNative } from "../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow, invokeWithRecovery } from "../bridge/native-invoke-pipeline.js";
 import { normalizePasswordData } from "../normalizers/index.js";
 import {
   validateDeviceId,
@@ -22,13 +22,9 @@ export class SessionConnection implements SessionInterface {
       deviceId,
       data: options,
     });
-    await invokeNative({
+    await invokeOrThrow({
       invoke: () => this.rt.native.connect(deviceId, options),
-      fallbackCode: "CONNECTION_FAILED",
-      deviceId,
-      throwMapped: (error: unknown) => {
-        throw this.rt.handleError(error, "CONNECTION_FAILED", deviceId);
-      },
+      mapError: (error: unknown) => this.rt.handleError(error, "CONNECTION_FAILED", deviceId),
       afterSuccess: () => {
         this.rt.state.setConnectedDeviceId(deviceId);
         this.rt.log(
@@ -51,13 +47,9 @@ export class SessionConnection implements SessionInterface {
     this.rt.log("info", "connection", "disconnect.start", "Disconnecting device", {
       deviceId: id,
     });
-    await invokeNative({
+    await invokeOrThrow({
       invoke: () => this.rt.native.disconnect(id),
-      fallbackCode: "DISCONNECTION_FAILED",
-      deviceId: id,
-      throwMapped: (error: unknown) => {
-        throw this.rt.handleError(error, "DISCONNECTION_FAILED", id);
-      },
+      mapError: (error: unknown) => this.rt.handleError(error, "DISCONNECTION_FAILED", id),
       afterSuccess: () => {
         if (this.rt.state.connectedDeviceId === id) {
           this.rt.state.setConnectedDeviceId(null);
@@ -73,10 +65,8 @@ export class SessionConnection implements SessionInterface {
     const id = deviceId || this.rt.state.connectedDeviceId;
     if (!id) return "disconnected";
 
-    return invokeNative({
+    return invokeWithRecovery({
       invoke: () => this.rt.native.getConnectionStatus(id),
-      fallbackCode: "UNKNOWN",
-      deviceId: id,
       recover: (error: unknown) => {
         this.rt.handleError(error, "UNKNOWN", id);
         return "disconnected";
@@ -98,14 +88,11 @@ export class SessionConnection implements SessionInterface {
       deviceId: this.rt.state.connectedDeviceId ?? undefined,
       data: { is24Hour },
     });
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.verifyPassword(password, is24Hour),
       normalize: normalizePasswordData,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (error: unknown) => {
-        throw this.rt.handleError(error, "OPERATION_FAILED", this.rt.state.connectedDeviceId ?? undefined);
-      },
+      mapError: (error: unknown) =>
+        this.rt.handleError(error, "OPERATION_FAILED", this.rt.state.connectedDeviceId ?? undefined),
       afterSuccess: (result: PasswordData) => {
         this.rt.log("info", "connection", "password.verify.result", "Device password verified", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,

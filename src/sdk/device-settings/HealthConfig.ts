@@ -1,4 +1,4 @@
-import { invokeNative } from "../../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
 import {
   normalizeAutoMeasureSettings,
   normalizeSedentaryReminderSettings,
@@ -23,22 +23,18 @@ export class HealthConfig implements HealthConfigInterface {
   constructor(private readonly rt: SubsystemRuntime) {}
 
   syncPersonalInfo(info: PersonalInfo): Promise<boolean> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validatePersonalInfo(info),
       invoke: () => this.rt.native.syncPersonalInfo(info),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   async readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readAutoMeasureSetting(),
       normalize: normalizeAutoMeasureSettings,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: AutoMeasureSetting[]) => {
         this.rt.log("debug", "device", "autoMeasure.read", "Auto measure settings received", {
           deviceId: this.rt.state.connectedDeviceId ?? undefined,
@@ -62,12 +58,10 @@ export class HealthConfig implements HealthConfigInterface {
         data: setting,
       },
     );
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.modifyAutoMeasureSetting(setting),
       normalize: normalizeAutoMeasureSettings,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (result: AutoMeasureSetting[]) => {
         this.rt.log(
           "info",
@@ -84,42 +78,34 @@ export class HealthConfig implements HealthConfigInterface {
   }
 
   readSedentaryReminder(): Promise<SedentaryReminderSettings> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readSedentaryReminder(),
       normalize: normalizeSedentaryReminderSettings,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateSedentaryReminderSettings(settings),
       invoke: () => this.rt.native.setSedentaryReminder(settings),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   readWomenHealthSettings(): Promise<WomenHealthSettings> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readWomenHealthSettings(),
       normalize: normalizeWomenHealthSettings,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setWomenHealthSettings(settings: WomenHealthSettings): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateWomenHealthSettings(settings),
       invoke: () => this.rt.native.setWomenHealthSettings(settings),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 }

@@ -1,4 +1,4 @@
-import { invokeNative } from "../../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
 import {
   normalizeScreenLightSettings,
   normalizeScreenLightDuration,
@@ -27,90 +27,74 @@ export class DisplaySettings implements DisplaySettingsInterface {
   constructor(private readonly rt: SubsystemRuntime) {}
 
   readScreenLightSettings(): Promise<ScreenLightSettings> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readScreenLightSettings(),
       normalize: normalizeScreenLightSettings,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setScreenLightSettings(settings: ScreenLightSettings): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateScreenLightSettings(settings),
       invoke: () => this.rt.native.setScreenLightSettings(settings),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   readScreenLightDuration(): Promise<ScreenLightDuration> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readScreenLightDuration(),
       normalize: normalizeScreenLightDuration,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setScreenLightDuration(seconds: number): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateScreenLightDurationSeconds(seconds),
       invoke: () => this.rt.native.setScreenLightDuration(seconds),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   readWristFlipWakeSettings(): Promise<WristFlipWakeSettings> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readWristFlipWakeSettings(),
       normalize: normalizeWristFlipWakeSettings,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateWristFlipWakeSettings(settings),
       invoke: () => this.rt.native.setWristFlipWakeSettings(settings),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateReadWatchFaceStyleOptions(options),
       invoke: () =>
         this.rt.native.readWatchFaceStyle(
           options?.dialType != null ? { dialType: options.dialType } : null,
         ),
       normalize: normalizeWatchFaceStyle,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateWatchFaceStyleSettings(settings),
       invoke: () =>
         this.rt.native.setWatchFaceStyle({
           screenIndex: settings.screenIndex,
           dialType: settings.dialType ?? "default",
         }),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 }

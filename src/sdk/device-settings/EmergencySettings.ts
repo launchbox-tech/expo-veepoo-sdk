@@ -1,4 +1,4 @@
-import { invokeNative } from "../../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
 import {
   normalizeContactList,
   normalizeSosCallTimesSettings,
@@ -20,12 +20,10 @@ export class EmergencySettings implements EmergencySettingsInterface {
   constructor(private readonly rt: SubsystemRuntime) {}
 
   async readContacts(crc?: number): Promise<DeviceContact[]> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readContacts(crc),
       normalize: normalizeContactList,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (contacts: DeviceContact[]) => {
         this.rt.emitLocal("contactsData", {
           deviceId: this.rt.state.connectedDeviceId,
@@ -36,42 +34,34 @@ export class EmergencySettings implements EmergencySettingsInterface {
   }
 
   addContact(contact: NewDeviceContact): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateNewContact(contact),
       invoke: () => this.rt.native.addContact(contact),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   deleteContact(contactId: number): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateContactId(contactId),
       invoke: () => this.rt.native.deleteContact(contactId),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setContactSosState(contactId: number, isOpen: boolean): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateContactId(contactId),
       invoke: () => this.rt.native.setContactSosState(contactId, isOpen),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   async readSosCallTimes(): Promise<SosCallTimesSettings> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readSosCallTimes(),
       normalize: normalizeSosCallTimesSettings,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
       afterSuccess: (data: SosCallTimesSettings) => {
         this.rt.emitLocal("sosCallTimesData", {
           deviceId: this.rt.state.connectedDeviceId,
@@ -82,12 +72,10 @@ export class EmergencySettings implements EmergencySettingsInterface {
   }
 
   setSosCallTimes(times: number): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateSosCallTimes(times),
       invoke: () => this.rt.native.setSosCallTimes(times),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 }

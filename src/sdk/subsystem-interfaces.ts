@@ -22,6 +22,7 @@ import type {
   PasswordData,
   PermissionsResult,
   PersonalInfo,
+  RealtimeTestModality,
   ScanOptions,
   ScreenLightDuration,
   ScreenLightSettings,
@@ -64,7 +65,7 @@ export interface SubsystemRuntime {
     fallbackCode: VeepooError["code"],
     deviceId?: string,
   ): VeepooError;
-  nativeOpFailed(error: unknown): never;
+  nativeOpFailed(error: unknown): VeepooError;
 }
 
 /** Runtime surface needed by `SdkLifecycle`. */
@@ -196,26 +197,8 @@ export interface DeviceSettingsInterface
     SystemSettingsInterface {}
 
 export interface RealtimeTestsInterface {
-  startHeartRateTest(): Promise<void>;
-  stopHeartRateTest(): Promise<void>;
-  startBloodPressureTest(): Promise<void>;
-  stopBloodPressureTest(): Promise<void>;
-  startBloodOxygenTest(): Promise<void>;
-  stopBloodOxygenTest(): Promise<void>;
-  startTemperatureTest(): Promise<void>;
-  stopTemperatureTest(): Promise<void>;
-  startStressTest(): Promise<void>;
-  stopStressTest(): Promise<void>;
-  startBloodGlucoseTest(): Promise<void>;
-  stopBloodGlucoseTest(): Promise<void>;
-  startHrvTest(): Promise<void>;
-  stopHrvTest(): Promise<void>;
+  startTest(modality: RealtimeTestModality): Promise<void>;
+  stopTest(modality: RealtimeTestModality): Promise<void>;
   startEcgTest(options?: EcgTestOptions): Promise<void>;
   stopEcgTest(): Promise<void>;
-  startFatigueTest(): Promise<void>;
-  stopFatigueTest(): Promise<void>;
-  startBreathingTest(): Promise<void>;
-  stopBreathingTest(): Promise<void>;
-  startBodyCompositionTest(): Promise<void>;
-  stopBodyCompositionTest(): Promise<void>;
 }

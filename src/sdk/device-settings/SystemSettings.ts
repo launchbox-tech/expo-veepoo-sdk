@@ -1,4 +1,4 @@
-import { invokeNative } from "../../bridge/native-invoke-pipeline.js";
+import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
 import {
   normalizeDeviceBTStatus,
   normalizeWeatherSettings,
@@ -24,17 +24,15 @@ export class SystemSettings implements SystemSettingsInterface {
   constructor(private readonly rt: SubsystemRuntime) {}
 
   setLanguage(language: Language): Promise<boolean> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.setLanguage(language),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   async setDeviceTime(time?: Date): Promise<boolean> {
     validateDeviceTime(time);
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () =>
         this.rt.native.setDeviceTime(
           time === undefined ? undefined : {
@@ -46,68 +44,54 @@ export class SystemSettings implements SystemSettingsInterface {
             second: time.getSeconds(),
           },
         ),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateGPSAndTimezoneData(data),
       invoke: () => this.rt.native.setDeviceGPSAndTimezone(data),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   readDeviceBTStatus(): Promise<DeviceBTStatus> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readDeviceBTStatus(),
       normalize: normalizeDeviceBTStatus,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setDeviceBTSwitch(open: boolean): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.setDeviceBTSwitch(open),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   readWeatherSettings(): Promise<WeatherSettings> {
-    return invokeNative({
+    return invokeOrThrow({
       invoke: () => this.rt.native.readWeatherSettings(),
       normalize: normalizeWeatherSettings,
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   setWeatherSettings(settings: WeatherSettings): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateWeatherSettings(settings),
       invoke: () => this.rt.native.setWeatherSettings(settings),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
   pushWeatherData(data: WeatherData): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateWeatherData(data),
       invoke: () => this.rt.native.pushWeatherData(data),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 
@@ -116,12 +100,10 @@ export class SystemSettings implements SystemSettingsInterface {
    * Android: JL-platform Bands only (`VPOperateManager.isJLDevice`). iOS: `VPDFUOperation` local file path.
    */
   startLocalFirmwareDfu(filePath: string): Promise<void> {
-    return invokeNative({
+    return invokeOrThrow({
       validate: () => validateFirmwareDfuFilePath(filePath),
       invoke: () => this.rt.native.startLocalFirmwareDfu(filePath.trim()),
-      fallbackCode: "OPERATION_FAILED",
-      deviceId: this.rt.state.connectedDeviceId ?? undefined,
-      throwMapped: (e: unknown) => this.rt.nativeOpFailed(e),
+      mapError: (e: unknown) => this.rt.nativeOpFailed(e),
     });
   }
 }
