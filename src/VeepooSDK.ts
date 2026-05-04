@@ -46,7 +46,14 @@ import { SdkLifecycle } from "./sdk/sdk-lifecycle.js";
 import { BandDiscovery } from "./sdk/band-discovery.js";
 import { SessionConnection } from "./sdk/session-connection.js";
 import { HealthData } from "./sdk/health-data.js";
-import { DeviceSettings } from "./sdk/device-settings.js";
+import {
+  AlarmSettings,
+  DisplaySettings,
+  HealthConfig,
+  EmergencySettings,
+  MediaInteraction,
+  SystemSettings,
+} from "./sdk/device-settings/index.js";
 import { RealtimeTests } from "./sdk/realtime-tests.js";
 
 export class VeepooSDK implements VeepooSDKModuleInterface {
@@ -55,7 +62,12 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   private readonly discovery: BandDiscovery;
   private readonly session: SessionConnection;
   private readonly health: HealthData;
-  private readonly deviceSettings: DeviceSettings;
+  private readonly alarmSettings: AlarmSettings;
+  private readonly displaySettings: DisplaySettings;
+  private readonly healthConfig: HealthConfig;
+  private readonly emergencySettings: EmergencySettings;
+  private readonly mediaInteraction: MediaInteraction;
+  private readonly systemSettings: SystemSettings;
   private readonly realtime: RealtimeTests;
 
   constructor(native: NativeVeepooSDKInterface = NativeVeepooSDK) {
@@ -64,7 +76,12 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     this.discovery = new BandDiscovery(this.rt);
     this.session = new SessionConnection(this.rt);
     this.health = new HealthData(this.rt);
-    this.deviceSettings = new DeviceSettings(this.rt);
+    this.alarmSettings = new AlarmSettings(this.rt);
+    this.displaySettings = new DisplaySettings(this.rt);
+    this.healthConfig = new HealthConfig(this.rt);
+    this.emergencySettings = new EmergencySettings(this.rt);
+    this.mediaInteraction = new MediaInteraction(this.rt);
+    this.systemSettings = new SystemSettings(this.rt);
     this.realtime = new RealtimeTests(this.rt);
   }
 
@@ -113,7 +130,7 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   syncPersonalInfo = (info: PersonalInfo): Promise<boolean> =>
-    this.deviceSettings.syncPersonalInfo(info);
+    this.healthConfig.syncPersonalInfo(info);
 
   readDeviceFunctions(): Promise<DeviceFunctions> {
     return this.health.readDeviceFunctions();
@@ -152,132 +169,132 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
   }
 
   readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
-    return this.deviceSettings.readAutoMeasureSetting();
+    return this.healthConfig.readAutoMeasureSetting();
   }
 
   modifyAutoMeasureSetting(
     setting: Partial<AutoMeasureSetting>,
   ): Promise<AutoMeasureSetting[]> {
-    return this.deviceSettings.modifyAutoMeasureSetting(setting);
+    return this.healthConfig.modifyAutoMeasureSetting(setting);
   }
 
   setLanguage = (language: Language): Promise<boolean> =>
-    this.deviceSettings.setLanguage(language);
+    this.systemSettings.setLanguage(language);
 
   setDeviceTime(time?: Date): Promise<boolean> {
-    return this.deviceSettings.setDeviceTime(time);
+    return this.systemSettings.setDeviceTime(time);
   }
 
   readAlarms(): Promise<DeviceAlarm[]> {
-    return this.deviceSettings.readAlarms();
+    return this.alarmSettings.readAlarms();
   }
 
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> {
-    return this.deviceSettings.setAlarm(alarm);
+    return this.alarmSettings.setAlarm(alarm);
   }
 
   deleteAlarm(alarmId: number): Promise<OperationStatus> {
-    return this.deviceSettings.deleteAlarm(alarmId);
+    return this.alarmSettings.deleteAlarm(alarmId);
   }
 
   readHeartRateAlarm(): Promise<HeartRateAlarm> {
-    return this.deviceSettings.readHeartRateAlarm();
+    return this.alarmSettings.readHeartRateAlarm();
   }
 
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> {
-    return this.deviceSettings.setHeartRateAlarm(alarm);
+    return this.alarmSettings.setHeartRateAlarm(alarm);
   }
 
-  startFindDevice = (): Promise<void> => this.deviceSettings.startFindDevice();
+  startFindDevice = (): Promise<void> => this.mediaInteraction.startFindDevice();
 
-  stopFindDevice = (): Promise<void> => this.deviceSettings.stopFindDevice();
+  stopFindDevice = (): Promise<void> => this.mediaInteraction.stopFindDevice();
 
   readScreenLightSettings = (): Promise<ScreenLightSettings> =>
-    this.deviceSettings.readScreenLightSettings();
+    this.displaySettings.readScreenLightSettings();
 
   setScreenLightSettings = (settings: ScreenLightSettings): Promise<void> =>
-    this.deviceSettings.setScreenLightSettings(settings);
+    this.displaySettings.setScreenLightSettings(settings);
 
   readScreenLightDuration = (): Promise<ScreenLightDuration> =>
-    this.deviceSettings.readScreenLightDuration();
+    this.displaySettings.readScreenLightDuration();
 
   setScreenLightDuration = (seconds: number): Promise<void> =>
-    this.deviceSettings.setScreenLightDuration(seconds);
+    this.displaySettings.setScreenLightDuration(seconds);
 
   readSedentaryReminder = (): Promise<SedentaryReminderSettings> =>
-    this.deviceSettings.readSedentaryReminder();
+    this.healthConfig.readSedentaryReminder();
 
   setSedentaryReminder = (settings: SedentaryReminderSettings): Promise<void> =>
-    this.deviceSettings.setSedentaryReminder(settings);
+    this.healthConfig.setSedentaryReminder(settings);
 
   readWristFlipWakeSettings = (): Promise<WristFlipWakeSettings> =>
-    this.deviceSettings.readWristFlipWakeSettings();
+    this.displaySettings.readWristFlipWakeSettings();
 
   setWristFlipWakeSettings = (settings: WristFlipWakeSettings): Promise<void> =>
-    this.deviceSettings.setWristFlipWakeSettings(settings);
+    this.displaySettings.setWristFlipWakeSettings(settings);
 
   readWomenHealthSettings = (): Promise<WomenHealthSettings> =>
-    this.deviceSettings.readWomenHealthSettings();
+    this.healthConfig.readWomenHealthSettings();
 
   setWomenHealthSettings = (settings: WomenHealthSettings): Promise<void> =>
-    this.deviceSettings.setWomenHealthSettings(settings);
+    this.healthConfig.setWomenHealthSettings(settings);
 
   readWeatherSettings = (): Promise<WeatherSettings> =>
-    this.deviceSettings.readWeatherSettings();
+    this.systemSettings.readWeatherSettings();
 
   setWeatherSettings = (settings: WeatherSettings): Promise<void> =>
-    this.deviceSettings.setWeatherSettings(settings);
+    this.systemSettings.setWeatherSettings(settings);
 
   pushWeatherData = (data: WeatherData): Promise<void> =>
-    this.deviceSettings.pushWeatherData(data);
+    this.systemSettings.pushWeatherData(data);
 
   startLocalFirmwareDfu = (filePath: string): Promise<void> =>
-    this.deviceSettings.startLocalFirmwareDfu(filePath);
+    this.systemSettings.startLocalFirmwareDfu(filePath);
 
   readWatchFaceStyle = (options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle> =>
-    this.deviceSettings.readWatchFaceStyle(options);
+    this.displaySettings.readWatchFaceStyle(options);
 
   setWatchFaceStyle = (settings: WatchFaceStyleSettings): Promise<void> =>
-    this.deviceSettings.setWatchFaceStyle(settings);
+    this.displaySettings.setWatchFaceStyle(settings);
 
   readContacts = (crc?: number): Promise<DeviceContact[]> =>
-    this.deviceSettings.readContacts(crc);
+    this.emergencySettings.readContacts(crc);
 
   addContact = (contact: NewDeviceContact): Promise<void> =>
-    this.deviceSettings.addContact(contact);
+    this.emergencySettings.addContact(contact);
 
   deleteContact = (contactId: number): Promise<void> =>
-    this.deviceSettings.deleteContact(contactId);
+    this.emergencySettings.deleteContact(contactId);
 
   setContactSosState = (contactId: number, isOpen: boolean): Promise<void> =>
-    this.deviceSettings.setContactSosState(contactId, isOpen);
+    this.emergencySettings.setContactSosState(contactId, isOpen);
 
   readSosCallTimes = (): Promise<SosCallTimesSettings> =>
-    this.deviceSettings.readSosCallTimes();
+    this.emergencySettings.readSosCallTimes();
 
   setSosCallTimes = (times: number): Promise<void> =>
-    this.deviceSettings.setSosCallTimes(times);
+    this.emergencySettings.setSosCallTimes(times);
 
   enterCameraMode = (): Promise<void> =>
-    this.deviceSettings.enterCameraMode();
+    this.mediaInteraction.enterCameraMode();
 
   exitCameraMode = (): Promise<void> =>
-    this.deviceSettings.exitCameraMode();
+    this.mediaInteraction.exitCameraMode();
 
   setMusicControlEnabled = (enabled: boolean): Promise<void> =>
-    this.deviceSettings.setMusicControlEnabled(enabled);
+    this.mediaInteraction.setMusicControlEnabled(enabled);
 
   pushMusicData = (data: MusicData): Promise<void> =>
-    this.deviceSettings.pushMusicData(data);
+    this.mediaInteraction.pushMusicData(data);
 
   setDeviceGPSAndTimezone = (data: GPSAndTimezoneData): Promise<void> =>
-    this.deviceSettings.setDeviceGPSAndTimezone(data);
+    this.systemSettings.setDeviceGPSAndTimezone(data);
 
   readDeviceBTStatus = (): Promise<DeviceBTStatus> =>
-    this.deviceSettings.readDeviceBTStatus();
+    this.systemSettings.readDeviceBTStatus();
 
   setDeviceBTSwitch = (open: boolean): Promise<void> =>
-    this.deviceSettings.setDeviceBTSwitch(open);
+    this.systemSettings.setDeviceBTSwitch(open);
 
   startHeartRateTest = (): Promise<void> => this.realtime.startHeartRateTest();
 
