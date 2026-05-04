@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import sdk from "@gaozh1024/expo-veepoo-sdk";
+import type { WristFlipWakeSettings } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
   card: {
@@ -45,6 +47,8 @@ export default function WristFlipCard({
   wristFlipInfo: string;
   setWristFlipInfo: (info: string) => void;
 }) {
+  const [lastSettings, setLastSettings] = useState<WristFlipWakeSettings | null>(null);
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardLabel}>Wrist-flip wake</Text>
@@ -61,12 +65,29 @@ export default function WristFlipCard({
           onPress={() => {
             void sdk
               .readWristFlipWakeSettings()
-              .then(s => setWristFlipInfo(JSON.stringify(s)))
+              .then(s => { setLastSettings(s); setWristFlipInfo(JSON.stringify(s)); })
               .catch(() => setWristFlipInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
         >
           <Text style={styles.buttonTextSecondary}>Read</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonSecondary,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => {
+            if (!lastSettings) { setWristFlipInfo("read first"); return; }
+            void sdk
+              .setWristFlipWakeSettings(lastSettings)
+              .then(() => setWristFlipInfo(`applied: ${JSON.stringify(lastSettings)}`))
+              .catch(() => setWristFlipInfo("(set failed)"));
+          }}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonTextSecondary}>Apply</Text>
         </Pressable>
       </View>
     </View>

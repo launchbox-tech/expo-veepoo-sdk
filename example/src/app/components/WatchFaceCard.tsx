@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import sdk from "@gaozh1024/expo-veepoo-sdk";
+import type { WatchFaceStyle } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
   card: {
@@ -44,30 +46,51 @@ export default function WatchFaceCard({
   watchFaceInfo: string;
   setWatchFaceInfo: (info: string) => void;
 }) {
+  const [lastStyle, setLastStyle] = useState<WatchFaceStyle | null>(null);
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardLabel}>Watch face (dial)</Text>
       <Text style={styles.findPhase} numberOfLines={5}>
         {watchFaceInfo}
       </Text>
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          styles.buttonSecondary,
-          pressed && styles.buttonPressed,
-        ]}
-        onPress={() => {
-          void sdk
-            .readWatchFaceStyle()
-            .then(s => setWatchFaceInfo(JSON.stringify(s)))
-            .catch(() =>
-              setWatchFaceInfo("(unsupported or error — gate with screenStyleFunction)")
-            );
-        }}
-        accessibilityRole="button"
-      >
-        <Text style={styles.buttonTextSecondary}>Read dial</Text>
-      </Pressable>
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonSecondary,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => {
+            void sdk
+              .readWatchFaceStyle()
+              .then(s => { setLastStyle(s); setWatchFaceInfo(JSON.stringify(s)); })
+              .catch(() =>
+                setWatchFaceInfo("(unsupported or error — gate with screenStyleFunction)")
+              );
+          }}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonTextSecondary}>Read dial</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonSecondary,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => {
+            if (!lastStyle) { setWatchFaceInfo("read first"); return; }
+            void sdk
+              .setWatchFaceStyle({ screenIndex: lastStyle.screenIndex, dialType: lastStyle.dialType })
+              .then(() => setWatchFaceInfo(`applied: ${JSON.stringify(lastStyle)}`))
+              .catch(() => setWatchFaceInfo("(set failed)"));
+          }}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonTextSecondary}>Apply dial</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }

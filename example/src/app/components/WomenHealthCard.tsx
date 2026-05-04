@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import sdk from "@gaozh1024/expo-veepoo-sdk";
+import type { WomenHealthSettings } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
   card: {
@@ -45,6 +47,8 @@ export default function WomenHealthCard({
   womenHealthInfo: string;
   setWomenHealthInfo: (info: string) => void;
 }) {
+  const [lastSettings, setLastSettings] = useState<WomenHealthSettings | null>(null);
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardLabel}>Women&apos;s health</Text>
@@ -61,12 +65,29 @@ export default function WomenHealthCard({
           onPress={() => {
             void sdk
               .readWomenHealthSettings()
-              .then(s => setWomenHealthInfo(JSON.stringify(s)))
+              .then(s => { setLastSettings(s); setWomenHealthInfo(JSON.stringify(s)); })
               .catch(() => setWomenHealthInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
         >
           <Text style={styles.buttonTextSecondary}>Read</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonSecondary,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => {
+            if (!lastSettings) { setWomenHealthInfo("read first"); return; }
+            void sdk
+              .setWomenHealthSettings(lastSettings)
+              .then(() => setWomenHealthInfo(`applied: ${JSON.stringify(lastSettings)}`))
+              .catch(() => setWomenHealthInfo("(set failed)"));
+          }}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonTextSecondary}>Apply</Text>
         </Pressable>
       </View>
     </View>

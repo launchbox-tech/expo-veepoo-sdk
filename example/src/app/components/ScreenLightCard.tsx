@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import sdk from "@gaozh1024/expo-veepoo-sdk";
+import type { ScreenLightSettings } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
   card: {
@@ -49,6 +51,9 @@ export default function ScreenLightCard({
   screenDurationInfo: string;
   setScreenDurationInfo: (info: string) => void;
 }) {
+  const [lastSettings, setLastSettings] = useState<ScreenLightSettings | null>(null);
+  const [lastDuration, setLastDuration] = useState<number | null>(null);
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardLabel}>Screen (brightness / on-time)</Text>
@@ -68,7 +73,7 @@ export default function ScreenLightCard({
           onPress={() => {
             void sdk
               .readScreenLightSettings()
-              .then(s => setScreenLightInfo(JSON.stringify(s)))
+              .then(s => { setLastSettings(s); setScreenLightInfo(JSON.stringify(s)); })
               .catch(() => setScreenLightInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
@@ -82,14 +87,50 @@ export default function ScreenLightCard({
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
+            if (!lastSettings) { setScreenLightInfo("read first"); return; }
+            void sdk
+              .setScreenLightSettings(lastSettings)
+              .then(() => setScreenLightInfo(`applied: ${JSON.stringify(lastSettings)}`))
+              .catch(() => setScreenLightInfo("(set failed)"));
+          }}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonTextSecondary}>Apply brightness</Text>
+        </Pressable>
+      </View>
+      <View style={styles.findRow}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonSecondary,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => {
             void sdk
               .readScreenLightDuration()
-              .then(d => setScreenDurationInfo(JSON.stringify(d)))
+              .then(d => { setLastDuration(d.currentSeconds); setScreenDurationInfo(JSON.stringify(d)); })
               .catch(() => setScreenDurationInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
         >
           <Text style={styles.buttonTextSecondary}>Read on-time</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonSecondary,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => {
+            if (lastDuration == null) { setScreenDurationInfo("read first"); return; }
+            void sdk
+              .setScreenLightDuration(lastDuration)
+              .then(() => setScreenDurationInfo(`applied: ${lastDuration}s`))
+              .catch(() => setScreenDurationInfo("(set failed)"));
+          }}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonTextSecondary}>Apply on-time</Text>
         </Pressable>
       </View>
     </View>

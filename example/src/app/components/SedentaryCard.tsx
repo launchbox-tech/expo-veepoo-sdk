@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import sdk from "@gaozh1024/expo-veepoo-sdk";
+import type { SedentaryReminderSettings } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
   card: {
@@ -45,6 +47,8 @@ export default function SedentaryCard({
   sedentaryInfo: string;
   setSedentaryInfo: (info: string) => void;
 }) {
+  const [lastSettings, setLastSettings] = useState<SedentaryReminderSettings | null>(null);
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardLabel}>Sedentary reminder</Text>
@@ -61,12 +65,29 @@ export default function SedentaryCard({
           onPress={() => {
             void sdk
               .readSedentaryReminder()
-              .then(s => setSedentaryInfo(JSON.stringify(s)))
+              .then(s => { setLastSettings(s); setSedentaryInfo(JSON.stringify(s)); })
               .catch(() => setSedentaryInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
         >
           <Text style={styles.buttonTextSecondary}>Read</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonSecondary,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => {
+            if (!lastSettings) { setSedentaryInfo("read first"); return; }
+            void sdk
+              .setSedentaryReminder(lastSettings)
+              .then(() => setSedentaryInfo(`applied: ${JSON.stringify(lastSettings)}`))
+              .catch(() => setSedentaryInfo("(set failed)"));
+          }}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonTextSecondary}>Apply</Text>
         </Pressable>
       </View>
     </View>
