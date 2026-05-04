@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
+import { useIsSessionReady } from '@gaozh1024/expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
-import type { AppState } from './appStateReducer';
 
 function clipJson(payload: unknown, max = 160): string {
   try {
@@ -16,10 +16,9 @@ function clipJson(payload: unknown, max = 160): string {
  * Routes each event to `labLog` via the provided `appendLog` callback.
  */
 export function usePassiveEvents(
-  appState: AppState,
   appendLog: (line: string) => void,
 ): void {
-  const isReady = appState === 'ready';
+  const isReady = useIsSessionReady();
 
   const log = useCallback(
     (name: string, payload: unknown) => appendLog(`${name} ${clipJson(payload)}`),

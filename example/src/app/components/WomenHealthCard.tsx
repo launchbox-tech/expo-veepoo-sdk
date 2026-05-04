@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
-import sdk from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
 import type { WomenHealthSettings } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
@@ -40,13 +40,9 @@ const styles = StyleSheet.create({
   buttonTextSecondary: { fontSize: 14, fontWeight: "600", color: BLUE },
 });
 
-export default function WomenHealthCard({
-  womenHealthInfo,
-  setWomenHealthInfo,
-}: {
-  womenHealthInfo: string;
-  setWomenHealthInfo: (info: string) => void;
-}) {
+export default function WomenHealthCard() {
+  const { sdk } = useVeepooSDK();
+  const [womenHealthInfo, setWomenHealthInfo] = useState("—");
   const [lastSettings, setLastSettings] = useState<WomenHealthSettings | null>(null);
 
   return (

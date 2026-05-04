@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { BLUE } from "../../components/theme";
-import sdk from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
   card: {
@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
 });
 
 export default function HistoricalQueryCard() {
+  const { sdk } = useVeepooSDK();
   const [info, setInfo] = useState("—");
 
   return (

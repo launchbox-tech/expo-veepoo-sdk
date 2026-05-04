@@ -1,28 +1,20 @@
 import { useEffect, useState } from 'react';
-import sdk from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK, useSDKInitialized } from '@gaozh1024/expo-veepoo-sdk';
 import type { PermissionsResult } from '@gaozh1024/expo-veepoo-sdk';
-import type { AppAction } from './appStateReducer';
 
-export function useSDKInit(dispatch: React.Dispatch<AppAction>): {
-  permissions: PermissionsResult | null;
-} {
+export function useSDKInit(): { permissions: PermissionsResult | null } {
+  const { sdk } = useVeepooSDK();
+  const initialized = useSDKInitialized();
   const [permissions, setPermissions] = useState<PermissionsResult | null>(null);
 
   useEffect(() => {
+    if (!initialized) return;
     let cancelled = false;
-    async function setup() {
-      await sdk.init();
-      const result = await sdk.discovery.requestPermissions();
-      if (!cancelled) {
-        setPermissions(result);
-        dispatch({ type: 'SDK_READY' });
-      }
-    }
-    setup();
-    return () => {
-      cancelled = true;
-    };
-  }, [dispatch]);
+    sdk.discovery.requestPermissions().then((result) => {
+      if (!cancelled) setPermissions(result);
+    });
+    return () => { cancelled = true; };
+  }, [sdk, initialized]);
 
   return { permissions };
 }

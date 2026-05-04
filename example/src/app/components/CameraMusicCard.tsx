@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { BLUE } from "../../components/theme";
-import sdk from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
+import { useSDKEvent } from "../../hooks/useSDKEvent";
 
 const styles = StyleSheet.create({
   card: {
@@ -39,16 +40,20 @@ const styles = StyleSheet.create({
   buttonTextSecondary: { fontSize: 14, fontWeight: "600", color: BLUE },
 });
 
-export default function CameraMusicCard({
-  cameraInfo,
-  setCameraInfo,
-  musicCommandInfo,
-}: {
-  cameraInfo: string;
-  setCameraInfo: (info: string) => void;
-  musicCommandInfo: string;
-}) {
+export default function CameraMusicCard() {
+  const { sdk } = useVeepooSDK();
+  const [cameraInfo, setCameraInfo] = useState("—");
+  const [musicCommandInfo, setMusicCommandInfo] = useState("—");
   const [musicEnabled, setMusicEnabled] = useState(false);
+
+  useSDKEvent("cameraShutter", ({ deviceId: _, status }) => {
+    setCameraInfo(`shutter: ${status}`);
+  }, true);
+
+  useSDKEvent("musicRemoteCommand", ({ deviceId: _, command }) => {
+    const ts = new Date().toISOString().slice(11, 19);
+    setMusicCommandInfo(`[${ts}] ${command}`);
+  }, true);
 
   return (
     <View style={styles.card}>

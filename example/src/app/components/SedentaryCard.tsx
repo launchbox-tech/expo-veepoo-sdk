@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
-import sdk from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
 import type { SedentaryReminderSettings } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
@@ -40,13 +40,9 @@ const styles = StyleSheet.create({
   buttonTextSecondary: { fontSize: 14, fontWeight: "600", color: BLUE },
 });
 
-export default function SedentaryCard({
-  sedentaryInfo,
-  setSedentaryInfo,
-}: {
-  sedentaryInfo: string;
-  setSedentaryInfo: (info: string) => void;
-}) {
+export default function SedentaryCard() {
+  const { sdk } = useVeepooSDK();
+  const [sedentaryInfo, setSedentaryInfo] = useState("—");
   const [lastSettings, setLastSettings] = useState<SedentaryReminderSettings | null>(null);
 
   return (

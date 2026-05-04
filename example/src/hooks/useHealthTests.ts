@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import sdk, { RealtimeTest } from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK, useIsSessionReady, RealtimeTest } from "@gaozh1024/expo-veepoo-sdk";
 import type {
   BloodGlucoseData,
   BloodOxygenTestResult,
@@ -13,7 +13,6 @@ import type {
   StressData,
   TemperatureTestResult,
 } from "@gaozh1024/expo-veepoo-sdk";
-import type { AppState } from './appStateReducer';
 import { useSDKEvent } from './useSDKEvent';
 
 /** One active realtime test across HR / SpO₂ / BP / vitals (native mutex matches). */
@@ -61,7 +60,7 @@ function clipJson(payload: unknown, max = 320): string {
   }
 }
 
-export function useHealthTests(appState: AppState): {
+export function useHealthTests(): {
   hrResult: HeartRateTestResult | null;
   bpResult: BloodPressureTestResult | null;
   spo2Result: BloodOxygenTestResult | null;
@@ -102,6 +101,8 @@ export function useHealthTests(appState: AppState): {
   startBodyComposition: () => Promise<void>;
   stopBodyComposition: () => Promise<void>;
 } {
+  const { sdk } = useVeepooSDK();
+  const isReady = useIsSessionReady();
   const [hrResult, setHrResult] = useState<HeartRateTestResult | null>(null);
   const [bpResult, setBpResult] = useState<BloodPressureTestResult | null>(null);
   const [spo2Result, setSpo2Result] = useState<BloodOxygenTestResult | null>(null);
@@ -117,8 +118,6 @@ export function useHealthTests(appState: AppState): {
   const [activeTest, setActiveTest] = useState<ActiveRealtimeTest>(null);
   const [ecgIncludeWaveform, setEcgIncludeWaveform] = useState(false);
   const [labLog, setLabLog] = useState<string[]>([]);
-
-  const isReady = appState === 'ready';
 
   const appendLog = useCallback((line: string) => {
     const ts = new Date().toISOString().slice(11, 23);

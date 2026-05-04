@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
-import sdk from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
+import { useSDKEvent } from "../../hooks/useSDKEvent";
 
 const styles = StyleSheet.create({
   card: {
@@ -38,13 +40,14 @@ const styles = StyleSheet.create({
   buttonTextSecondary: { fontSize: 14, fontWeight: "600", color: BLUE },
 });
 
-export default function FindBandCard({
-  findPhase,
-  setFindPhase,
-}: {
-  findPhase: string | null;
-  setFindPhase: (phase: string | null) => void;
-}) {
+export default function FindBandCard() {
+  const { sdk } = useVeepooSDK();
+  const [findPhase, setFindPhase] = useState<string | null>(null);
+
+  useSDKEvent("findDeviceState", ({ deviceId: _, phase }) => {
+    setFindPhase(phase);
+  }, true);
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardLabel}>Find Band</Text>

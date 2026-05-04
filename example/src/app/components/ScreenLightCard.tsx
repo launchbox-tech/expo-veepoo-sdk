@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
-import sdk from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
 import type { ScreenLightSettings } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
@@ -40,17 +40,10 @@ const styles = StyleSheet.create({
   buttonTextSecondary: { fontSize: 14, fontWeight: "600", color: BLUE },
 });
 
-export default function ScreenLightCard({
-  screenLightInfo,
-  setScreenLightInfo,
-  screenDurationInfo,
-  setScreenDurationInfo,
-}: {
-  screenLightInfo: string;
-  setScreenLightInfo: (info: string) => void;
-  screenDurationInfo: string;
-  setScreenDurationInfo: (info: string) => void;
-}) {
+export default function ScreenLightCard() {
+  const { sdk } = useVeepooSDK();
+  const [screenLightInfo, setScreenLightInfo] = useState("—");
+  const [screenDurationInfo, setScreenDurationInfo] = useState("—");
   const [lastSettings, setLastSettings] = useState<ScreenLightSettings | null>(null);
   const [lastDuration, setLastDuration] = useState<number | null>(null);
 

@@ -1,22 +1,20 @@
 import { useState } from 'react';
-import sdk from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
 import type { VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
-import type { AppAction, AppState } from './appStateReducer';
 import { useSDKEvent } from './useSDKEvent';
+import type { AppState } from './useAppState';
 
-export function useBandScan(
-  appState: AppState,
-  dispatch: React.Dispatch<AppAction>
-): {
+export function useBandScan(appState: AppState): {
   devices: VeepooDevice[];
   startScan: () => Promise<void>;
   stopScan: () => Promise<void>;
 } {
+  const { sdk } = useVeepooSDK();
   const [devices, setDevices] = useState<VeepooDevice[]>([]);
 
   useSDKEvent(
     'deviceFound',
-    ({ device, timestamp: _ }) => {
+    ({ device }) => {
       setDevices(prev => {
         const idx = prev.findIndex(d => d.id === device.id);
         if (idx !== -1) {
@@ -32,13 +30,11 @@ export function useBandScan(
 
   async function startScan() {
     setDevices([]);
-    dispatch({ type: 'SCAN_START' });
     await sdk.discovery.startScan();
   }
 
   async function stopScan() {
     await sdk.discovery.stopScan();
-    dispatch({ type: 'SCAN_STOP' });
   }
 
   return { devices, startScan, stopScan };

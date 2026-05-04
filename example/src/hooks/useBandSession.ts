@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import sdk from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
 import type { BatteryInfo, DeviceVersion, PersonalInfo, VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
-import type { AppAction, AppState } from './appStateReducer';
 import { useSDKEvent } from './useSDKEvent';
+import type { AppState } from './useAppState';
 
 const DEFAULT_PERSONAL_INFO: PersonalInfo = {
   sex: 1,
@@ -15,7 +15,7 @@ const DEFAULT_PERSONAL_INFO: PersonalInfo = {
 
 export function useBandSession(
   appState: AppState,
-  dispatch: React.Dispatch<AppAction>,
+  onIntentionalDisconnect: () => void,
   stopScan: () => Promise<void>
 ): {
   connectedDevice: VeepooDevice | null;
@@ -28,6 +28,7 @@ export function useBandSession(
   disconnect: () => Promise<void>;
   reconnect: () => Promise<void>;
 } {
+  const { sdk } = useVeepooSDK();
   const [connectedDevice, setConnectedDevice] = useState<VeepooDevice | null>(null);
   const [connectingDevice, setConnectingDevice] = useState<VeepooDevice | null>(null);
   const [connectError, setConnectError] = useState<string | null>(null);
@@ -43,7 +44,6 @@ export function useBandSession(
       setSyncDone(false);
       setBatteryInfo(null);
       setDeviceVersion(null);
-      dispatch({ type: 'SESSION_READY' });
 
       const [, battery, version] = await Promise.allSettled([
         sdk.personalInfo.syncPersonalInfo(DEFAULT_PERSONAL_INFO),
@@ -66,7 +66,6 @@ export function useBandSession(
       setConnectError(null);
       setBatteryInfo(null);
       setDeviceVersion(null);
-      dispatch({ type: 'SESSION_ENDED' });
     },
     isActive
   );
@@ -82,7 +81,6 @@ export function useBandSession(
         );
         setConnectingDevice(null);
         setConnectedDevice(null);
-        dispatch({ type: 'SESSION_ERROR' });
       }
     },
     isActive
@@ -100,24 +98,22 @@ export function useBandSession(
     await stopScan();
     setConnectingDevice(device);
     setConnectedDevice(device);
-    dispatch({ type: 'BAND_SELECTED' });
     await sdk.session.connect(device.id);
   }
 
   async function disconnect() {
+    onIntentionalDisconnect();
     await sdk.session.disconnect();
     setConnectedDevice(null);
     setSyncDone(false);
     setConnectError(null);
     setBatteryInfo(null);
     setDeviceVersion(null);
-    dispatch({ type: 'DISCONNECT' });
   }
 
   async function reconnect() {
     setConnectingDevice(null);
     setConnectError(null);
-    dispatch({ type: 'RECONNECT' });
     await sdk.discovery.startScan();
   }
 

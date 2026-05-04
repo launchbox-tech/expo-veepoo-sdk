@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
-import sdk from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
 import type { WatchFaceStyle } from "@gaozh1024/expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
@@ -39,13 +39,9 @@ const styles = StyleSheet.create({
   buttonTextSecondary: { fontSize: 14, fontWeight: "600", color: BLUE },
 });
 
-export default function WatchFaceCard({
-  watchFaceInfo,
-  setWatchFaceInfo,
-}: {
-  watchFaceInfo: string;
-  setWatchFaceInfo: (info: string) => void;
-}) {
+export default function WatchFaceCard() {
+  const { sdk } = useVeepooSDK();
+  const [watchFaceInfo, setWatchFaceInfo] = useState("—");
   const [lastStyle, setLastStyle] = useState<WatchFaceStyle | null>(null);
 
   return (
