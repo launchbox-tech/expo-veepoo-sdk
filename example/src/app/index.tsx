@@ -13,6 +13,7 @@ import { useBandSession } from "../hooks/useBandSession";
 import { useHealthTests } from "../hooks/useHealthTests";
 import { useDataSync } from "../hooks/useDataSync";
 import { useSDKEvent } from "../hooks/useSDKEvent";
+import { usePassiveEvents } from "../hooks/usePassiveEvents";
 export type { AppState } from "../hooks/appStateReducer";
 
 export default function Index() {
@@ -64,6 +65,8 @@ export default function Index() {
   const dataSyncProgress = appState === "ready" ? dataSync.dataSyncProgress : null;
   const sleepSummary = appState === "ready" ? dataSync.sleepSummary : null;
   const stepData = appState === "ready" ? dataSync.stepData : null;
+  usePassiveEvents(appState, healthTests.appendLog);
+
   const {
     startHR, stopHR,
     startBP, stopBP,

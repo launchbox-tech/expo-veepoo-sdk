@@ -78,6 +78,7 @@ export function useHealthTests(appState: AppState): {
   setEcgIncludeWaveform: (v: boolean) => void;
   labLog: string[];
   clearLabLog: () => void;
+  appendLog: (line: string) => void;
   startHR: () => Promise<void>;
   stopHR: () => Promise<void>;
   startBP: () => Promise<void>;
@@ -518,6 +519,7 @@ export function useHealthTests(appState: AppState): {
     setEcgIncludeWaveform,
     labLog,
     clearLabLog,
+    appendLog,
     startHR,
     stopHR,
     startBP,
