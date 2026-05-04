@@ -68,6 +68,9 @@ export const NATIVE_EMITTED_EVENTS = [
 
 export const JS_LOCAL_ONLY_EVENTS = [
   "heartRateAlarmData",
+  "sdkInitialized",
+  "scanStarted",
+  "scanStopped",
 ] as const;
 
 export const ALL_VEEPOO_EVENTS = [

@@ -13,6 +13,7 @@ export class SdkLifecycle {
       mapError: (error: unknown) => this.rt.handleError(error, "UNKNOWN"),
       afterSuccess: () => {
         this.rt.state.markInitialized(true);
+        this.rt.emitLocal("sdkInitialized", {});
         this.rt.log("info", "sdk", "init.success", "SDK initialized");
       },
     });

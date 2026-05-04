@@ -179,6 +179,9 @@ export type VeepooEventPayload = {
   /** Fired when device autonomously enters or exits PTT mode. iOS only. */
   pttStateChanged: { deviceId: string; state: PttState };
   error: VeepooError;
+  sdkInitialized: Record<never, never>;
+  scanStarted: Record<never, never>;
+  scanStopped: Record<never, never>;
 };
 
 export type VeepooEvent = keyof VeepooEventPayload;

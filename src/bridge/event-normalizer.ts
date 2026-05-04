@@ -238,6 +238,9 @@ const EVENT_NORMALIZERS: {
     const p = isRecord(raw) ? raw : {};
     return { ...p, result: normalizeBodyCompositionTestResult(p.result) } as VeepooEventPayload['bodyCompositionTestResult'];
   },
+  sdkInitialized: () => ({} as VeepooEventPayload['sdkInitialized']),
+  scanStarted: () => ({} as VeepooEventPayload['scanStarted']),
+  scanStopped: () => ({} as VeepooEventPayload['scanStopped']),
 };
 
 export function normalizeEventPayload<K extends VeepooEvent>(

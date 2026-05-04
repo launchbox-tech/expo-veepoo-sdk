@@ -222,7 +222,8 @@ export class VeepooSDKRuntime {
     ) {
       return "test";
     }
-    if (event === "error") return "sdk";
+    if (event === "error" || event === "sdkInitialized") return "sdk";
+    if (event === "scanStarted" || event === "scanStopped") return "scan";
     return "device";
   }
 

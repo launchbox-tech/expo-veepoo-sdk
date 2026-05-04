@@ -42,6 +42,7 @@ export class BandDiscoveryCapability {
     if (this.ctx.isScanning()) return;
 
     this.ctx.setScanning(true);
+    this.ctx.emit("scanStarted", {});
     try {
       this.ctx.log("info", "scan", "scan.start", "Starting device scan", { data: options });
       await invokeOrThrow({
@@ -50,6 +51,7 @@ export class BandDiscoveryCapability {
       });
     } catch (e) {
       this.ctx.setScanning(false);
+      this.ctx.emit("scanStopped", {});
       throw e;
     }
   }
@@ -63,9 +65,11 @@ export class BandDiscoveryCapability {
         mapError: (error: unknown) => this.ctx.mapError(error, { code: "UNKNOWN" }),
       });
       this.ctx.setScanning(false);
+      this.ctx.emit("scanStopped", {});
       this.ctx.log("info", "scan", "scan.stop", "Stopped device scan");
     } catch (e) {
       this.ctx.setScanning(false);
+      this.ctx.emit("scanStopped", {});
       throw e;
     }
   }
