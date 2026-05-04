@@ -35,7 +35,7 @@ export function VeepooSDKProvider({ children, logEnabled, logger }: VeepooSDKPro
       storeRef.current?.destroy();
       sdk.destroy();
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const value = useMemo(
     () => ({ sdk: sdkRef.current!, store: storeRef.current!, error }),
