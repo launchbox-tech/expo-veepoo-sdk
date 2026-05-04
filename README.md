@@ -18,7 +18,7 @@ Design goals:
 
 - Keep Android / iOS native layers close to each vendor SDK
 - Normalize values exposed to the app in TypeScript
-- Apps calling through `VeepooSDK` receive consistent shapes
+- Apps calling through the SDK receive consistent shapes
 
 ## Platform requirements
 
@@ -91,327 +91,447 @@ npx expo prebuild --clean
 npx expo run:android
 ```
 
-## Quick start
+## React integration
 
-```ts
-import VeepooSDK from '@gaozh1024/expo-veepoo-sdk';
+The preferred way to use this SDK in a React / Expo app is through the provider and hooks. The provider handles SDK initialization, cleanup, and makes the SDK instance available anywhere in the tree via context.
 
-await VeepooSDK.init();
+### Provider setup
 
-const enabled = await VeepooSDK.checkBluetoothStatus();
-if (!enabled) {
-  throw new Error('Bluetooth is disabled');
+Wrap your app (or the relevant subtree) once at the root:
+
+```tsx
+// app/_layout.tsx
+import { VeepooSDKProvider } from '@gaozh1024/expo-veepoo-sdk';
+import { Stack } from 'expo-router';
+
+export default function Layout() {
+  return (
+    <VeepooSDKProvider>
+      <Stack />
+    </VeepooSDKProvider>
+  );
 }
+```
 
-const permission = await VeepooSDK.requestPermissions();
-if (!permission.granted) {
-  throw new Error(`Permission denied: ${permission.status}`);
+Optional props:
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `logEnabled` | `boolean` | Enable structured SDK logging on mount |
+| `logger` | `(entry: LogEntry) => void` | Custom log sink |
+
+The provider calls `sdk.init()` automatically on mount and `sdk.destroy()` on unmount. You do not need to call these yourself.
+
+### Hooks
+
+All hooks must be called inside `<VeepooSDKProvider>`.
+
+| Hook | Returns | Description |
+| --- | --- | --- |
+| `useVeepooSDK()` | `{ sdk, error }` | Access the SDK instance for imperative calls |
+| `useSDKState(selector)` | `T` | Reactive selector over the SDK state snapshot |
+| `useIsSessionReady()` | `boolean` | `true` when connected and Band is ready |
+| `useIsConnected()` | `boolean` | `true` when BLE connection is established |
+| `useIsScanning()` | `boolean` | `true` while Band Discovery is active |
+| `useConnectedDeviceId()` | `string \| null` | ID of the currently connected Band |
+| `useSDKInitialized()` | `boolean` | `true` after `sdk.init()` resolves |
+
+`useSDKState` accepts a selector function and re-renders only when the selected value changes:
+
+```ts
+import { useSDKState } from '@gaozh1024/expo-veepoo-sdk';
+
+const isReady = useSDKState(s => s.isReady);
+const deviceId = useSDKState(s => s.connectedDeviceId);
+```
+
+The `SDKStateSnapshot` shape:
+
+```ts
+type SDKStateSnapshot = {
+  initialized: boolean;
+  isConnected: boolean;
+  isReady: boolean;
+  isScanning: boolean;
+  connectedDeviceId: string | null;
+};
+```
+
+### Accessing the SDK
+
+Use `useVeepooSDK()` to get the SDK instance for any imperative call:
+
+```tsx
+import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
+
+function ScanButton() {
+  const { sdk } = useVeepooSDK();
+  return (
+    <Button
+      title="Scan"
+      onPress={() => sdk.discovery.startScan()}
+    />
+  );
 }
-
-VeepooSDK.on('deviceFound', ({ device }) => {
-  console.log('deviceFound', device.id, device.name, device.rssi);
-});
-
-await VeepooSDK.startScan({ timeout: 10000 });
 ```
 
-Connect:
+### Subscribing to events
+
+Use a `useSDKEvent` hook (copy this into your app — the example app in this repo includes a ready-made version):
 
 ```ts
-await VeepooSDK.connect(deviceId, {
-  password: '0000',
-  is24Hour: true,
-});
+import { useEffect, useRef } from 'react';
+import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
+import type { VeepooEvent, VeepooEventPayload } from '@gaozh1024/expo-veepoo-sdk';
 
-VeepooSDK.on('deviceConnected', ({ deviceId }) => {
-  console.log('deviceConnected', deviceId);
-});
+export function useSDKEvent<K extends VeepooEvent>(
+  event: K,
+  handler: (payload: VeepooEventPayload[K]) => void,
+  active = true,
+): void {
+  const { sdk } = useVeepooSDK();
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
 
-VeepooSDK.on('deviceReady', ({ deviceId }) => {
-  console.log('deviceReady', deviceId);
-});
+  useEffect(() => {
+    if (!active) return;
+    const stable = (payload: VeepooEventPayload[K]) => handlerRef.current(payload);
+    sdk.on(event, stable);
+    return () => { sdk.off(event, stable); };
+  }, [sdk, event, active]);
+}
 ```
 
-Read data:
+The "latest ref" pattern (`handlerRef.current = handler` in the render body) ensures the subscription never goes stale even when the handler is an inline arrow function, without causing extra subscribe/unsubscribe cycles.
+
+Usage:
+
+```tsx
+useSDKEvent('heartRateTestResult', ({ result }) => {
+  setHrResult(result);
+}, isReady);
+
+useSDKEvent('deviceFound', ({ device }) => {
+  setDevices(prev => [...prev, device]);
+}, isScanning);
+```
+
+### Quick start
+
+```tsx
+// app/_layout.tsx
+import { VeepooSDKProvider } from '@gaozh1024/expo-veepoo-sdk';
+import { Stack } from 'expo-router';
+
+export default function Layout() {
+  return <VeepooSDKProvider><Stack /></VeepooSDKProvider>;
+}
+```
+
+```tsx
+// ScanScreen.tsx
+import { useVeepooSDK, useIsScanning } from '@gaozh1024/expo-veepoo-sdk';
+import type { VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
+import { useState } from 'react';
+import { Button, FlatList, Text } from 'react-native';
+
+export function ScanScreen() {
+  const { sdk } = useVeepooSDK();
+  const isScanning = useIsScanning();
+  const [devices, setDevices] = useState<VeepooDevice[]>([]);
+
+  useSDKEvent('deviceFound', ({ device }) => {
+    setDevices(prev => {
+      const idx = prev.findIndex(d => d.id === device.id);
+      if (idx !== -1) {
+        const next = [...prev]; next[idx] = device; return next;
+      }
+      return [...prev, device];
+    });
+  }, isScanning);
+
+  return (
+    <>
+      <Button
+        title={isScanning ? 'Stop' : 'Scan'}
+        onPress={() =>
+          isScanning ? sdk.discovery.stopScan() : sdk.discovery.startScan()
+        }
+      />
+      <FlatList
+        data={devices}
+        keyExtractor={d => d.id}
+        renderItem={({ item }) => (
+          <Text onPress={() => sdk.session.connect(item.id)}>
+            {item.name} ({item.rssi} dBm)
+          </Text>
+        )}
+      />
+    </>
+  );
+}
+```
+
+The full working example app is in the `example/` directory of this repo.
+
+## SDK modules
+
+The SDK is accessed via `const { sdk } = useVeepooSDK()`. All methods are organized into sub-modules.
+
+### `sdk.discovery` — Band Discovery
 
 ```ts
-const battery = await VeepooSDK.readBattery();
-const version = await VeepooSDK.readDeviceVersion();
-const sleepList = await VeepooSDK.readSleepData();
-const sport = await VeepooSDK.readSportStepData();
-
-console.log(battery.chargeState, battery.level);
-console.log(version.deviceNumber, version.hardwareVersion);
-console.log(sleepList);
-console.log(sport.stepCount, sport.distance);
+await sdk.discovery.startScan()
+await sdk.discovery.stopScan()
+await sdk.discovery.requestPermissions()   // → PermissionsResult
+await sdk.discovery.checkBluetoothStatus() // → boolean
 ```
 
-## Unified return shapes
+Events: `deviceFound`, `bluetoothStateChanged`
 
-Import:
+### `sdk.session` — Session
 
 ```ts
-import VeepooSDK from '@gaozh1024/expo-veepoo-sdk';
+await sdk.session.connect(deviceId: string)
+await sdk.session.disconnect()
 ```
 
-Do not rely on `NativeVeepooSDK` directly. `VeepooSDK` normalizes returns from:
+Events: `deviceConnected`, `deviceDisconnected`, `deviceReady`, `deviceConnectStatus`, `connectionStatusChanged`
 
-- `requestPermissions`
-- `verifyPassword`
-- `readBattery`
-- `readDeviceFunctions`
-- `readSocialMsgData`
-- `readDeviceVersion`
-- `readSleepData`
-- `readSportStepData`
-- `readOriginData`
-- `readDaySummaryData`
-- `readAutoMeasureSetting`
-- `modifyAutoMeasureSetting`
-
-…and normalizes payloads for events including:
-
-- `bluetoothStateChanged`
-- `readOriginProgress`
-- `deviceFunction`
-- `deviceVersion`
-- `passwordData`
-- `socialMsgData`
-- `batteryData`
-- `alarmData`
-- `heartRateAlarmData`
-- `originFiveMinuteData`
-- `originHalfHourData`
-- `originSpo2Data`
-- `sleepData`
-- `sportStepData`
-- `heartRateTestResult`
-- `bloodPressureTestResult`
-- `bloodOxygenTestResult`
-- `temperatureTestResult`
-- `stressData`
-- `bloodGlucoseData`
-- `hrvTestResult`
-- `ecgTestResult`
-- `fatigueTestResult`
-- `breathingTestResult`
-- `bodyCompositionTestResult`
-- `findDeviceState`
-- `cameraShutter`
-- `musicRemoteCommand`
-- `deviceBTStateChanged`
-- `contactsData`
-- `sosCallTimesData`
-
-For `readOriginProgress`, `progress` means:
-
-- Integer percent `0–100`
-- Truncated from any fractional input—no rounding
-- Events fire again only when the integer changes
-- Completion always sends `100`
-
-## Logging
-
-Optional structured logging (off by default). Enable it to trace scan, connect, reads, and tests.
+### `sdk.personalInfo` — Personal Info
 
 ```ts
-import VeepooSDK, { type LogEntry } from '@gaozh1024/expo-veepoo-sdk';
-
-VeepooSDK
-  .setLogEnabled(true)
-  .setLogger((entry: LogEntry) => {
-    console.log('[veepoo-log]', entry.level, entry.scope, entry.action, entry);
-  });
+await sdk.personalInfo.syncPersonalInfo(info: PersonalInfo) // → boolean
 ```
 
-Methods:
-
-- `setLogEnabled(enabled: boolean): VeepooSDK`
-- `isLogEnabled(): boolean`
-- `setLogger(logger: ((entry: LogEntry) => void) | null): VeepooSDK`
-
-Fields:
-
-- `timestamp`
-- `level`
-- `scope`
-- `action`
-- `platform`
-- `message`
-- `deviceId`
-- `data`
-- `error`
-
-## Bluetooth and Session listeners
-
-System Bluetooth:
+### `sdk.battery` — Battery
 
 ```ts
-VeepooSDK.on('bluetoothStateChanged', (payload) => {
-  console.log(payload.state, payload.authorization);
-});
+await sdk.battery.readBattery() // → BatteryInfo
 ```
 
-Disconnect and connection changes:
+Events: `batteryData`
+
+### `sdk.deviceVersion` — Device Version
 
 ```ts
-VeepooSDK.on('deviceDisconnected', ({ deviceId }) => {
-  console.log('deviceDisconnected', deviceId);
-});
-
-VeepooSDK.on('connectionStatusChanged', ({ deviceId, status }) => {
-  console.log('connectionStatusChanged', deviceId, status);
-});
-
-VeepooSDK.on('deviceConnectStatus', ({ deviceId, status, code }) => {
-  console.log('deviceConnectStatus', deviceId, status, code);
-});
+await sdk.deviceVersion.readDeviceVersion() // → DeviceVersion
 ```
 
-Subscribe to all three to cover device drops and Bluetooth toggling off.
+Events: `deviceVersion`
 
-## Common APIs
-
-### Initialization
-
-- `init(): Promise<void>`
-- `destroy(): void`
-- `isSDKInitialized(): boolean`
-- `checkBluetoothStatus(): Promise<boolean>`
-- `requestPermissions(): Promise<PermissionsResult>`
-- `setLogEnabled(enabled: boolean): VeepooSDK`
-- `isLogEnabled(): boolean`
-- `setLogger(logger: ((entry: LogEntry) => void) | null): VeepooSDK`
-
-### Scan and Session
-
-- `startScan(options?: ScanOptions): Promise<void>`
-- `stopScan(): Promise<void>`
-- `isScanningActive(): boolean`
-- `connect(deviceId: string, options?: ConnectOptions): Promise<void>`
-- `disconnect(deviceId?: string): Promise<void>`
-- `getConnectionStatus(deviceId?: string): Promise<ConnectionStatus>`
-- `getConnectedDeviceId(): string | null`
-- `verifyPassword(password?: string, is24Hour?: boolean): Promise<PasswordData>`
-
-### Event listeners
-
-- `on<K>(event: K, listener: (payload: VeepooEventPayload[K]) => void): VeepooSDK`
-- `off<K>(event: K, listener: (payload: VeepooEventPayload[K]) => void): VeepooSDK`
-- `once<K>(event: K, listener: (payload: VeepooEventPayload[K]) => void): VeepooSDK`
-- `removeAllListeners(event?: VeepooEvent): VeepooSDK`
-
-### Band info
-
-- `readBattery(): Promise<BatteryInfo>`
-- `readDeviceFunctions(): Promise<DeviceFunctions>`
-- `readDeviceVersion(): Promise<DeviceVersion>`
-- `readSocialMsgData(): Promise<SocialMsgData>`
-- `writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus>`
-- `syncPersonalInfo(info: PersonalInfo): Promise<boolean>`
-- `setLanguage(language: Language): Promise<boolean>`
-
-### Data reads
-
-- `startReadOriginData(): Promise<void>`
-- `readDeviceAllData(): Promise<boolean>`
-- `readSleepData(date?: string): Promise<SleepData[]>`
-- `readSportStepData(date?: string): Promise<SportStepData>`
-- `readOriginData(dayOffset?: number): Promise<OriginData[]>`
-- `readDaySummaryData(dayOffset?: number): Promise<DaySummaryData>`
-- `readAutoMeasureSetting(): Promise<AutoMeasureSetting[]>`
-- `modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<AutoMeasureSetting[]>`
-
-Historical read progress:
+### `sdk.deviceFunctions` — Device Functions
 
 ```ts
-VeepooSDK.on('readOriginProgress', ({ progress }) => {
-  console.log(progress.progress); // 0..100, integer
-});
+await sdk.deviceFunctions.readDeviceFunctions() // → DeviceFunctions
 ```
 
-### Health tests
+Events: `deviceFunction`
 
-- `startHeartRateTest(): Promise<void>` / `stopHeartRateTest(): Promise<void>`
-- `startBloodPressureTest(): Promise<void>` / `stopBloodPressureTest(): Promise<void>`
-- `startBloodOxygenTest(): Promise<void>` / `stopBloodOxygenTest(): Promise<void>`
-- `startTemperatureTest(): Promise<void>` / `stopTemperatureTest(): Promise<void>`
-- `startStressTest(): Promise<void>` / `stopStressTest(): Promise<void>`
-- `startBloodGlucoseTest(): Promise<void>` / `stopBloodGlucoseTest(): Promise<void>`
-- `startHrvTest(): Promise<void>` / `stopHrvTest(): Promise<void>`
-- `startEcgTest(options?: EcgTestOptions): Promise<void>` / `stopEcgTest(): Promise<void>`
-- `startFatigueTest(): Promise<void>` / `stopFatigueTest(): Promise<void>`
-- `startBreathingTest(): Promise<void>` / `stopBreathingTest(): Promise<void>`
-- `startBodyCompositionTest(): Promise<void>` / `stopBodyCompositionTest(): Promise<void>`
+### `sdk.deviceTime` — Device Time
 
-### Device settings
+```ts
+await sdk.deviceTime.setDeviceTime(time?: Date) // → boolean
+```
 
-Time and display:
+### `sdk.language` — Language
 
-- `setDeviceTime(time?: Date): Promise<boolean>`
-- `readScreenLightSettings(): Promise<ScreenLightSettings>`
-- `setScreenLightSettings(settings: ScreenLightSettings): Promise<void>`
-- `readScreenLightDuration(): Promise<ScreenLightDuration>`
-- `setScreenLightDuration(seconds: number): Promise<void>`
+```ts
+await sdk.language.setLanguage(language: Language) // → boolean
+```
 
-Alarms:
+### `sdk.realtimeTests` — Realtime Health Tests
 
-- `readAlarms(): Promise<DeviceAlarm[]>`
-- `setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>`
-- `deleteAlarm(alarmId: number): Promise<OperationStatus>`
-- `readHeartRateAlarm(): Promise<HeartRateAlarm>`
-- `setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>`
+```ts
+import { RealtimeTest } from '@gaozh1024/expo-veepoo-sdk';
 
-Reminders:
+await sdk.realtimeTests.startTest(modality: RealtimeTest)
+await sdk.realtimeTests.stopTest(modality: RealtimeTest)
+await sdk.realtimeTests.startEcgTest(options?: EcgTestOptions)
+await sdk.realtimeTests.stopEcgTest()
+```
 
-- `readSedentaryReminder(): Promise<SedentaryReminderSettings>`
-- `setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>`
-- `readWristFlipWakeSettings(): Promise<WristFlipWakeSettings>`
-- `setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>`
-- `readWomenHealthSettings(): Promise<WomenHealthSettings>`
-- `setWomenHealthSettings(settings: WomenHealthSettings): Promise<void>`
+`RealtimeTest` values: `HEART_RATE`, `BLOOD_PRESSURE`, `BLOOD_OXYGEN`, `TEMPERATURE`, `STRESS`, `BLOOD_GLUCOSE`, `HRV`, `FATIGUE`, `BREATHING`, `BODY_COMPOSITION`
 
-Weather:
+Events: `heartRateTestResult`, `bloodPressureTestResult`, `bloodOxygenTestResult`, `temperatureTestResult`, `stressData`, `bloodGlucoseData`, `hrvTestResult`, `ecgTestResult`, `fatigueTestResult`, `breathingTestResult`, `bodyCompositionTestResult`, `pttTestResult`, `pttStateChanged`, `gsrTestResult`
 
-- `readWeatherSettings(): Promise<WeatherSettings>`
-- `setWeatherSettings(settings: WeatherSettings): Promise<void>`
-- `pushWeatherData(data: WeatherData): Promise<void>`
+### `sdk.historicalQuery` — Historical Data
 
-Contacts and SOS:
+```ts
+await sdk.historicalQuery.startReadOriginData()
+```
 
-- `readContacts(crc?: number): Promise<DeviceContact[]>`
-- `addContact(contact: NewDeviceContact): Promise<void>`
-- `deleteContact(contactId: number): Promise<void>`
-- `setContactSosState(contactId: number, isOpen: boolean): Promise<void>`
-- `readSosCallTimes(): Promise<SosCallTimesSettings>`
-- `setSosCallTimes(times: number): Promise<void>`
+Events: `readOriginProgress`, `readOriginComplete`, `originFiveMinuteData`, `originHalfHourData`, `originSpo2Data`, `sleepData`, `accurateSleepData`, `sportStepData`
 
-Camera and music:
+`readOriginProgress.progress` is an integer 0–100 (truncated, not rounded). Events fire only when the integer changes. Completion always sends 100.
 
-- `enterCameraMode(): Promise<void>`
-- `exitCameraMode(): Promise<void>`
-- `setMusicControlEnabled(enabled: boolean): Promise<void>`
-- `pushMusicData(data: MusicData): Promise<void>`
+### `sdk.sleepData` — Sleep Data
 
-Connectivity and location:
+```ts
+await sdk.sleepData.readSleepData(date?: string) // → SleepData[]
+```
 
-- `setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void>`
-- `readDeviceBTStatus(): Promise<DeviceBTStatus>`
-- `setDeviceBTSwitch(open: boolean): Promise<void>`
+### `sdk.sportSteps` — Sport / Steps
 
-Find device:
+```ts
+await sdk.sportSteps.readSportStepData(date?: string) // → SportStepData
+```
 
-- `startFindDevice(): Promise<void>`
-- `stopFindDevice(): Promise<void>`
+### `sdk.originData` — Origin / Half-hour Data
 
-Watch face:
+```ts
+await sdk.originData.readOriginData(dayOffset?: number)      // → OriginData[]
+await sdk.originData.readDaySummaryData(dayOffset?: number)  // → DaySummaryData
+```
 
-- `readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle>`
-- `setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>`
+### `sdk.daySummary` — Day Summary
 
-Firmware:
+```ts
+await sdk.daySummary.readDaySummaryData(dayOffset?: number) // → DaySummaryData
+```
 
-- `startLocalFirmwareDfu(filePath: string): Promise<void>`
+### `sdk.autoMeasure` — Auto Measure
+
+```ts
+await sdk.autoMeasure.readAutoMeasureSetting()                       // → AutoMeasureSetting[]
+await sdk.autoMeasure.modifyAutoMeasureSetting(Partial<AutoMeasureSetting>) // → AutoMeasureSetting[]
+```
+
+### `sdk.socialMsg` — Social Messages
+
+```ts
+await sdk.socialMsg.readSocialMsgData()               // → SocialMsgData
+await sdk.socialMsg.writeSocialMsgData(Partial<SocialMsgData>) // → OperationStatus
+```
+
+Events: `socialMsgData`
+
+### `sdk.alarms` — Alarms
+
+```ts
+await sdk.alarms.readAlarms()                      // → DeviceAlarm[]
+await sdk.alarms.setAlarm(alarm: DeviceAlarm)      // → OperationStatus
+await sdk.alarms.deleteAlarm(alarmId: number)      // → OperationStatus
+await sdk.alarms.readHeartRateAlarm()              // → HeartRateAlarm
+await sdk.alarms.setHeartRateAlarm(alarm: HeartRateAlarm) // → OperationStatus
+```
+
+Events: `alarmData`, `heartRateAlarmData` *(JS-local — emitted by `readHeartRateAlarm` / `setHeartRateAlarm`)*
+
+### `sdk.screenLight` — Screen Brightness and On-time
+
+```ts
+await sdk.screenLight.readScreenLightSettings()             // → ScreenLightSettings
+await sdk.screenLight.setScreenLightSettings(ScreenLightSettings)
+await sdk.screenLight.readScreenLightDuration()             // → ScreenLightDuration
+await sdk.screenLight.setScreenLightDuration(seconds: number)
+```
+
+### `sdk.sedentaryReminder` — Sedentary Reminder
+
+```ts
+await sdk.sedentaryReminder.readSedentaryReminder()                   // → SedentaryReminderSettings
+await sdk.sedentaryReminder.setSedentaryReminder(SedentaryReminderSettings)
+```
+
+### `sdk.wristFlip` — Wrist Flip Wake
+
+```ts
+await sdk.wristFlip.readWristFlipWakeSettings()             // → WristFlipWakeSettings
+await sdk.wristFlip.setWristFlipWakeSettings(WristFlipWakeSettings)
+```
+
+### `sdk.womenHealth` — Women's Health
+
+```ts
+await sdk.womenHealth.readWomenHealthSettings()             // → WomenHealthSettings
+await sdk.womenHealth.setWomenHealthSettings(WomenHealthSettings)
+```
+
+### `sdk.watchFace` — Watch Face
+
+```ts
+await sdk.watchFace.readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }) // → WatchFaceStyle
+await sdk.watchFace.setWatchFaceStyle(WatchFaceStyleSettings)
+```
+
+### `sdk.weather` — Weather
+
+```ts
+await sdk.weather.readWeatherSettings()            // → WeatherSettings
+await sdk.weather.setWeatherSettings(WeatherSettings)
+await sdk.weather.pushWeatherData(WeatherData)
+```
+
+### `sdk.contacts` — Contacts
+
+```ts
+await sdk.contacts.readContacts(crc?: number)                            // → DeviceContact[]
+await sdk.contacts.addContact(contact: NewDeviceContact)
+await sdk.contacts.deleteContact(contactId: number)
+await sdk.contacts.setContactSosState(contactId: number, isOpen: boolean)
+```
+
+Events: `contactsData`
+
+### `sdk.sos` — SOS
+
+```ts
+await sdk.sos.readSosCallTimes()           // → SosCallTimesSettings
+await sdk.sos.setSosCallTimes(times: number)
+```
+
+Events: `sosCallTimesData`, `deviceSosTriggered`
+
+### `sdk.camera` — Camera
+
+```ts
+await sdk.camera.enterCameraMode()
+await sdk.camera.exitCameraMode()
+```
+
+Events: `cameraShutter`
+
+### `sdk.music` — Music Remote
+
+```ts
+await sdk.music.setMusicControlEnabled(enabled: boolean)
+await sdk.music.pushMusicData(data: MusicData)
+```
+
+Events: `musicRemoteCommand`
+
+### `sdk.findDevice` — Find Device
+
+```ts
+await sdk.findDevice.startFindDevice()
+await sdk.findDevice.stopFindDevice()
+```
+
+Events: `findDeviceState`
+
+### `sdk.btStatus` — Band Bluetooth
+
+```ts
+await sdk.btStatus.readDeviceBTStatus() // → DeviceBTStatus
+await sdk.btStatus.setDeviceBTSwitch(open: boolean)
+```
+
+Events: `deviceBTStateChanged`
+
+### `sdk.gpsTimezone` — GPS and Timezone
+
+```ts
+await sdk.gpsTimezone.setDeviceGPSAndTimezone(data: GPSAndTimezoneData)
+```
+
+### `sdk.dfu` — Firmware Update
+
+```ts
+await sdk.dfu.startLocalFirmwareDfu(filePath: string)
+```
+
+Events: `firmwareDfuProgress`
 
 ## Events
 
@@ -495,28 +615,35 @@ Firmware:
 
 - `error`
 
-## Usage tips
+## Logging
 
-- Start every flow with `await VeepooSDK.init()`
-- Verify Bluetooth and permissions before connecting
-- For Session lifecycle, listen for `deviceDisconnected`, `connectionStatusChanged`, and `bluetoothStateChanged`
-- If you depend on unified returns, call through `VeepooSDK`, not the raw native module
-- Native frameworks on iOS exclude Expo Go
+Enable structured logging via `VeepooSDKProvider` props:
+
+```tsx
+<VeepooSDKProvider
+  logEnabled
+  logger={(entry) => console.log('[veepoo]', entry.level, entry.scope, entry.action, entry)}
+>
+  <Stack />
+</VeepooSDKProvider>
+```
+
+Log entry fields: `timestamp`, `level`, `scope`, `action`, `platform`, `message`, `deviceId`, `data`, `error`
 
 ## Local development
 
 ```bash
-npm run typecheck
-npm test -- --runInBand
-npm run build
+bun run typecheck
+bun test
+bun run build
 ```
 
 ## Pre-release checklist
 
 ```bash
-npm run typecheck
-npm test -- --runInBand
-npm run build
+bun run typecheck
+bun test
+bun run build
 npm pack --dry-run
 ```
 
