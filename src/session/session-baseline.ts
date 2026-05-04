@@ -78,9 +78,9 @@ export async function runSessionBaseline(
   config: SessionBaselineConfig,
 ): Promise<SessionBaselineResult> {
   const [syncResult, batteryResult, versionResult] = await Promise.allSettled([
-    sdk.syncPersonalInfo(config.personalInfo),
-    sdk.readBattery(),
-    sdk.readDeviceVersion(),
+    sdk.personalInfo.syncPersonalInfo(config.personalInfo),
+    sdk.battery.readBattery(),
+    sdk.deviceVersion.readDeviceVersion(),
   ]);
 
   const errors: SessionBaselineResult['errors'] = {};

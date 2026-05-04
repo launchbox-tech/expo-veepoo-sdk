@@ -5,19 +5,23 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { EmergencySettings } from '../../sdk/device-settings/EmergencySettings';
+import { ContactsCapability } from '../../capabilities/contacts/index';
+import { SosCapability } from '../../capabilities/sos/index';
 import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '../helpers/mock-native';
 
-describe('EmergencySettings', () => {
+describe('EmergencySettings (split capabilities)', () => {
   let native: MockNative;
   let runtime: VeepooSDKRuntime;
-  let emergencySettings: EmergencySettings;
+  let contacts: ContactsCapability;
+  let sos: SosCapability;
 
   beforeEach(() => {
     native = makeMockNative();
     runtime = new VeepooSDKRuntime(native);
-    emergencySettings = new EmergencySettings(runtime);
+    const ctx = runtime.createCapabilityContext();
+    contacts = new ContactsCapability(ctx);
+    sos = new SosCapability(ctx);
   });
 
   // ── readContacts ──────────────────────────────────────────────────────────
@@ -25,7 +29,7 @@ describe('EmergencySettings', () => {
   it('readContacts delegates to native and emits contactsData via emitLocal', async () => {
     const emitSpy = jest.spyOn(runtime, 'emitLocal');
 
-    const result = await emergencySettings.readContacts();
+    const result = await contacts.readContacts();
 
     expect(native.readContacts).toHaveBeenCalledTimes(1);
     expect(result).toEqual([]);
@@ -40,7 +44,7 @@ describe('EmergencySettings', () => {
   it('addContact delegates to native (happy path)', async () => {
     const contact = { name: 'Alice', phoneNumber: '1234567890' };
 
-    await emergencySettings.addContact(contact);
+    await contacts.addContact(contact);
 
     expect(native.addContact).toHaveBeenCalledWith(contact);
   });
@@ -48,7 +52,7 @@ describe('EmergencySettings', () => {
   // ── deleteContact ─────────────────────────────────────────────────────────
 
   it('deleteContact(1) delegates to native (happy path)', async () => {
-    await emergencySettings.deleteContact(1);
+    await contacts.deleteContact(1);
 
     expect(native.deleteContact).toHaveBeenCalledWith(1);
   });
@@ -56,7 +60,7 @@ describe('EmergencySettings', () => {
   // ── setContactSosState ────────────────────────────────────────────────────
 
   it('setContactSosState delegates to native (happy path)', async () => {
-    await emergencySettings.setContactSosState(2, true);
+    await contacts.setContactSosState(2, true);
 
     expect(native.setContactSosState).toHaveBeenCalledWith(2, true);
   });
@@ -66,7 +70,7 @@ describe('EmergencySettings', () => {
   it('readSosCallTimes delegates to native and emits sosCallTimesData via emitLocal', async () => {
     const emitSpy = jest.spyOn(runtime, 'emitLocal');
 
-    const result = await emergencySettings.readSosCallTimes();
+    const result = await sos.readSosCallTimes();
 
     expect(native.readSosCallTimes).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ times: 3, minTimes: 1, maxTimes: 9 });
@@ -79,7 +83,7 @@ describe('EmergencySettings', () => {
   // ── setSosCallTimes ───────────────────────────────────────────────────────
 
   it('setSosCallTimes(3) delegates to native (happy path)', async () => {
-    await emergencySettings.setSosCallTimes(3);
+    await sos.setSosCallTimes(3);
 
     expect(native.setSosCallTimes).toHaveBeenCalledWith(3);
   });
@@ -87,7 +91,7 @@ describe('EmergencySettings', () => {
   // ── deleteContact validation ──────────────────────────────────────────────
 
   it('deleteContact(-1) throws INVALID_ARGUMENT', async () => {
-    await expect(emergencySettings.deleteContact(-1)).rejects.toMatchObject({
+    await expect(contacts.deleteContact(-1)).rejects.toMatchObject({
       code: 'INVALID_ARGUMENT',
     });
     expect(native.deleteContact).not.toHaveBeenCalled();
@@ -96,7 +100,7 @@ describe('EmergencySettings', () => {
   // ── setSosCallTimes validation ────────────────────────────────────────────
 
   it('setSosCallTimes(0) throws INVALID_ARGUMENT', async () => {
-    await expect(emergencySettings.setSosCallTimes(0)).rejects.toMatchObject({
+    await expect(sos.setSosCallTimes(0)).rejects.toMatchObject({
       code: 'INVALID_ARGUMENT',
     });
     expect(native.setSosCallTimes).not.toHaveBeenCalled();

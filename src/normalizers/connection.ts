@@ -6,7 +6,7 @@ import type {
   PermissionStatus,
   PermissionsResult,
 } from '../types/index.js';
-import { isRecord, toBoolean, toStringValue, normalizeFunctionStatus } from './shared.js';
+import { isRecord, toBoolean, toStringValue, normalizeFunctionStatus } from './primitives.js';
 
 const bluetoothStatesByCode: BluetoothState[] = [
   'unknown',

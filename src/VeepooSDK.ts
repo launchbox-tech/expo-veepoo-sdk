@@ -1,358 +1,236 @@
 import type {
+  AutoMeasureSetting,
   BatteryInfo,
+  ConnectOptions,
+  ConnectionStatus,
+  DaySummaryData,
+  DeviceAlarm,
+  DeviceBTStatus,
   DeviceContact,
-  PersonalInfo,
   DeviceFunctions,
   DeviceVersion,
-  NewDeviceContact,
-  PasswordData,
-  SocialMsgData,
-  Language,
-  AutoMeasureSetting,
-  SleepData,
-  SportStepData,
-  OriginData,
-  DaySummaryData,
-  VeepooEvent,
-  VeepooEventPayload,
-  PermissionsResult,
   EcgTestOptions,
+  GPSAndTimezoneData,
   HeartRateAlarm,
+  Language,
+  MusicData,
+  NewDeviceContact,
+  OperationStatus,
+  OriginData,
+  PasswordData,
+  PermissionsResult,
+  PersonalInfo,
+  RealtimeTestModality,
+  ScanOptions,
   ScreenLightDuration,
   ScreenLightSettings,
   SedentaryReminderSettings,
+  SleepData,
+  SocialMsgData,
   SosCallTimesSettings,
-  WristFlipWakeSettings,
-  WomenHealthSettings,
+  SportStepData,
+  VeepooEvent,
+  VeepooEventPayload,
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
-  WeatherSettings,
   WeatherData,
-  MusicData,
-  GPSAndTimezoneData,
-  DeviceBTStatus,
-  ScanOptions,
-  ConnectOptions,
-  ConnectionStatus,
-  DeviceAlarm,
-  OperationStatus,
-  RealtimeTestModality,
+  WeatherSettings,
+  WomenHealthSettings,
+  WristFlipWakeSettings,
 } from "./types/index.js";
 import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
 import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
-import type { VeepooSDKModuleInterface, LogListener } from "./VeepooSDKModule.js";
+import type { LogListener } from "./VeepooSDKModule.js";
 import { VeepooSDKRuntime } from "./sdk/veepoo-sdk-runtime.js";
 import { SdkLifecycle } from "./sdk/sdk-lifecycle.js";
-import { BandDiscovery } from "./sdk/band-discovery.js";
-import { SessionConnection } from "./sdk/session-connection.js";
-import { HealthData } from "./sdk/health-data.js";
-import {
-  AlarmSettings,
-  DisplaySettings,
-  HealthConfig,
-  EmergencySettings,
-  MediaInteraction,
-  SystemSettings,
-} from "./sdk/device-settings/index.js";
-import { RealtimeTests } from "./sdk/realtime-tests.js";
 
-export class VeepooSDK implements VeepooSDKModuleInterface {
+import { AlarmsCapability } from "./capabilities/alarms/index.js";
+import { AutoMeasureCapability } from "./capabilities/auto-measure/index.js";
+import { BandDiscoveryCapability } from "./capabilities/band-discovery/index.js";
+import { BatteryCapability } from "./capabilities/battery/index.js";
+import { BtStatusCapability } from "./capabilities/bt-status/index.js";
+import { CameraCapability } from "./capabilities/camera/index.js";
+import { ContactsCapability } from "./capabilities/contacts/index.js";
+import { DaySummaryCapability } from "./capabilities/day-summary/index.js";
+import { DeviceFunctionsCapability } from "./capabilities/device-functions/index.js";
+import { DeviceTimeCapability } from "./capabilities/device-time/index.js";
+import { DeviceVersionCapability } from "./capabilities/device-version/index.js";
+import { DfuCapability } from "./capabilities/dfu/index.js";
+import { FindDeviceCapability } from "./capabilities/find-device/index.js";
+import { GpsTimezoneCapability } from "./capabilities/gps-timezone/index.js";
+import { HistoricalQueryCapability } from "./capabilities/historical-query/index.js";
+import { LanguageCapability } from "./capabilities/language/index.js";
+import { MusicCapability } from "./capabilities/music/index.js";
+import { OriginDataCapability } from "./capabilities/origin-data/index.js";
+import { PersonalInfoCapability } from "./capabilities/personal-info/index.js";
+import { RealtimeTestsCapability } from "./capabilities/realtime-tests/index.js";
+import { ScreenLightCapability } from "./capabilities/screen-light/index.js";
+import { SedentaryReminderCapability } from "./capabilities/sedentary-reminder/index.js";
+import { SessionCapability } from "./capabilities/session/index.js";
+import { SleepDataCapability } from "./capabilities/sleep-data/index.js";
+import { SocialMsgCapability } from "./capabilities/social-msg/index.js";
+import { SosCapability } from "./capabilities/sos/index.js";
+import { SportStepsCapability } from "./capabilities/sport-steps/index.js";
+import { WatchFaceCapability } from "./capabilities/watch-face/index.js";
+import { WeatherCapability } from "./capabilities/weather/index.js";
+import { WomenHealthCapability } from "./capabilities/women-health/index.js";
+import { WristFlipCapability } from "./capabilities/wrist-flip/index.js";
+
+export interface VeepooSDKInterface {
+  // Lifecycle (flat, not namespaced)
+  init(): Promise<void>;
+  destroy(): void;
+  setLogEnabled(enabled: boolean): this;
+  isLogEnabled(): boolean;
+  setLogger(logger: LogListener | null): this;
+  isScanningActive(): boolean;
+  isSDKInitialized(): boolean;
+  getConnectedDeviceId(): string | null;
+  on<K extends VeepooEvent>(event: K, listener: (payload: VeepooEventPayload[K]) => void): this;
+  off<K extends VeepooEvent>(event: K, listener: (payload: VeepooEventPayload[K]) => void): this;
+  once<K extends VeepooEvent>(event: K, listener: (payload: VeepooEventPayload[K]) => void): this;
+  removeAllListeners(event?: VeepooEvent): this;
+
+  // Capabilities (namespaced)
+  alarms: AlarmsCapability;
+  autoMeasure: AutoMeasureCapability;
+  battery: BatteryCapability;
+  btStatus: BtStatusCapability;
+  camera: CameraCapability;
+  contacts: ContactsCapability;
+  daySummary: DaySummaryCapability;
+  deviceFunctions: DeviceFunctionsCapability;
+  deviceTime: DeviceTimeCapability;
+  deviceVersion: DeviceVersionCapability;
+  dfu: DfuCapability;
+  discovery: BandDiscoveryCapability;
+  findDevice: FindDeviceCapability;
+  gpsTimezone: GpsTimezoneCapability;
+  historicalQuery: HistoricalQueryCapability;
+  language: LanguageCapability;
+  music: MusicCapability;
+  originData: OriginDataCapability;
+  personalInfo: PersonalInfoCapability;
+  realtimeTests: RealtimeTestsCapability;
+  screenLight: ScreenLightCapability;
+  sedentaryReminder: SedentaryReminderCapability;
+  session: SessionCapability;
+  sleepData: SleepDataCapability;
+  socialMsg: SocialMsgCapability;
+  sos: SosCapability;
+  sportSteps: SportStepsCapability;
+  watchFace: WatchFaceCapability;
+  weather: WeatherCapability;
+  womenHealth: WomenHealthCapability;
+  wristFlip: WristFlipCapability;
+}
+
+export class VeepooSDK implements VeepooSDKInterface {
   private readonly rt: VeepooSDKRuntime;
   private readonly lifecycle: SdkLifecycle;
-  private readonly discovery: BandDiscovery;
-  private readonly session: SessionConnection;
-  private readonly health: HealthData;
-  private readonly alarmSettings: AlarmSettings;
-  private readonly displaySettings: DisplaySettings;
-  private readonly healthConfig: HealthConfig;
-  private readonly emergencySettings: EmergencySettings;
-  private readonly mediaInteraction: MediaInteraction;
-  private readonly systemSettings: SystemSettings;
-  private readonly realtime: RealtimeTests;
+
+  readonly alarms: AlarmsCapability;
+  readonly autoMeasure: AutoMeasureCapability;
+  readonly battery: BatteryCapability;
+  readonly btStatus: BtStatusCapability;
+  readonly camera: CameraCapability;
+  readonly contacts: ContactsCapability;
+  readonly daySummary: DaySummaryCapability;
+  readonly deviceFunctions: DeviceFunctionsCapability;
+  readonly deviceTime: DeviceTimeCapability;
+  readonly deviceVersion: DeviceVersionCapability;
+  readonly dfu: DfuCapability;
+  readonly discovery: BandDiscoveryCapability;
+  readonly findDevice: FindDeviceCapability;
+  readonly gpsTimezone: GpsTimezoneCapability;
+  readonly historicalQuery: HistoricalQueryCapability;
+  readonly language: LanguageCapability;
+  readonly music: MusicCapability;
+  readonly originData: OriginDataCapability;
+  readonly personalInfo: PersonalInfoCapability;
+  readonly realtimeTests: RealtimeTestsCapability;
+  readonly screenLight: ScreenLightCapability;
+  readonly sedentaryReminder: SedentaryReminderCapability;
+  readonly session: SessionCapability;
+  readonly sleepData: SleepDataCapability;
+  readonly socialMsg: SocialMsgCapability;
+  readonly sos: SosCapability;
+  readonly sportSteps: SportStepsCapability;
+  readonly watchFace: WatchFaceCapability;
+  readonly weather: WeatherCapability;
+  readonly womenHealth: WomenHealthCapability;
+  readonly wristFlip: WristFlipCapability;
 
   constructor(native: NativeVeepooSDKInterface = NativeVeepooSDK) {
     this.rt = new VeepooSDKRuntime(native);
+    const ctx = this.rt.createCapabilityContext();
     this.lifecycle = new SdkLifecycle(this.rt);
-    this.discovery = new BandDiscovery(this.rt);
-    this.session = new SessionConnection(this.rt);
-    this.health = new HealthData(this.rt);
-    this.alarmSettings = new AlarmSettings(this.rt);
-    this.displaySettings = new DisplaySettings(this.rt);
-    this.healthConfig = new HealthConfig(this.rt);
-    this.emergencySettings = new EmergencySettings(this.rt);
-    this.mediaInteraction = new MediaInteraction(this.rt);
-    this.systemSettings = new SystemSettings(this.rt);
-    this.realtime = new RealtimeTests(this.rt);
+
+    this.alarms = new AlarmsCapability(ctx);
+    this.autoMeasure = new AutoMeasureCapability(ctx);
+    this.battery = new BatteryCapability(ctx);
+    this.btStatus = new BtStatusCapability(ctx);
+    this.camera = new CameraCapability(ctx);
+    this.contacts = new ContactsCapability(ctx);
+    this.daySummary = new DaySummaryCapability(ctx);
+    this.deviceFunctions = new DeviceFunctionsCapability(ctx);
+    this.deviceTime = new DeviceTimeCapability(ctx);
+    this.deviceVersion = new DeviceVersionCapability(ctx);
+    this.dfu = new DfuCapability(ctx);
+    this.discovery = new BandDiscoveryCapability(ctx);
+    this.findDevice = new FindDeviceCapability(ctx);
+    this.gpsTimezone = new GpsTimezoneCapability(ctx);
+    this.historicalQuery = new HistoricalQueryCapability(ctx);
+    this.language = new LanguageCapability(ctx);
+    this.music = new MusicCapability(ctx);
+    this.originData = new OriginDataCapability(ctx);
+    this.personalInfo = new PersonalInfoCapability(ctx);
+    this.realtimeTests = new RealtimeTestsCapability(ctx);
+    this.screenLight = new ScreenLightCapability(ctx);
+    this.sedentaryReminder = new SedentaryReminderCapability(ctx);
+    this.session = new SessionCapability(ctx);
+    this.sleepData = new SleepDataCapability(ctx);
+    this.socialMsg = new SocialMsgCapability(ctx);
+    this.sos = new SosCapability(ctx);
+    this.sportSteps = new SportStepsCapability(ctx);
+    this.watchFace = new WatchFaceCapability(ctx);
+    this.weather = new WeatherCapability(ctx);
+    this.womenHealth = new WomenHealthCapability(ctx);
+    this.wristFlip = new WristFlipCapability(ctx);
   }
 
-  init(): Promise<void> {
-    return this.lifecycle.init();
-  }
-
-  destroy(): void {
-    this.lifecycle.destroy();
-  }
-
-  checkBluetoothStatus(): Promise<boolean> {
-    return this.discovery.checkBluetoothStatus();
-  }
-
-  requestPermissions(): Promise<PermissionsResult> {
-    return this.discovery.requestPermissions();
-  }
-
-  startScan(options?: ScanOptions): Promise<void> {
-    return this.discovery.startScan(options);
-  }
-
-  stopScan(): Promise<void> {
-    return this.discovery.stopScan();
-  }
-
-  connect(deviceId: string, options?: ConnectOptions): Promise<void> {
-    return this.session.connect(deviceId, options);
-  }
-
-  disconnect(deviceId?: string): Promise<void> {
-    return this.session.disconnect(deviceId);
-  }
-
-  getConnectionStatus(deviceId?: string): Promise<ConnectionStatus> {
-    return this.session.getConnectionStatus(deviceId);
-  }
-
-  verifyPassword(password?: string, is24Hour?: boolean): Promise<PasswordData> {
-    return this.session.verifyPassword(password, is24Hour);
-  }
-
-  readBattery(): Promise<BatteryInfo> {
-    return this.health.readBattery();
-  }
-
-  syncPersonalInfo = (info: PersonalInfo): Promise<boolean> =>
-    this.healthConfig.syncPersonalInfo(info);
-
-  readDeviceFunctions(): Promise<DeviceFunctions> {
-    return this.health.readDeviceFunctions();
-  }
-
-  readSocialMsgData(): Promise<SocialMsgData> {
-    return this.health.readSocialMsgData();
-  }
-
-  writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus> {
-    return this.health.writeSocialMsgData(data);
-  }
-
-  readDeviceVersion(): Promise<DeviceVersion> {
-    return this.health.readDeviceVersion();
-  }
-
-  startReadOriginData = (): Promise<void> => this.health.startReadOriginData();
-
-  readDeviceAllData = (): Promise<boolean> => this.health.readDeviceAllData();
-
-  readSleepData(date?: string): Promise<SleepData[]> {
-    return this.health.readSleepData(date);
-  }
-
-  readSportStepData(date?: string): Promise<SportStepData> {
-    return this.health.readSportStepData(date);
-  }
-
-  readOriginData(dayOffset?: number): Promise<OriginData[]> {
-    return this.health.readOriginData(dayOffset);
-  }
-
-  readDaySummaryData(dayOffset?: number): Promise<DaySummaryData> {
-    return this.health.readDaySummaryData(dayOffset);
-  }
-
-  readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
-    return this.healthConfig.readAutoMeasureSetting();
-  }
-
-  modifyAutoMeasureSetting(
-    setting: Partial<AutoMeasureSetting>,
-  ): Promise<AutoMeasureSetting[]> {
-    return this.healthConfig.modifyAutoMeasureSetting(setting);
-  }
-
-  setLanguage = (language: Language): Promise<boolean> =>
-    this.systemSettings.setLanguage(language);
-
-  setDeviceTime(time?: Date): Promise<boolean> {
-    return this.systemSettings.setDeviceTime(time);
-  }
-
-  readAlarms(): Promise<DeviceAlarm[]> {
-    return this.alarmSettings.readAlarms();
-  }
-
-  setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> {
-    return this.alarmSettings.setAlarm(alarm);
-  }
-
-  deleteAlarm(alarmId: number): Promise<OperationStatus> {
-    return this.alarmSettings.deleteAlarm(alarmId);
-  }
-
-  readHeartRateAlarm(): Promise<HeartRateAlarm> {
-    return this.alarmSettings.readHeartRateAlarm();
-  }
-
-  setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> {
-    return this.alarmSettings.setHeartRateAlarm(alarm);
-  }
-
-  startFindDevice = (): Promise<void> => this.mediaInteraction.startFindDevice();
-
-  stopFindDevice = (): Promise<void> => this.mediaInteraction.stopFindDevice();
-
-  readScreenLightSettings = (): Promise<ScreenLightSettings> =>
-    this.displaySettings.readScreenLightSettings();
-
-  setScreenLightSettings = (settings: ScreenLightSettings): Promise<void> =>
-    this.displaySettings.setScreenLightSettings(settings);
-
-  readScreenLightDuration = (): Promise<ScreenLightDuration> =>
-    this.displaySettings.readScreenLightDuration();
-
-  setScreenLightDuration = (seconds: number): Promise<void> =>
-    this.displaySettings.setScreenLightDuration(seconds);
-
-  readSedentaryReminder = (): Promise<SedentaryReminderSettings> =>
-    this.healthConfig.readSedentaryReminder();
-
-  setSedentaryReminder = (settings: SedentaryReminderSettings): Promise<void> =>
-    this.healthConfig.setSedentaryReminder(settings);
-
-  readWristFlipWakeSettings = (): Promise<WristFlipWakeSettings> =>
-    this.displaySettings.readWristFlipWakeSettings();
-
-  setWristFlipWakeSettings = (settings: WristFlipWakeSettings): Promise<void> =>
-    this.displaySettings.setWristFlipWakeSettings(settings);
-
-  readWomenHealthSettings = (): Promise<WomenHealthSettings> =>
-    this.healthConfig.readWomenHealthSettings();
-
-  setWomenHealthSettings = (settings: WomenHealthSettings): Promise<void> =>
-    this.healthConfig.setWomenHealthSettings(settings);
-
-  readWeatherSettings = (): Promise<WeatherSettings> =>
-    this.systemSettings.readWeatherSettings();
-
-  setWeatherSettings = (settings: WeatherSettings): Promise<void> =>
-    this.systemSettings.setWeatherSettings(settings);
-
-  pushWeatherData = (data: WeatherData): Promise<void> =>
-    this.systemSettings.pushWeatherData(data);
-
-  startLocalFirmwareDfu = (filePath: string): Promise<void> =>
-    this.systemSettings.startLocalFirmwareDfu(filePath);
-
-  readWatchFaceStyle = (options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle> =>
-    this.displaySettings.readWatchFaceStyle(options);
-
-  setWatchFaceStyle = (settings: WatchFaceStyleSettings): Promise<void> =>
-    this.displaySettings.setWatchFaceStyle(settings);
-
-  readContacts = (crc?: number): Promise<DeviceContact[]> =>
-    this.emergencySettings.readContacts(crc);
-
-  addContact = (contact: NewDeviceContact): Promise<void> =>
-    this.emergencySettings.addContact(contact);
-
-  deleteContact = (contactId: number): Promise<void> =>
-    this.emergencySettings.deleteContact(contactId);
-
-  setContactSosState = (contactId: number, isOpen: boolean): Promise<void> =>
-    this.emergencySettings.setContactSosState(contactId, isOpen);
-
-  readSosCallTimes = (): Promise<SosCallTimesSettings> =>
-    this.emergencySettings.readSosCallTimes();
-
-  setSosCallTimes = (times: number): Promise<void> =>
-    this.emergencySettings.setSosCallTimes(times);
-
-  enterCameraMode = (): Promise<void> =>
-    this.mediaInteraction.enterCameraMode();
-
-  exitCameraMode = (): Promise<void> =>
-    this.mediaInteraction.exitCameraMode();
-
-  setMusicControlEnabled = (enabled: boolean): Promise<void> =>
-    this.mediaInteraction.setMusicControlEnabled(enabled);
-
-  pushMusicData = (data: MusicData): Promise<void> =>
-    this.mediaInteraction.pushMusicData(data);
-
-  setDeviceGPSAndTimezone = (data: GPSAndTimezoneData): Promise<void> =>
-    this.systemSettings.setDeviceGPSAndTimezone(data);
-
-  readDeviceBTStatus = (): Promise<DeviceBTStatus> =>
-    this.systemSettings.readDeviceBTStatus();
-
-  setDeviceBTSwitch = (open: boolean): Promise<void> =>
-    this.systemSettings.setDeviceBTSwitch(open);
-
-  startTest = (modality: RealtimeTestModality): Promise<void> => this.realtime.startTest(modality);
-
-  stopTest = (modality: RealtimeTestModality): Promise<void> => this.realtime.stopTest(modality);
-
-  startEcgTest(options?: EcgTestOptions): Promise<void> {
-    return this.realtime.startEcgTest(options);
-  }
-
-  stopEcgTest = (): Promise<void> => this.realtime.stopEcgTest();
+  // ── Lifecycle ────────────────────────────────────────────────────────────────
+  init(): Promise<void> { return this.lifecycle.init(); }
+  destroy(): void { this.lifecycle.destroy(); }
 
   setLogEnabled(enabled: boolean): this {
     this.rt.setLogEnabled(enabled);
     return this;
   }
 
-  isLogEnabled(): boolean {
-    return this.rt.isLogEnabled();
-  }
+  isLogEnabled(): boolean { return this.rt.isLogEnabled(); }
 
   setLogger(logger: LogListener | null): this {
     this.rt.setLogger(logger);
     return this;
   }
 
-  isScanningActive(): boolean {
-    return this.rt.state.isScanning;
-  }
+  isScanningActive(): boolean { return this.rt.state.isScanning; }
+  isSDKInitialized(): boolean { return this.rt.state.isInitialized; }
+  getConnectedDeviceId(): string | null { return this.rt.state.connectedDeviceId; }
 
-  isSDKInitialized(): boolean {
-    return this.rt.state.isInitialized;
-  }
-
-  getConnectedDeviceId(): string | null {
-    return this.rt.state.connectedDeviceId;
-  }
-
-  on<K extends VeepooEvent>(
-    event: K,
-    listener: (payload: VeepooEventPayload[K]) => void,
-  ): this {
+  on<K extends VeepooEvent>(event: K, listener: (payload: VeepooEventPayload[K]) => void): this {
     this.rt.on(event, listener);
     return this;
   }
 
-  off<K extends VeepooEvent>(
-    event: K,
-    listener: (payload: VeepooEventPayload[K]) => void,
-  ): this {
+  off<K extends VeepooEvent>(event: K, listener: (payload: VeepooEventPayload[K]) => void): this {
     this.rt.off(event, listener);
     return this;
   }
 
-  once<K extends VeepooEvent>(
-    event: K,
-    listener: (payload: VeepooEventPayload[K]) => void,
-  ): this {
+  once<K extends VeepooEvent>(event: K, listener: (payload: VeepooEventPayload[K]) => void): this {
     this.rt.once(event, listener);
     return this;
   }
@@ -361,6 +239,100 @@ export class VeepooSDK implements VeepooSDKModuleInterface {
     this.rt.removeAllListeners(event);
     return this;
   }
+
+  // ── Flat legacy API (delegates to namespaced capabilities) ───────────────────
+  checkBluetoothStatus(): Promise<boolean> { return this.discovery.checkBluetoothStatus(); }
+  requestPermissions(): Promise<PermissionsResult> { return this.discovery.requestPermissions(); }
+  startScan(options?: ScanOptions): Promise<void> { return this.discovery.startScan(options); }
+  stopScan(): Promise<void> { return this.discovery.stopScan(); }
+
+  connect(deviceId: string, options?: ConnectOptions): Promise<void> { return this.session.connect(deviceId, options); }
+  disconnect(deviceId?: string): Promise<void> { return this.session.disconnect(deviceId); }
+  getConnectionStatus(deviceId?: string): Promise<ConnectionStatus> { return this.session.getConnectionStatus(deviceId); }
+  verifyPassword(password?: string, is24Hour?: boolean): Promise<PasswordData> { return this.session.verifyPassword(password, is24Hour); }
+
+  readBattery(): Promise<BatteryInfo> { return this.battery.readBattery(); }
+
+  syncPersonalInfo = (info: PersonalInfo): Promise<boolean> => this.personalInfo.syncPersonalInfo(info);
+
+  readDeviceFunctions(): Promise<DeviceFunctions> { return this.deviceFunctions.readDeviceFunctions(); }
+
+  readSocialMsgData(): Promise<SocialMsgData> { return this.socialMsg.readSocialMsgData(); }
+  writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus> { return this.socialMsg.writeSocialMsgData(data); }
+
+  readDeviceVersion(): Promise<DeviceVersion> { return this.deviceVersion.readDeviceVersion(); }
+
+  startReadOriginData = (): Promise<void> => this.historicalQuery.startReadOriginData();
+  readDeviceAllData = (): Promise<boolean> => this.historicalQuery.readDeviceAllData();
+
+  readSleepData(date?: string): Promise<SleepData[]> { return this.sleepData.readSleepData(date); }
+  readSportStepData(date?: string): Promise<SportStepData> { return this.sportSteps.readSportStepData(date); }
+  readOriginData(dayOffset?: number): Promise<OriginData[]> { return this.originData.readOriginData(dayOffset); }
+  readDaySummaryData(dayOffset?: number): Promise<DaySummaryData> { return this.daySummary.readDaySummaryData(dayOffset); }
+
+  readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> { return this.autoMeasure.readAutoMeasureSetting(); }
+  modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<AutoMeasureSetting[]> { return this.autoMeasure.modifyAutoMeasureSetting(setting); }
+
+  setLanguage = (language: Language): Promise<boolean> => this.language.setLanguage(language);
+
+  setDeviceTime(time?: Date): Promise<boolean> { return this.deviceTime.setDeviceTime(time); }
+
+  readAlarms(): Promise<DeviceAlarm[]> { return this.alarms.readAlarms(); }
+  setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> { return this.alarms.setAlarm(alarm); }
+  deleteAlarm(alarmId: number): Promise<OperationStatus> { return this.alarms.deleteAlarm(alarmId); }
+  readHeartRateAlarm(): Promise<HeartRateAlarm> { return this.alarms.readHeartRateAlarm(); }
+  setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> { return this.alarms.setHeartRateAlarm(alarm); }
+
+  startFindDevice = (): Promise<void> => this.findDevice.startFindDevice();
+  stopFindDevice = (): Promise<void> => this.findDevice.stopFindDevice();
+
+  readScreenLightSettings = (): Promise<ScreenLightSettings> => this.screenLight.readScreenLightSettings();
+  setScreenLightSettings = (settings: ScreenLightSettings): Promise<void> => this.screenLight.setScreenLightSettings(settings);
+  readScreenLightDuration = (): Promise<ScreenLightDuration> => this.screenLight.readScreenLightDuration();
+  setScreenLightDuration = (seconds: number): Promise<void> => this.screenLight.setScreenLightDuration(seconds);
+
+  readSedentaryReminder = (): Promise<SedentaryReminderSettings> => this.sedentaryReminder.readSedentaryReminder();
+  setSedentaryReminder = (settings: SedentaryReminderSettings): Promise<void> => this.sedentaryReminder.setSedentaryReminder(settings);
+
+  readWristFlipWakeSettings = (): Promise<WristFlipWakeSettings> => this.wristFlip.readWristFlipWakeSettings();
+  setWristFlipWakeSettings = (settings: WristFlipWakeSettings): Promise<void> => this.wristFlip.setWristFlipWakeSettings(settings);
+
+  readWomenHealthSettings = (): Promise<WomenHealthSettings> => this.womenHealth.readWomenHealthSettings();
+  setWomenHealthSettings = (settings: WomenHealthSettings): Promise<void> => this.womenHealth.setWomenHealthSettings(settings);
+
+  readWeatherSettings = (): Promise<WeatherSettings> => this.weather.readWeatherSettings();
+  setWeatherSettings = (settings: WeatherSettings): Promise<void> => this.weather.setWeatherSettings(settings);
+  pushWeatherData = (data: WeatherData): Promise<void> => this.weather.pushWeatherData(data);
+
+  startLocalFirmwareDfu = (filePath: string): Promise<void> => this.dfu.startLocalFirmwareDfu(filePath);
+
+  readWatchFaceStyle = (options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle> => this.watchFace.readWatchFaceStyle(options);
+  setWatchFaceStyle = (settings: WatchFaceStyleSettings): Promise<void> => this.watchFace.setWatchFaceStyle(settings);
+
+  readContacts = (crc?: number): Promise<DeviceContact[]> => this.contacts.readContacts(crc);
+  addContact = (contact: NewDeviceContact): Promise<void> => this.contacts.addContact(contact);
+  deleteContact = (contactId: number): Promise<void> => this.contacts.deleteContact(contactId);
+  setContactSosState = (contactId: number, isOpen: boolean): Promise<void> => this.contacts.setContactSosState(contactId, isOpen);
+
+  readSosCallTimes = (): Promise<SosCallTimesSettings> => this.sos.readSosCallTimes();
+  setSosCallTimes = (times: number): Promise<void> => this.sos.setSosCallTimes(times);
+
+  enterCameraMode = (): Promise<void> => this.camera.enterCameraMode();
+  exitCameraMode = (): Promise<void> => this.camera.exitCameraMode();
+
+  setMusicControlEnabled = (enabled: boolean): Promise<void> => this.music.setMusicControlEnabled(enabled);
+  pushMusicData = (data: MusicData): Promise<void> => this.music.pushMusicData(data);
+
+  setDeviceGPSAndTimezone = (data: GPSAndTimezoneData): Promise<void> => this.gpsTimezone.setDeviceGPSAndTimezone(data);
+
+  readDeviceBTStatus = (): Promise<DeviceBTStatus> => this.btStatus.readDeviceBTStatus();
+  setDeviceBTSwitch = (open: boolean): Promise<void> => this.btStatus.setDeviceBTSwitch(open);
+
+  startTest = (modality: RealtimeTestModality): Promise<void> => this.realtimeTests.startTest(modality);
+  stopTest = (modality: RealtimeTestModality): Promise<void> => this.realtimeTests.stopTest(modality);
+
+  startEcgTest(options?: EcgTestOptions): Promise<void> { return this.realtimeTests.startEcgTest(options); }
+  stopEcgTest = (): Promise<void> => this.realtimeTests.stopEcgTest();
 }
 
 const sdk = new VeepooSDK();

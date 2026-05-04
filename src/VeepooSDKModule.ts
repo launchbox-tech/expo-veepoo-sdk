@@ -1,19 +1,7 @@
 import type { LogEntry } from './types/index.js';
-import type {
-  SdkLifecycleInterface,
-  BandDiscoveryInterface,
-  SessionInterface,
-  HealthDataInterface,
-  DeviceSettingsInterface,
-  RealtimeTestsInterface,
-} from './sdk/subsystem-interfaces.js';
+import type { VeepooSDKInterface } from './VeepooSDK.js';
 
 export type LogListener = (entry: LogEntry) => void;
 
-export interface VeepooSDKModuleInterface
-  extends SdkLifecycleInterface,
-    BandDiscoveryInterface,
-    SessionInterface,
-    HealthDataInterface,
-    DeviceSettingsInterface,
-    RealtimeTestsInterface {}
+/** @deprecated Use {@link VeepooSDKInterface} directly. */
+export type VeepooSDKModuleInterface = VeepooSDKInterface;

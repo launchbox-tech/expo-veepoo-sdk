@@ -1,5 +1,5 @@
 import type { AutoMeasureSetting } from '../types/index.js';
-import { isRecord, toInt, toBoolean } from './shared.js';
+import { isRecord, toInt, toBoolean } from './primitives.js';
 
 export function normalizeAutoMeasureSettings(value: unknown): AutoMeasureSetting[] {
   if (!Array.isArray(value)) return [];

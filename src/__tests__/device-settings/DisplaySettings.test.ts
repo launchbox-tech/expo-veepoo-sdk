@@ -5,19 +5,26 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { DisplaySettings } from '../../sdk/device-settings/DisplaySettings';
+import { ScreenLightCapability } from '../../capabilities/screen-light/index';
+import { WristFlipCapability } from '../../capabilities/wrist-flip/index';
+import { WatchFaceCapability } from '../../capabilities/watch-face/index';
 import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '../helpers/mock-native';
 
-describe('DisplaySettings', () => {
+describe('DisplaySettings (split capabilities)', () => {
   let native: MockNative;
   let runtime: VeepooSDKRuntime;
-  let displaySettings: DisplaySettings;
+  let screenLight: ScreenLightCapability;
+  let wristFlip: WristFlipCapability;
+  let displaySettings: WatchFaceCapability;
 
   beforeEach(() => {
     native = makeMockNative();
     runtime = new VeepooSDKRuntime(native);
-    displaySettings = new DisplaySettings(runtime);
+    const ctx = runtime.createCapabilityContext();
+    screenLight = new ScreenLightCapability(ctx);
+    wristFlip = new WristFlipCapability(ctx);
+    displaySettings = new WatchFaceCapability(ctx);
   });
 
   // ── readScreenLightSettings ───────────────────────────────────────────────
@@ -35,7 +42,7 @@ describe('DisplaySettings', () => {
     };
     native.readScreenLightSettings.mockResolvedValueOnce(raw);
 
-    const result = await displaySettings.readScreenLightSettings();
+    const result = await screenLight.readScreenLightSettings();
 
     expect(native.readScreenLightSettings).toHaveBeenCalledTimes(1);
     expect(result.nightStartHour).toBe(22);
@@ -57,7 +64,7 @@ describe('DisplaySettings', () => {
       maxLevel: 10,
     };
 
-    await displaySettings.setScreenLightSettings(settings);
+    await screenLight.setScreenLightSettings(settings);
 
     expect(native.setScreenLightSettings).toHaveBeenCalledWith(settings);
   });
@@ -68,7 +75,7 @@ describe('DisplaySettings', () => {
     const raw = { currentSeconds: 30, minSeconds: 5, maxSeconds: 600 };
     native.readScreenLightDuration.mockResolvedValueOnce(raw);
 
-    const result = await displaySettings.readScreenLightDuration();
+    const result = await screenLight.readScreenLightDuration();
 
     expect(native.readScreenLightDuration).toHaveBeenCalledTimes(1);
     expect(result.currentSeconds).toBe(30);
@@ -79,20 +86,20 @@ describe('DisplaySettings', () => {
   // ── setScreenLightDuration ────────────────────────────────────────────────
 
   it('setScreenLightDuration(30) delegates to native (happy path)', async () => {
-    await displaySettings.setScreenLightDuration(30);
+    await screenLight.setScreenLightDuration(30);
 
     expect(native.setScreenLightDuration).toHaveBeenCalledWith(30);
   });
 
   it('setScreenLightDuration(0) throws INVALID_ARGUMENT', async () => {
-    await expect(displaySettings.setScreenLightDuration(0)).rejects.toMatchObject({
+    await expect(screenLight.setScreenLightDuration(0)).rejects.toMatchObject({
       code: 'INVALID_ARGUMENT',
     });
     expect(native.setScreenLightDuration).not.toHaveBeenCalled();
   });
 
   it('setScreenLightDuration(601) throws INVALID_ARGUMENT', async () => {
-    await expect(displaySettings.setScreenLightDuration(601)).rejects.toMatchObject({
+    await expect(screenLight.setScreenLightDuration(601)).rejects.toMatchObject({
       code: 'INVALID_ARGUMENT',
     });
     expect(native.setScreenLightDuration).not.toHaveBeenCalled();
@@ -111,7 +118,7 @@ describe('DisplaySettings', () => {
     };
     native.readWristFlipWakeSettings.mockResolvedValueOnce(raw);
 
-    const result = await displaySettings.readWristFlipWakeSettings();
+    const result = await wristFlip.readWristFlipWakeSettings();
 
     expect(native.readWristFlipWakeSettings).toHaveBeenCalledTimes(1);
     expect(result.enabled).toBe(true);
@@ -130,7 +137,7 @@ describe('DisplaySettings', () => {
       sensitivityLevel: 5,
     };
 
-    await displaySettings.setWristFlipWakeSettings(settings);
+    await wristFlip.setWristFlipWakeSettings(settings);
 
     expect(native.setWristFlipWakeSettings).toHaveBeenCalledWith(settings);
   });

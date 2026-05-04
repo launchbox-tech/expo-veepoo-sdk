@@ -4,7 +4,7 @@ import type {
   VeepooEventPayload,
   FirmwareDfuState,
 } from '../types/index.js';
-import { isRecord, clamp, toInt, toStringValue } from './shared.js';
+import { isRecord, clamp, toInt, toStringValue } from './primitives.js';
 import { normalizeBluetoothStatus, normalizePasswordData } from './connection.js';
 import {
   normalizeAlarmList,

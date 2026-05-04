@@ -10,7 +10,7 @@ import type {
   HrvTestResult,
   TemperatureTestResult,
 } from '../types/index.js';
-import { isRecord, toInt, toNumber, normalizeTestState } from './shared.js';
+import { isRecord, toInt, toNumber, normalizeTestState } from './primitives.js';
 
 export function normalizeHeartRateTestResult(value: unknown): HeartRateTestResult {
   const record = isRecord(value) ? value : {};

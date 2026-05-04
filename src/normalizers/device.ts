@@ -23,7 +23,7 @@ import type {
   WomenHealthStatus,
   WristFlipWakeSettings,
 } from '../types/index.js';
-import { isRecord, toInt, toBoolean, toStringValue, normalizeFunctionStatus } from './shared.js';
+import { isRecord, toInt, toBoolean, toStringValue, normalizeFunctionStatus } from './primitives.js';
 
 const supportedFunctionKeys = [
   'phone',

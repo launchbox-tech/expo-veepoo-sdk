@@ -8,7 +8,7 @@ import type {
   SportStepData,
   StressData,
 } from '../types/index.js';
-import { isRecord, toNumber, toInt, toStringValue, normalizeTestState } from './shared.js';
+import { isRecord, toNumber, toInt, toStringValue, normalizeTestState } from './primitives.js';
 
 function normalizeSleepRecord(value: Record<string, unknown>): SleepData | null {
   if (Array.isArray(value.items) && isRecord(value.summary)) {

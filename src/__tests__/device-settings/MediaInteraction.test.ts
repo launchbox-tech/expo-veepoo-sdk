@@ -5,25 +5,32 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { MediaInteraction } from '../../sdk/device-settings/MediaInteraction';
+import { FindDeviceCapability } from '../../capabilities/find-device/index';
+import { CameraCapability } from '../../capabilities/camera/index';
+import { MusicCapability } from '../../capabilities/music/index';
 import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '../helpers/mock-native';
 
-describe('MediaInteraction', () => {
+describe('MediaInteraction (split capabilities)', () => {
   let native: MockNative;
   let runtime: VeepooSDKRuntime;
-  let mediaInteraction: MediaInteraction;
+  let findDevice: FindDeviceCapability;
+  let camera: CameraCapability;
+  let music: MusicCapability;
 
   beforeEach(() => {
     native = makeMockNative();
     runtime = new VeepooSDKRuntime(native);
-    mediaInteraction = new MediaInteraction(runtime);
+    const ctx = runtime.createCapabilityContext();
+    findDevice = new FindDeviceCapability(ctx);
+    camera = new CameraCapability(ctx);
+    music = new MusicCapability(ctx);
   });
 
   // ── startFindDevice ────────────────────────────────────────────────────────
 
   it('startFindDevice delegates to native (happy path)', async () => {
-    await mediaInteraction.startFindDevice();
+    await findDevice.startFindDevice();
 
     expect(native.startFindDevice).toHaveBeenCalledTimes(1);
   });
@@ -31,7 +38,7 @@ describe('MediaInteraction', () => {
   // ── stopFindDevice ─────────────────────────────────────────────────────────
 
   it('stopFindDevice delegates to native (happy path)', async () => {
-    await mediaInteraction.stopFindDevice();
+    await findDevice.stopFindDevice();
 
     expect(native.stopFindDevice).toHaveBeenCalledTimes(1);
   });
@@ -39,7 +46,7 @@ describe('MediaInteraction', () => {
   // ── enterCameraMode ────────────────────────────────────────────────────────
 
   it('enterCameraMode delegates to native (happy path)', async () => {
-    await mediaInteraction.enterCameraMode();
+    await camera.enterCameraMode();
 
     expect(native.enterCameraMode).toHaveBeenCalledTimes(1);
   });
@@ -47,7 +54,7 @@ describe('MediaInteraction', () => {
   // ── exitCameraMode ─────────────────────────────────────────────────────────
 
   it('exitCameraMode delegates to native (happy path)', async () => {
-    await mediaInteraction.exitCameraMode();
+    await camera.exitCameraMode();
 
     expect(native.exitCameraMode).toHaveBeenCalledTimes(1);
   });
@@ -55,7 +62,7 @@ describe('MediaInteraction', () => {
   // ── setMusicControlEnabled ─────────────────────────────────────────────────
 
   it('setMusicControlEnabled(true) delegates to native', async () => {
-    await mediaInteraction.setMusicControlEnabled(true);
+    await music.setMusicControlEnabled(true);
 
     expect(native.setMusicControlEnabled).toHaveBeenCalledWith(true);
   });
@@ -70,7 +77,7 @@ describe('MediaInteraction', () => {
       volume: 75,
     };
 
-    await mediaInteraction.pushMusicData(data);
+    await music.pushMusicData(data);
 
     expect(native.pushMusicData).toHaveBeenCalledWith(data);
   });
@@ -83,7 +90,7 @@ describe('MediaInteraction', () => {
       volume: 75,
     };
 
-    await expect(mediaInteraction.pushMusicData(data)).rejects.toMatchObject({
+    await expect(music.pushMusicData(data)).rejects.toMatchObject({
       code: 'INVALID_ARGUMENT',
     });
     expect(native.pushMusicData).not.toHaveBeenCalled();
@@ -97,7 +104,7 @@ describe('MediaInteraction', () => {
       volume: 75,
     };
 
-    await expect(mediaInteraction.pushMusicData(data)).rejects.toMatchObject({
+    await expect(music.pushMusicData(data)).rejects.toMatchObject({
       code: 'INVALID_ARGUMENT',
     });
     expect(native.pushMusicData).not.toHaveBeenCalled();

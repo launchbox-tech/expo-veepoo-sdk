@@ -16,6 +16,7 @@ import { mapNativeRejection } from "../errors/map-native-rejection.js";
 import { VeepooSdkState } from "./veepoo-sdk-state.js";
 import { OriginReadPipeline } from "../bridge/origin-read-pipeline.js";
 import { EventBus } from "../bridge/event-bus.js";
+import type { CapabilityContext } from "../capabilities/shared/context.js";
 
 /**
  * Shared **Session** / scan / init state (`state`), logging, and wiring between
@@ -315,5 +316,24 @@ export class VeepooSDKRuntime {
     this.state.reset();
     this.logger = null;
     this.logEnabled = false;
+  }
+
+  createCapabilityContext(): CapabilityContext<NativeVeepooSDKInterface> {
+    return {
+      native: this.native,
+      mapError: (error, opts) =>
+        this.handleError(
+          error,
+          opts?.code ?? "OPERATION_FAILED",
+          opts?.deviceId ?? this.state.connectedDeviceId ?? undefined,
+        ),
+      emit: (event, payload) => this.emitLocal(event, payload),
+      connectedDeviceId: () => this.state.connectedDeviceId,
+      setConnectedDeviceId: (id) => this.state.setConnectedDeviceId(id),
+      isScanning: () => this.state.isScanning,
+      setScanning: (v) => this.state.setScanning(v),
+      log: (level, scope, action, message, options) =>
+        this.log(level, scope, action, message, options),
+    };
   }
 }

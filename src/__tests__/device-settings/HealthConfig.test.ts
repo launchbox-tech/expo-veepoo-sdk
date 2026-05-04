@@ -6,19 +6,29 @@ jest.mock('react-native', () => ({
 }));
 
 import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
-import { HealthConfig } from '../../sdk/device-settings/HealthConfig';
+import { PersonalInfoCapability } from '../../capabilities/personal-info/index';
+import { AutoMeasureCapability } from '../../capabilities/auto-measure/index';
+import { SedentaryReminderCapability } from '../../capabilities/sedentary-reminder/index';
+import { WomenHealthCapability } from '../../capabilities/women-health/index';
 import { makeMockNative, type MockNative } from '../helpers/mock-native';
 import type { AutoMeasureSetting, PersonalInfo, SedentaryReminderSettings, WomenHealthSettings } from '../../types/index';
 
-describe('HealthConfig', () => {
+describe('HealthConfig (split capabilities)', () => {
   let native: MockNative;
   let runtime: VeepooSDKRuntime;
-  let healthConfig: HealthConfig;
+  let personalInfo: PersonalInfoCapability;
+  let autoMeasure: AutoMeasureCapability;
+  let sedentaryReminder: SedentaryReminderCapability;
+  let womenHealth: WomenHealthCapability;
 
   beforeEach(() => {
     native = makeMockNative();
     runtime = new VeepooSDKRuntime(native);
-    healthConfig = new HealthConfig(runtime);
+    const ctx = runtime.createCapabilityContext();
+    personalInfo = new PersonalInfoCapability(ctx);
+    autoMeasure = new AutoMeasureCapability(ctx);
+    sedentaryReminder = new SedentaryReminderCapability(ctx);
+    womenHealth = new WomenHealthCapability(ctx);
   });
 
   // ── syncPersonalInfo ───────────────────────────────────────────────
@@ -32,7 +42,7 @@ describe('HealthConfig', () => {
       stepAim: 8000,
       sleepAim: 480,
     };
-    const result = await healthConfig.syncPersonalInfo(info);
+    const result = await personalInfo.syncPersonalInfo(info);
     expect(native.syncPersonalInfo).toHaveBeenCalledWith(info);
     expect(result).toBe(true);
   });
@@ -44,7 +54,7 @@ describe('HealthConfig', () => {
       { type: 'heartRate', enabled: true, measureInterval: 30, currentStartMinute: 0, currentEndMinute: 1439 },
     ];
     native.readAutoMeasureSetting.mockResolvedValueOnce(raw);
-    const result = await healthConfig.readAutoMeasureSetting();
+    const result = await autoMeasure.readAutoMeasureSetting();
     expect(native.readAutoMeasureSetting).toHaveBeenCalled();
     expect(Array.isArray(result)).toBe(true);
   });
@@ -54,14 +64,14 @@ describe('HealthConfig', () => {
   it('modifyAutoMeasureSetting delegates to native (happy path)', async () => {
     const setting: Partial<AutoMeasureSetting> = { measureInterval: 30 };
     native.modifyAutoMeasureSetting.mockResolvedValueOnce([]);
-    await healthConfig.modifyAutoMeasureSetting(setting);
+    await autoMeasure.modifyAutoMeasureSetting(setting);
     expect(native.modifyAutoMeasureSetting).toHaveBeenCalledWith(setting);
   });
 
   it('modifyAutoMeasureSetting throws INVALID_ARGUMENT for out-of-range interval', async () => {
     // measureInterval must be in range 1–120; 0 is invalid
     await expect(
-      healthConfig.modifyAutoMeasureSetting({ measureInterval: 0 }),
+      autoMeasure.modifyAutoMeasureSetting({ measureInterval: 0 }),
     ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
     expect(native.modifyAutoMeasureSetting).not.toHaveBeenCalled();
   });
@@ -77,7 +87,7 @@ describe('HealthConfig', () => {
       thresholdMinutes: 60,
       enabled: 1,
     });
-    const result = await healthConfig.readSedentaryReminder();
+    const result = await sedentaryReminder.readSedentaryReminder();
     expect(native.readSedentaryReminder).toHaveBeenCalled();
     expect(result.thresholdMinutes).toBe(60);
   });
@@ -93,7 +103,7 @@ describe('HealthConfig', () => {
       endMinute: 0,
       thresholdMinutes: 60,
     };
-    await healthConfig.setSedentaryReminder(settings);
+    await sedentaryReminder.setSedentaryReminder(settings);
     expect(native.setSedentaryReminder).toHaveBeenCalledWith(settings);
   });
 
@@ -108,7 +118,7 @@ describe('HealthConfig', () => {
       thresholdMinutes: 10,
     };
     await expect(
-      healthConfig.setSedentaryReminder(invalid),
+      sedentaryReminder.setSedentaryReminder(invalid),
     ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
     expect(native.setSedentaryReminder).not.toHaveBeenCalled();
   });
@@ -119,7 +129,7 @@ describe('HealthConfig', () => {
     native.readWomenHealthSettings.mockResolvedValueOnce({
       status: 'none',
     });
-    const result = await healthConfig.readWomenHealthSettings();
+    const result = await womenHealth.readWomenHealthSettings();
     expect(native.readWomenHealthSettings).toHaveBeenCalled();
     expect(result.status).toBe('none');
   });
@@ -128,7 +138,7 @@ describe('HealthConfig', () => {
 
   it('setWomenHealthSettings delegates to native', async () => {
     const settings: WomenHealthSettings = { status: 'none' };
-    await healthConfig.setWomenHealthSettings(settings);
+    await womenHealth.setWomenHealthSettings(settings);
     expect(native.setWomenHealthSettings).toHaveBeenCalledWith(settings);
   });
 });

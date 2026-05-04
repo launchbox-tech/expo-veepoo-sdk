@@ -5,19 +5,19 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { AlarmSettings } from '../../sdk/device-settings/AlarmSettings';
+import { AlarmsCapability } from '../../capabilities/alarms/index';
 import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '../helpers/mock-native';
 
-describe('AlarmSettings', () => {
+describe('AlarmsCapability', () => {
   let native: MockNative;
   let runtime: VeepooSDKRuntime;
-  let alarmSettings: AlarmSettings;
+  let alarmSettings: AlarmsCapability;
 
   beforeEach(() => {
     native = makeMockNative();
     runtime = new VeepooSDKRuntime(native);
-    alarmSettings = new AlarmSettings(runtime);
+    alarmSettings = new AlarmsCapability(runtime.createCapabilityContext());
   });
 
   // ── readAlarms ────────────────────────────────────────────────────────────
