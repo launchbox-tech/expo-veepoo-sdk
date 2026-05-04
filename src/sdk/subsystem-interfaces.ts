@@ -128,53 +128,72 @@ export interface HealthDataInterface {
   readDaySummaryData(dayOffset?: number): Promise<DaySummaryData>;
 }
 
-export interface DeviceSettingsInterface {
-  syncPersonalInfo(info: PersonalInfo): Promise<boolean>;
-  readAutoMeasureSetting(): Promise<AutoMeasureSetting[]>;
-  modifyAutoMeasureSetting(
-    setting: Partial<AutoMeasureSetting>,
-  ): Promise<AutoMeasureSetting[]>;
-  setLanguage(language: Language): Promise<boolean>;
-  setDeviceTime(time?: Date): Promise<boolean>;
+export interface AlarmSettingsInterface {
   readAlarms(): Promise<DeviceAlarm[]>;
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus>;
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
   readHeartRateAlarm(): Promise<HeartRateAlarm>;
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>;
-  startFindDevice(): Promise<void>;
-  stopFindDevice(): Promise<void>;
+}
+
+export interface DisplaySettingsInterface {
   readScreenLightSettings(): Promise<ScreenLightSettings>;
   setScreenLightSettings(settings: ScreenLightSettings): Promise<void>;
   readScreenLightDuration(): Promise<ScreenLightDuration>;
   setScreenLightDuration(seconds: number): Promise<void>;
-  readSedentaryReminder(): Promise<SedentaryReminderSettings>;
-  setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
   readWristFlipWakeSettings(): Promise<WristFlipWakeSettings>;
   setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
+  readWatchFaceStyle(options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle>;
+  setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;
+}
+
+export interface HealthConfigInterface {
+  syncPersonalInfo(info: PersonalInfo): Promise<boolean>;
+  readAutoMeasureSetting(): Promise<AutoMeasureSetting[]>;
+  modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<AutoMeasureSetting[]>;
+  readSedentaryReminder(): Promise<SedentaryReminderSettings>;
+  setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
   readWomenHealthSettings(): Promise<WomenHealthSettings>;
   setWomenHealthSettings(settings: WomenHealthSettings): Promise<void>;
-  readWeatherSettings(): Promise<WeatherSettings>;
-  setWeatherSettings(settings: WeatherSettings): Promise<void>;
-  pushWeatherData(data: WeatherData): Promise<void>;
+}
+
+export interface EmergencySettingsInterface {
   readContacts(crc?: number): Promise<DeviceContact[]>;
   addContact(contact: NewDeviceContact): Promise<void>;
   deleteContact(contactId: number): Promise<void>;
   setContactSosState(contactId: number, isOpen: boolean): Promise<void>;
   readSosCallTimes(): Promise<SosCallTimesSettings>;
   setSosCallTimes(times: number): Promise<void>;
+}
+
+export interface MediaInteractionInterface {
+  startFindDevice(): Promise<void>;
+  stopFindDevice(): Promise<void>;
   enterCameraMode(): Promise<void>;
   exitCameraMode(): Promise<void>;
   setMusicControlEnabled(enabled: boolean): Promise<void>;
   pushMusicData(data: MusicData): Promise<void>;
+}
+
+export interface SystemSettingsInterface {
+  setLanguage(language: Language): Promise<boolean>;
+  setDeviceTime(time?: Date): Promise<boolean>;
   setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void>;
   readDeviceBTStatus(): Promise<DeviceBTStatus>;
   setDeviceBTSwitch(open: boolean): Promise<void>;
+  readWeatherSettings(): Promise<WeatherSettings>;
+  setWeatherSettings(settings: WeatherSettings): Promise<void>;
+  pushWeatherData(data: WeatherData): Promise<void>;
   startLocalFirmwareDfu(filePath: string): Promise<void>;
-  readWatchFaceStyle(options?: {
-    dialType?: WatchFaceDialType;
-  }): Promise<WatchFaceStyle>;
-  setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;
 }
+
+export interface DeviceSettingsInterface
+  extends AlarmSettingsInterface,
+    DisplaySettingsInterface,
+    HealthConfigInterface,
+    EmergencySettingsInterface,
+    MediaInteractionInterface,
+    SystemSettingsInterface {}
 
 export interface RealtimeTestsInterface {
   startHeartRateTest(): Promise<void>;
