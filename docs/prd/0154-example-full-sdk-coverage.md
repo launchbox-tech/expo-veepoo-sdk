@@ -1,8 +1,8 @@
 # feat(example): full SDK coverage — all 59 methods and 56 events reachable from the example app
 
 **Issue:** #154
-**Status:** OPEN
-**Labels:** enhancement, needs-triage
+**Status:** CLOSED
+**Labels:** enhancement
 
 ## Problem Statement
 
