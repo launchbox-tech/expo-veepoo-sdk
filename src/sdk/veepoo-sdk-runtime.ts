@@ -14,7 +14,7 @@ import type { LogListener } from "../VeepooSDKModule.js";
 import { normalizeEventPayload } from "../normalizers/index.js";
 import { mapNativeRejection } from "../errors/map-native-rejection.js";
 import { VeepooSdkState } from "./veepoo-sdk-state.js";
-import { OriginReadProgressFilter } from "../bridge/origin-read-progress-filter.js";
+import { OriginReadPipeline } from "../bridge/origin-read-pipeline.js";
 import { EventBus } from "../bridge/event-bus.js";
 
 /**
@@ -24,7 +24,7 @@ import { EventBus } from "../bridge/event-bus.js";
 export class VeepooSDKRuntime {
   readonly native: NativeVeepooSDKInterface;
   readonly state = new VeepooSdkState();
-  private readonly originProgressFilter = new OriginReadProgressFilter();
+  private readonly originReadPipeline = new OriginReadPipeline();
   private readonly bus = new EventBus(
     (error, event, payload) => {
       this.log(
@@ -130,20 +130,10 @@ export class VeepooSDKRuntime {
     const normalizedPayload = normalizeEventPayload(event, payload);
 
     if (event === "readOriginProgress") {
-      const originPayload =
-        normalizedPayload as VeepooEventPayload["readOriginProgress"];
-      if (
-        this.isEventRecord(originPayload) &&
-        this.isEventRecord(originPayload.progress)
-      ) {
-        const deviceId =
-          this.getPayloadDeviceId(originPayload) ?? "__default__";
-        const progressValue = originPayload.progress.progress as number;
-        const readState = originPayload.progress.readState as string | undefined;
-
-        if (!this.originProgressFilter.shouldEmit(deviceId, readState, progressValue)) {
-          return;
-        }
+      if (!this.originReadPipeline.shouldEmit(
+        normalizedPayload as VeepooEventPayload["readOriginProgress"],
+      )) {
+        return;
       }
     }
 
@@ -174,7 +164,7 @@ export class VeepooSDKRuntime {
       const device = normalizedPayload as { deviceId?: string };
       this.state.onDeviceDisconnected(device.deviceId);
       if (device.deviceId) {
-        this.originProgressFilter.clearDevice(device.deviceId);
+        this.originReadPipeline.clearDevice(device.deviceId);
       }
     }
 
@@ -243,10 +233,6 @@ export class VeepooSDKRuntime {
     return typeof deviceId === "string" && deviceId.length > 0
       ? deviceId
       : undefined;
-  }
-
-  private isEventRecord(payload: unknown): payload is Record<string, unknown> {
-    return typeof payload === "object" && payload !== null;
   }
 
   handleError(
