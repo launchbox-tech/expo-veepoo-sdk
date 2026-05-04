@@ -42,6 +42,7 @@ import {
   BandBluetoothCard,
   FirmwareDfuCard,
   AlarmsCard,
+  ContactsCard,
   PersonalInfoSync,
   HealthTestsSection,
   VitalsLabSection,
@@ -293,6 +294,7 @@ export default function ReadyScreen({
         <GpsAgpsCard />
         <BandBluetoothCard />
         <AlarmsCard />
+        <ContactsCard />
         <FirmwareDfuCard />
 
         <PersonalInfoSync syncDone={syncDone} />
