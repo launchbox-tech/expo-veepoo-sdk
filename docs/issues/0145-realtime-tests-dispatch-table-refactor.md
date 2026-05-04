@@ -1,7 +1,7 @@
 # refactor(realtime-tests): dispatch table + shrink interface to startTest/stopTest
 
 **Issue:** #145
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage
 
 ## Parent

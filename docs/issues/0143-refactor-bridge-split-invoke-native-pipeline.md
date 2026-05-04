@@ -1,7 +1,7 @@
 # refactor(bridge): split invokeNative into invokeOrThrow / invokeWithRecovery
 
 **Issue:** #143
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage
 **Parent:** #139
 

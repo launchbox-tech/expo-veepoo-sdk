@@ -1,7 +1,7 @@
 # types: add RealtimeTestModality union + RealtimeTest constants
 
 **Issue:** #141
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage
 
 ## Parent

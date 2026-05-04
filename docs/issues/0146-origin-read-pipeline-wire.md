@@ -1,6 +1,6 @@
 # Issue #146 — Wire OriginReadPipeline into runtime, delete OriginReadProgressFilter
 
-**Status:** Open  
+**Status:** Closed  
 **Labels:** needs-triage  
 **Parent:** #140  
 **GitHub:** https://github.com/launchbox-tech/expo-veepoo-sdk/issues/146

@@ -1,6 +1,6 @@
 # PRD #140 — Extract OriginReadPipeline: concentrate readOriginProgress flow into one seam
 
-**Status:** Open  
+**Status:** Closed  
 **Labels:** needs-triage  
 **GitHub:** https://github.com/launchbox-tech/expo-veepoo-sdk/issues/140
 

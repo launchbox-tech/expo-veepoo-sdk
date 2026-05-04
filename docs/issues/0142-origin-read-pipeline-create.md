@@ -1,6 +1,6 @@
 # Issue #142 — Create OriginReadPipeline with tests
 
-**Status:** Open  
+**Status:** Closed  
 **Labels:** needs-triage  
 **Parent:** #140  
 **GitHub:** https://github.com/launchbox-tech/expo-veepoo-sdk/issues/142

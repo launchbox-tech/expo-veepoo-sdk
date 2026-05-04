@@ -1,7 +1,7 @@
 # refactor(realtime-tests): collapse 20-method interface to startTest/stopTest + modality constants
 
 **Issue:** #137
-**Status:** Open
+**Status:** Closed
 **Labels:** needs-triage
 
 ## Problem Statement
