@@ -3,6 +3,7 @@
 /** @type {import('jest').Config} */
 module.exports = {
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.+)\\.js$': '$1',
   },
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/src/__tests__/helpers/', '<rootDir>/build/', '<rootDir>/.claude/'],
