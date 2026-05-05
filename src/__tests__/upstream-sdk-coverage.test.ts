@@ -4,8 +4,16 @@ import {
   type CoverageDoc,
 } from "@/bridge-contract/verify-upstream-sdk-coverage";
 import { NATIVE_EMITTED_EVENTS } from "@/bridge/veepoo-events-registry";
+import coverageDocJson from "../../docs/vendor-sdk-snapshot/sdk-callback-coverage.json";
+import manifestJson from "../../vendor-manifest.json";
 
 const repoRoot = join(__dirname, "..", "..");
+const coverageDoc = coverageDocJson as unknown as CoverageDoc;
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fsModule = require("fs") as typeof import("fs");
+const origExistsSync = fsModule.existsSync;
+const origReadFileSync = fsModule.readFileSync;
 
 describe("upstream SDK coverage contract", () => {
   it("all NATIVE_EMITTED_EVENTS are documented in sdk-callback-coverage.json", () => {
@@ -14,25 +22,21 @@ describe("upstream SDK coverage contract", () => {
   });
 
   it("coverage doc has no stale events absent from NATIVE_EMITTED_EVENTS", () => {
-    const coverageDoc = require("../../docs/vendor-sdk-snapshot/sdk-callback-coverage.json") as CoverageDoc;
     const registered = new Set<string>(NATIVE_EMITTED_EVENTS);
     const stale = Object.keys(coverageDoc.events).filter((e) => !registered.has(e));
     expect(stale).toEqual([]);
   });
 
   it("coverage doc SHA pins match vendor-manifest.json", () => {
-    const coverageDoc = require("../../docs/vendor-sdk-snapshot/sdk-callback-coverage.json") as CoverageDoc;
-    const manifest = require("../../vendor-manifest.json");
     expect(coverageDoc.androidSdkSha).toBe(
-      manifest.upstreamReference.androidBleSdk.lastReviewedHeadSha,
+      manifestJson.upstreamReference.androidBleSdk.lastReviewedHeadSha,
     );
     expect(coverageDoc.iosSdkSha).toBe(
-      manifest.upstreamReference.iosBleSdk.lastReviewedHeadSha,
+      manifestJson.upstreamReference.iosBleSdk.lastReviewedHeadSha,
     );
   });
 
   it("every bridged event has both android and ios coverage entries", () => {
-    const coverageDoc = require("../../docs/vendor-sdk-snapshot/sdk-callback-coverage.json") as CoverageDoc;
     const missingAndroid: string[] = [];
     const missingIos: string[] = [];
     for (const [event, entry] of Object.entries(coverageDoc.events)) {
@@ -44,7 +48,6 @@ describe("upstream SDK coverage contract", () => {
   });
 
   it("notBridged entries have non-empty reason fields", () => {
-    const coverageDoc = require("../../docs/vendor-sdk-snapshot/sdk-callback-coverage.json") as CoverageDoc;
     const missing: string[] = [];
     for (const entry of coverageDoc.notBridged.android) {
       if (!entry.reason?.trim()) missing.push(`android:${entry.interface}`);
@@ -59,17 +62,12 @@ describe("upstream SDK coverage contract", () => {
 // Unit tests for the verifier logic with synthetic data
 
 describe("verifyUpstreamSdkCoverage edge cases", () => {
-  const tmpFs: Record<string, string> = {};
-  const origExistsSync = require("fs").existsSync;
-  const origReadFileSync = require("fs").readFileSync;
-
   function withMockedFs(files: Record<string, string>, fn: () => void): void {
-    const { existsSync, readFileSync } = require("fs") as typeof import("fs");
-    jest.spyOn(require("fs"), "existsSync").mockImplementation((p) =>
+    jest.spyOn(fsModule, "existsSync").mockImplementation((p) =>
       p.toString() in files ? true : origExistsSync(p),
     );
-    jest.spyOn(require("fs"), "readFileSync").mockImplementation((p, ...args) =>
-      p.toString() in files ? files[p.toString()] : origReadFileSync(p, ...args),
+    jest.spyOn(fsModule, "readFileSync").mockImplementation((p, ...args) =>
+      p.toString() in files ? files[p.toString()] : origReadFileSync(p, ...args as []),
     );
     try { fn(); } finally { jest.restoreAllMocks(); }
   }
