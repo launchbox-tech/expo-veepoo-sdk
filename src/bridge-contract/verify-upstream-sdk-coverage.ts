@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { NATIVE_EMITTED_EVENTS } from "@/bridge/veepoo-events-registry";
+import { NATIVE_EMITTED_EVENTS } from "../bridge/veepoo-events-registry";
 
 export type CoverageDoc = {
   schemaVersion: number;
