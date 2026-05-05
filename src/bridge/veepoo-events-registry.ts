@@ -128,6 +128,8 @@ export const NATIVE_TO_JS_EVENT_MAP = {
 
 export const JS_LOCAL_ONLY_EVENTS = [
   "heart_rate_alarm_data",
+  "spo2_alarm_data",
+  "device_switches_data",
   "sdk_initialized",
   "scan_started",
   "scan_stopped",

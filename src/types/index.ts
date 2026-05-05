@@ -60,6 +60,9 @@ export type {
   DeviceBTStatus,
   HealthReminderType,
   HealthReminder,
+  Spo2Alarm,
+  DeviceSwitchType,
+  DeviceSwitches,
 } from './device';
 
 export type {
@@ -127,6 +130,8 @@ export type {
   OperationStatus,
   SportMode,
   SportModeStatus,
+  BloodGlucoseRiskConfig,
+  WorldClockEntry,
 } from './settings';
 export { SPORT_MODE_ORDINALS } from './settings';
 

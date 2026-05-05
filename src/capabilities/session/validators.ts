@@ -21,3 +21,17 @@ export function validateConnectOptions(options: ConnectOptions): void {
     requireInRange(t.second, 'timeSetting.second', 0, 59);
   }
 }
+
+export function validateDeviceName(name: string): void {
+  requireNonEmptyString(name, 'name');
+  if (new TextEncoder().encode(name).byteLength > 20) {
+    throw { code: 'INVALID_ARGUMENT', message: 'name must not exceed 20 UTF-8 bytes' };
+  }
+}
+
+export function validateConnectionConfirmTimeout(seconds: number): void {
+  if (!Number.isInteger(seconds)) {
+    throw { code: 'INVALID_ARGUMENT', message: 'seconds must be an integer' };
+  }
+  requireInRange(seconds, 'seconds', 5, 120);
+}

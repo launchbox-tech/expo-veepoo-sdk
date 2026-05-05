@@ -1,4 +1,4 @@
-import type { DeviceAlarm, HeartRateAlarm, OperationStatus } from "@/types/index";
+import type { DeviceAlarm, HeartRateAlarm, OperationStatus, Spo2Alarm } from "@/types/index";
 
 export interface AlarmNativeMethods {
   readAlarms(): Promise<unknown>;
@@ -6,4 +6,6 @@ export interface AlarmNativeMethods {
   deleteAlarm(alarmId: number): Promise<OperationStatus>;
   readHeartRateAlarm(): Promise<unknown>;
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus>;
+  readSpo2Alarm(): Promise<unknown>;
+  setSpo2Alarm(alarm: Spo2Alarm): Promise<OperationStatus>;
 }

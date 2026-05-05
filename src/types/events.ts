@@ -13,12 +13,14 @@ import type {
   DeviceContact,
   DeviceFunctions,
   DeviceVersion,
+  DeviceSwitches,
   HeartRateAlarm,
   FindDevicePhase,
   HealthReminder,
   MusicRemoteCommand,
   SocialMsgData,
   SosCallTimesSettings,
+  Spo2Alarm,
 } from './device';
 import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings';
 import type {
@@ -130,6 +132,8 @@ export type VeepooEventPayload = {
   origin_spo2_data: { device_id: string; data: Spo2OriginData };
   alarm_data: { device_id: string; alarms: DeviceAlarm[] };
   heart_rate_alarm_data: { device_id: string; data: HeartRateAlarm };
+  spo2_alarm_data: { device_id: string; data: Spo2Alarm };
+  device_switches_data: { device_id: string; switches: DeviceSwitches };
   find_device_state: {
     device_id: string;
     phase: FindDevicePhase;

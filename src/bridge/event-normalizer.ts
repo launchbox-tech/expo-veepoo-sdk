@@ -189,6 +189,8 @@ const EVENT_NORMALIZERS: {
     const p = isRecord(raw) ? raw : {};
     return { ...p, data: normalizeHeartRateAlarm(p.data) } as VeepooEventPayload['heart_rate_alarm_data'];
   },
+  spo2_alarm_data: (raw) => raw as VeepooEventPayload['spo2_alarm_data'],
+  device_switches_data: (raw) => raw as VeepooEventPayload['device_switches_data'],
   contacts_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
     return { ...p, contacts: normalizeContactList(p.contacts ?? p.data) } as VeepooEventPayload['contacts_data'];

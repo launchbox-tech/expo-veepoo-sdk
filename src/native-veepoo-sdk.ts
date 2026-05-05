@@ -5,6 +5,8 @@ import type { VeepooEvent } from "./types/index";
 import type { AlarmNativeMethods } from "./capabilities/alarms/native";
 import type { AutoMeasureNativeMethods } from "./capabilities/auto-measure/native";
 import type { BandDiscoveryNativeMethods } from "./capabilities/band-discovery/native";
+import type { CalibrationNativeMethods } from "./capabilities/calibration/native";
+import type { DeviceSwitchesNativeMethods } from "./capabilities/device-switches/native";
 import type { BatteryNativeMethods } from "./capabilities/battery/native";
 import type { BtStatusNativeMethods } from "./capabilities/bt-status/native";
 import type { CameraNativeMethods } from "./capabilities/camera/native";
@@ -28,10 +30,12 @@ import type { SessionNativeMethods } from "./capabilities/session/native";
 import type { SleepDataNativeMethods } from "./capabilities/sleep-data/native";
 import type { SocialMsgNativeMethods } from "./capabilities/social-msg/native";
 import type { SosNativeMethods } from "./capabilities/sos/native";
+import type { SportModeNativeMethods } from "./capabilities/sport-mode/native";
 import type { SportStepsNativeMethods } from "./capabilities/sport-steps/native";
 import type { WatchFaceNativeMethods } from "./capabilities/watch-face/native";
 import type { WeatherNativeMethods } from "./capabilities/weather/native";
 import type { WomenHealthNativeMethods } from "./capabilities/women-health/native";
+import type { WorldClockNativeMethods } from "./capabilities/world-clock/native";
 import type { WristFlipNativeMethods } from "./capabilities/wrist-flip/native";
 
 const LINKING_ERROR =
@@ -50,10 +54,12 @@ export interface NativeVeepooSDKInterface
     BandDiscoveryNativeMethods,
     BatteryNativeMethods,
     BtStatusNativeMethods,
+    CalibrationNativeMethods,
     CameraNativeMethods,
     ContactsNativeMethods,
     DaySummaryNativeMethods,
     DeviceFunctionsNativeMethods,
+    DeviceSwitchesNativeMethods,
     DeviceTimeNativeMethods,
     DeviceVersionNativeMethods,
     DfuNativeMethods,
@@ -71,10 +77,12 @@ export interface NativeVeepooSDKInterface
     SleepDataNativeMethods,
     SocialMsgNativeMethods,
     SosNativeMethods,
+    SportModeNativeMethods,
     SportStepsNativeMethods,
     WatchFaceNativeMethods,
     WeatherNativeMethods,
     WomenHealthNativeMethods,
+    WorldClockNativeMethods,
     WristFlipNativeMethods,
     EventListenerMethods {}
 

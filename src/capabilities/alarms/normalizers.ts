@@ -1,4 +1,4 @@
-import type { DeviceAlarm, HeartRateAlarm } from "@/types/index";
+import type { DeviceAlarm, HeartRateAlarm, Spo2Alarm } from "@/types/index";
 import { isRecord, toInt, toBoolean } from "@/normalizers/primitives";
 
 function repeatStringToWeekdays(repeatStr: string): number[] {
@@ -43,6 +43,14 @@ export function normalizeHeartRateAlarm(value: unknown): HeartRateAlarm {
   return {
     enabled: toBoolean(record.enabled, false),
     high_threshold: toInt(record.highThreshold ?? record.high_threshold),
+    low_threshold: toInt(record.lowThreshold ?? record.low_threshold),
+  };
+}
+
+export function normalizeSpo2Alarm(value: unknown): Spo2Alarm {
+  const record = isRecord(value) ? value : {};
+  return {
+    enabled: toBoolean(record.enabled, false),
     low_threshold: toInt(record.lowThreshold ?? record.low_threshold),
   };
 }

@@ -133,3 +133,15 @@ export interface SportModeStatus {
   mode: SportMode | null;
   is_active: boolean;
 }
+
+export interface BloodGlucoseRiskConfig {
+  low: number;
+  high: number;
+  unit: BloodGlucoseUnit;
+}
+
+export interface WorldClockEntry {
+  timezone_offset_minutes: number;
+  city_name: string;
+  dst_offset?: number;
+}

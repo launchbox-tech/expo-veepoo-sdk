@@ -52,6 +52,22 @@ export const NATIVE_ASYNC_MOCK_RESOLVES: Partial<
   },
   readContacts: [],
   readSosCallTimes: { times: 3, minTimes: 1, maxTimes: 9 },
+  readSportMode: { sportMode: 0, isActive: false },
+  setSportMode: 'success',
+  stopSportMode: 'success',
+  readSpo2Alarm: { enabled: false, lowThreshold: 90 },
+  setSpo2Alarm: 'success',
+  readDeviceSwitches: {},
+  setDeviceSwitch: 'success',
+  calibrateBloodPressure: 'success',
+  calibrateBloodGlucose: 'success',
+  setBloodGlucoseRiskLevel: 'success',
+  readWorldClock: [],
+  setWorldClock: 'success',
+  renameDevice: 'success',
+  isConnectionConfirmEnabled: false,
+  setConnectionConfirmEnabled: 'success',
+  setConnectionConfirmTimeout: 'success',
 };
 
 export function makeMockNative(

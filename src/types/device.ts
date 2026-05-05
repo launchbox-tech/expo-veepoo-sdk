@@ -429,3 +429,18 @@ export interface HealthReminder {
   interval: number;
   enabled: boolean;
 }
+
+/** SpO₂ low-saturation alarm settings stored on the Band. */
+export interface Spo2Alarm {
+  enabled: boolean;
+  /** SpO₂ percentage threshold (1–99) below which the alarm fires. */
+  low_threshold: number;
+}
+
+export type DeviceSwitchType =
+  | 'auto_hr' | 'auto_bp' | 'auto_spo2' | 'auto_temperature' | 'auto_hrv'
+  | 'auto_blood_glucose' | 'auto_ppg' | 'wear_detection' | 'disconnect_remind'
+  | 'sos_remind' | 'auto_answer' | 'exercise_detection' | 'accurate_sleep'
+  | 'ecg_normally_open' | 'met' | 'stress' | 'music_control';
+
+export type DeviceSwitches = Record<DeviceSwitchType, boolean>;

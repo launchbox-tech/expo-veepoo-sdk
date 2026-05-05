@@ -2,8 +2,8 @@ import { invokeOrThrow, invokeWithRecovery } from "@/bridge/native-invoke-pipeli
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { SessionNativeMethods } from "./native";
 import { normalizePasswordData } from "./normalizers";
-import { validateDeviceId, validateConnectOptions } from "./validators";
-import type { ConnectOptions, ConnectionStatus, PasswordData } from "@/types/index";
+import { validateDeviceId, validateConnectOptions, validateDeviceName, validateConnectionConfirmTimeout } from "./validators";
+import type { ConnectOptions, ConnectionStatus, OperationStatus, PasswordData } from "@/types/index";
 
 export class SessionCapability {
   constructor(private readonly ctx: CapabilityContext<SessionNativeMethods>) {}
@@ -77,6 +77,36 @@ export class SessionCapability {
           },
         });
       },
+    });
+  }
+
+  renameDevice(name: string): Promise<OperationStatus> {
+    return invokeOrThrow({
+      validate: () => validateDeviceName(name),
+      invoke: () => this.ctx.native.renameDevice(name),
+      mapError: (e) => this.ctx.mapError(e),
+    });
+  }
+
+  isConnectionConfirmEnabled(): Promise<boolean> {
+    return invokeOrThrow({
+      invoke: () => this.ctx.native.isConnectionConfirmEnabled(),
+      mapError: (e) => this.ctx.mapError(e),
+    });
+  }
+
+  setConnectionConfirmEnabled(enabled: boolean): Promise<OperationStatus> {
+    return invokeOrThrow({
+      invoke: () => this.ctx.native.setConnectionConfirmEnabled(enabled),
+      mapError: (e) => this.ctx.mapError(e),
+    });
+  }
+
+  setConnectionConfirmTimeout(seconds: number): Promise<OperationStatus> {
+    return invokeOrThrow({
+      validate: () => validateConnectionConfirmTimeout(seconds),
+      invoke: () => this.ctx.native.setConnectionConfirmTimeout(seconds),
+      mapError: (e) => this.ctx.mapError(e),
     });
   }
 }

@@ -95,6 +95,22 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "setDeviceGPSAndTimezone",
   "readDeviceBTStatus",
   "setDeviceBTSwitch",
+  "readSportMode",
+  "setSportMode",
+  "stopSportMode",
+  "readSpo2Alarm",
+  "setSpo2Alarm",
+  "readDeviceSwitches",
+  "setDeviceSwitch",
+  "calibrateBloodPressure",
+  "calibrateBloodGlucose",
+  "setBloodGlucoseRiskLevel",
+  "readWorldClock",
+  "setWorldClock",
+  "renameDevice",
+  "isConnectionConfirmEnabled",
+  "setConnectionConfirmEnabled",
+  "setConnectionConfirmTimeout",
 ] as const satisfies readonly NativeAsyncMethodName[];
 
 export type NativeAsyncRegistryUnion =

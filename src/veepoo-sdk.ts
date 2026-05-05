@@ -28,7 +28,10 @@ import type {
   SleepData,
   SocialMsgData,
   SosCallTimesSettings,
+  SportMode,
+  SportModeStatus,
   SportStepData,
+  Spo2Alarm,
   VeepooEvent,
   VeepooEventPayload,
   WatchFaceDialType,
@@ -47,6 +50,8 @@ import { SdkLifecycle } from "./sdk/sdk-lifecycle";
 
 import { AlarmsCapability } from "./capabilities/alarms/index";
 import { AutoMeasureCapability } from "./capabilities/auto-measure/index";
+import { CalibrationCapability } from "./capabilities/calibration/index";
+import { DeviceSwitchesCapability } from "./capabilities/device-switches/index";
 import { BandDiscoveryCapability } from "./capabilities/band-discovery/index";
 import { BatteryCapability } from "./capabilities/battery/index";
 import { BtStatusCapability } from "./capabilities/bt-status/index";
@@ -71,10 +76,12 @@ import { SessionCapability } from "./capabilities/session/index";
 import { SleepDataCapability } from "./capabilities/sleep-data/index";
 import { SocialMsgCapability } from "./capabilities/social-msg/index";
 import { SosCapability } from "./capabilities/sos/index";
+import { SportModeCapability } from "./capabilities/sport-mode/index";
 import { SportStepsCapability } from "./capabilities/sport-steps/index";
 import { WatchFaceCapability } from "./capabilities/watch-face/index";
 import { WeatherCapability } from "./capabilities/weather/index";
 import { WomenHealthCapability } from "./capabilities/women-health/index";
+import { WorldClockCapability } from "./capabilities/world-clock/index";
 import { WristFlipCapability } from "./capabilities/wrist-flip/index";
 
 export interface VeepooSDKInterface {
@@ -96,6 +103,8 @@ export interface VeepooSDKInterface {
   alarms: AlarmsCapability;
   autoMeasure: AutoMeasureCapability;
   battery: BatteryCapability;
+  calibration: CalibrationCapability;
+  deviceSwitches: DeviceSwitchesCapability;
   btStatus: BtStatusCapability;
   camera: CameraCapability;
   contacts: ContactsCapability;
@@ -119,10 +128,12 @@ export interface VeepooSDKInterface {
   sleepData: SleepDataCapability;
   socialMsg: SocialMsgCapability;
   sos: SosCapability;
+  sportMode: SportModeCapability;
   sportSteps: SportStepsCapability;
   watchFace: WatchFaceCapability;
   weather: WeatherCapability;
   womenHealth: WomenHealthCapability;
+  worldClock: WorldClockCapability;
   wristFlip: WristFlipCapability;
 }
 
@@ -133,6 +144,8 @@ export class VeepooSDK implements VeepooSDKInterface {
   readonly alarms: AlarmsCapability;
   readonly autoMeasure: AutoMeasureCapability;
   readonly battery: BatteryCapability;
+  readonly calibration: CalibrationCapability;
+  readonly deviceSwitches: DeviceSwitchesCapability;
   readonly btStatus: BtStatusCapability;
   readonly camera: CameraCapability;
   readonly contacts: ContactsCapability;
@@ -156,10 +169,12 @@ export class VeepooSDK implements VeepooSDKInterface {
   readonly sleepData: SleepDataCapability;
   readonly socialMsg: SocialMsgCapability;
   readonly sos: SosCapability;
+  readonly sportMode: SportModeCapability;
   readonly sportSteps: SportStepsCapability;
   readonly watchFace: WatchFaceCapability;
   readonly weather: WeatherCapability;
   readonly womenHealth: WomenHealthCapability;
+  readonly worldClock: WorldClockCapability;
   readonly wristFlip: WristFlipCapability;
 
   constructor(native: NativeVeepooSDKInterface = NativeVeepooSDK) {
@@ -170,6 +185,8 @@ export class VeepooSDK implements VeepooSDKInterface {
     this.alarms = new AlarmsCapability(ctx);
     this.autoMeasure = new AutoMeasureCapability(ctx);
     this.battery = new BatteryCapability(ctx);
+    this.calibration = new CalibrationCapability(ctx);
+    this.deviceSwitches = new DeviceSwitchesCapability(ctx);
     this.btStatus = new BtStatusCapability(ctx);
     this.camera = new CameraCapability(ctx);
     this.contacts = new ContactsCapability(ctx);
@@ -193,10 +210,12 @@ export class VeepooSDK implements VeepooSDKInterface {
     this.sleepData = new SleepDataCapability(ctx);
     this.socialMsg = new SocialMsgCapability(ctx);
     this.sos = new SosCapability(ctx);
+    this.sportMode = new SportModeCapability(ctx);
     this.sportSteps = new SportStepsCapability(ctx);
     this.watchFace = new WatchFaceCapability(ctx);
     this.weather = new WeatherCapability(ctx);
     this.womenHealth = new WomenHealthCapability(ctx);
+    this.worldClock = new WorldClockCapability(ctx);
     this.wristFlip = new WristFlipCapability(ctx);
   }
 
@@ -282,6 +301,8 @@ export class VeepooSDK implements VeepooSDKInterface {
   deleteAlarm(alarmId: number): Promise<OperationStatus> { return this.alarms.deleteAlarm(alarmId); }
   readHeartRateAlarm(): Promise<HeartRateAlarm> { return this.alarms.readHeartRateAlarm(); }
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> { return this.alarms.setHeartRateAlarm(alarm); }
+  readSpo2Alarm(): Promise<Spo2Alarm> { return this.alarms.readSpo2Alarm(); }
+  setSpo2Alarm(alarm: Spo2Alarm): Promise<OperationStatus> { return this.alarms.setSpo2Alarm(alarm); }
 
   startFindDevice = (): Promise<void> => this.findDevice.startFindDevice();
   stopFindDevice = (): Promise<void> => this.findDevice.stopFindDevice();
@@ -333,6 +354,15 @@ export class VeepooSDK implements VeepooSDKInterface {
 
   startEcgTest(options?: EcgTestOptions): Promise<void> { return this.realtimeTests.startEcgTest(options); }
   stopEcgTest = (): Promise<void> => this.realtimeTests.stopEcgTest();
+
+  readSportMode = (): Promise<SportModeStatus> => this.sportMode.readSportMode();
+  setSportMode = (mode: SportMode): Promise<OperationStatus> => this.sportMode.setSportMode(mode);
+  stopSportMode = (): Promise<OperationStatus> => this.sportMode.stopSportMode();
+
+  renameDevice = (name: string): Promise<OperationStatus> => this.session.renameDevice(name);
+  isConnectionConfirmEnabled = (): Promise<boolean> => this.session.isConnectionConfirmEnabled();
+  setConnectionConfirmEnabled = (enabled: boolean): Promise<OperationStatus> => this.session.setConnectionConfirmEnabled(enabled);
+  setConnectionConfirmTimeout = (seconds: number): Promise<OperationStatus> => this.session.setConnectionConfirmTimeout(seconds);
 }
 
 const sdk = new VeepooSDK();

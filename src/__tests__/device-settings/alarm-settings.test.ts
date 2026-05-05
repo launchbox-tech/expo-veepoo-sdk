@@ -120,4 +120,51 @@ describe('AlarmsCapability', () => {
     ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
     expect(native.setHeartRateAlarm).not.toHaveBeenCalled();
   });
+
+  // ── readSpo2Alarm ─────────────────────────────────────────────────────────
+
+  it('readSpo2Alarm normalizes and emits spo2_alarm_data', async () => {
+    const emitSpy = jest.spyOn(runtime, 'emitLocal');
+
+    const result = await alarmSettings.readSpo2Alarm();
+
+    expect(native.readSpo2Alarm).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ enabled: false, low_threshold: 90 });
+    expect(emitSpy).toHaveBeenCalledWith(
+      'spo2_alarm_data',
+      expect.objectContaining({
+        data: expect.objectContaining({ enabled: false, low_threshold: 90 }),
+      }),
+    );
+  });
+
+  // ── setSpo2Alarm ──────────────────────────────────────────────────────────
+
+  it('setSpo2Alarm delegates and emits spo2_alarm_data', async () => {
+    const emitSpy = jest.spyOn(runtime, 'emitLocal');
+    const alarm = { enabled: true, low_threshold: 85 };
+
+    const result = await alarmSettings.setSpo2Alarm(alarm);
+
+    expect(native.setSpo2Alarm).toHaveBeenCalledWith({ enabled: true, lowThreshold: 85 });
+    expect(result).toBe('success');
+    expect(emitSpy).toHaveBeenCalledWith(
+      'spo2_alarm_data',
+      expect.objectContaining({ data: alarm }),
+    );
+  });
+
+  it('setSpo2Alarm with low_threshold: 0 throws INVALID_ARGUMENT', async () => {
+    await expect(
+      alarmSettings.setSpo2Alarm({ enabled: true, low_threshold: 0 }),
+    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+    expect(native.setSpo2Alarm).not.toHaveBeenCalled();
+  });
+
+  it('setSpo2Alarm with low_threshold: 100 throws INVALID_ARGUMENT', async () => {
+    await expect(
+      alarmSettings.setSpo2Alarm({ enabled: true, low_threshold: 100 }),
+    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+    expect(native.setSpo2Alarm).not.toHaveBeenCalled();
+  });
 });

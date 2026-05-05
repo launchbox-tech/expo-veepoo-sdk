@@ -1,4 +1,4 @@
-import type { DeviceAlarm, HeartRateAlarm } from "@/types/index";
+import type { DeviceAlarm, HeartRateAlarm, Spo2Alarm } from "@/types/index";
 import { requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
 
 export function validateAlarm(alarm: DeviceAlarm): void {
@@ -28,4 +28,8 @@ export function validateHeartRateAlarm(alarm: HeartRateAlarm): void {
   if (alarm.high_threshold <= alarm.low_threshold) {
     throw { code: 'INVALID_ARGUMENT', message: 'highThreshold must be greater than lowThreshold' };
   }
+}
+
+export function validateSpo2Alarm(alarm: Spo2Alarm): void {
+  requireInRange(alarm.low_threshold, 'low_threshold', 1, 99);
 }
