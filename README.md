@@ -128,7 +128,7 @@ All hooks must be called inside `<VeepooSDKProvider>`.
 
 | Hook | Returns | Description |
 | --- | --- | --- |
-| `useVeepooSDK()` | `{ sdk, error }` | Access the SDK instance for imperative calls |
+| `useVeepooSDK()` | `{ sdk, status, error }` | SDK instance, current state snapshot, and last error |
 | `useSDKState(selector)` | `T` | Reactive selector over the SDK state snapshot |
 | `useIsSessionReady()` | `boolean` | `true` when connected and Band is ready |
 | `useIsConnected()` | `boolean` | `true` when BLE connection is established |
@@ -159,17 +159,19 @@ type SDKStateSnapshot = {
 
 ### Accessing the SDK
 
-Use `useVeepooSDK()` to get the SDK instance for any imperative call:
+Use `useVeepooSDK()` to get the SDK instance and current state for any imperative call:
 
 ```tsx
 import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
 
 function ScanButton() {
-  const { sdk } = useVeepooSDK();
+  const { sdk, status } = useVeepooSDK();
   return (
     <Button
-      title="Scan"
-      onPress={() => sdk.discovery.startScan()}
+      title={status.isScanning ? 'Stop' : 'Scan'}
+      onPress={() =>
+        status.isScanning ? sdk.discovery.stopScan() : sdk.discovery.startScan()
+      }
     />
   );
 }
