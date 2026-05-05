@@ -1,4 +1,6 @@
 import type {
+  BloodAnalysisTestResult,
+  BloodAnalysisValues,
   BloodGlucoseData,
   BloodOxygenTestResult,
   BloodPressureTestResult,
@@ -7,8 +9,10 @@ import type {
   BreathingTestResult,
   EcgTestResult,
   FatigueTestResult,
+  GsrTestResult,
   HeartRateTestResult,
   HrvTestResult,
+  PttTestResult,
   StressData,
   TemperatureTestResult,
 } from "@/types/index";
@@ -189,5 +193,50 @@ export function normalizeBloodGlucoseData(value: unknown): BloodGlucoseData {
     timestamp: toInt(record.timestamp, Date.now()),
     is_end: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
     error: toStringValue(record.error),
+  };
+}
+
+export function normalizeGsrTestResult(value: unknown): GsrTestResult {
+  const record = isRecord(value) ? value : {};
+  const elRaw = record.emotionLevel ?? record.emotion_level;
+  return {
+    state: normalizeTestState(record.state),
+    progress: toInt(record.progress) ?? 0,
+    emotion_level: elRaw != null ? toInt(elRaw) : null,
+    skin_moisture: toNumber(record.skinMoisture ?? record.skin_moisture) ?? null,
+    sns_activation: toNumber(record.snsActivation ?? record.sns_activation) ?? null,
+    cortisol_value: toNumber(record.cortisolValue ?? record.cortisol_value) ?? null,
+  };
+}
+
+function normalizeBloodAnalysisValues(value: unknown): BloodAnalysisValues | null {
+  if (!isRecord(value)) return null;
+  const r = value;
+  return {
+    uric_acid: toNumber(r.uricAcid ?? r.uric_acid) ?? 0,
+    total_cholesterol: toNumber(r.totalCholesterol ?? r.total_cholesterol) ?? 0,
+    triglyceride: toNumber(r.triglyceride) ?? 0,
+    high_density_lipoprotein: toNumber(r.highDensityLipoprotein ?? r.high_density_lipoprotein) ?? 0,
+    low_density_lipoprotein: toNumber(r.lowDensityLipoprotein ?? r.low_density_lipoprotein) ?? 0,
+  };
+}
+
+export function normalizeBloodAnalysisTestResult(value: unknown): BloodAnalysisTestResult {
+  const record = isRecord(value) ? value : {};
+  return {
+    state: normalizeTestState(record.state),
+    progress: toInt(record.progress) ?? 0,
+    values: isRecord(record.values) ? normalizeBloodAnalysisValues(record.values) : null,
+  };
+}
+
+export function normalizePttTestResult(value: unknown): PttTestResult {
+  const record = isRecord(value) ? value : {};
+  return {
+    heart_rate: toInt(record.heartRate ?? record.heart_rate) ?? 0,
+    hrv: toInt(record.hrv) ?? 0,
+    qt_interval: toInt(record.qtInterval ?? record.qt_interval) ?? 0,
+    signal_quality: toInt(record.signalQuality ?? record.signal_quality) ?? 0,
+    progress: toInt(record.progress) ?? 0,
   };
 }

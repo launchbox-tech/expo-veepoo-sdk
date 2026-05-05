@@ -25,6 +25,7 @@ import {
 import { normalizeSleepDataList } from '@/capabilities/sleep-data/normalizers';
 import { normalizeSportStepData } from '@/capabilities/sport-steps/normalizers';
 import {
+  normalizeBloodAnalysisTestResult,
   normalizeBloodGlucoseData,
   normalizeBloodOxygenTestResult,
   normalizeBloodPressureTestResult,
@@ -32,8 +33,10 @@ import {
   normalizeBreathingTestResult,
   normalizeEcgTestResult,
   normalizeFatigueTestResult,
+  normalizeGsrTestResult,
   normalizeHeartRateTestResult,
   normalizeHrvTestResult,
+  normalizePttTestResult,
   normalizeStressData,
   normalizeTemperatureTestResult,
 } from '@/capabilities/realtime-tests/normalizers';
@@ -93,9 +96,24 @@ const EVENT_NORMALIZERS: {
   custom_settings_data: (raw) => raw as VeepooEventPayload['custom_settings_data'],
   health_remind_data: (raw) => raw as VeepooEventPayload['health_remind_data'],
   apnea_remind_data: (raw) => raw as VeepooEventPayload['apnea_remind_data'],
-  sport_mode_data: (raw) => raw as VeepooEventPayload['sport_mode_data'],
-  blood_analysis_test_result: (raw) => raw as VeepooEventPayload['blood_analysis_test_result'],
-  gsr_test_result: (raw) => raw as VeepooEventPayload['gsr_test_result'],
+  sport_mode_data: (raw) => {
+    const p = isRecord(raw) ? raw : {};
+    const rawMode = p.mode;
+    // Native sends camelCase e.g. "outdoorRun"; TypeScript SportMode is snake_case "outdoor_run"
+    const mode =
+      typeof rawMode === 'string' && rawMode !== '' && rawMode !== 'common'
+        ? (rawMode.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`) as VeepooEventPayload['sport_mode_data']['mode'])
+        : null;
+    return { ...p, mode } as VeepooEventPayload['sport_mode_data'];
+  },
+  blood_analysis_test_result: (raw) => {
+    const p = isRecord(raw) ? raw : {};
+    return { ...p, result: normalizeBloodAnalysisTestResult(p.result) } as VeepooEventPayload['blood_analysis_test_result'];
+  },
+  gsr_test_result: (raw) => {
+    const p = isRecord(raw) ? raw : {};
+    return { ...p, result: normalizeGsrTestResult(p.result) } as VeepooEventPayload['gsr_test_result'];
+  },
   exercise_session_data: (raw) => raw as VeepooEventPayload['exercise_session_data'],
   accurate_sleep_data: (raw) => raw as VeepooEventPayload['accurate_sleep_data'],
   stored_temperature_data: (raw) => raw as VeepooEventPayload['stored_temperature_data'],
@@ -103,7 +121,10 @@ const EVENT_NORMALIZERS: {
   stored_hrv_data: (raw) => raw as VeepooEventPayload['stored_hrv_data'],
   stored_ecg_data: (raw) => raw as VeepooEventPayload['stored_ecg_data'],
   stored_body_composition_data: (raw) => raw as VeepooEventPayload['stored_body_composition_data'],
-  ptt_test_result: (raw) => raw as VeepooEventPayload['ptt_test_result'],
+  ptt_test_result: (raw) => {
+    const p = isRecord(raw) ? raw : {};
+    return { ...p, result: normalizePttTestResult(p.result) } as VeepooEventPayload['ptt_test_result'];
+  },
   ptt_state_changed: (raw) => raw as VeepooEventPayload['ptt_state_changed'],
   error: (raw) => raw as VeepooEventPayload['error'],
 
