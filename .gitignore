@@ -169,6 +169,9 @@ pnpm-lock.yaml
 # Local tooling venvs (e.g. vendor_snapshot_translate.py)
 .venv-translate/
 
+# Upstream SDK snapshots (fetched at CI time via scripts/fetch-sdk-snapshots.sh)
+vendor-sdk-snapshots/
+
 # Environment files
 .env
 .env.*

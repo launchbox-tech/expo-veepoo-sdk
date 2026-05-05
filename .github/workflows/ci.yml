@@ -48,6 +48,30 @@ jobs:
       - name: Verify vendor manifest
         run: bun run vendor:check
 
+      - name: Compute SDK snapshot cache keys
+        id: sdk-keys
+        run: |
+          echo "android=$(node -e "const m=require('./vendor-manifest.json'); process.stdout.write(m.upstreamReference.androidBleSdk.lastReviewedHeadSha)")" >> $GITHUB_OUTPUT
+          echo "ios=$(node -e "const m=require('./vendor-manifest.json'); process.stdout.write(m.upstreamReference.iosBleSdk.lastReviewedHeadSha)")" >> $GITHUB_OUTPUT
+
+      - name: Cache Android SDK snapshot
+        uses: actions/cache@v5
+        with:
+          path: vendor-sdk-snapshots/android/
+          key: android-sdk-${{ steps.sdk-keys.outputs.android }}
+
+      - name: Cache iOS SDK snapshot
+        uses: actions/cache@v5
+        with:
+          path: vendor-sdk-snapshots/ios/
+          key: ios-sdk-${{ steps.sdk-keys.outputs.ios }}
+
+      - name: Fetch SDK snapshots
+        run: bash scripts/fetch-sdk-snapshots.sh
+
+      - name: Verify upstream SDK coverage
+        run: node build/bridge-contract/cli-check-upstream-sdk.js
+
       - name: Test with coverage
         run: bun run test:coverage
         env:

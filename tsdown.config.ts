@@ -1,7 +1,11 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/plugin/index.ts'],
+  entry: [
+    'src/index.ts',
+    'src/plugin/index.ts',
+    'src/bridge-contract/cli-check-upstream-sdk.ts',
+  ],
   format: 'cjs',
   outDir: 'build',
   dts: false,

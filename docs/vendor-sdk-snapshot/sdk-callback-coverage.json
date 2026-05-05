@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "description": "Authoritative map of upstream HBandSDK native callbacks to the TS NATIVE_EMITTED_EVENTS they produce. Maintained manually; update when vendor-manifest.json SHAs change. Contract test (verify-upstream-sdk-coverage.ts) validates this against NATIVE_EMITTED_EVENTS.",
+  "androidSdkSha": "9fcada5278340881340021fce70c4b984e783d3c",
+  "iosSdkSha": "77c8a4b321d041574014e306a1283ab252d196ce",
+
+  "events": {
+    "deviceFound": {
+      "android": { "via": "VPOperateManager scan result callback (SearchResponse.onDeviceFounded)" },
+      "ios":     { "via": "VPBleCentralManage scan result block (peripheral discovered)" }
+    },
+    "deviceConnected": {
+      "android": { "via": "IABleConnectStatusListener.onConnectStatusChanged STATUS_CONNECTED" },
+      "ios":     { "via": "VPBleConnectStateChangeBlock VPDeviceConnectStateConnect" }
+    },
+    "deviceDisconnected": {
+      "android": { "via": "IABleConnectStatusListener.onConnectStatusChanged STATUS_DISCONNECTED" },
+      "ios":     { "via": "VPBleConnectStateChangeBlock VPDeviceConnectStateDisConnect" }
+    },
+    "deviceConnectStatus": {
+      "android": { "via": "IConnectResponse.connectState intermediate codes" },
+      "ios":     { "via": "VPBleConnectStateChangeBlock all intermediate states" }
+    },
+    "deviceReady": {
+      "android": { "via": "IPwdDataListener.onPwdDataChange (CHECK_SUCCESS triggers deviceReady)" },
+      "ios":     { "via": "VPBleConnectStateChangeBlock VPDeviceConnectStateVerifyPasswordSuccess" }
+    },
+    "bluetoothStateChanged": {
+      "android": { "via": "IABluetoothStateListener.onBluetoothStateChanged" },
+      "ios":     { "via": "VPBleCentralManageChangeBlock (VPCentralManagerState enum)" }
+    },
+    "connectionStatusChanged": {
+      "android": { "via": "IABleConnectStatusListener.onConnectStatusChanged (all state changes)" },
+      "ios":     { "via": "VPBleConnectStateChangeBlock (all state changes)" }
+    },
+    "passwordData": {
+      "android": { "via": "IPwdDataListener.onPwdDataChange (full PwdData object)" },
+      "ios":     { "via": "VPBleConnectStateChangeBlock (password verify state + peripheral model fields)" }
+    },
+    "deviceFunction": {
+      "android": { "via": "IDeviceFuctionDataListener.onFunctionSupportDataChange / onDeviceFunctionPackage1-5Report" },
+      "ios":     { "via": "VPHealthFunctionModel / VPPeripheralManage device function read blocks" }
+    },
+    "deviceVersion": {
+      "android": { "via": "VPOperateManager readDeviceAllInfo (firmware version fields in DeviceVersion)" },
+      "ios":     { "via": "VPPeripheralManage device info read block (firmwareVersion, model)" }
+    },
+    "socialMsgData": {
+      "android": { "via": "ISocialMsgDataListener.onSocialMsgSupportDataChange" },
+      "ios":     { "via": "VPDeviceMessageTypeModel read/set result block" }
+    },
+    "heartRateTestResult": {
+      "android": { "via": "IHeartDataListener.onDataChange(HeartData)" },
+      "ios":     { "via": "veepooSDKTestHeartStart:testResult: block (VPTestHeartState, heartValue)" }
+    },
+    "bloodPressureTestResult": {
+      "android": { "via": "IBPDetectDataListener.onDataChange(BpData)" },
+      "ios":     { "via": "veepooSDKTestBloodStart:testMode:testResult: block (VPTestBloodState, high, low)" }
+    },
+    "bloodOxygenTestResult": {
+      "android": { "via": "ISpo2hDataListener.onSpO2HADataChange(Spo2hData)" },
+      "ios":     { "via": "veepooSDKTestOxygenStart:testResult: block (VPTestOxygenState, oxygenValue)" }
+    },
+    "temperatureTestResult": {
+      "android": { "via": "ITemptureDetectDataListener.onDataChange(TemptureDetectData)" },
+      "ios":     { "via": "veepooSDK_temperatureTestStart:result: block (VPTemperatureTestState, tempValue)" }
+    },
+    "stressData": {
+      "android": { "via": "IFatigueDataListener.onFatigueDataListener(FatigueData) [stress field]" },
+      "ios":     { "via": "veepooSDK_stressTestStart:result: block (VPDeviceStressTestState, stress)" }
+    },
+    "bloodGlucoseData": {
+      "android": { "via": "IBloodGlucoseChangeListener.onBloodGlucoseDetect(progress, bloodGlucose)" },
+      "ios":     { "via": "veepooSDKTestBloodGlucoseStart:isPersonalModel:testResult: block" }
+    },
+    "hrvTestResult": {
+      "android": { "via": "IHRVOriginDataListener.onHRVOriginListener(HRVOriginData) [real-time]" },
+      "ios":     { "via": "veepooSDK_HRVTest:callBack: block (VPTestHRVState, hrvValue)" }
+    },
+    "ecgTestResult": {
+      "android": { "via": "IECGDetectListener.onEcgDetectStateChange / onEcgDetectResultChange" },
+      "ios":     { "via": "veepooSDKTestECGStart:testResult: block (VPTestECGState, VPECGTestDataModel)" }
+    },
+    "fatigueTestResult": {
+      "android": { "via": "IFatigueDataListener.onFatigueDataListener(FatigueData) [fatigue field]" },
+      "ios":     { "via": "veepooSDKTestFatigueStart:testResult: block (VPTestFatigueState, fatigueValue)" }
+    },
+    "breathingTestResult": {
+      "android": { "via": "IBreathDataListener.onDataChange(BreathData)" },
+      "ios":     { "via": "veepooSDKTestBreathingRateStart:testResult: block (VPTestBreathingRateState, value)" }
+    },
+    "bodyCompositionTestResult": {
+      "android": { "via": "body composition result listener (VPOperateManager startBodyCompositionTest)" },
+      "ios":     { "via": "veepooSDKTestBodyCompositionStart:progress:testResult: block (VPDeviceBodyCompositionState)" }
+    },
+    "bloodAnalysisTestResult": {
+      "android": { "via": "ILightDataCallBack.onGreenLightDataChange / blood analysis result callback" },
+      "ios":     { "via": "veepooSDKTestBloodAnalysisStart:isPersonalModel:progress:testResult: block (VPDeviceBloodAnalysisState)" }
+    },
+    "gsrTestResult": {
+      "android": { "via": "GSR/electrodermal result listener (VPOperateManager startGSRTest)" },
+      "ios":     { "via": "veepooSDKTestGSRStart:progress:testResult: block (VPDeviceGSRState, VPGSRResultModel)" }
+    },
+    "pttTestResult": {
+      "android": { "via": "IPttDetectListener (extends IECGDetectListener + IPttModelStateListener)" },
+      "ios":     { "via": "veepooSDKPTTTest:valueBlock:signalBlock: (VPPttValueModel)" }
+    },
+    "pttStateChanged": {
+      "android": { "via": "IPttModelStateListener.inPttModel / outPttModel" },
+      "ios":     { "via": "veepooSDKAddPTTStateListener: block (pttState integer)" }
+    },
+    "readOriginProgress": {
+      "android": { "via": "IOriginProgressListener.onReadOriginProgress / onReadOriginProgressDetail" },
+      "ios":     { "via": "VPReadDeviceBaseDataState progress in veepooSdkStartReadDeviceAllDataWithReadStateChangeBlock:" }
+    },
+    "readOriginComplete": {
+      "android": { "via": "IOriginProgressListener.onReadOriginComplete" },
+      "ios":     { "via": "VPReadDeviceBaseDataState Complete in veepooSdkStartReadDeviceAllDataWithReadStateChangeBlock:" }
+    },
+    "originFiveMinuteData": {
+      "android": { "via": "IOriginDataListener.onOringinFiveMinuteDataChange(OriginData)" },
+      "ios":     { "via": "veepooSdkStartReadDeviceAllDataWithReadStateChangeBlock: origin 5-min data callback" }
+    },
+    "originHalfHourData": {
+      "android": { "via": "IOriginDataListener.onOringinHalfHourDataChange(OriginHalfHourData)" },
+      "ios":     { "via": "veepooSdkStartReadDeviceAllDataWithReadStateChangeBlock: half-hour data callback" }
+    },
+    "originSpo2Data": {
+      "android": { "via": "IOriginData3Listener.onOriginSpo2OriginListDataChange(List<Spo2hOriginData>)" },
+      "ios":     { "via": "veepooSdkStartReadDeviceOxygenData: Spo2 origin list callback" }
+    },
+    "sleepData": {
+      "android": { "via": "ISleepDataListener.onSleepDataChange(day, SleepData)" },
+      "ios":     { "via": "veepooSdkStartReadDeviceAllDataWithReadStateChangeBlock: sleep data callback" }
+    },
+    "accurateSleepData": {
+      "android": { "via": "ISleepDataListener (precision sleep via readPrecisionSleepData)" },
+      "ios":     { "via": "VPAccurateSleepModel read result block (VPPeripheralAddManage)" }
+    },
+    "sportStepData": {
+      "android": { "via": "ISportDataListener.onSportDataChange(SportData)" },
+      "ios":     { "via": "veepooSdkStartReadDeviceAllDataWithReadStateChangeBlock: step/sport data callback" }
+    },
+    "exerciseSessionData": {
+      "android": { "via": "ISportModelOriginListener.onItemChangeListListener(List<SportModelOriginItemData>)" },
+      "ios":     { "via": "veepooSDKStartReadDeviceRunningData: running/exercise data callback" }
+    },
+    "sportModeData": {
+      "android": { "via": "ISportModelStateListener.onSportModelStateChange(SportModelStateData)" },
+      "ios":     { "via": "veepooSDK_deviceSportRunninStateSubscribe: block (VPSportControlRunState)" }
+    },
+    "batteryData": {
+      "android": { "via": "IBatteryDataListener.onDataChange(BatteryData)" },
+      "ios":     { "via": "veepooSDKReadDeviceBatteryAndChargeInfo: block (battery, VPDeviceChargeState)" }
+    },
+    "alarmData": {
+      "android": { "via": "IAlarm2DataListListener.onAlarmDataChangeListListener(AlarmData2)" },
+      "ios":     { "via": "veepooSDKSettingDeviceNewAlarm...successResult: block (NSArray alarmArray)" }
+    },
+    "findDeviceState": {
+      "android": { "via": "IFindDevicelistener.findedDevice / unFindDevice / findingDevice" },
+      "ios":     { "via": "VPPeripheralManage find device result block (VPSettingFunctionCompleteState)" }
+    },
+    "firmwareDfuProgress": {
+      "android": { "via": "OAD DFU listener OnUpdateCheckListener.onDownLoadOadFile / OnFindOadDeviceListener" },
+      "ios":     { "via": "DeviceDFUBlock (progress: Double, deviceDFUState: DeviceDFUState) in VPDFUOperation.h" }
+    },
+    "contactsData": {
+      "android": { "via": "IContactOptListener.onContactReadSuccess(List<Contact>)" },
+      "ios":     { "via": "veepooSDKSettingDeviceContacts...resultBlock: (VPDeviceContactsOpState, NSArray<VPDeviceContactsModel>)" }
+    },
+    "sosCallTimesData": {
+      "android": { "via": "ISOSCallTimesListener.onSOSCallTimesReadSuccess(times, minTimes, maxTimes)" },
+      "ios":     { "via": "SOS call times read result block (times, minTimes, maxTimes)" }
+    },
+    "cameraShutter": {
+      "android": { "via": "ICameraDataListener.OnCameraDataChange(ECameraStatus)" },
+      "ios":     { "via": "veepooSDKSettingCameraType:settingAndMonitorResult: block (VPCameraType)" }
+    },
+    "musicRemoteCommand": {
+      "android": { "via": "IMusicControlListener.nextMusic / previousMusic / pauseAndPlayMusic / voiceUp / voiceDown" },
+      "ios":     { "via": "Music control blocks on VPPeripheralBaseManage (next/prev/play/pause/volume)" }
+    },
+    "deviceBTStateChanged": {
+      "android": { "via": "IDeviceBTConnectionListener.onDeviceBTConnected / onDeviceBTDisconnected / onDeviceBTConnecting" },
+      "ios":     { "via": "VPBTConnectStateChangeBlock (VPDeviceBTState: disconnect/connected/advertising)" }
+    },
+    "deviceSosTriggered": {
+      "android": { "via": "ISOSListener.sos()" },
+      "ios":     { "via": "ReceiveDeviceSOSCommand block on VPPeripheralBaseManage" }
+    },
+    "customSettingsData": {
+      "android": { "via": "ICustomSettingDataListener.OnSettingDataChange(CustomSettingData)" },
+      "ios":     { "via": "VPPeripheralManage custom setting read/report block" }
+    },
+    "healthRemindData": {
+      "android": { "via": "IHealthRemindListener.onHealthRemindReport(HealthRemind)" },
+      "ios":     { "via": "veepooSDKSettingHealthRemind...deviceInfoDidChangeBlock: (VPDeviceHealthRemindModel)" }
+    },
+    "apneaRemindData": {
+      "android": { "via": "ISpo2hBreathBreakRemainListener.onSpo2hBreathBreakRemainDataChange(BreathBreakRemindData)" },
+      "ios":     { "via": "veepooSDKSettingOxygenApneaRemind...successResult: (VPOxygenApneaRemindModel)" }
+    },
+    "storedTemperatureData": {
+      "android": { "via": "ITemptureDataListener.onTemptureDataListDataChange(List<TemptureData>)" },
+      "ios":     { "via": "veepooSdkStartReadDeviceTemperatureData: temperature list callback" }
+    },
+    "storedBloodGlucoseData": {
+      "android": { "via": "IBloodGlucoseChangeListener historical read callback (startReadBloodGlucoseHistory)" },
+      "ios":     { "via": "VPMultiBloodGlucoseModel historical read result block (VPPeripheralAddManage)" }
+    },
+    "storedHrvData": {
+      "android": { "via": "IHRVOriginDataListener.onHRVOriginListener (readHRVData)" },
+      "ios":     { "via": "veepooSdkStartReadDeviceHrvData: HRV stored data callback (VPRRIntervalDataModel)" }
+    },
+    "storedEcgData": {
+      "android": { "via": "IECGReadDataListener.readDataFinish(List<EcgDetectResult>)" },
+      "ios":     { "via": "VPECGTestResutHandle read result block (List of ECG results)" }
+    },
+    "storedBodyCompositionData": {
+      "android": { "via": "body composition history read callback (VPOperateManager readBodyCompositionHistory)" },
+      "ios":     { "via": "VPTCMTestDataModel / body composition history result block (VPPeripheralAddManage)" }
+    },
+    "error": {
+      "android": { "via": "VPOperateManager error state callbacks / native module exception mapping" },
+      "ios":     { "via": "Native module exception mapping (VeepooSDK.swift error path)" }
+    }
+  },
+
+  "notBridged": {
+    "description": "Upstream SDK callbacks intentionally NOT mapped to TS events. Logged here so drift reviews know these omissions are deliberate.",
+    "android": [
+      { "interface": "IGpsLatLonDataListener",          "reason": "GPS coordinates sent from app to device, not from device to app" },
+      { "interface": "IReportGpsDataListener",          "reason": "Device-initiated GPS request handled inline, no JS event needed" },
+      { "interface": "IKnocknotifyListener",            "reason": "Tap/knock gesture not exposed in this module" },
+      { "interface": "IMusicDataListener",              "reason": "Music metadata push to device; musicRemoteCommand covers app←device direction" },
+      { "interface": "IFindPhonelistener",              "reason": "Find-phone buzzer is app-side vibration, handled via OS notification" },
+      { "interface": "ICheckWearDataListener",          "reason": "Wear-detect setting read; not a real-time event" },
+      { "interface": "IScreenLightListener",            "reason": "Screen brightness is a write-only setting from app side" },
+      { "interface": "IScreenLightTimeListener",        "reason": "Screen duration setting; read result only" },
+      { "interface": "ILongSeatDataListener",           "reason": "Sedentary reminder read/write result; not a push event" },
+      { "interface": "INightTurnWristeDataListener",    "reason": "Raise-to-wake setting; read/write result only" },
+      { "interface": "IWeatherStatusDataListener",      "reason": "Weather push acknowledgement only; no JS event needed" },
+      { "interface": "ILanguageDataListener",           "reason": "Language setting acknowledgement; write-only from app" },
+      { "interface": "ILowPowerListener",               "reason": "Low-power mode setting; batteryData covers battery state" },
+      { "interface": "ICountDownListener",              "reason": "Countdown timer setting; not a real-time event" },
+      { "interface": "IAllSetDataListener",             "reason": "Combined device settings dump; covered by individual events" },
+      { "interface": "IMtuChangeListener",              "reason": "MTU negotiation is internal BLE bookkeeping" },
+      { "interface": "IScreenStyleListener",            "reason": "Screen style (dial layout) read result; no push event" },
+      { "interface": "IPersonInfoDataListener",         "reason": "Personal info sync acknowledgement; write-only from app" },
+      { "interface": "IWomenDataListener",              "reason": "Women health setting read/write result; no push event" },
+      { "interface": "IDrinkDataListener",              "reason": "Drink reminder data; not currently surfaced in module" },
+      { "interface": "IECGSwitchListener",              "reason": "ECG always-on switch state; setting result only" },
+      { "interface": "IECGReadIdListener",              "reason": "Internal ECG record ID management" },
+      { "interface": "IECGLightDataCallback",           "reason": "Raw ECG ADC bytes; storedEcgData covers processed results" },
+      { "interface": "IECGAutoReportListener",          "reason": "ECG always-on raw data stream; not exposed in module" },
+      { "interface": "ISpo2hOriginDataListener",        "reason": "Raw SpO2 origin stream; originSpo2Data covers the used data" },
+      { "interface": "IAutoDetectOriginDataListener",   "reason": "30-min auto-detect origin; covered by originFiveMinuteData/originHalfHourData" },
+      { "interface": "IRRIntervalProgressListener",     "reason": "RR-interval reader; storedHrvData covers the result" },
+      { "interface": "IDeviceRenameListener",           "reason": "Device name write acknowledgement; no push event" },
+      { "interface": "IDeviceBTInfoListener",           "reason": "BT classic info; deviceBTStateChanged covers connection state" },
+      { "interface": "IBPSettingDataListener",          "reason": "BP setting (ambulatory) result; not a real-time push" },
+      { "interface": "IBPFunctionListener",             "reason": "BP function support flags; covered by deviceFunction" },
+      { "interface": "IAllHealthDataListener",          "reason": "Combined read wrapper; individual events cover each data type" },
+      { "interface": "ISportModelOriginListener.onHeadChangeListListener", "reason": "GPS track header; exerciseSessionData covers item data" }
+    ],
+    "ios": [
+      { "method": "ReceiveDeviceSearchIphoneCommand",        "reason": "Find-phone direction is device→app OS notification" },
+      { "method": "ReceiveTapDeviceAlarm",                   "reason": "Tap/knock gesture not exposed in this module" },
+      { "method": "ReceiveGreenLightData",                   "reason": "Raw 50 Hz PPG bytes; processed results covered by test events" },
+      { "method": "deviceFunctionSwitchDidChangeBlock",      "reason": "Device-side switch proactive report; deviceFunction covers read" },
+      { "method": "deviceTestOffStoreECGDidFinishBlock",     "reason": "Offline ECG storage done; storedEcgData covers the result read" },
+      { "method": "deviceTestBodyCompositionDidFinishBlock", "reason": "Offline body composition done; storedBodyCompositionData covers read" },
+      { "method": "deviceSportDidFinishBlock",               "reason": "Sport session end; exerciseSessionData covers the data" },
+      { "method": "veepooSDKSettingDeviceAlarm",             "reason": "Alarm write result; alarmData covers read events" },
+      { "method": "veepooSDKSettingDeviceLongSeat",          "reason": "Sedentary reminder setting result; no push event" },
+      { "method": "veepooSDKSettingDeviceHeartAlarm",        "reason": "HR alarm threshold setting result; no push event" },
+      { "method": "veepooSDKSettingRaiseHand",               "reason": "Raise-to-wake setting result; no push event" },
+      { "method": "veepooSDKSettingBright",                  "reason": "Screen brightness write result; no push event" },
+      { "method": "veepooSDKSettingDeviceFemale",            "reason": "Women health setting write result; no push event" },
+      { "method": "veepooSDKSettingBaseFunctionType",        "reason": "Base function toggle write result; no push event" },
+      { "method": "veepooSDKSettingMessageType",             "reason": "Social message type toggle; socialMsgData covers the state" },
+      { "method": "veepooSDKSettingDeviceName",              "reason": "Device rename write acknowledgement; no push event" },
+      { "method": "veepooSDKSettingCameraType enter/exit",   "reason": "Camera mode enter/exit feedback handled inline" },
+      { "method": "veepooSDKSettingAllDayOxygenTest",        "reason": "All-day SpO2 toggle write result; no push event" },
+      { "method": "veepooSDK_dialChannelWithChannelModel",   "reason": "Watch face OTA; firmwareDfuProgress covers OTA progress" },
+      { "method": "veepooSDK_sendGPSDataToDeviceWithBlock",  "reason": "GPS sent from app to device; not a device-push event" },
+      { "method": "VPECGMultiLeadBLEDelegate",               "reason": "Multi-lead ECG raw waveform; not exposed in this module" },
+      { "method": "veepooSDK_aiFuncOpusDataSubscribe",       "reason": "AI audio feature; not in module scope" },
+      { "method": "veepooSDK_QX17*",                         "reason": "QX17 sport sensor; model-specific, not in module scope" },
+      { "method": "veepooSDK_JH58*",                         "reason": "JH58 PPG raw data; model-specific, not in module scope" },
+      { "method": "veepooSDK_QH15*",                         "reason": "QH15 child guardian; model-specific, not in module scope" },
+      { "method": "veepooSDK_read4GDeviceConfigInfo",        "reason": "4G/cellular config; model-specific, not in module scope" },
+      { "method": "veepooSDKWorldClockDeviceDeleteSubscribe","reason": "World clock device-delete push; handled inline in world clock flow" },
+      { "method": "veepooSDKReadDisconnectOxygenData",       "reason": "Post-disconnect SpO2 batch read; originSpo2Data covers real-time" }
+    ]
+  }
+}
