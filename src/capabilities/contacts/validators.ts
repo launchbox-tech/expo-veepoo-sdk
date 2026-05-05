@@ -9,7 +9,7 @@ export function validateNewContact(contact: NewDeviceContact): void {
   if (new TextEncoder().encode(contact.name).byteLength > CONTACT_NAME_MAX_BYTES) {
     throw { code: 'INVALID_ARGUMENT', message: `name must not exceed ${CONTACT_NAME_MAX_BYTES} bytes` };
   }
-  const phoneNumber = contact.phone_number ?? (contact as any).phoneNumber;
+  const phoneNumber = contact.phone_number;
   if (typeof phoneNumber !== 'string' || phoneNumber.trim().length === 0) {
     throw { code: 'INVALID_ARGUMENT', message: 'phoneNumber is required' };
   }

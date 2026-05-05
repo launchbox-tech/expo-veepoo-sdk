@@ -21,8 +21,8 @@ const PERSONAL_INFO: PersonalInfo = {
   height: 175,
   weight: 70,
   age: 30,
-  stepAim: 8000,
-  sleepAim: 480,
+  step_aim: 8000,
+  sleep_aim: 480,
 };
 
 
@@ -47,7 +47,7 @@ describe('Session baseline helper', () => {
       const result = await runSessionBaseline(sdk, { personalInfo: PERSONAL_INFO });
 
       expect(native.syncPersonalInfo).toHaveBeenCalledTimes(1);
-      expect(native.syncPersonalInfo).toHaveBeenCalledWith(PERSONAL_INFO);
+      expect(native.syncPersonalInfo).toHaveBeenCalledWith({ sex: 1, height: 175, weight: 70, age: 30, stepAim: 8000, sleepAim: 480 });
       expect(native.readBattery).toHaveBeenCalledTimes(1);
       expect(native.readDeviceVersion).toHaveBeenCalledTimes(1);
       expect(result.personalInfoSynced).toBe(true);

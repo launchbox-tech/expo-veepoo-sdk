@@ -64,34 +64,34 @@ describe('validateConnectOptions', () => {
 
   it('throws when timeSetting.hour is out of range', () => {
     expectInvalidArgument(
-      () => validateConnectOptions({ timeSetting: { year: 2024, month: 1, day: 1, hour: 24, minute: 0, second: 0 } }),
+      () => validateConnectOptions({ time_setting: { year: 2024, month: 1, day: 1, hour: 24, minute: 0, second: 0 } }),
       'timeSetting.hour',
     );
   });
 
   it('throws when timeSetting.minute is out of range', () => {
     expectInvalidArgument(
-      () => validateConnectOptions({ timeSetting: { year: 2024, month: 1, day: 1, hour: 0, minute: 60, second: 0 } }),
+      () => validateConnectOptions({ time_setting: { year: 2024, month: 1, day: 1, hour: 0, minute: 60, second: 0 } }),
       'timeSetting.minute',
     );
   });
 
   it('throws when timeSetting.month is out of range', () => {
     expectInvalidArgument(
-      () => validateConnectOptions({ timeSetting: { year: 2024, month: 13, day: 1, hour: 0, minute: 0, second: 0 } }),
+      () => validateConnectOptions({ time_setting: { year: 2024, month: 13, day: 1, hour: 0, minute: 0, second: 0 } }),
       'timeSetting.month',
     );
   });
 
   it('passes for valid timeSetting', () => {
     expect(() =>
-      validateConnectOptions({ timeSetting: { year: 2024, month: 6, day: 15, hour: 10, minute: 30, second: 0 } })
+      validateConnectOptions({ time_setting: { year: 2024, month: 6, day: 15, hour: 10, minute: 30, second: 0 } })
     ).not.toThrow();
   });
 });
 
 describe('validatePersonalInfo', () => {
-  const valid = { sex: 1 as 0 | 1, height: 170, weight: 70, age: 30, stepAim: 8000, sleepAim: 480 };
+  const valid = { sex: 1 as 0 | 1, height: 170, weight: 70, age: 30, step_aim: 8000, sleep_aim: 480 };
 
   it('passes for valid info', () => {
     expect(() => validatePersonalInfo(valid)).not.toThrow();
@@ -125,20 +125,20 @@ describe('validatePersonalInfo', () => {
     expectInvalidArgument(() => validatePersonalInfo({ ...valid, age: 121 }), 'age');
   });
 
-  it('throws for stepAim below range', () => {
-    expectInvalidArgument(() => validatePersonalInfo({ ...valid, stepAim: 0 }), 'stepAim');
+  it('throws for step_aim below range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, step_aim: 0 }), 'stepAim');
   });
 
-  it('throws for stepAim above range', () => {
-    expectInvalidArgument(() => validatePersonalInfo({ ...valid, stepAim: 100_001 }), 'stepAim');
+  it('throws for step_aim above range', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, step_aim: 100_001 }), 'stepAim');
   });
 
-  it('passes for sleepAim = 0', () => {
-    expect(() => validatePersonalInfo({ ...valid, sleepAim: 0 })).not.toThrow();
+  it('passes for sleep_aim = 0', () => {
+    expect(() => validatePersonalInfo({ ...valid, sleep_aim: 0 })).not.toThrow();
   });
 
-  it('throws for sleepAim above 1440', () => {
-    expectInvalidArgument(() => validatePersonalInfo({ ...valid, sleepAim: 1_441 }), 'sleepAim');
+  it('throws for sleep_aim above 1440', () => {
+    expectInvalidArgument(() => validatePersonalInfo({ ...valid, sleep_aim: 1_441 }), 'sleepAim');
   });
 });
 
@@ -147,24 +147,24 @@ describe('validateAutoMeasureSetting', () => {
     expect(() => validateAutoMeasureSetting({})).not.toThrow();
   });
 
-  it('throws for measureInterval below 1', () => {
-    expectInvalidArgument(() => validateAutoMeasureSetting({ measureInterval: 0 }), 'measureInterval');
+  it('throws for measure_interval below 1', () => {
+    expectInvalidArgument(() => validateAutoMeasureSetting({ measure_interval: 0 }), 'measureInterval');
   });
 
-  it('throws for measureInterval above 120', () => {
-    expectInvalidArgument(() => validateAutoMeasureSetting({ measureInterval: 121 }), 'measureInterval');
+  it('throws for measure_interval above 120', () => {
+    expectInvalidArgument(() => validateAutoMeasureSetting({ measure_interval: 121 }), 'measureInterval');
   });
 
-  it('passes for valid measureInterval', () => {
-    expect(() => validateAutoMeasureSetting({ measureInterval: 30 })).not.toThrow();
+  it('passes for valid measure_interval', () => {
+    expect(() => validateAutoMeasureSetting({ measure_interval: 30 })).not.toThrow();
   });
 
-  it('throws for currentStartMinute above 1439', () => {
-    expectInvalidArgument(() => validateAutoMeasureSetting({ currentStartMinute: 1440 }), 'currentStartMinute');
+  it('throws for current_start_minute above 1439', () => {
+    expectInvalidArgument(() => validateAutoMeasureSetting({ current_start_minute: 1440 }), 'currentStartMinute');
   });
 
-  it('throws for currentEndMinute above 1439', () => {
-    expectInvalidArgument(() => validateAutoMeasureSetting({ currentEndMinute: 1440 }), 'currentEndMinute');
+  it('throws for current_end_minute above 1439', () => {
+    expectInvalidArgument(() => validateAutoMeasureSetting({ current_end_minute: 1440 }), 'currentEndMinute');
   });
 });
 
@@ -281,7 +281,7 @@ describe('validateSocialMsgData', () => {
 });
 
 describe('validateHeartRateAlarm', () => {
-  const valid = { enabled: true, highThreshold: 120, lowThreshold: 50 };
+  const valid = { enabled: true, high_threshold: 120, low_threshold: 50 };
 
   it('passes for a valid alarm', () => {
     expect(() => validateHeartRateAlarm(valid)).not.toThrow();
@@ -292,31 +292,31 @@ describe('validateHeartRateAlarm', () => {
   });
 
   it('throws for highThreshold of 0', () => {
-    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, highThreshold: 0 }), 'highThreshold');
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, high_threshold: 0 }), 'highThreshold');
   });
 
   it('throws for highThreshold of 301', () => {
-    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, highThreshold: 301 }), 'highThreshold');
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, high_threshold: 301 }), 'highThreshold');
   });
 
   it('throws for lowThreshold of 0', () => {
-    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, lowThreshold: 0 }), 'lowThreshold');
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, low_threshold: 0 }), 'lowThreshold');
   });
 
   it('throws for lowThreshold of 301', () => {
-    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, lowThreshold: 301 }), 'lowThreshold');
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, low_threshold: 301 }), 'lowThreshold');
   });
 
   it('throws when lowThreshold equals highThreshold', () => {
-    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, highThreshold: 100, lowThreshold: 100 }), 'highThreshold');
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, high_threshold: 100, low_threshold: 100 }), 'highThreshold');
   });
 
   it('throws when lowThreshold is greater than highThreshold', () => {
-    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, highThreshold: 50, lowThreshold: 120 }), 'highThreshold');
+    expectInvalidArgument(() => validateHeartRateAlarm({ ...valid, high_threshold: 50, low_threshold: 120 }), 'highThreshold');
   });
 
   it('passes at boundary values 1 and 300', () => {
-    expect(() => validateHeartRateAlarm({ enabled: true, highThreshold: 300, lowThreshold: 1 })).not.toThrow();
+    expect(() => validateHeartRateAlarm({ enabled: true, high_threshold: 300, low_threshold: 1 })).not.toThrow();
   });
 });
 
@@ -344,14 +344,14 @@ describe('validateDeviceTime', () => {
 
 describe('validateScreenLightSettings', () => {
   const valid = {
-    nightStartHour: 22,
-    nightStartMinute: 0,
-    nightEndHour: 7,
-    nightEndMinute: 0,
-    nightLevel: 2,
-    dayLevel: 4,
-    autoAdjust: false,
-    maxLevel: 5,
+    night_start_hour: 22,
+    night_start_minute: 0,
+    night_end_hour: 7,
+    night_end_minute: 0,
+    night_level: 2,
+    day_level: 4,
+    auto_adjust: false,
+    max_level: 5,
   };
 
   it('passes for a typical schedule', () => {
@@ -359,7 +359,7 @@ describe('validateScreenLightSettings', () => {
   });
 
   it('throws when maxLevel out of range', () => {
-    expectInvalidArgument(() => validateScreenLightSettings({ ...valid, maxLevel: 0 }), 'maxLevel');
+    expectInvalidArgument(() => validateScreenLightSettings({ ...valid, max_level: 0 }), 'maxLevel');
   });
 });
 
@@ -375,11 +375,11 @@ describe('validateScreenLightDurationSeconds', () => {
 
 describe('validateSedentaryReminderSettings', () => {
   const valid = {
-    startHour: 9,
-    startMinute: 0,
-    endHour: 18,
-    endMinute: 0,
-    thresholdMinutes: 60,
+    start_hour: 9,
+    start_minute: 0,
+    end_hour: 18,
+    end_minute: 0,
+    threshold_minutes: 60,
     enabled: true,
   };
 
@@ -389,7 +389,7 @@ describe('validateSedentaryReminderSettings', () => {
 
   it('throws when threshold below vendor minimum', () => {
     expectInvalidArgument(
-      () => validateSedentaryReminderSettings({ ...valid, thresholdMinutes: 20 }),
+      () => validateSedentaryReminderSettings({ ...valid, threshold_minutes: 20 }),
       'thresholdMinutes',
     );
   });
@@ -401,27 +401,27 @@ describe('validateReadWatchFaceStyleOptions', () => {
   });
 
   it('allows valid dialType', () => {
-    expect(() => validateReadWatchFaceStyleOptions({ dialType: 'market' })).not.toThrow();
+    expect(() => validateReadWatchFaceStyleOptions({ dial_type: 'market' })).not.toThrow();
   });
 
   it('rejects invalid dialType', () => {
-    expectInvalidArgument(() => validateReadWatchFaceStyleOptions({ dialType: 'x' as any }), 'dialType');
+    expectInvalidArgument(() => validateReadWatchFaceStyleOptions({ dial_type: 'x' as any }), 'dialType');
   });
 });
 
 describe('validateWatchFaceStyleSettings', () => {
   it('requires screenIndex in range', () => {
-    expect(() => validateWatchFaceStyleSettings({ screenIndex: 0 })).not.toThrow();
-    expectInvalidArgument(() => validateWatchFaceStyleSettings({ screenIndex: -1 }), 'screenIndex');
+    expect(() => validateWatchFaceStyleSettings({ screen_index: 0 })).not.toThrow();
+    expectInvalidArgument(() => validateWatchFaceStyleSettings({ screen_index: -1 }), 'screenIndex');
     expectInvalidArgument(
-      () => validateWatchFaceStyleSettings({ screenIndex: 66_000 }),
+      () => validateWatchFaceStyleSettings({ screen_index: 66_000 }),
       'screenIndex',
     );
   });
 
   it('validates optional dialType', () => {
     expectInvalidArgument(
-      () => validateWatchFaceStyleSettings({ screenIndex: 0, dialType: 'oops' as any }),
+      () => validateWatchFaceStyleSettings({ screen_index: 0, dial_type: 'oops' as any }),
       'dialType',
     );
   });
@@ -440,11 +440,11 @@ describe('validateFirmwareDfuFilePath', () => {
 describe('validateWristFlipWakeSettings', () => {
   const valid = {
     enabled: true,
-    startHour: 22,
-    startMinute: 0,
-    endHour: 8,
-    endMinute: 0,
-    sensitivityLevel: 5,
+    start_hour: 22,
+    start_minute: 0,
+    end_hour: 8,
+    end_minute: 0,
+    sensitivity_level: 5,
   };
 
   it('passes for typical night window', () => {
@@ -453,7 +453,7 @@ describe('validateWristFlipWakeSettings', () => {
 
   it('throws when sensitivity out of range', () => {
     expectInvalidArgument(
-      () => validateWristFlipWakeSettings({ ...valid, sensitivityLevel: 11 }),
+      () => validateWristFlipWakeSettings({ ...valid, sensitivity_level: 11 }),
       'sensitivityLevel',
     );
   });
@@ -464,9 +464,9 @@ describe('validateWomenHealthSettings', () => {
     expect(() =>
       validateWomenHealthSettings({
         status: 'menstrual',
-        lastMenstrualDate: '2026-04-01',
-        menstrualLengthDays: 5,
-        menstrualCycleDays: 28,
+        last_menstrual_date: '2026-04-01',
+        menstrual_length_days: 5,
+        menstrual_cycle_days: 28,
       }),
     ).not.toThrow();
   });
@@ -476,7 +476,7 @@ describe('validateWomenHealthSettings', () => {
       () =>
         validateWomenHealthSettings({
           status: 'pregnancy',
-          lastMenstrualDate: '2026-04-01',
+          last_menstrual_date: '2026-04-01',
         }),
       'expectedDeliveryDate',
     );
@@ -487,9 +487,9 @@ describe('validateWomenHealthSettings', () => {
       () =>
         validateWomenHealthSettings({
           status: 'menstrual',
-          lastMenstrualDate: '04-01-2026',
-          menstrualLengthDays: 5,
-          menstrualCycleDays: 28,
+          last_menstrual_date: '04-01-2026',
+          menstrual_length_days: 5,
+          menstrual_cycle_days: 28,
         }),
       'lastMenstrualDate',
     );
@@ -523,26 +523,26 @@ describe('validateWeatherData', () => {
 
   const validHourly = [{
     time: '2026-05-02 12:00',
-    tempC: 20,
-    tempF: 68,
-    weatherState: 5,
-    uvIndex: 3,
-    windLevel: '3-5',
-    visibilityM: 10000,
+    temp_c: 20,
+    temp_f: 68,
+    weather_state: 5,
+    uv_index: 3,
+    wind_level: '3-5',
+    visibility_m: 10000,
   }];
 
   const validDaily = [{
     date: '2026-05-02',
-    maxTempC: 25,
-    minTempC: 15,
-    maxTempF: 77,
-    minTempF: 59,
-    weatherStateDay: 0,
-    weatherStateNight: 0,
+    max_temp_c: 25,
+    min_temp_c: 15,
+    max_temp_f: 77,
+    min_temp_f: 59,
+    weather_state_day: 0,
+    weather_state_night: 0,
   }];
 
   const validData = {
-    cityName: 'Kathmandu',
+    city_name: 'Kathmandu',
     crc: 42,
     hourly: validHourly,
     daily: validDaily,
@@ -553,11 +553,11 @@ describe('validateWeatherData', () => {
   });
 
   it('throws when cityName is empty', () => {
-    expectInvalidArgument(() => validateWeatherData({ ...validData, cityName: '' }), 'cityName');
+    expectInvalidArgument(() => validateWeatherData({ ...validData, city_name: '' }), 'cityName');
   });
 
   it('throws when cityName is missing', () => {
-    expectInvalidArgument(() => validateWeatherData({ ...validData, cityName: '   ' }), 'cityName');
+    expectInvalidArgument(() => validateWeatherData({ ...validData, city_name: '   ' }), 'cityName');
   });
 
   it('throws for negative crc', () => {
@@ -578,7 +578,7 @@ describe('validateWeatherData', () => {
   });
 
   it('throws for weatherState out of range in hourly', () => {
-    const bad = [{ ...validHourly[0], weatherState: 200 }];
+    const bad = [{ ...validHourly[0], weather_state: 200 }];
     expectInvalidArgument(() => validateWeatherData({ ...validData, hourly: bad }), 'hourly[0].weatherState');
   });
 
@@ -588,12 +588,12 @@ describe('validateWeatherData', () => {
   });
 
   it('throws for weatherStateDay out of range in daily', () => {
-    const bad = [{ ...validDaily[0], weatherStateDay: 999 }];
+    const bad = [{ ...validDaily[0], weather_state_day: 999 }];
     expectInvalidArgument(() => validateWeatherData({ ...validData, daily: bad }), 'daily[0].weatherStateDay');
   });
 
   it('throws for negative visibilityM', () => {
-    const bad = [{ ...validHourly[0], visibilityM: -1 }];
+    const bad = [{ ...validHourly[0], visibility_m: -1 }];
     expectInvalidArgument(() => validateWeatherData({ ...validData, hourly: bad }), 'hourly[0].visibilityM');
   });
 });
@@ -601,31 +601,31 @@ describe('validateWeatherData', () => {
 describe('validateNewContact', () => {
 
   it('passes for a valid contact', () => {
-    expect(() => validateNewContact({ name: 'Alice', phoneNumber: '+1234567890' })).not.toThrow();
+    expect(() => validateNewContact({ name: 'Alice', phone_number: '+1234567890' })).not.toThrow();
   });
 
   it('passes with isSOS true', () => {
-    expect(() => validateNewContact({ name: 'Bob', phoneNumber: '555-1234', isSOS: true })).not.toThrow();
+    expect(() => validateNewContact({ name: 'Bob', phone_number: '555-1234', is_sos: true })).not.toThrow();
   });
 
   it('throws for empty name', () => {
-    expectInvalidArgument(() => validateNewContact({ name: '', phoneNumber: '123' }), 'name');
+    expectInvalidArgument(() => validateNewContact({ name: '', phone_number: '123' }), 'name');
   });
 
   it('throws for whitespace-only name', () => {
-    expectInvalidArgument(() => validateNewContact({ name: '   ', phoneNumber: '123' }), 'name');
+    expectInvalidArgument(() => validateNewContact({ name: '   ', phone_number: '123' }), 'name');
   });
 
   it('throws when name exceeds 20 bytes', () => {
-    expectInvalidArgument(() => validateNewContact({ name: 'A'.repeat(21), phoneNumber: '123' }), 'name');
+    expectInvalidArgument(() => validateNewContact({ name: 'A'.repeat(21), phone_number: '123' }), 'name');
   });
 
   it('throws for empty phoneNumber', () => {
-    expectInvalidArgument(() => validateNewContact({ name: 'Alice', phoneNumber: '' }), 'phoneNumber');
+    expectInvalidArgument(() => validateNewContact({ name: 'Alice', phone_number: '' }), 'phoneNumber');
   });
 
   it('throws when phoneNumber exceeds 20 characters', () => {
-    expectInvalidArgument(() => validateNewContact({ name: 'Alice', phoneNumber: '1'.repeat(21) }), 'phoneNumber');
+    expectInvalidArgument(() => validateNewContact({ name: 'Alice', phone_number: '1'.repeat(21) }), 'phoneNumber');
   });
 });
 
@@ -716,7 +716,7 @@ describe('validateMusicData', () => {
 });
 
 describe('validateGPSAndTimezoneData', () => {
-  const valid = { latitude: 39.904987, longitude: 116.405289, timezoneOffsetMinutes: 480 };
+  const valid = { latitude: 39.904987, longitude: 116.405289, timezone_offset_minutes: 480 };
 
   it('accepts valid GPS data', () => {
     expect(() => validateGPSAndTimezoneData(valid)).not.toThrow();
@@ -750,11 +750,11 @@ describe('validateGPSAndTimezoneData', () => {
     expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, altitude: Infinity }), 'altitude');
   });
 
-  it('throws for non-multiple-of-15 timezoneOffsetMinutes', () => {
-    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, timezoneOffsetMinutes: 481 }), 'timezoneOffsetMinutes');
+  it('throws for non-multiple-of-15 timezone_offset_minutes', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, timezone_offset_minutes: 481 }), 'timezoneOffsetMinutes');
   });
 
-  it('throws for non-integer timezoneOffsetMinutes', () => {
-    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, timezoneOffsetMinutes: 480.5 }), 'timezoneOffsetMinutes');
+  it('throws for non-integer timezone_offset_minutes', () => {
+    expectInvalidArgument(() => validateGPSAndTimezoneData({ ...valid, timezone_offset_minutes: 480.5 }), 'timezoneOffsetMinutes');
   });
 });

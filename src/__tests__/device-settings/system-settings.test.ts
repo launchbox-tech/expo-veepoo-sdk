@@ -75,12 +75,12 @@ describe('SystemSettings (split capabilities)', () => {
       latitude: 27.7172,
       longitude: 85.3240,
       altitude: 1300,
-      timezoneOffsetMinutes: 345,
+      timezone_offset_minutes: 345,
     };
 
     await gpsTimezone.setDeviceGPSAndTimezone(data);
 
-    expect(native.setDeviceGPSAndTimezone).toHaveBeenCalledWith(data);
+    expect(native.setDeviceGPSAndTimezone).toHaveBeenCalledWith({ latitude: 27.7172, longitude: 85.3240, altitude: 1300, timezoneOffsetMinutes: 345 });
   });
 
   // ── readDeviceBTStatus ────────────────────────────────────────────────────
@@ -127,28 +127,33 @@ describe('SystemSettings (split capabilities)', () => {
 
   it('pushWeatherData delegates to native (happy path)', async () => {
     const data = {
-      cityName: 'Kathmandu',
+      city_name: 'Kathmandu',
       crc: 1,
       hourly: [
         {
           time: '2024-01-15 10:00',
-          weatherState: 1,
-          uvIndex: 3,
-          visibilityM: 10000,
+          weather_state: 1,
+          uv_index: 3,
+          visibility_m: 10000,
         },
       ],
       daily: [
         {
           date: '2024-01-15',
-          weatherStateDay: 1,
-          weatherStateNight: 2,
+          weather_state_day: 1,
+          weather_state_night: 2,
         },
       ],
     };
 
     await weather.pushWeatherData(data);
 
-    expect(native.pushWeatherData).toHaveBeenCalledWith(data);
+    expect(native.pushWeatherData).toHaveBeenCalledWith({
+      cityName: 'Kathmandu',
+      crc: 1,
+      hourly: [{ time: '2024-01-15 10:00', weatherState: 1, uvIndex: 3, visibilityM: 10000 }],
+      daily: [{ date: '2024-01-15', weatherStateDay: 1, weatherStateNight: 2 }],
+    });
   });
 
   // ── startLocalFirmwareDfu ─────────────────────────────────────────────────

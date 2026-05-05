@@ -425,9 +425,9 @@ describe('VeepooSDK', () => {
     beforeEach(async () => { await sdk.init(); });
 
     it('syncPersonalInfo delegates to native.syncPersonalInfo', async () => {
-      const info = { sex: 1 as const, height: 175, weight: 70, age: 30, stepAim: 8000, sleepAim: 480 };
+      const info = { sex: 1 as const, height: 175, weight: 70, age: 30, step_aim: 8000, sleep_aim: 480 };
       await sdk.syncPersonalInfo(info);
-      expect(native.syncPersonalInfo).toHaveBeenCalledWith(info);
+      expect(native.syncPersonalInfo).toHaveBeenCalledWith({ sex: 1, height: 175, weight: 70, age: 30, stepAim: 8000, sleepAim: 480 });
     });
 
     it('readDeviceAllData delegates to native.readDeviceAllData and returns result', async () => {

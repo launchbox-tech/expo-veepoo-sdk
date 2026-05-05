@@ -3,10 +3,9 @@ import { requireInRange, requireValidHour, requireValidMinute } from "@/validato
 
 /** Vendor long-sit gate is 30–240 minutes (iOS `longSeatGateValue`). */
 export function validateSedentaryReminderSettings(s: SedentaryReminderSettings): void {
-  const r = s as any;
-  requireValidHour(s.start_hour ?? r.startHour, 'startHour');
-  requireValidMinute(s.start_minute ?? r.startMinute, 'startMinute');
-  requireValidHour(s.end_hour ?? r.endHour, 'endHour');
-  requireValidMinute(s.end_minute ?? r.endMinute, 'endMinute');
-  requireInRange(s.threshold_minutes ?? r.thresholdMinutes, 'thresholdMinutes', 30, 240);
+  requireValidHour(s.start_hour, 'startHour');
+  requireValidMinute(s.start_minute, 'startMinute');
+  requireValidHour(s.end_hour, 'endHour');
+  requireValidMinute(s.end_minute, 'endMinute');
+  requireInRange(s.threshold_minutes, 'thresholdMinutes', 30, 240);
 }
