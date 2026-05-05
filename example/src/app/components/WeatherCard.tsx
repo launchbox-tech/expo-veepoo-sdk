@@ -35,13 +35,13 @@ const styles = StyleSheet.create({
 });
 
 const SAMPLE_WEATHER = {
-  cityName: "TestCity",
+  city_name: "TestCity",
   crc: 1,
   hourly: [
-    { time: "2024-01-01 09:00", tempC: 15, tempF: 59, weatherState: 0, uvIndex: 3, windLevel: "2", visibilityM: 10000 },
+    { time: "2024-01-01 09:00", temp_c: 15, temp_f: 59, weather_state: 0, uv_index: 3, wind_level: "2", visibility_m: 10000 },
   ],
   daily: [
-    { date: "2024-01-01", highTempC: 20, lowTempC: 10, highTempF: 68, lowTempF: 50, weatherState: 0, uvIndex: 3, sunriseTime: "06:00", sunsetTime: "18:00", windLevel: "2", windDirection: 90 },
+    { date: "2024-01-01", max_temp_c: 20, min_temp_c: 10, max_temp_f: 68, min_temp_f: 50, weather_state_day: 0, weather_state_night: 0, uv_index: 3, wind_level: "2" },
   ],
 };
 
@@ -64,7 +64,7 @@ export default function WeatherCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setInfo("setting…");
-          void sdk.weather.setWeatherSettings({ isOpen: true, unit: "celsius", crc: 0 })
+          void sdk.weather.setWeatherSettings({ is_open: true, unit: "C", crc: 0 })
             .then(() => setInfo("weather enabled (celsius)"))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

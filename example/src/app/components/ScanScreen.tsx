@@ -77,7 +77,7 @@ export default function ScanScreen({
       </View>
 
       <View style={styles.scanControls}>
-        {!permissionsGranted && permissions?.canAskAgain === false ? (
+        {!permissionsGranted && permissions?.can_ask_again === false ? (
           <>
             <Text style={styles.permissionHint}>
               Bluetooth access was permanently denied. Open Settings to grant

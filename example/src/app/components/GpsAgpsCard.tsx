@@ -58,7 +58,7 @@ export default function GpsAgpsCard() {
                 latitude: 27.7172,
                 longitude: 85.324,
                 altitude: 1400,
-                timezoneOffsetMinutes: 345,
+                timezone_offset_minutes: 345,
               })
               .then(() => setGpsInfo("sent OK"))
               .catch((e: unknown) => setGpsInfo((e as Error)?.message ?? "error"));

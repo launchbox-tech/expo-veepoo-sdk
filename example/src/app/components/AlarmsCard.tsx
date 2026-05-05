@@ -65,7 +65,7 @@ export default function AlarmsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setAlarmsInfo("setting…");
-          void sdk.alarms.setAlarm({ id: 1, hour: 7, minute: 0, isOpen: true, cycle: 0b1111110 })
+          void sdk.alarms.setAlarm({ id: 1, hour: 7, minute: 0, enabled: true, repeat: [1, 2, 3, 4, 5, 6] })
             .then(s => setAlarmsInfo(`set: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setAlarmsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
@@ -91,7 +91,7 @@ export default function AlarmsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setHrAlarmInfo("setting…");
-          void sdk.alarms.setHeartRateAlarm({ enabled: true, highThreshold: 150, lowThreshold: 50 })
+          void sdk.alarms.setHeartRateAlarm({ enabled: true, high_threshold: 150, low_threshold: 50 })
             .then(s => setHrAlarmInfo(`set: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setHrAlarmInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

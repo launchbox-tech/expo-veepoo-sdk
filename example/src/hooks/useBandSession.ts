@@ -9,8 +9,8 @@ const DEFAULT_PERSONAL_INFO: PersonalInfo = {
   height: 175,
   weight: 70,
   age: 30,
-  stepAim: 8000,
-  sleepAim: 480,
+  step_aim: 8000,
+  sleep_aim: 480,
 };
 
 export function useBandSession(
@@ -40,7 +40,7 @@ export function useBandSession(
 
   useSDKEvent(
     'deviceReady',
-    async ({ deviceId: _ }) => {
+    async ({ device_id: _ }) => {
       setSyncDone(false);
       setBatteryInfo(null);
       setDeviceVersion(null);
@@ -60,7 +60,7 @@ export function useBandSession(
 
   useSDKEvent(
     'deviceDisconnected',
-    ({ deviceId: _ }) => {
+    ({ device_id: _ }) => {
       setConnectedDevice(null);
       setSyncDone(false);
       setConnectError(null);
@@ -72,7 +72,7 @@ export function useBandSession(
 
   useSDKEvent(
     'deviceConnectStatus',
-    ({ deviceId: _, status, code }) => {
+    ({ device_id: _, status, code }) => {
       if (status === 'error') {
         setConnectError(
           code != null
@@ -88,7 +88,7 @@ export function useBandSession(
 
   useSDKEvent(
     'batteryData',
-    ({ deviceId: _, data }) => {
+    ({ device_id: _, data }) => {
       setBatteryInfo(data);
     },
     appState === 'ready'

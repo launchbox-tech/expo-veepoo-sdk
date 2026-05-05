@@ -128,7 +128,7 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'heartRateTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       setHrResult(result);
       appendLog(`heartRateTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -140,7 +140,7 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'bloodPressureTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       setBpResult(result);
       appendLog(`bloodPressureTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -152,7 +152,7 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'bloodOxygenTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       setSpo2Result(result);
       appendLog(`bloodOxygenTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -164,7 +164,7 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'temperatureTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       setTempResult(result);
       appendLog(`temperatureTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -176,10 +176,10 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'stressData',
-    ({ deviceId: _, data }) => {
+    ({ device_id: _, data }) => {
       setStressResult(data);
       appendLog(`stressData ${clipJson(data)}`);
-      if (data.isEnd === true) {
+      if (data.is_end === true) {
         setActiveTest(prev => (prev === 'stress' ? null : prev));
       }
     },
@@ -188,10 +188,10 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'bloodGlucoseData',
-    ({ deviceId: _, data }) => {
+    ({ device_id: _, data }) => {
       setBloodGlucoseResult(data);
       appendLog(`bloodGlucoseData ${clipJson(data)}`);
-      if (data.isEnd === true) {
+      if (data.is_end === true) {
         setActiveTest(prev => (prev === 'bloodGlucose' ? null : prev));
       }
     },
@@ -200,7 +200,7 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'hrvTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       setHrvResult(result);
       appendLog(`hrvTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -212,7 +212,7 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'ecgTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       const slim =
         result.waveform && result.waveform.length > 0
           ? { ...result, waveform: [`…${result.waveform.length} samples`] }
@@ -228,7 +228,7 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'fatigueTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       setFatigueResult(result);
       appendLog(`fatigueTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -240,7 +240,7 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'breathingTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       setBreathingResult(result);
       appendLog(`breathingTestResult ${clipJson(result)}`);
       if (isTerminalState(result.state)) {
@@ -252,10 +252,10 @@ export function useHealthTests(): {
 
   useSDKEvent(
     'bodyCompositionTestResult',
-    ({ deviceId: _, result }) => {
+    ({ device_id: _, result }) => {
       setBodyCompositionResult(result);
       appendLog(`bodyCompositionTestResult ${clipJson(result)}`);
-      if (result.isEnd === true || isTerminalState(String(result.state))) {
+      if (result.is_end === true || isTerminalState(String(result.state))) {
         setActiveTest(prev => (prev === 'bodyComposition' ? null : prev));
       }
     },
@@ -421,7 +421,7 @@ export function useHealthTests(): {
     setEcgResult(null);
     try {
       setActiveTest('ecg');
-      await sdk.realtimeTests.startEcgTest(ecgIncludeWaveform ? { includeWaveform: true } : undefined);
+      await sdk.realtimeTests.startEcgTest(ecgIncludeWaveform ? { include_waveform: true } : undefined);
       appendLog(`startEcgTest ok (includeWaveform=${ecgIncludeWaveform})`);
     } catch (e) {
       setActiveTest(null);

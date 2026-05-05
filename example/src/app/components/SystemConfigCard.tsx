@@ -87,7 +87,7 @@ export default function SystemConfigCard() {
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setSysInfo("setting lang…");
-          void sdk.language.setLanguage("en")
+          void sdk.language.setLanguage("english")
             .then(ok => setSysInfo(`setLanguage(en): ${ok}`))
             .catch((e: unknown) => setSysInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

@@ -110,7 +110,7 @@ export default function HistoricalDataSection({
               <View style={[styles.progressFill, { width: `${syncPct}%` }]} />
             </View>
             <Text style={styles.progressLabel}>
-              Day {dataSyncProgress.currentDay}/{dataSyncProgress.totalDays} ·{" "}
+              Day {dataSyncProgress.current_day}/{dataSyncProgress.total_days} ·{" "}
               {Math.round(syncPct)}%
             </Text>
           </>
@@ -120,7 +120,7 @@ export default function HistoricalDataSection({
           <View style={styles.summary}>
             <Text style={styles.summaryTitle}>Today&apos;s Steps</Text>
             <Text style={styles.summaryValue}>
-              {stepData.stepCount.toLocaleString()}
+              {stepData.step_count.toLocaleString()}
             </Text>
             <Text style={styles.summaryMeta}>
               {(stepData.distance / 1000).toFixed(2)} km ·{" "}
@@ -133,13 +133,13 @@ export default function HistoricalDataSection({
           <View style={styles.summary}>
             <Text style={styles.summaryTitle}>Last Night&apos;s Sleep</Text>
             <Text style={styles.summaryValue}>
-              {Math.floor(sleepSummary.totalSleepMinutes / 60)}h{" "}
-              {sleepSummary.totalSleepMinutes % 60}m
+              {Math.floor(sleepSummary.total_sleep_minutes / 60)}h{" "}
+              {sleepSummary.total_sleep_minutes % 60}m
             </Text>
             <Text style={styles.summaryMeta}>
-              Deep {sleepSummary.totalDeepSleepMinutes}m · Light{" "}
-              {sleepSummary.totalLightSleepMinutes}m · Woke{" "}
-              {sleepSummary.totalWakeUpCount}×
+              Deep {sleepSummary.total_deep_sleep_minutes}m · Light{" "}
+              {sleepSummary.total_light_sleep_minutes}m · Woke{" "}
+              {sleepSummary.total_wake_up_count}×
             </Text>
           </View>
         )}

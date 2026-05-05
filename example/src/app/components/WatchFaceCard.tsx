@@ -78,7 +78,7 @@ export default function WatchFaceCard() {
           onPress={() => {
             if (!lastStyle) { setWatchFaceInfo("read first"); return; }
             void sdk
-              .watchFace.setWatchFaceStyle({ screenIndex: lastStyle.screenIndex, dialType: lastStyle.dialType })
+              .watchFace.setWatchFaceStyle({ screen_index: lastStyle.screen_index, dial_type: lastStyle.dial_type })
               .then(() => setWatchFaceInfo(`applied: ${JSON.stringify(lastStyle)}`))
               .catch(() => setWatchFaceInfo("(set failed)"));
           }}

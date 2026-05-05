@@ -53,7 +53,7 @@ export default function AutoMeasureCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setInfo("modifying…");
-          void sdk.autoMeasure.modifyAutoMeasureSetting({ measureInterval: 30 })
+          void sdk.autoMeasure.modifyAutoMeasureSetting({ measure_interval: 30 })
             .then(s => setInfo(`modified: ${JSON.stringify(s)}`))
             .catch((e: unknown) => setInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

@@ -101,7 +101,7 @@ export default function ScreenLightCard() {
           onPress={() => {
             void sdk
               .screenLight.readScreenLightDuration()
-              .then(d => { setLastDuration(d.currentSeconds); setScreenDurationInfo(JSON.stringify(d)); })
+              .then(d => { setLastDuration(d.current_seconds); setScreenDurationInfo(JSON.stringify(d)); })
               .catch(() => setScreenDurationInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"

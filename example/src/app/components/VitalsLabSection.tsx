@@ -137,8 +137,8 @@ export default function VitalsLabSection({
         progress={ecgResult?.progress}
         state={typeof ecgResult?.state === "string" ? ecgResult.state : undefined}
         resultLine={
-          ecgResult?.heartRate != null
-            ? `HR ${ecgResult.heartRate}${
+          ecgResult?.heart_rate != null
+            ? `HR ${ecgResult.heart_rate}${
                 ecgResult.hrv != null ? ` · HRV ${ecgResult.hrv}` : ""
               }${
                 ecgResult.waveform?.length
@@ -193,8 +193,8 @@ export default function VitalsLabSection({
         resultLine={
           bodyCompositionResult?.composition?.bmi != null
             ? `BMI ${bodyCompositionResult.composition.bmi.toFixed(1)}`
-            : bodyCompositionResult?.composition?.bodyFatPercentage != null
-            ? `Fat ${bodyCompositionResult.composition.bodyFatPercentage}%`
+            : bodyCompositionResult?.composition?.body_fat_percentage != null
+            ? `Fat ${bodyCompositionResult.composition.body_fat_percentage}%`
             : null
         }
         onStart={startBodyComposition}

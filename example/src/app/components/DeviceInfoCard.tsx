@@ -38,9 +38,9 @@ export default function DeviceInfoCard({
           value={
             batteryInfo
               ? `${batteryInfo.percent}%${
-                  batteryInfo.chargeState === "charging"
+                  batteryInfo.charge_state === "charging"
                     ? " ⚡"
-                    : batteryInfo.isLowBattery
+                    : batteryInfo.is_low_battery
                     ? " ⚠️"
                     : ""
                 }`
@@ -49,7 +49,7 @@ export default function DeviceInfoCard({
         />
         <InfoRow
           label="Firmware"
-          value={deviceVersion?.firmwareVersion ?? "—"}
+          value={deviceVersion?.firmware_version ?? "—"}
         />
       </View>
     </View>

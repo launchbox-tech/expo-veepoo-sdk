@@ -55,7 +55,7 @@ export default function BandBluetoothCard() {
             setBtInfo("reading…");
             void sdk
               .btStatus.readDeviceBTStatus()
-              .then((s) => setBtInfo(`open=${s.isBTOpen} state=${s.state}`))
+              .then((s) => setBtInfo(`open=${s.is_bt_open} state=${s.state}`))
               .catch((e: unknown) => setBtInfo((e as Error)?.message ?? "error"));
           }}
           accessibilityRole="button"

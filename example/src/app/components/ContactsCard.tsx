@@ -65,7 +65,7 @@ export default function ContactsCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setContactsInfo("adding…");
-          void sdk.contacts.addContact({ name: "Test", phone: "1234567890" })
+          void sdk.contacts.addContact({ name: "Test", phone_number: "1234567890" })
             .then(() => setContactsInfo("added Test / 1234567890"))
             .catch((e: unknown) => setContactsInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
