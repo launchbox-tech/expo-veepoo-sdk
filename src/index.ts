@@ -120,3 +120,14 @@ export {
   useSDKInitialized,
 } from './react/index.js';
 export type { SDKStateSnapshot } from './react/index.js';
+
+export {
+  runSessionBaseline,
+  attachSessionBaseline,
+} from './session/index.js';
+export type {
+  SessionBaselineConfig,
+  SessionBaselineResult,
+  AttachSessionBaselineConfig,
+  SessionBaselineHandle,
+} from './session/index.js';
