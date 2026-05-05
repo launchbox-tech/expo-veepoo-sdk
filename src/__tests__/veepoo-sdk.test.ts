@@ -508,13 +508,13 @@ describe('VeepooSDK', () => {
       expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 1, dialType: 'photo' });
     });
 
-    it('startTest(RealtimeTest.BODY_COMPOSITION) delegates to native', async () => {
-      await sdk.startTest(RealtimeTest.BODY_COMPOSITION);
+    it('startTest(RealtimeTest.body_composition) delegates to native', async () => {
+      await sdk.startTest(RealtimeTest.body_composition);
       expect(native.startBodyCompositionTest).toHaveBeenCalled();
     });
 
-    it('stopTest(RealtimeTest.BODY_COMPOSITION) delegates to native', async () => {
-      await sdk.stopTest(RealtimeTest.BODY_COMPOSITION);
+    it('stopTest(RealtimeTest.body_composition) delegates to native', async () => {
+      await sdk.stopTest(RealtimeTest.body_composition);
       expect(native.stopBodyCompositionTest).toHaveBeenCalled();
     });
   });
@@ -594,28 +594,28 @@ describe('VeepooSDK', () => {
       expect(native.startReadOriginData).toHaveBeenCalled();
     });
 
-    it('startTest(RealtimeTest.HEART_RATE) delegates to native', async () => {
-      await sdk.startTest(RealtimeTest.HEART_RATE);
+    it('startTest(RealtimeTest.heart_rate) delegates to native', async () => {
+      await sdk.startTest(RealtimeTest.heart_rate);
       expect(native.startHeartRateTest).toHaveBeenCalled();
     });
 
-    it('startTest(RealtimeTest.HEART_RATE) preserves REALTIME_TEST_IN_PROGRESS from native', async () => {
+    it('startTest(RealtimeTest.heart_rate) preserves REALTIME_TEST_IN_PROGRESS from native', async () => {
       native.startHeartRateTest.mockRejectedValueOnce({
         code: 'REALTIME_TEST_IN_PROGRESS',
         message: 'Another realtime test is already in progress',
       });
-      await expect(sdk.startTest(RealtimeTest.HEART_RATE)).rejects.toMatchObject({
+      await expect(sdk.startTest(RealtimeTest.heart_rate)).rejects.toMatchObject({
         code: 'REALTIME_TEST_IN_PROGRESS',
       });
     });
 
-    it('stopTest(RealtimeTest.HEART_RATE) delegates to native', async () => {
-      await sdk.stopTest(RealtimeTest.HEART_RATE);
+    it('stopTest(RealtimeTest.heart_rate) delegates to native', async () => {
+      await sdk.stopTest(RealtimeTest.heart_rate);
       expect(native.stopHeartRateTest).toHaveBeenCalled();
     });
 
-    it('startTest(RealtimeTest.HRV) delegates to native', async () => {
-      await sdk.startTest(RealtimeTest.HRV);
+    it('startTest(RealtimeTest.hrv) delegates to native', async () => {
+      await sdk.startTest(RealtimeTest.hrv);
       expect(native.startHrvTest).toHaveBeenCalled();
     });
 
@@ -624,8 +624,8 @@ describe('VeepooSDK', () => {
       expect(native.startEcgTest).toHaveBeenCalledWith({ includeWaveform: true });
     });
 
-    it('stopTest(RealtimeTest.FATIGUE) delegates to native', async () => {
-      await sdk.stopTest(RealtimeTest.FATIGUE);
+    it('stopTest(RealtimeTest.fatigue) delegates to native', async () => {
+      await sdk.stopTest(RealtimeTest.fatigue);
       expect(native.stopFatigueTest).toHaveBeenCalled();
     });
   });

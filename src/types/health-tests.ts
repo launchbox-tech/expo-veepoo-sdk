@@ -173,16 +173,16 @@ export interface PttTestResult {
 }
 
 export const RealtimeTest = {
-  HEART_RATE: 'heart_rate',
-  BLOOD_PRESSURE: 'blood_pressure',
-  BLOOD_OXYGEN: 'blood_oxygen',
-  TEMPERATURE: 'temperature',
-  STRESS: 'stress',
-  BLOOD_GLUCOSE: 'blood_glucose',
-  HRV: 'hrv',
-  FATIGUE: 'fatigue',
-  BREATHING: 'breathing',
-  BODY_COMPOSITION: 'body_composition',
+  heart_rate: 'heart_rate',
+  blood_pressure: 'blood_pressure',
+  blood_oxygen: 'blood_oxygen',
+  temperature: 'temperature',
+  stress: 'stress',
+  blood_glucose: 'blood_glucose',
+  hrv: 'hrv',
+  fatigue: 'fatigue',
+  breathing: 'breathing',
+  body_composition: 'body_composition',
 } as const;
 
 export type RealtimeTestModality = typeof RealtimeTest[keyof typeof RealtimeTest];

@@ -274,7 +274,7 @@ export function useHealthTests(): {
     setHrResult(null);
     try {
       setActiveTest('hr');
-      await sdk.realtimeTests.startTest(RealtimeTest.HEART_RATE);
+      await sdk.realtimeTests.startTest(RealtimeTest.heart_rate);
       appendLog('startTest(heartRate) ok');
     } catch (e) {
       setActiveTest(null);
@@ -284,7 +284,7 @@ export function useHealthTests(): {
 
   async function stopHR() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.HEART_RATE);
+      await sdk.realtimeTests.stopTest(RealtimeTest.heart_rate);
       appendLog('stopTest(heartRate) ok');
     } finally {
       setActiveTest(null);
@@ -295,7 +295,7 @@ export function useHealthTests(): {
     setBpResult(null);
     try {
       setActiveTest('bp');
-      await sdk.realtimeTests.startTest(RealtimeTest.BLOOD_PRESSURE);
+      await sdk.realtimeTests.startTest(RealtimeTest.blood_pressure);
       appendLog('startTest(bloodPressure) ok');
     } catch (e) {
       setActiveTest(null);
@@ -305,7 +305,7 @@ export function useHealthTests(): {
 
   async function stopBP() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.BLOOD_PRESSURE);
+      await sdk.realtimeTests.stopTest(RealtimeTest.blood_pressure);
       appendLog('stopTest(bloodPressure) ok');
     } finally {
       setActiveTest(null);
@@ -316,7 +316,7 @@ export function useHealthTests(): {
     setSpo2Result(null);
     try {
       setActiveTest('spo2');
-      await sdk.realtimeTests.startTest(RealtimeTest.BLOOD_OXYGEN);
+      await sdk.realtimeTests.startTest(RealtimeTest.blood_oxygen);
       appendLog('startTest(bloodOxygen) ok');
     } catch (e) {
       setActiveTest(null);
@@ -326,7 +326,7 @@ export function useHealthTests(): {
 
   async function stopSpo2() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.BLOOD_OXYGEN);
+      await sdk.realtimeTests.stopTest(RealtimeTest.blood_oxygen);
       appendLog('stopTest(bloodOxygen) ok');
     } finally {
       setActiveTest(null);
@@ -337,7 +337,7 @@ export function useHealthTests(): {
     setTempResult(null);
     try {
       setActiveTest('temperature');
-      await sdk.realtimeTests.startTest(RealtimeTest.TEMPERATURE);
+      await sdk.realtimeTests.startTest(RealtimeTest.temperature);
       appendLog('startTest(temperature) ok');
     } catch (e) {
       setActiveTest(null);
@@ -347,7 +347,7 @@ export function useHealthTests(): {
 
   async function stopTemp() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.TEMPERATURE);
+      await sdk.realtimeTests.stopTest(RealtimeTest.temperature);
       appendLog('stopTest(temperature) ok');
     } finally {
       setActiveTest(null);
@@ -358,7 +358,7 @@ export function useHealthTests(): {
     setStressResult(null);
     try {
       setActiveTest('stress');
-      await sdk.realtimeTests.startTest(RealtimeTest.STRESS);
+      await sdk.realtimeTests.startTest(RealtimeTest.stress);
       appendLog('startTest(stress) ok');
     } catch (e) {
       setActiveTest(null);
@@ -368,7 +368,7 @@ export function useHealthTests(): {
 
   async function stopStress() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.STRESS);
+      await sdk.realtimeTests.stopTest(RealtimeTest.stress);
       appendLog('stopTest(stress) ok');
     } finally {
       setActiveTest(null);
@@ -379,7 +379,7 @@ export function useHealthTests(): {
     setBloodGlucoseResult(null);
     try {
       setActiveTest('bloodGlucose');
-      await sdk.realtimeTests.startTest(RealtimeTest.BLOOD_GLUCOSE);
+      await sdk.realtimeTests.startTest(RealtimeTest.blood_glucose);
       appendLog('startTest(bloodGlucose) ok');
     } catch (e) {
       setActiveTest(null);
@@ -389,7 +389,7 @@ export function useHealthTests(): {
 
   async function stopBloodGlucose() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.BLOOD_GLUCOSE);
+      await sdk.realtimeTests.stopTest(RealtimeTest.blood_glucose);
       appendLog('stopTest(bloodGlucose) ok');
     } finally {
       setActiveTest(null);
@@ -400,7 +400,7 @@ export function useHealthTests(): {
     setHrvResult(null);
     try {
       setActiveTest('hrv');
-      await sdk.realtimeTests.startTest(RealtimeTest.HRV);
+      await sdk.realtimeTests.startTest(RealtimeTest.hrv);
       appendLog('startTest(hrv) ok');
     } catch (e) {
       setActiveTest(null);
@@ -410,7 +410,7 @@ export function useHealthTests(): {
 
   async function stopHrv() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.HRV);
+      await sdk.realtimeTests.stopTest(RealtimeTest.hrv);
       appendLog('stopTest(hrv) ok');
     } finally {
       setActiveTest(null);
@@ -442,7 +442,7 @@ export function useHealthTests(): {
     setFatigueResult(null);
     try {
       setActiveTest('fatigue');
-      await sdk.realtimeTests.startTest(RealtimeTest.FATIGUE);
+      await sdk.realtimeTests.startTest(RealtimeTest.fatigue);
       appendLog('startTest(fatigue) ok');
     } catch (e) {
       setActiveTest(null);
@@ -452,7 +452,7 @@ export function useHealthTests(): {
 
   async function stopFatigue() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.FATIGUE);
+      await sdk.realtimeTests.stopTest(RealtimeTest.fatigue);
       appendLog('stopTest(fatigue) ok');
     } finally {
       setActiveTest(null);
@@ -463,7 +463,7 @@ export function useHealthTests(): {
     setBreathingResult(null);
     try {
       setActiveTest('breathing');
-      await sdk.realtimeTests.startTest(RealtimeTest.BREATHING);
+      await sdk.realtimeTests.startTest(RealtimeTest.breathing);
       appendLog('startTest(breathing) ok');
     } catch (e) {
       setActiveTest(null);
@@ -473,7 +473,7 @@ export function useHealthTests(): {
 
   async function stopBreathing() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.BREATHING);
+      await sdk.realtimeTests.stopTest(RealtimeTest.breathing);
       appendLog('stopTest(breathing) ok');
     } finally {
       setActiveTest(null);
@@ -484,7 +484,7 @@ export function useHealthTests(): {
     setBodyCompositionResult(null);
     try {
       setActiveTest('bodyComposition');
-      await sdk.realtimeTests.startTest(RealtimeTest.BODY_COMPOSITION);
+      await sdk.realtimeTests.startTest(RealtimeTest.body_composition);
       appendLog('startTest(bodyComposition) ok');
     } catch (e) {
       setActiveTest(null);
@@ -494,7 +494,7 @@ export function useHealthTests(): {
 
   async function stopBodyComposition() {
     try {
-      await sdk.realtimeTests.stopTest(RealtimeTest.BODY_COMPOSITION);
+      await sdk.realtimeTests.stopTest(RealtimeTest.body_composition);
       appendLog('stopTest(bodyComposition) ok');
     } finally {
       setActiveTest(null);

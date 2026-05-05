@@ -353,7 +353,7 @@ await sdk.realtimeTests.startEcgTest(options?: EcgTestOptions)
 await sdk.realtimeTests.stopEcgTest()
 ```
 
-`RealtimeTest` values: `HEART_RATE`, `BLOOD_PRESSURE`, `BLOOD_OXYGEN`, `TEMPERATURE`, `STRESS`, `BLOOD_GLUCOSE`, `HRV`, `FATIGUE`, `BREATHING`, `BODY_COMPOSITION`
+`RealtimeTest` values: `heart_rate`, `blood_pressure`, `blood_oxygen`, `temperature`, `stress`, `blood_glucose`, `hrv`, `fatigue`, `breathing`, `body_composition`
 
 Events: `heart_rate_test_result`, `blood_pressure_test_result`, `blood_oxygen_test_result`, `temperature_test_result`, `stress_data`, `blood_glucose_data`, `hrv_test_result`, `ecg_test_result`, `fatigue_test_result`, `breathing_test_result`, `body_composition_test_result`, `ptt_test_result`, `ptt_state_changed`, `gsr_test_result`
 
