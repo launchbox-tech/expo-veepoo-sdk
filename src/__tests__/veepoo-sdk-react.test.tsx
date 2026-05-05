@@ -55,10 +55,17 @@ describe("VeepooSDKProvider", () => {
 // ── useVeepooSDK ──────────────────────────────────────────────────────────────
 
 describe("useVeepooSDK", () => {
-  it("returns sdk and error", () => {
+  it("returns sdk, status, and error", () => {
     const result = renderInProvider(() => useVeepooSDK());
     expect(result.current.sdk).toBeDefined();
     expect(result.current.error).toBeNull();
+    expect(result.current.status).toMatchObject({
+      initialized: expect.any(Boolean),
+      isConnected: false,
+      isReady: false,
+      isScanning: false,
+      connectedDeviceId: null,
+    });
   });
 
   it("throws a descriptive error when called outside Provider", () => {
