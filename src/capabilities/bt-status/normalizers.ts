@@ -1,5 +1,5 @@
-import type { DeviceBTState, DeviceBTStatus } from "../../types/index.js";
-import { isRecord, toBoolean } from "../../normalizers/primitives.js";
+import type { DeviceBTState, DeviceBTStatus } from "@/types/index";
+import { isRecord, toBoolean } from "@/normalizers/primitives";
 
 const BT_STATE_MAP: Record<number, DeviceBTState> = {
   0: 'disconnected',

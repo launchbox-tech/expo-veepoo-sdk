@@ -1,10 +1,10 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { GpsTimezoneNativeMethods } from "./native.js";
-import { validateGPSAndTimezoneData } from "./validators.js";
-import type { GPSAndTimezoneData } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { GpsTimezoneNativeMethods } from "./native";
+import { validateGPSAndTimezoneData } from "./validators";
+import type { GPSAndTimezoneData } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class GpsTimezoneCapability {
   constructor(private readonly ctx: CapabilityContext<GpsTimezoneNativeMethods>) {}

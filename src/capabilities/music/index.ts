@@ -1,10 +1,10 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { MusicNativeMethods } from "./native.js";
-import { validateMusicData } from "./validators.js";
-import type { MusicData } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { MusicNativeMethods } from "./native";
+import { validateMusicData } from "./validators";
+import type { MusicData } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class MusicCapability {
   constructor(private readonly ctx: CapabilityContext<MusicNativeMethods>) {}

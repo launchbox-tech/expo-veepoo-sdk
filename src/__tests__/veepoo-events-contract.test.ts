@@ -6,12 +6,12 @@ import {
   setDiff,
   sliceSwiftEventsHeader,
   verifyVeepooEventsContract,
-} from "../bridge-contract/verify-veepoo-events.js";
+} from "@/bridge-contract/verify-veepoo-events";
 import {
   NATIVE_EMITTED_EVENTS,
   JS_LOCAL_ONLY_EVENTS,
   ALL_VEEPOO_EVENTS,
-} from "../bridge/veepoo-events-registry.js";
+} from "@/bridge/veepoo-events-registry";
 
 const repoRoot = join(__dirname, "..", "..");
 

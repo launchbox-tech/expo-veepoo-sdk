@@ -9,11 +9,11 @@
 export {
   runSessionBaseline,
   attachSessionBaseline,
-} from './session-baseline.js';
+} from './session-baseline';
 
 export type {
   SessionBaselineConfig,
   SessionBaselineResult,
   AttachSessionBaselineConfig,
   SessionBaselineHandle,
-} from './session-baseline.js';
+} from './session-baseline';

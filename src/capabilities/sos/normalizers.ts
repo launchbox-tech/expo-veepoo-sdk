@@ -1,5 +1,5 @@
-import type { SosCallTimesSettings } from "../../types/index.js";
-import { isRecord, toInt } from "../../normalizers/primitives.js";
+import type { SosCallTimesSettings } from "@/types/index";
+import { isRecord, toInt } from "@/normalizers/primitives";
 
 export function normalizeSosCallTimesSettings(value: unknown): SosCallTimesSettings {
   const record = isRecord(value) ? value : {};

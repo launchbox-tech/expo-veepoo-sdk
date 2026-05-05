@@ -1,5 +1,5 @@
-import type { FindDevicePhase } from "../../types/index.js";
-import { isRecord, toStringValue } from "../../normalizers/primitives.js";
+import type { FindDevicePhase } from "@/types/index";
+import { isRecord, toStringValue } from "@/normalizers/primitives";
 
 const FIND_DEVICE_PHASES: readonly FindDevicePhase[] = [
   'unsupported',

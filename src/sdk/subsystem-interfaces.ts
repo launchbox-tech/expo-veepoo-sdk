@@ -41,10 +41,10 @@ import type {
   WeatherSettings,
   WomenHealthSettings,
   WristFlipWakeSettings,
-} from "../types/index.js";
-import type { NativeVeepooSDKInterface } from "../NativeVeepooSDK.js";
-import type { LogListener } from "../VeepooSDKModule.js";
-import type { VeepooSdkState } from "./veepoo-sdk-state.js";
+} from "@/types/index";
+import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
+import type { LogListener } from "@/veepoo-sdk-module";
+import type { VeepooSdkState } from "./veepoo-sdk-state";
 
 // ── Constructor input interfaces ────────────────────────────────────────────
 

@@ -5,11 +5,11 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { ScreenLightCapability } from '../../capabilities/screen-light/index';
-import { WristFlipCapability } from '../../capabilities/wrist-flip/index';
-import { WatchFaceCapability } from '../../capabilities/watch-face/index';
-import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
-import { makeMockNative, type MockNative } from '../helpers/mock-native';
+import { ScreenLightCapability } from '@/capabilities/screen-light/index';
+import { WristFlipCapability } from '@/capabilities/wrist-flip/index';
+import { WatchFaceCapability } from '@/capabilities/watch-face/index';
+import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
+import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 
 describe('DisplaySettings (split capabilities)', () => {
   let native: MockNative;

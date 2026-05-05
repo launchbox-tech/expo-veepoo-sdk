@@ -1,5 +1,5 @@
-import type { FirmwareDfuState, VeepooEventPayload } from "../../types/index.js";
-import { isRecord, clamp, toInt, toStringValue } from "../../normalizers/primitives.js";
+import type { FirmwareDfuState, VeepooEventPayload } from "@/types/index";
+import { isRecord, clamp, toInt, toStringValue } from "@/normalizers/primitives";
 
 const FIRMWARE_DFU_STATES: readonly FirmwareDfuState[] = [
   'file_not_exist',

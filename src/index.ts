@@ -1,5 +1,5 @@
-export { default } from './VeepooSDK.js';
-export { default as VeepooSDK } from './VeepooSDK.js';
+export { default } from './veepoo-sdk';
+export { default as VeepooSDK } from './veepoo-sdk';
 
 export type {
   VeepooDevice,
@@ -100,14 +100,14 @@ export type {
   GPSAndTimezoneData,
   DeviceBTState,
   DeviceBTStatus,
-} from './types/index.js';
-export { RealtimeTest } from './types/index.js';
-export type { RealtimeTestModality } from './types/index.js';
+} from './types/index';
+export { RealtimeTest } from './types/index';
+export type { RealtimeTestModality } from './types/index';
 
-export type { VeepooSDKModuleInterface, LogListener } from './VeepooSDKModule.js';
+export type { VeepooSDKModuleInterface, LogListener } from './veepoo-sdk-module';
 
-export { mapNativeRejection, isVeepooErrorShape } from './errors/map-native-rejection.js';
-export type { MapNativeRejectionContext } from './errors/map-native-rejection.js';
+export { mapNativeRejection, isVeepooErrorShape } from './errors/map-native-rejection';
+export type { MapNativeRejectionContext } from './errors/map-native-rejection';
 
 export {
   VeepooSDKProvider,
@@ -118,16 +118,16 @@ export {
   useIsScanning,
   useConnectedDeviceId,
   useSDKInitialized,
-} from './react/index.js';
-export type { SDKStateSnapshot } from './react/index.js';
+} from './react/index';
+export type { SDKStateSnapshot } from './react/index';
 
 export {
   runSessionBaseline,
   attachSessionBaseline,
-} from './session/index.js';
+} from './session/index';
 export type {
   SessionBaselineConfig,
   SessionBaselineResult,
   AttachSessionBaselineConfig,
   SessionBaselineHandle,
-} from './session/index.js';
+} from './session/index';

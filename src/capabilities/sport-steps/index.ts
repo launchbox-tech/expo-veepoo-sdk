@@ -1,9 +1,9 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { SportStepsNativeMethods } from "./native.js";
-import { normalizeSportStepData } from "./normalizers.js";
-import type { SportStepData } from "../../types/index.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { SportStepsNativeMethods } from "./native";
+import { normalizeSportStepData } from "./normalizers";
+import type { SportStepData } from "@/types/index";
 
 export class SportStepsCapability {
   constructor(private readonly ctx: CapabilityContext<SportStepsNativeMethods>) {}

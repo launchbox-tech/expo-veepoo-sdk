@@ -1,4 +1,4 @@
-import type { WomenHealthSettings } from "../../types/index.js";
+import type { WomenHealthSettings } from "@/types/index";
 
 export interface WomenHealthNativeMethods {
   readWomenHealthSettings(): Promise<unknown>;

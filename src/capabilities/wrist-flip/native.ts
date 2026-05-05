@@ -1,4 +1,4 @@
-import type { WristFlipWakeSettings } from "../../types/index.js";
+import type { WristFlipWakeSettings } from "@/types/index";
 
 export interface WristFlipNativeMethods {
   readWristFlipWakeSettings(): Promise<unknown>;

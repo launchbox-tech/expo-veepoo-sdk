@@ -1,5 +1,5 @@
-import type { DeviceFunctions } from "../../../types/index.js";
-import { isRecord, toInt, normalizeFunctionStatus } from "../../../normalizers/primitives.js";
+import type { DeviceFunctions } from "@/types/index";
+import { isRecord, toInt, normalizeFunctionStatus } from "@/normalizers/primitives";
 
 export function normalizePackage3(record: Record<string, unknown>): DeviceFunctions["package3"] {
   if (isRecord(record.package3)) {

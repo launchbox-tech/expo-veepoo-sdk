@@ -1,4 +1,4 @@
-import type { VeepooSDKInterface } from "../VeepooSDK.js";
+import type { VeepooSDKInterface } from "@/veepoo-sdk";
 
 export type SDKStateSnapshot = {
   readonly initialized: boolean;

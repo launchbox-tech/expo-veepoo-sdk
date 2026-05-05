@@ -1,11 +1,11 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { WatchFaceNativeMethods } from "./native.js";
-import { normalizeWatchFaceStyle } from "./normalizers.js";
-import { validateReadWatchFaceStyleOptions, validateWatchFaceStyleSettings } from "./validators.js";
-import type { WatchFaceDialType, WatchFaceStyle, WatchFaceStyleSettings } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { WatchFaceNativeMethods } from "./native";
+import { normalizeWatchFaceStyle } from "./normalizers";
+import { validateReadWatchFaceStyleOptions, validateWatchFaceStyleSettings } from "./validators";
+import type { WatchFaceDialType, WatchFaceStyle, WatchFaceStyleSettings } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class WatchFaceCapability {
   constructor(private readonly ctx: CapabilityContext<WatchFaceNativeMethods>) {}

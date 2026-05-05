@@ -5,13 +5,13 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { VeepooSDK } from '../VeepooSDK';
-import type { PersonalInfo } from '../types/index';
+import { VeepooSDK } from '@/veepoo-sdk';
+import type { PersonalInfo } from '@/types/index';
 import {
   runSessionBaseline,
   attachSessionBaseline,
   type SessionBaselineResult,
-} from '../session/session-baseline';
+} from '@/session/session-baseline';
 import { makeMockNative, type MockNative } from './helpers/mock-native';
 
 // ── Fixtures ────────────────────────────────────────────────────────

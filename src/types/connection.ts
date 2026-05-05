@@ -1,4 +1,4 @@
-import type { FunctionStatus } from './device.js';
+import type { FunctionStatus } from './device';
 
 export interface VeepooDevice {
   id: string;

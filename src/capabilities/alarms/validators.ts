@@ -1,5 +1,5 @@
-import type { DeviceAlarm, HeartRateAlarm } from "../../types/index.js";
-import { requireInRange, requireValidHour, requireValidMinute } from "../../validators/shared.js";
+import type { DeviceAlarm, HeartRateAlarm } from "@/types/index";
+import { requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
 
 export function validateAlarm(alarm: DeviceAlarm): void {
   requireInRange(alarm.id, 'id', 1, 20);

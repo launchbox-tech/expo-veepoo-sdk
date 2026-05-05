@@ -1,5 +1,5 @@
-import { mapNativeRejection, isVeepooErrorShape } from '../errors/map-native-rejection.js';
-import type { VeepooError } from '../types/errors.js';
+import { mapNativeRejection, isVeepooErrorShape } from '@/errors/map-native-rejection';
+import type { VeepooError } from '@/types/errors';
 
 describe('isVeepooErrorShape', () => {
   it('returns true for validator-style VeepooError', () => {

@@ -1,7 +1,7 @@
-import type { ConnectOptions } from "../../types/index.js";
-import { requireNonEmptyString, requireInRange, requireValidHour, requireValidMinute } from "../../validators/shared.js";
+import type { ConnectOptions } from "@/types/index";
+import { requireNonEmptyString, requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
 
-export { validatePersonalInfo } from "../personal-info/validators.js";
+export { validatePersonalInfo } from "@/capabilities/personal-info/validators";
 
 export function validateDeviceId(deviceId: unknown): asserts deviceId is string {
   requireNonEmptyString(deviceId, 'deviceId');

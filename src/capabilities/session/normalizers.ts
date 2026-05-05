@@ -1,7 +1,7 @@
-import type { PasswordData } from "../../types/index.js";
-import { isRecord, toBoolean, toStringValue, normalizeFunctionStatus } from "../../normalizers/primitives.js";
+import type { PasswordData } from "@/types/index";
+import { isRecord, toBoolean, toStringValue, normalizeFunctionStatus } from "@/normalizers/primitives";
 
-export { normalizePermissionsResult, normalizeBluetoothStatus } from "../band-discovery/normalizers.js";
+export { normalizePermissionsResult, normalizeBluetoothStatus } from "@/capabilities/band-discovery/normalizers";
 
 export function normalizePasswordData(value: unknown): PasswordData {
   const record = isRecord(value) ? value : {};

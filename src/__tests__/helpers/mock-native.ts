@@ -2,8 +2,8 @@
 import {
   NATIVE_ASYNC_METHOD_NAMES,
   type NativeAsyncMethodName,
-} from '../../bridge-contract/async-native-method-registry';
-import type { NativeVeepooSDKInterface } from '../../NativeVeepooSDK';
+} from '@/bridge-contract/async-native-method-registry';
+import type { NativeVeepooSDKInterface } from '@/native-veepoo-sdk';
 
 export type MockNative = jest.Mocked<NativeVeepooSDKInterface> & {
   _emit(event: string, payload: unknown): void;

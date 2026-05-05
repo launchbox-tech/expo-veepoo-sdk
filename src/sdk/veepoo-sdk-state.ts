@@ -1,4 +1,4 @@
-import type { ConnectionStatus } from "../types/connection.js";
+import type { ConnectionStatus } from "@/types/connection";
 
 /**
  * Mutable **Session** / scan / init fields driven by native events and host calls.

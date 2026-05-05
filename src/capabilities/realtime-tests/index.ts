@@ -1,8 +1,8 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { RealtimeTestsNativeMethods } from "./native.js";
-import type { EcgTestOptions, RealtimeTestModality } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { RealtimeTestsNativeMethods } from "./native";
+import type { EcgTestOptions, RealtimeTestModality } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 type Direction = "start" | "stop";
 

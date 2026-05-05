@@ -1,4 +1,4 @@
-import type { MusicRemoteCommand } from "../../types/index.js";
+import type { MusicRemoteCommand } from "@/types/index";
 
 /** Normalizes a music remote command string from native. */
 export function normalizeMusicRemoteCommand(value: unknown): MusicRemoteCommand {

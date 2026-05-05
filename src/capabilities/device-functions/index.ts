@@ -1,9 +1,9 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { DeviceFunctionsNativeMethods } from "./native.js";
-import { normalizeDeviceFunctions } from "./normalizers/index.js";
-import type { DeviceFunctions } from "../../types/index.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { DeviceFunctionsNativeMethods } from "./native";
+import { normalizeDeviceFunctions } from "./normalizers/index";
+import type { DeviceFunctions } from "@/types/index";
 
 export class DeviceFunctionsCapability {
   constructor(private readonly ctx: CapabilityContext<DeviceFunctionsNativeMethods>) {}

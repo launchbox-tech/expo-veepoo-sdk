@@ -1,10 +1,10 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { SosNativeMethods } from "./native.js";
-import { normalizeSosCallTimesSettings } from "./normalizers.js";
-import { validateSosCallTimes } from "./validators.js";
-import type { SosCallTimesSettings } from "../../types/index.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { SosNativeMethods } from "./native";
+import { normalizeSosCallTimesSettings } from "./normalizers";
+import { validateSosCallTimes } from "./validators";
+import type { SosCallTimesSettings } from "@/types/index";
 
 export class SosCapability {
   constructor(private readonly ctx: CapabilityContext<SosNativeMethods>) {}

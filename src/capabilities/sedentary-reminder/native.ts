@@ -1,4 +1,4 @@
-import type { SedentaryReminderSettings } from "../../types/index.js";
+import type { SedentaryReminderSettings } from "@/types/index";
 
 export interface SedentaryReminderNativeMethods {
   readSedentaryReminder(): Promise<unknown>;

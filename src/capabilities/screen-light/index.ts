@@ -1,11 +1,11 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { ScreenLightNativeMethods } from "./native.js";
-import { normalizeScreenLightSettings, normalizeScreenLightDuration } from "./normalizers.js";
-import { validateScreenLightSettings, validateScreenLightDurationSeconds } from "./validators.js";
-import type { ScreenLightDuration, ScreenLightSettings } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { ScreenLightNativeMethods } from "./native";
+import { normalizeScreenLightSettings, normalizeScreenLightDuration } from "./normalizers";
+import { validateScreenLightSettings, validateScreenLightDurationSeconds } from "./validators";
+import type { ScreenLightDuration, ScreenLightSettings } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class ScreenLightCapability {
   constructor(private readonly ctx: CapabilityContext<ScreenLightNativeMethods>) {}

@@ -1,5 +1,5 @@
-import type { ScreenLightDuration, ScreenLightSettings } from "../../types/index.js";
-import { isRecord, toInt, toBoolean } from "../../normalizers/primitives.js";
+import type { ScreenLightDuration, ScreenLightSettings } from "@/types/index";
+import { isRecord, toInt, toBoolean } from "@/normalizers/primitives";
 
 export function normalizeScreenLightSettings(value: unknown): ScreenLightSettings {
   const record = isRecord(value) ? value : {};

@@ -1,8 +1,8 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { DeviceTimeNativeMethods } from "./native.js";
-import { validateDeviceTime } from "./validators.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { DeviceTimeNativeMethods } from "./native";
+import { validateDeviceTime } from "./validators";
 
 export class DeviceTimeCapability {
   constructor(private readonly ctx: CapabilityContext<DeviceTimeNativeMethods>) {}

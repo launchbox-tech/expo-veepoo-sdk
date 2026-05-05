@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 
-import { NATIVE_EMITTED_EVENTS, JS_LOCAL_ONLY_EVENTS } from "../bridge/veepoo-events-registry.js";
+import { NATIVE_EMITTED_EVENTS, JS_LOCAL_ONLY_EVENTS } from "../bridge/veepoo-events-registry";
 
 /** Kotlin `VeepooSDKConstants.kt` event string literals (excludes TAG). */
 export function extractKotlinNativeEvents(source: string): Set<string> {

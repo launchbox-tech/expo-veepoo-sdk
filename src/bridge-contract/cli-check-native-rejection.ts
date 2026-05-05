@@ -3,7 +3,7 @@ import { join } from "path";
 import {
   loadNativeRejectionContract,
   verifyNativeRejectionContract,
-} from "./verify-native-rejection-contract.js";
+} from "./verify-native-rejection-contract";
 
 const root = join(__dirname, "..", "..");
 const errors = verifyNativeRejectionContract(root);

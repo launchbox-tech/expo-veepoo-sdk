@@ -1,9 +1,9 @@
-import type { DeviceFunctions } from "../../../types/index.js";
-import { isRecord } from "../../../normalizers/primitives.js";
-import { normalizePackage1 } from "./package1.js";
-import { normalizePackage2 } from "./package2.js";
-import { normalizePackage3 } from "./package3.js";
-import { normalizePackage4, normalizePackage5 } from "./package4-5.js";
+import type { DeviceFunctions } from "@/types/index";
+import { isRecord } from "@/normalizers/primitives";
+import { normalizePackage1 } from "./package1";
+import { normalizePackage2 } from "./package2";
+import { normalizePackage3 } from "./package3";
+import { normalizePackage4, normalizePackage5 } from "./package4-5";
 
 export function normalizeDeviceFunctions(value: unknown): DeviceFunctions {
   const record = isRecord(value) ? value : {};

@@ -1,4 +1,4 @@
-import { deepSnakeKeys, deepCamelKeys } from '../normalizers/deep-keys.js';
+import { deepSnakeKeys, deepCamelKeys } from '@/normalizers/deep-keys';
 
 describe('deepSnakeKeys', () => {
   describe('flat objects', () => {

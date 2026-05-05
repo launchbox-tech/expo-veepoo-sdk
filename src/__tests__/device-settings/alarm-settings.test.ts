@@ -5,9 +5,9 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { AlarmsCapability } from '../../capabilities/alarms/index';
-import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
-import { makeMockNative, type MockNative } from '../helpers/mock-native';
+import { AlarmsCapability } from '@/capabilities/alarms/index';
+import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
+import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 
 describe('AlarmsCapability', () => {
   let native: MockNative;

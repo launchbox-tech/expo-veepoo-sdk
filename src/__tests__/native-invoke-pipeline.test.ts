@@ -1,5 +1,5 @@
-import { invokeOrThrow, invokeWithRecovery } from "../bridge/native-invoke-pipeline.js";
-import type { VeepooError } from "../types/errors.js";
+import { invokeOrThrow, invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
+import type { VeepooError } from "@/types/errors";
 
 describe("invokeOrThrow", () => {
   it("happy path — validate called, normalize applied, afterSuccess called, result returned", async () => {

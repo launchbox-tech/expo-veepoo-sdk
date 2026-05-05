@@ -1,6 +1,6 @@
-import { OriginReadPipeline } from '../bridge/origin-read-pipeline';
-import type { VeepooEventPayload } from '../types/events';
-import type { ReadOriginProgress } from '../types/health-tests';
+import { OriginReadPipeline } from '@/bridge/origin-read-pipeline';
+import type { VeepooEventPayload } from '@/types/events';
+import type { ReadOriginProgress } from '@/types/health-tests';
 
 /**
  * Helper to build a well-formed `readOriginProgress` payload.

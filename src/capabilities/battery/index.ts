@@ -1,9 +1,9 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { BatteryNativeMethods } from "./native.js";
-import { normalizeBatteryInfo } from "./normalizers.js";
-import type { BatteryInfo } from "../../types/index.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { BatteryNativeMethods } from "./native";
+import { normalizeBatteryInfo } from "./normalizers";
+import type { BatteryInfo } from "@/types/index";
 
 export class BatteryCapability {
   constructor(private readonly ctx: CapabilityContext<BatteryNativeMethods>) {}

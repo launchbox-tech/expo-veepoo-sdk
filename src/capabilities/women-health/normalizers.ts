@@ -1,5 +1,5 @@
-import type { WomenHealthSettings, WomenHealthStatus } from "../../types/index.js";
-import { isRecord, toInt, toStringValue } from "../../normalizers/primitives.js";
+import type { WomenHealthSettings, WomenHealthStatus } from "@/types/index";
+import { isRecord, toInt, toStringValue } from "@/normalizers/primitives";
 
 const WH_STATUSES: readonly WomenHealthStatus[] = [
   'none',

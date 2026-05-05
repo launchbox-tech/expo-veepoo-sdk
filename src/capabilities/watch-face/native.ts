@@ -1,4 +1,4 @@
-import type { WatchFaceDialType, WatchFaceStyleSettings } from "../../types/index.js";
+import type { WatchFaceDialType, WatchFaceStyleSettings } from "@/types/index";
 
 export interface WatchFaceNativeMethods {
   readWatchFaceStyle(options?: { dialType?: WatchFaceDialType } | null): Promise<unknown>;

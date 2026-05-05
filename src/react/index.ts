@@ -1,11 +1,11 @@
-export { VeepooSDKProvider } from "./VeepooSDKProvider.js";
-export { useVeepooSDK } from "./useVeepooSDK.js";
-export { useSDKState } from "./useSDKState.js";
+export { VeepooSDKProvider } from "./veepoo-sdk-provider";
+export { useVeepooSDK } from "./useVeepooSDK";
+export { useSDKState } from "./useSDKState";
 export {
   useIsConnected,
   useIsSessionReady,
   useIsScanning,
   useConnectedDeviceId,
   useSDKInitialized,
-} from "./convenience-hooks.js";
-export type { SDKStateSnapshot } from "./sdk-state-store.js";
+} from "./convenience-hooks";
+export type { SDKStateSnapshot } from "./sdk-state-store";

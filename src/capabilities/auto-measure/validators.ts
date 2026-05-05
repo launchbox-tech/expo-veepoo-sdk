@@ -1,5 +1,5 @@
-import type { AutoMeasureSetting } from "../../types/index.js";
-import { requireInRange } from "../../validators/shared.js";
+import type { AutoMeasureSetting } from "@/types/index";
+import { requireInRange } from "@/validators/shared";
 
 export function validateAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): void {
   const s = setting as any;

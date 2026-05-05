@@ -1,4 +1,4 @@
-import type { OperationStatus, SocialMsgData } from "../../types/index.js";
+import type { OperationStatus, SocialMsgData } from "@/types/index";
 
 export interface SocialMsgNativeMethods {
   readSocialMsgData(): Promise<unknown>;

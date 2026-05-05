@@ -1,6 +1,6 @@
 import type { EventSubscription } from "expo-modules-core";
-import type { VeepooEvent, VeepooEventPayload } from "../types/index.js";
-import { NATIVE_EMITTED_EVENTS } from "./veepoo-events-registry.js";
+import type { VeepooEvent, VeepooEventPayload } from "@/types/index";
+import { NATIVE_EMITTED_EVENTS } from "./veepoo-events-registry";
 
 export type EventListener = (payload: unknown) => void;
 

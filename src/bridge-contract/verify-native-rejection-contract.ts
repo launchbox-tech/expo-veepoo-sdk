@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 
-import { extractNativeRejectCodes } from "./extract-native-reject-codes.js";
+import { extractNativeRejectCodes } from "./extract-native-reject-codes";
 
 export interface NativeRejectionMappingJson {
   description?: string;

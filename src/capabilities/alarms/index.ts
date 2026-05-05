@@ -1,11 +1,11 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { AlarmNativeMethods } from "./native.js";
-import { normalizeAlarmList, normalizeHeartRateAlarm } from "./normalizers.js";
-import { validateAlarm, validateDeleteAlarm, validateHeartRateAlarm } from "./validators.js";
-import type { DeviceAlarm, HeartRateAlarm, OperationStatus } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { AlarmNativeMethods } from "./native";
+import { normalizeAlarmList, normalizeHeartRateAlarm } from "./normalizers";
+import { validateAlarm, validateDeleteAlarm, validateHeartRateAlarm } from "./validators";
+import type { DeviceAlarm, HeartRateAlarm, OperationStatus } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class AlarmsCapability {
   constructor(private readonly ctx: CapabilityContext<AlarmNativeMethods>) {}

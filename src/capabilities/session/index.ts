@@ -1,9 +1,9 @@
-import { invokeOrThrow, invokeWithRecovery } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { SessionNativeMethods } from "./native.js";
-import { normalizePasswordData } from "./normalizers.js";
-import { validateDeviceId, validateConnectOptions } from "./validators.js";
-import type { ConnectOptions, ConnectionStatus, PasswordData } from "../../types/index.js";
+import { invokeOrThrow, invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { SessionNativeMethods } from "./native";
+import { normalizePasswordData } from "./normalizers";
+import { validateDeviceId, validateConnectOptions } from "./validators";
+import type { ConnectOptions, ConnectionStatus, PasswordData } from "@/types/index";
 
 export class SessionCapability {
   constructor(private readonly ctx: CapabilityContext<SessionNativeMethods>) {}

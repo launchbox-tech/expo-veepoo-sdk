@@ -1,4 +1,4 @@
-import type { PermissionsResult, ScanOptions } from "../../types/index.js";
+import type { PermissionsResult, ScanOptions } from "@/types/index";
 
 export interface BandDiscoveryNativeMethods {
   isBluetoothEnabled(): Promise<boolean>;

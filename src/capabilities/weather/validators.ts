@@ -3,8 +3,8 @@ import type {
   WeatherDailyForecast,
   WeatherHourlyForecast,
   WeatherSettings,
-} from "../../types/index.js";
-import { requireInRange } from "../../validators/shared.js";
+} from "@/types/index";
+import { requireInRange } from "@/validators/shared";
 
 const DATETIME_RE = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;

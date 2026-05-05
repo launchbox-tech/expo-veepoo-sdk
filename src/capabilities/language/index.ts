@@ -1,8 +1,8 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { LanguageNativeMethods } from "./native.js";
-import type { Language } from "../../types/index.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { LanguageNativeMethods } from "./native";
+import type { Language } from "@/types/index";
 
 export class LanguageCapability {
   constructor(private readonly ctx: CapabilityContext<LanguageNativeMethods>) {}

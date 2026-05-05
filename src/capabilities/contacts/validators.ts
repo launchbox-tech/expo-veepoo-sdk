@@ -1,4 +1,4 @@
-import type { NewDeviceContact } from "../../types/index.js";
+import type { NewDeviceContact } from "@/types/index";
 
 const CONTACT_NAME_MAX_BYTES = 20;
 

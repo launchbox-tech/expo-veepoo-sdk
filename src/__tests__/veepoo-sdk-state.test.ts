@@ -1,4 +1,4 @@
-import { VeepooSdkState } from "../sdk/veepoo-sdk-state";
+import { VeepooSdkState } from "@/sdk/veepoo-sdk-state";
 
 describe("VeepooSdkState — Session transition methods", () => {
   let state: VeepooSdkState;

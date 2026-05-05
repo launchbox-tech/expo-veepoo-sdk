@@ -1,4 +1,4 @@
-import { useSDKState } from "./useSDKState.js";
+import { useSDKState } from "./useSDKState";
 
 export const useIsConnected = (): boolean => useSDKState((s) => s.isConnected);
 

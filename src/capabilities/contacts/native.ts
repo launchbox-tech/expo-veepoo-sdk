@@ -1,4 +1,4 @@
-import type { NewDeviceContact } from "../../types/index.js";
+import type { NewDeviceContact } from "@/types/index";
 
 export interface ContactsNativeMethods {
   readContacts(crc?: number): Promise<unknown>;

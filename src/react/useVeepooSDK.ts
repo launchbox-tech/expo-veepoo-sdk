@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { useSyncExternalStore } from "react";
-import { VeepooSDKContext } from "./VeepooSDKContext.js";
+import { VeepooSDKContext } from "./veepoo-sdk-context";
 
 export function useVeepooSDK() {
   const ctx = useContext(VeepooSDKContext);

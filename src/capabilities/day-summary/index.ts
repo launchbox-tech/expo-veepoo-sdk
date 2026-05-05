@@ -1,9 +1,9 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { DaySummaryNativeMethods } from "./native.js";
-import { normalizeDaySummaryData } from "./normalizers.js";
-import type { DaySummaryData } from "../../types/index.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { DaySummaryNativeMethods } from "./native";
+import { normalizeDaySummaryData } from "./normalizers";
+import type { DaySummaryData } from "@/types/index";
 
 export class DaySummaryCapability {
   constructor(private readonly ctx: CapabilityContext<DaySummaryNativeMethods>) {}

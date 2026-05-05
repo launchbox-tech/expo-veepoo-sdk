@@ -1,4 +1,4 @@
-import type { AutoMeasureSetting } from "../../types/index.js";
+import type { AutoMeasureSetting } from "@/types/index";
 
 export interface AutoMeasureNativeMethods {
   readAutoMeasureSetting(): Promise<unknown>;

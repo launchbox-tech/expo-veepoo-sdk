@@ -1,5 +1,5 @@
-import type { SleepData } from "../../types/index.js";
-import { isRecord, toInt, toNumber, toStringValue } from "../../normalizers/primitives.js";
+import type { SleepData } from "@/types/index";
+import { isRecord, toInt, toNumber, toStringValue } from "@/normalizers/primitives";
 
 function normalizeSleepRecord(value: Record<string, unknown>): SleepData | null {
   if (Array.isArray(value.items) && isRecord(value.summary)) {

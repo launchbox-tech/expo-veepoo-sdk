@@ -1,5 +1,5 @@
-import type { TestState } from './health-tests.js';
-import type { SportMode } from './settings.js';
+import type { TestState } from './health-tests';
+import type { SportMode } from './settings';
 
 export interface HeartRateData {
   value: number;

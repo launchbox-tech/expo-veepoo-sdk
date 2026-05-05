@@ -1,5 +1,5 @@
-import type { WristFlipWakeSettings } from "../../types/index.js";
-import { requireInRange, requireValidHour, requireValidMinute } from "../../validators/shared.js";
+import type { WristFlipWakeSettings } from "@/types/index";
+import { requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
 
 export function validateWristFlipWakeSettings(s: WristFlipWakeSettings): void {
   const r = s as any;

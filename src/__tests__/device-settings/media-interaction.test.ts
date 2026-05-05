@@ -5,11 +5,11 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { FindDeviceCapability } from '../../capabilities/find-device/index';
-import { CameraCapability } from '../../capabilities/camera/index';
-import { MusicCapability } from '../../capabilities/music/index';
-import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
-import { makeMockNative, type MockNative } from '../helpers/mock-native';
+import { FindDeviceCapability } from '@/capabilities/find-device/index';
+import { CameraCapability } from '@/capabilities/camera/index';
+import { MusicCapability } from '@/capabilities/music/index';
+import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
+import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 
 describe('MediaInteraction (split capabilities)', () => {
   let native: MockNative;

@@ -1,11 +1,11 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { SedentaryReminderNativeMethods } from "./native.js";
-import { normalizeSedentaryReminderSettings } from "./normalizers.js";
-import { validateSedentaryReminderSettings } from "./validators.js";
-import type { SedentaryReminderSettings } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { SedentaryReminderNativeMethods } from "./native";
+import { normalizeSedentaryReminderSettings } from "./normalizers";
+import { validateSedentaryReminderSettings } from "./validators";
+import type { SedentaryReminderSettings } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class SedentaryReminderCapability {
   constructor(private readonly ctx: CapabilityContext<SedentaryReminderNativeMethods>) {}

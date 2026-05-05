@@ -2,28 +2,28 @@ import type {
   ReadOriginProgress,
   VeepooEvent,
   VeepooEventPayload,
-} from '../types/index.js';
-import { isRecord, clamp } from '../normalizers/primitives.js';
-import { deepSnakeKeys } from '../normalizers/deep-keys.js';
-import { normalizeBluetoothStatus, normalizePasswordData } from '../capabilities/session/normalizers.js';
-import { normalizeAlarmList, normalizeHeartRateAlarm } from '../capabilities/alarms/normalizers.js';
-import { normalizeBatteryInfo } from '../capabilities/battery/normalizers.js';
-import { normalizeCameraShutterStatus } from '../capabilities/camera/normalizers.js';
-import { normalizeContactList } from '../capabilities/contacts/normalizers.js';
-import { normalizeDeviceBTState } from '../capabilities/bt-status/normalizers.js';
-import { normalizeDeviceFunctions } from '../capabilities/device-functions/normalizers/index.js';
-import { normalizeDeviceVersion } from '../capabilities/device-version/normalizers.js';
-import { normalizeFindDeviceStatePayload } from '../capabilities/find-device/normalizers.js';
-import { normalizeMusicRemoteCommand } from '../capabilities/music/normalizers.js';
-import { normalizeSocialMsgData } from '../capabilities/social-msg/normalizers.js';
-import { normalizeSosCallTimesSettings } from '../capabilities/sos/normalizers.js';
+} from '@/types/index';
+import { isRecord, clamp } from '@/normalizers/primitives';
+import { deepSnakeKeys } from '@/normalizers/deep-keys';
+import { normalizeBluetoothStatus, normalizePasswordData } from '@/capabilities/session/normalizers';
+import { normalizeAlarmList, normalizeHeartRateAlarm } from '@/capabilities/alarms/normalizers';
+import { normalizeBatteryInfo } from '@/capabilities/battery/normalizers';
+import { normalizeCameraShutterStatus } from '@/capabilities/camera/normalizers';
+import { normalizeContactList } from '@/capabilities/contacts/normalizers';
+import { normalizeDeviceBTState } from '@/capabilities/bt-status/normalizers';
+import { normalizeDeviceFunctions } from '@/capabilities/device-functions/normalizers/index';
+import { normalizeDeviceVersion } from '@/capabilities/device-version/normalizers';
+import { normalizeFindDeviceStatePayload } from '@/capabilities/find-device/normalizers';
+import { normalizeMusicRemoteCommand } from '@/capabilities/music/normalizers';
+import { normalizeSocialMsgData } from '@/capabilities/social-msg/normalizers';
+import { normalizeSosCallTimesSettings } from '@/capabilities/sos/normalizers';
 import {
   normalizeHalfHourData,
   normalizeOriginDataList,
   normalizeSpo2OriginData,
-} from '../capabilities/origin-data/normalizers.js';
-import { normalizeSleepDataList } from '../capabilities/sleep-data/normalizers.js';
-import { normalizeSportStepData } from '../capabilities/sport-steps/normalizers.js';
+} from '@/capabilities/origin-data/normalizers';
+import { normalizeSleepDataList } from '@/capabilities/sleep-data/normalizers';
+import { normalizeSportStepData } from '@/capabilities/sport-steps/normalizers';
 import {
   normalizeBloodGlucoseData,
   normalizeBloodOxygenTestResult,
@@ -36,8 +36,8 @@ import {
   normalizeHrvTestResult,
   normalizeStressData,
   normalizeTemperatureTestResult,
-} from '../capabilities/realtime-tests/normalizers.js';
-import { normalizeFirmwareDfuProgress } from '../capabilities/dfu/normalizers.js';
+} from '@/capabilities/realtime-tests/normalizers';
+import { normalizeFirmwareDfuProgress } from '@/capabilities/dfu/normalizers';
 
 export function normalizeReadOriginProgressPayload(value: unknown): VeepooEventPayload['readOriginProgress'] {
   if (!isRecord(value) || !isRecord(value.progress)) {

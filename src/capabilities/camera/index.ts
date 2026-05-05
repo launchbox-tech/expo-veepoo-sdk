@@ -1,7 +1,7 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { CameraNativeMethods } from "./native.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { CameraNativeMethods } from "./native";
 
 export class CameraCapability {
   constructor(private readonly ctx: CapabilityContext<CameraNativeMethods>) {}

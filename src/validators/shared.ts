@@ -1,4 +1,4 @@
-import type { VeepooError } from '../types/index.js';
+import type { VeepooError } from '@/types/index';
 
 function fail(message: string): never {
   throw { code: 'INVALID_ARGUMENT', message } satisfies VeepooError;

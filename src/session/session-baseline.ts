@@ -17,8 +17,8 @@
  * @module
  */
 
-import type { VeepooSDKModuleInterface } from '../VeepooSDKModule.js';
-import type { PersonalInfo, BatteryInfo, DeviceVersion } from '../types/index.js';
+import type { VeepooSDKModuleInterface } from '@/veepoo-sdk-module';
+import type { PersonalInfo, BatteryInfo, DeviceVersion } from '@/types/index';
 
 // ── Public types ────────────────────────────────────────────────────
 

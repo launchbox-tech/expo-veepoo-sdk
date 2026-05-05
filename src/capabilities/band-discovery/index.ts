@@ -1,8 +1,8 @@
-import { invokeOrThrow, invokeWithRecovery } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { BandDiscoveryNativeMethods } from "./native.js";
-import { normalizePermissionsResult } from "./normalizers.js";
-import type { PermissionsResult, ScanOptions } from "../../types/index.js";
+import { invokeOrThrow, invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { BandDiscoveryNativeMethods } from "./native";
+import { normalizePermissionsResult } from "./normalizers";
+import type { PermissionsResult, ScanOptions } from "@/types/index";
 
 export class BandDiscoveryCapability {
   constructor(private readonly ctx: CapabilityContext<BandDiscoveryNativeMethods>) {}

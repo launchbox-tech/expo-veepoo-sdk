@@ -1,7 +1,7 @@
 import { join } from "node:path";
 
-import { NATIVE_EMITTED_EVENTS, JS_LOCAL_ONLY_EVENTS } from "../bridge/veepoo-events-registry.js";
-import { verifyVeepooEventsContract } from "./verify-veepoo-events.js";
+import { NATIVE_EMITTED_EVENTS, JS_LOCAL_ONLY_EVENTS } from "../bridge/veepoo-events-registry";
+import { verifyVeepooEventsContract } from "./verify-veepoo-events";
 
 const root = join(__dirname, "..", "..");
 const errors = verifyVeepooEventsContract(root);

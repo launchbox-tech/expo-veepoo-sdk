@@ -1,7 +1,7 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { FindDeviceNativeMethods } from "./native.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { FindDeviceNativeMethods } from "./native";
 
 export class FindDeviceCapability {
   constructor(private readonly ctx: CapabilityContext<FindDeviceNativeMethods>) {}

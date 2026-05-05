@@ -1,5 +1,5 @@
-import type { HalfHourData, OriginData, Spo2OriginData } from "../../types/index.js";
-import { isRecord, toInt, toNumber, toStringValue } from "../../normalizers/primitives.js";
+import type { HalfHourData, OriginData, Spo2OriginData } from "@/types/index";
+import { isRecord, toInt, toNumber, toStringValue } from "@/normalizers/primitives";
 
 function normalizeOriginItem(value: Record<string, unknown>): OriginData {
   const rawBloodGlucose = toNumber(value.bloodGlucose ?? value.glucose);

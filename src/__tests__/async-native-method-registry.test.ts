@@ -1,7 +1,7 @@
 import {
   NATIVE_ASYNC_METHOD_NAMES,
   NATIVE_ASYNC_REGISTRY_INTEGRITY,
-} from "../bridge-contract/async-native-method-registry";
+} from "@/bridge-contract/async-native-method-registry";
 
 describe("NATIVE_ASYNC_METHOD_NAMES (#84)", () => {
   it("compile-time integrity export is true", () => {

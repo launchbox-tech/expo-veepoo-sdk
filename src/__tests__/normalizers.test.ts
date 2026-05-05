@@ -1,17 +1,17 @@
-import { normalizeAlarmList, normalizeHeartRateAlarm } from '../capabilities/alarms/normalizers.js';
-import { normalizeBluetoothStatus, normalizePermissionsResult } from '../capabilities/session/normalizers.js';
-import { normalizeCameraShutterStatus } from '../capabilities/camera/normalizers.js';
-import { normalizeDeviceBTState, normalizeDeviceBTStatus } from '../capabilities/bt-status/normalizers.js';
-import { normalizeEventPayload, normalizeReadOriginProgressPayload } from '../bridge/event-normalizer.js';
-import { normalizeMusicRemoteCommand } from '../capabilities/music/normalizers.js';
-import { normalizeScreenLightDuration, normalizeScreenLightSettings } from '../capabilities/screen-light/normalizers.js';
-import { normalizeSedentaryReminderSettings } from '../capabilities/sedentary-reminder/normalizers.js';
-import { normalizeWristFlipWakeSettings } from '../capabilities/wrist-flip/normalizers.js';
-import { normalizeWomenHealthSettings } from '../capabilities/women-health/normalizers.js';
-import { normalizeWatchFaceStyle } from '../capabilities/watch-face/normalizers.js';
-import { normalizeContactList } from '../capabilities/contacts/normalizers.js';
-import { normalizeSosCallTimesSettings } from '../capabilities/sos/normalizers.js';
-import { normalizeWeatherSettings } from '../capabilities/weather/normalizers.js';
+import { normalizeAlarmList, normalizeHeartRateAlarm } from '@/capabilities/alarms/normalizers';
+import { normalizeBluetoothStatus, normalizePermissionsResult } from '@/capabilities/session/normalizers';
+import { normalizeCameraShutterStatus } from '@/capabilities/camera/normalizers';
+import { normalizeDeviceBTState, normalizeDeviceBTStatus } from '@/capabilities/bt-status/normalizers';
+import { normalizeEventPayload, normalizeReadOriginProgressPayload } from '@/bridge/event-normalizer';
+import { normalizeMusicRemoteCommand } from '@/capabilities/music/normalizers';
+import { normalizeScreenLightDuration, normalizeScreenLightSettings } from '@/capabilities/screen-light/normalizers';
+import { normalizeSedentaryReminderSettings } from '@/capabilities/sedentary-reminder/normalizers';
+import { normalizeWristFlipWakeSettings } from '@/capabilities/wrist-flip/normalizers';
+import { normalizeWomenHealthSettings } from '@/capabilities/women-health/normalizers';
+import { normalizeWatchFaceStyle } from '@/capabilities/watch-face/normalizers';
+import { normalizeContactList } from '@/capabilities/contacts/normalizers';
+import { normalizeSosCallTimesSettings } from '@/capabilities/sos/normalizers';
+import { normalizeWeatherSettings } from '@/capabilities/weather/normalizers';
 
 describe('normalizeAlarmList', () => {
   it('returns empty array for non-array input', () => {

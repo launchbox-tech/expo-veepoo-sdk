@@ -2,8 +2,8 @@ import type {
   WomenHealthBabySex,
   WomenHealthSettings,
   WomenHealthStatus,
-} from "../../types/index.js";
-import { requireInRange } from "../../validators/shared.js";
+} from "@/types/index";
+import { requireInRange } from "@/validators/shared";
 
 const YMD = /^\d{4}-\d{2}-\d{2}$/;
 

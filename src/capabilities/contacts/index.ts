@@ -1,11 +1,11 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { ContactsNativeMethods } from "./native.js";
-import { normalizeContactList } from "./normalizers.js";
-import { validateNewContact, validateContactId } from "./validators.js";
-import type { DeviceContact, NewDeviceContact } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { ContactsNativeMethods } from "./native";
+import { normalizeContactList } from "./normalizers";
+import { validateNewContact, validateContactId } from "./validators";
+import type { DeviceContact, NewDeviceContact } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class ContactsCapability {
   constructor(private readonly ctx: CapabilityContext<ContactsNativeMethods>) {}

@@ -7,11 +7,11 @@ jest.mock("react-native", () => ({
 
 import React, { act } from "react";
 import { create } from "react-test-renderer";
-import { VeepooSDKProvider } from "../react/VeepooSDKProvider";
-import { useVeepooSDK } from "../react/useVeepooSDK";
-import { useSDKState } from "../react/useSDKState";
+import { VeepooSDKProvider } from "@/react/veepoo-sdk-provider";
+import { useVeepooSDK } from "@/react/useVeepooSDK";
+import { useSDKState } from "@/react/useSDKState";
 import { makeMockNative } from "./helpers/mock-native";
-import { VeepooSDK } from "../VeepooSDK";
+import { VeepooSDK } from "@/veepoo-sdk";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

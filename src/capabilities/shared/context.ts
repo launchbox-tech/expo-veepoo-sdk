@@ -1,4 +1,4 @@
-import type { LogLevel, LogScope, VeepooError, VeepooEvent } from "../../types/index.js";
+import type { LogLevel, LogScope, VeepooError, VeepooEvent } from "@/types/index";
 
 export interface CapabilityContext<TNative> {
   native: TNative;

@@ -1,4 +1,4 @@
-import type { FunctionStatus, TestState } from '../types/index.js';
+import type { FunctionStatus, TestState } from '@/types/index';
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;

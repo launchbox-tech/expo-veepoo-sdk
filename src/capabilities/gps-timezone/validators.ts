@@ -1,4 +1,4 @@
-import type { GPSAndTimezoneData } from "../../types/index.js";
+import type { GPSAndTimezoneData } from "@/types/index";
 
 export function validateGPSAndTimezoneData(data: GPSAndTimezoneData): void {
   if (typeof data.latitude !== 'number' || !Number.isFinite(data.latitude) || data.latitude < -90 || data.latitude > 90) {

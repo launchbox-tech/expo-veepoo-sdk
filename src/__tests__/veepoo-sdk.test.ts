@@ -5,8 +5,8 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { VeepooSDK } from '../VeepooSDK';
-import { RealtimeTest } from '../types/index.js';
+import { VeepooSDK } from '@/veepoo-sdk';
+import { RealtimeTest } from '@/types/index';
 import { makeMockNative, type MockNative } from './helpers/mock-native';
 
 // ── VeepooSDK class ───────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
-import type { LogEntry } from './types/index.js';
-import type { VeepooSDKInterface } from './VeepooSDK.js';
+import type { LogEntry } from './types/index';
+import type { VeepooSDKInterface } from './veepoo-sdk';
 
 export type LogListener = (entry: LogEntry) => void;
 

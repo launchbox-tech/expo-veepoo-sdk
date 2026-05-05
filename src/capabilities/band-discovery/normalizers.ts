@@ -4,8 +4,8 @@ import type {
   BluetoothStatus,
   PermissionStatus,
   PermissionsResult,
-} from "../../types/index.js";
-import { isRecord, toBoolean } from "../../normalizers/primitives.js";
+} from "@/types/index";
+import { isRecord, toBoolean } from "@/normalizers/primitives";
 
 const bluetoothStatesByCode: BluetoothState[] = [
   'unknown',

@@ -1,8 +1,8 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { DfuNativeMethods } from "./native.js";
-import { validateFirmwareDfuFilePath } from "./validators.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { DfuNativeMethods } from "./native";
+import { validateFirmwareDfuFilePath } from "./validators";
 
 export class DfuCapability {
   constructor(private readonly ctx: CapabilityContext<DfuNativeMethods>) {}

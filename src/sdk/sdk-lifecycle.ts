@@ -1,5 +1,5 @@
-import { invokeOrThrow } from "../bridge/native-invoke-pipeline.js";
-import type { LifecycleRuntime } from "./subsystem-interfaces.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { LifecycleRuntime } from "./subsystem-interfaces";
 
 export class SdkLifecycle {
   constructor(private readonly rt: LifecycleRuntime) {}

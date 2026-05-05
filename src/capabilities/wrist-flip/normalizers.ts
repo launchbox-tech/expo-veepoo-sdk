@@ -1,5 +1,5 @@
-import type { WristFlipWakeSettings } from "../../types/index.js";
-import { isRecord, toInt, toBoolean } from "../../normalizers/primitives.js";
+import type { WristFlipWakeSettings } from "@/types/index";
+import { isRecord, toInt, toBoolean } from "@/normalizers/primitives";
 
 export function normalizeWristFlipWakeSettings(value: unknown): WristFlipWakeSettings {
   const record = isRecord(value) ? value : {};

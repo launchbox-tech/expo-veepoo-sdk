@@ -5,10 +5,10 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { ContactsCapability } from '../../capabilities/contacts/index';
-import { SosCapability } from '../../capabilities/sos/index';
-import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
-import { makeMockNative, type MockNative } from '../helpers/mock-native';
+import { ContactsCapability } from '@/capabilities/contacts/index';
+import { SosCapability } from '@/capabilities/sos/index';
+import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
+import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 
 describe('EmergencySettings (split capabilities)', () => {
   let native: MockNative;

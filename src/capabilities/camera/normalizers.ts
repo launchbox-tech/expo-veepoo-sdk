@@ -1,4 +1,4 @@
-import type { CameraShutterStatus } from "../../types/index.js";
+import type { CameraShutterStatus } from "@/types/index";
 
 /**
  * Normalizes camera shutter status from native.

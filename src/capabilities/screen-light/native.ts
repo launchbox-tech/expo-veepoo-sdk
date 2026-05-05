@@ -1,4 +1,4 @@
-import type { ScreenLightSettings } from "../../types/index.js";
+import type { ScreenLightSettings } from "@/types/index";
 
 export interface ScreenLightNativeMethods {
   readScreenLightSettings(): Promise<unknown>;

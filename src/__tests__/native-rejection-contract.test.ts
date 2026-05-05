@@ -1,6 +1,6 @@
 import { join } from "path";
 
-import { verifyNativeRejectionContract } from "../bridge-contract/verify-native-rejection-contract.js";
+import { verifyNativeRejectionContract } from "@/bridge-contract/verify-native-rejection-contract";
 
 const repoRoot = join(__dirname, "..", "..");
 

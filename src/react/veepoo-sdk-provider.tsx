@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { VeepooSDK } from "../VeepooSDK.js";
-import { VeepooSDKStateStore } from "./sdk-state-store.js";
-import { VeepooSDKContext } from "./VeepooSDKContext.js";
-import type { LogListener } from "../VeepooSDKModule.js";
-import type { VeepooError } from "../types/index.js";
+import { VeepooSDK } from "@/veepoo-sdk";
+import { VeepooSDKStateStore } from "./sdk-state-store";
+import { VeepooSDKContext } from "./veepoo-sdk-context";
+import type { LogListener } from "@/veepoo-sdk-module";
+import type { VeepooError } from "@/types/index";
 
 type VeepooSDKProviderProps = {
   children?: React.ReactNode;

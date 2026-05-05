@@ -1,4 +1,4 @@
-import type { DeviceAlarm, HeartRateAlarm, OperationStatus } from "../../types/index.js";
+import type { DeviceAlarm, HeartRateAlarm, OperationStatus } from "@/types/index";
 
 export interface AlarmNativeMethods {
   readAlarms(): Promise<unknown>;

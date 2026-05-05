@@ -1,7 +1,7 @@
 import { createContext } from "react";
-import type { VeepooSDKInterface } from "../VeepooSDK.js";
-import type { VeepooSDKStateStore } from "./sdk-state-store.js";
-import type { VeepooError } from "../types/index.js";
+import type { VeepooSDKInterface } from "@/veepoo-sdk";
+import type { VeepooSDKStateStore } from "./sdk-state-store";
+import type { VeepooError } from "@/types/index";
 
 export type VeepooSDKContextValue = {
   readonly sdk: VeepooSDKInterface;

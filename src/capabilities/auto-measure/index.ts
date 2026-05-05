@@ -1,11 +1,11 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { AutoMeasureNativeMethods } from "./native.js";
-import { normalizeAutoMeasureSettings } from "./normalizers.js";
-import { validateAutoMeasureSetting } from "./validators.js";
-import type { AutoMeasureSetting } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { AutoMeasureNativeMethods } from "./native";
+import { normalizeAutoMeasureSettings } from "./normalizers";
+import { validateAutoMeasureSetting } from "./validators";
+import type { AutoMeasureSetting } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class AutoMeasureCapability {
   constructor(private readonly ctx: CapabilityContext<AutoMeasureNativeMethods>) {}

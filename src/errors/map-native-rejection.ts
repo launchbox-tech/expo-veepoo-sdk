@@ -1,6 +1,6 @@
-import type { NativeRejectionMappingJson } from "../bridge-contract/verify-native-rejection-contract.js";
-import mappingDocument from "../bridge-contract/native-rejection-codes.json";
-import type { VeepooError, VeepooErrorCode } from "../types/errors.js";
+import type { NativeRejectionMappingJson } from "@/bridge-contract/verify-native-rejection-contract";
+import mappingDocument from "@/bridge-contract/native-rejection-codes.json";
+import type { VeepooError, VeepooErrorCode } from "@/types/errors";
 
 const VEEPOO_CODES: readonly VeepooErrorCode[] = [
   "UNKNOWN",

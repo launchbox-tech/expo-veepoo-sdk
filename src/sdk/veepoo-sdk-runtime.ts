@@ -8,15 +8,15 @@ import type {
   VeepooError,
   VeepooEvent,
   VeepooEventPayload,
-} from "../types/index.js";
-import type { NativeVeepooSDKInterface } from "../NativeVeepooSDK.js";
-import type { LogListener } from "../VeepooSDKModule.js";
-import { normalizeEventPayload } from "../bridge/event-normalizer.js";
-import { mapNativeRejection } from "../errors/map-native-rejection.js";
-import { VeepooSdkState } from "./veepoo-sdk-state.js";
-import { OriginReadPipeline } from "../bridge/origin-read-pipeline.js";
-import { EventBus } from "../bridge/event-bus.js";
-import type { CapabilityContext } from "../capabilities/shared/context.js";
+} from "@/types/index";
+import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
+import type { LogListener } from "@/veepoo-sdk-module";
+import { normalizeEventPayload } from "@/bridge/event-normalizer";
+import { mapNativeRejection } from "@/errors/map-native-rejection";
+import { VeepooSdkState } from "./veepoo-sdk-state";
+import { OriginReadPipeline } from "@/bridge/origin-read-pipeline";
+import { EventBus } from "@/bridge/event-bus";
+import type { CapabilityContext } from "@/capabilities/shared/context";
 
 /**
  * Shared **Session** / scan / init state (`state`), logging, and wiring between

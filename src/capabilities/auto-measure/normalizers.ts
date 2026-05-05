@@ -1,5 +1,5 @@
-import type { AutoMeasureSetting } from "../../types/index.js";
-import { isRecord, toInt, toBoolean } from "../../normalizers/primitives.js";
+import type { AutoMeasureSetting } from "@/types/index";
+import { isRecord, toInt, toBoolean } from "@/normalizers/primitives";
 
 export function normalizeAutoMeasureSettings(value: unknown): AutoMeasureSetting[] {
   if (!Array.isArray(value)) return [];

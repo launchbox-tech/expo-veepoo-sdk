@@ -38,44 +38,44 @@ import type {
   WeatherSettings,
   WomenHealthSettings,
   WristFlipWakeSettings,
-} from "./types/index.js";
-import type { NativeVeepooSDKInterface } from "./NativeVeepooSDK.js";
-import { NativeVeepooSDK } from "./NativeVeepooSDK.js";
-import type { LogListener } from "./VeepooSDKModule.js";
-import { VeepooSDKRuntime } from "./sdk/veepoo-sdk-runtime.js";
-import { SdkLifecycle } from "./sdk/sdk-lifecycle.js";
+} from "./types/index";
+import type { NativeVeepooSDKInterface } from "./native-veepoo-sdk";
+import { NativeVeepooSDK } from "./native-veepoo-sdk";
+import type { LogListener } from "./veepoo-sdk-module";
+import { VeepooSDKRuntime } from "./sdk/veepoo-sdk-runtime";
+import { SdkLifecycle } from "./sdk/sdk-lifecycle";
 
-import { AlarmsCapability } from "./capabilities/alarms/index.js";
-import { AutoMeasureCapability } from "./capabilities/auto-measure/index.js";
-import { BandDiscoveryCapability } from "./capabilities/band-discovery/index.js";
-import { BatteryCapability } from "./capabilities/battery/index.js";
-import { BtStatusCapability } from "./capabilities/bt-status/index.js";
-import { CameraCapability } from "./capabilities/camera/index.js";
-import { ContactsCapability } from "./capabilities/contacts/index.js";
-import { DaySummaryCapability } from "./capabilities/day-summary/index.js";
-import { DeviceFunctionsCapability } from "./capabilities/device-functions/index.js";
-import { DeviceTimeCapability } from "./capabilities/device-time/index.js";
-import { DeviceVersionCapability } from "./capabilities/device-version/index.js";
-import { DfuCapability } from "./capabilities/dfu/index.js";
-import { FindDeviceCapability } from "./capabilities/find-device/index.js";
-import { GpsTimezoneCapability } from "./capabilities/gps-timezone/index.js";
-import { HistoricalQueryCapability } from "./capabilities/historical-query/index.js";
-import { LanguageCapability } from "./capabilities/language/index.js";
-import { MusicCapability } from "./capabilities/music/index.js";
-import { OriginDataCapability } from "./capabilities/origin-data/index.js";
-import { PersonalInfoCapability } from "./capabilities/personal-info/index.js";
-import { RealtimeTestsCapability } from "./capabilities/realtime-tests/index.js";
-import { ScreenLightCapability } from "./capabilities/screen-light/index.js";
-import { SedentaryReminderCapability } from "./capabilities/sedentary-reminder/index.js";
-import { SessionCapability } from "./capabilities/session/index.js";
-import { SleepDataCapability } from "./capabilities/sleep-data/index.js";
-import { SocialMsgCapability } from "./capabilities/social-msg/index.js";
-import { SosCapability } from "./capabilities/sos/index.js";
-import { SportStepsCapability } from "./capabilities/sport-steps/index.js";
-import { WatchFaceCapability } from "./capabilities/watch-face/index.js";
-import { WeatherCapability } from "./capabilities/weather/index.js";
-import { WomenHealthCapability } from "./capabilities/women-health/index.js";
-import { WristFlipCapability } from "./capabilities/wrist-flip/index.js";
+import { AlarmsCapability } from "./capabilities/alarms/index";
+import { AutoMeasureCapability } from "./capabilities/auto-measure/index";
+import { BandDiscoveryCapability } from "./capabilities/band-discovery/index";
+import { BatteryCapability } from "./capabilities/battery/index";
+import { BtStatusCapability } from "./capabilities/bt-status/index";
+import { CameraCapability } from "./capabilities/camera/index";
+import { ContactsCapability } from "./capabilities/contacts/index";
+import { DaySummaryCapability } from "./capabilities/day-summary/index";
+import { DeviceFunctionsCapability } from "./capabilities/device-functions/index";
+import { DeviceTimeCapability } from "./capabilities/device-time/index";
+import { DeviceVersionCapability } from "./capabilities/device-version/index";
+import { DfuCapability } from "./capabilities/dfu/index";
+import { FindDeviceCapability } from "./capabilities/find-device/index";
+import { GpsTimezoneCapability } from "./capabilities/gps-timezone/index";
+import { HistoricalQueryCapability } from "./capabilities/historical-query/index";
+import { LanguageCapability } from "./capabilities/language/index";
+import { MusicCapability } from "./capabilities/music/index";
+import { OriginDataCapability } from "./capabilities/origin-data/index";
+import { PersonalInfoCapability } from "./capabilities/personal-info/index";
+import { RealtimeTestsCapability } from "./capabilities/realtime-tests/index";
+import { ScreenLightCapability } from "./capabilities/screen-light/index";
+import { SedentaryReminderCapability } from "./capabilities/sedentary-reminder/index";
+import { SessionCapability } from "./capabilities/session/index";
+import { SleepDataCapability } from "./capabilities/sleep-data/index";
+import { SocialMsgCapability } from "./capabilities/social-msg/index";
+import { SosCapability } from "./capabilities/sos/index";
+import { SportStepsCapability } from "./capabilities/sport-steps/index";
+import { WatchFaceCapability } from "./capabilities/watch-face/index";
+import { WeatherCapability } from "./capabilities/weather/index";
+import { WomenHealthCapability } from "./capabilities/women-health/index";
+import { WristFlipCapability } from "./capabilities/wrist-flip/index";
 
 export interface VeepooSDKInterface {
   // Lifecycle (flat, not namespaced)

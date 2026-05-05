@@ -1,5 +1,5 @@
-import type { ScreenLightSettings } from "../../types/index.js";
-import { requireInRange, requireValidHour, requireValidMinute } from "../../validators/shared.js";
+import type { ScreenLightSettings } from "@/types/index";
+import { requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
 
 export function validateScreenLightSettings(s: ScreenLightSettings): void {
   const r = s as any;

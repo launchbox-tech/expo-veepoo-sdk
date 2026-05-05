@@ -1,9 +1,9 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { SleepDataNativeMethods } from "./native.js";
-import { normalizeSleepDataList } from "./normalizers.js";
-import type { SleepData } from "../../types/index.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { SleepDataNativeMethods } from "./native";
+import { normalizeSleepDataList } from "./normalizers";
+import type { SleepData } from "@/types/index";
 
 export class SleepDataCapability {
   constructor(private readonly ctx: CapabilityContext<SleepDataNativeMethods>) {}

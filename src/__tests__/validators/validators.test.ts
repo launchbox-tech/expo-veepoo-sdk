@@ -1,19 +1,19 @@
-import { validateDeviceId, validateConnectOptions, validatePersonalInfo } from '../../capabilities/session/validators.js';
-import { validateAutoMeasureSetting } from '../../capabilities/auto-measure/validators.js';
-import { validateAlarm, validateDeleteAlarm, validateHeartRateAlarm } from '../../capabilities/alarms/validators.js';
-import { validateSocialMsgData } from '../../capabilities/social-msg/validators.js';
-import { validateScreenLightDurationSeconds, validateScreenLightSettings } from '../../capabilities/screen-light/validators.js';
-import { validateSedentaryReminderSettings } from '../../capabilities/sedentary-reminder/validators.js';
-import { validateWristFlipWakeSettings } from '../../capabilities/wrist-flip/validators.js';
-import { validateWomenHealthSettings } from '../../capabilities/women-health/validators.js';
-import { validateFirmwareDfuFilePath } from '../../capabilities/dfu/validators.js';
-import { validateReadWatchFaceStyleOptions, validateWatchFaceStyleSettings } from '../../capabilities/watch-face/validators.js';
-import { validateDeviceTime } from '../../capabilities/device-time/validators.js';
-import { validateWeatherSettings, validateWeatherData } from '../../capabilities/weather/validators.js';
-import { validateNewContact, validateContactId } from '../../capabilities/contacts/validators.js';
-import { validateSosCallTimes } from '../../capabilities/sos/validators.js';
-import { validateMusicData } from '../../capabilities/music/validators.js';
-import { validateGPSAndTimezoneData } from '../../capabilities/gps-timezone/validators.js';
+import { validateDeviceId, validateConnectOptions, validatePersonalInfo } from '@/capabilities/session/validators';
+import { validateAutoMeasureSetting } from '@/capabilities/auto-measure/validators';
+import { validateAlarm, validateDeleteAlarm, validateHeartRateAlarm } from '@/capabilities/alarms/validators';
+import { validateSocialMsgData } from '@/capabilities/social-msg/validators';
+import { validateScreenLightDurationSeconds, validateScreenLightSettings } from '@/capabilities/screen-light/validators';
+import { validateSedentaryReminderSettings } from '@/capabilities/sedentary-reminder/validators';
+import { validateWristFlipWakeSettings } from '@/capabilities/wrist-flip/validators';
+import { validateWomenHealthSettings } from '@/capabilities/women-health/validators';
+import { validateFirmwareDfuFilePath } from '@/capabilities/dfu/validators';
+import { validateReadWatchFaceStyleOptions, validateWatchFaceStyleSettings } from '@/capabilities/watch-face/validators';
+import { validateDeviceTime } from '@/capabilities/device-time/validators';
+import { validateWeatherSettings, validateWeatherData } from '@/capabilities/weather/validators';
+import { validateNewContact, validateContactId } from '@/capabilities/contacts/validators';
+import { validateSosCallTimes } from '@/capabilities/sos/validators';
+import { validateMusicData } from '@/capabilities/music/validators';
+import { validateGPSAndTimezoneData } from '@/capabilities/gps-timezone/validators';
 
 function expectInvalidArgument(fn: () => void, fieldHint?: string): void {
   let thrown: unknown;

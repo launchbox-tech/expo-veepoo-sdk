@@ -1,5 +1,5 @@
-import type { SportStepData } from "../../types/index.js";
-import { isRecord, toInt, toNumber, toStringValue } from "../../normalizers/primitives.js";
+import type { SportStepData } from "@/types/index";
+import { isRecord, toInt, toNumber, toStringValue } from "@/normalizers/primitives";
 
 export function normalizeSportStepData(value: unknown): SportStepData {
   const record = isRecord(value) ? value : {};

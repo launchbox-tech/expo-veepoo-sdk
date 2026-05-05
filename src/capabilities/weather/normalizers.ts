@@ -1,5 +1,5 @@
-import type { WeatherSettings, WeatherUnit } from "../../types/index.js";
-import { isRecord, toInt, toBoolean, toStringValue } from "../../normalizers/primitives.js";
+import type { WeatherSettings, WeatherUnit } from "@/types/index";
+import { isRecord, toInt, toBoolean, toStringValue } from "@/normalizers/primitives";
 
 /** Normalizes native `WeatherStatusData` / `VPWeatherConfigModel` read result. */
 export function normalizeWeatherSettings(value: unknown): WeatherSettings {

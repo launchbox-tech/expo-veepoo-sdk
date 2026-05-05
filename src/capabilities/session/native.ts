@@ -1,4 +1,4 @@
-import type { ConnectOptions, ConnectionStatus } from "../../types/index.js";
+import type { ConnectOptions, ConnectionStatus } from "@/types/index";
 
 export interface SessionNativeMethods {
   init(): Promise<void>;

@@ -1,4 +1,4 @@
-import type { NativeVeepooSDKInterface } from "../NativeVeepooSDK.js";
+import type { NativeVeepooSDKInterface } from "../native-veepoo-sdk";
 
 /** Async native module methods (Expo `AsyncFunction`), excluding event subscription helpers. */
 export type NativeAsyncMethodName = Exclude<

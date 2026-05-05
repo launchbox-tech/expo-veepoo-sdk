@@ -5,13 +5,13 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { VeepooSDKRuntime } from '../../sdk/veepoo-sdk-runtime';
-import { PersonalInfoCapability } from '../../capabilities/personal-info/index';
-import { AutoMeasureCapability } from '../../capabilities/auto-measure/index';
-import { SedentaryReminderCapability } from '../../capabilities/sedentary-reminder/index';
-import { WomenHealthCapability } from '../../capabilities/women-health/index';
-import { makeMockNative, type MockNative } from '../helpers/mock-native';
-import type { AutoMeasureSetting, PersonalInfo, SedentaryReminderSettings, WomenHealthSettings } from '../../types/index';
+import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
+import { PersonalInfoCapability } from '@/capabilities/personal-info/index';
+import { AutoMeasureCapability } from '@/capabilities/auto-measure/index';
+import { SedentaryReminderCapability } from '@/capabilities/sedentary-reminder/index';
+import { WomenHealthCapability } from '@/capabilities/women-health/index';
+import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
+import type { AutoMeasureSetting, PersonalInfo, SedentaryReminderSettings, WomenHealthSettings } from '@/types/index';
 
 describe('HealthConfig (split capabilities)', () => {
   let native: MockNative;

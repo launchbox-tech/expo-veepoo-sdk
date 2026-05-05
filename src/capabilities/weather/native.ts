@@ -1,4 +1,4 @@
-import type { WeatherData, WeatherSettings } from "../../types/index.js";
+import type { WeatherData, WeatherSettings } from "@/types/index";
 
 export interface WeatherNativeMethods {
   readWeatherSettings(): Promise<unknown>;

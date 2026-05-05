@@ -1,4 +1,4 @@
-import type { VeepooError } from "../types/errors.js";
+import type { VeepooError } from "@/types/errors";
 
 type BaseInvoke<T> = {
   /** Pure TypeScript preflight; must throw {@link VeepooError} from validators, not native errors. */

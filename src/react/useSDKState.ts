@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useSyncExternalStore } from "react";
-import { VeepooSDKContext } from "./VeepooSDKContext.js";
-import type { SDKStateSnapshot } from "./sdk-state-store.js";
+import { VeepooSDKContext } from "./veepoo-sdk-context";
+import type { SDKStateSnapshot } from "./sdk-state-store";
 
 export function useSDKState<T>(selector: (state: SDKStateSnapshot) => T): T {
   const ctx = useContext(VeepooSDKContext);

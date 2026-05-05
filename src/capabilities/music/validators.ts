@@ -1,4 +1,4 @@
-import type { MusicData } from "../../types/index.js";
+import type { MusicData } from "@/types/index";
 
 export function validateMusicData(data: MusicData): void {
   if (typeof data.name !== 'string' || data.name.trim().length === 0) {

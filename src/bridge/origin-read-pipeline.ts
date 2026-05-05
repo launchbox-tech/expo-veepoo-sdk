@@ -1,4 +1,4 @@
-import type { VeepooEventPayload } from "../types/events.js";
+import type { VeepooEventPayload } from "@/types/events";
 
 /**
  * Pure pipeline that wraps per-device deduplication for `readOriginProgress`

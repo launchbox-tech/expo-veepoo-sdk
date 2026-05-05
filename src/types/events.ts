@@ -1,10 +1,10 @@
-import type { ALL_VEEPOO_EVENTS } from '../bridge/veepoo-events-registry.js';
+import type { ALL_VEEPOO_EVENTS } from '@/bridge/veepoo-events-registry';
 import type {
   VeepooDevice,
   ConnectionStatus,
   BluetoothStatus,
   PasswordData,
-} from './connection.js';
+} from './connection';
 import type {
   BatteryInfo,
   CameraShutterStatus,
@@ -19,8 +19,8 @@ import type {
   MusicRemoteCommand,
   SocialMsgData,
   SosCallTimesSettings,
-} from './device.js';
-import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings.js';
+} from './device';
+import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings';
 import type {
   AccurateSleepSession,
   StoredTemperatureData,
@@ -36,7 +36,7 @@ import type {
   Spo2OriginData,
   SportStepData,
   StressData,
-} from './health-data.js';
+} from './health-data';
 import type {
   BloodAnalysisTestResult,
   BloodOxygenTestResult,
@@ -52,8 +52,8 @@ import type {
   HrvTestResult,
   ReadOriginProgress,
   TemperatureTestResult,
-} from './health-tests.js';
-import type { VeepooError } from './errors.js';
+} from './health-tests';
+import type { VeepooError } from './errors';
 
 /** Normalized DFU / OTA progress (`firmwareDfuProgress` event). */
 export type FirmwareDfuState =

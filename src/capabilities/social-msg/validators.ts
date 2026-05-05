@@ -1,4 +1,4 @@
-import type { FunctionStatus, SocialMsgData } from "../../types/index.js";
+import type { FunctionStatus, SocialMsgData } from "@/types/index";
 
 const VALID_FUNCTION_STATUSES = new Set<FunctionStatus>([
   'unsupported', 'support', 'open', 'close', 'unknown',

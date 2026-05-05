@@ -5,8 +5,8 @@ jest.mock("react-native", () => ({
   Platform: { OS: "ios" },
 }));
 
-import { VeepooSDK } from "../VeepooSDK";
-import { VeepooSDKStateStore } from "../react/sdk-state-store";
+import { VeepooSDK } from "@/veepoo-sdk";
+import { VeepooSDKStateStore } from "@/react/sdk-state-store";
 import { makeMockNative } from "./helpers/mock-native";
 
 async function makeInitializedStore() {

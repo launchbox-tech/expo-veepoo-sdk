@@ -1,11 +1,11 @@
-import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
-import type { ThrowingInvoke } from "../../bridge/native-invoke-pipeline.js";
-import type { CapabilityContext } from "../shared/context.js";
-import type { WomenHealthNativeMethods } from "./native.js";
-import { normalizeWomenHealthSettings } from "./normalizers.js";
-import { validateWomenHealthSettings } from "./validators.js";
-import type { WomenHealthSettings } from "../../types/index.js";
-import { deepCamelKeys } from "../../normalizers/deep-keys.js";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { WomenHealthNativeMethods } from "./native";
+import { normalizeWomenHealthSettings } from "./normalizers";
+import { validateWomenHealthSettings } from "./validators";
+import type { WomenHealthSettings } from "@/types/index";
+import { deepCamelKeys } from "@/normalizers/deep-keys";
 
 export class WomenHealthCapability {
   constructor(private readonly ctx: CapabilityContext<WomenHealthNativeMethods>) {}

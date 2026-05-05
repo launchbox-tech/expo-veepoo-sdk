@@ -1,5 +1,5 @@
-import type { SedentaryReminderSettings } from "../../types/index.js";
-import { isRecord, toInt, toBoolean } from "../../normalizers/primitives.js";
+import type { SedentaryReminderSettings } from "@/types/index";
+import { isRecord, toInt, toBoolean } from "@/normalizers/primitives";
 
 export function normalizeSedentaryReminderSettings(value: unknown): SedentaryReminderSettings {
   const record = isRecord(value) ? value : {};

@@ -13,7 +13,7 @@ export type {
   BluetoothStatus,
   PasswordStatus,
   PasswordData,
-} from './connection.js';
+} from './connection';
 
 export type {
   FunctionStatus,
@@ -60,7 +60,7 @@ export type {
   DeviceBTStatus,
   HealthReminderType,
   HealthReminder,
-} from './device.js';
+} from './device';
 
 export type {
   HeartRateData,
@@ -87,7 +87,7 @@ export type {
   StoredHrvData,
   StoredEcgData,
   StoredBodyCompositionData,
-} from './health-data.js';
+} from './health-data';
 
 export type {
   TestState,
@@ -110,9 +110,9 @@ export type {
   PttTestResult,
   ReadState,
   ReadOriginProgress,
-} from './health-tests.js';
-export { RealtimeTest } from './health-tests.js';
-export type { RealtimeTestModality } from './health-tests.js';
+} from './health-tests';
+export { RealtimeTest } from './health-tests';
+export type { RealtimeTestModality } from './health-tests';
 
 export type {
   AutoMeasureSetting,
@@ -127,14 +127,14 @@ export type {
   OperationStatus,
   SportMode,
   SportModeStatus,
-} from './settings.js';
-export { SPORT_MODE_ORDINALS } from './settings.js';
+} from './settings';
+export { SPORT_MODE_ORDINALS } from './settings';
 
 export type {
   VeepooEvent,
   VeepooEventPayload,
   FirmwareDfuState,
   FirmwareDfuProgress,
-} from './events.js';
+} from './events';
 
-export type { VeepooErrorCode, VeepooError, LogLevel, LogScope, LogEntry } from './errors.js';
+export type { VeepooErrorCode, VeepooError, LogLevel, LogScope, LogEntry } from './errors';

@@ -1,5 +1,5 @@
-import type { PersonalInfo, VeepooError } from "../../types/index.js";
-import { requireInRange } from "../../validators/shared.js";
+import type { PersonalInfo, VeepooError } from "@/types/index";
+import { requireInRange } from "@/validators/shared";
 
 export function validatePersonalInfo(info: PersonalInfo): void {
   if (info.sex !== 0 && info.sex !== 1) {

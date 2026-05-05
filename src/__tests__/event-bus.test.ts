@@ -1,4 +1,4 @@
-import { EventBus } from '../bridge/event-bus';
+import { EventBus } from '@/bridge/event-bus';
 
 describe('EventBus', () => {
   let bus: EventBus;
