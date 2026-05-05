@@ -83,4 +83,46 @@ describe('mapNativeRejection', () => {
     expect(out.code).toBe('OPERATION_FAILED');
     expect(out.native_code).toBe('CONTEXT_ERROR');
   });
+
+  it('maps Error with numeric code to OPERATION_FAILED using string form', () => {
+    const err = Object.assign(new Error('errno'), { code: 5 });
+    const out = mapNativeRejection(err, { fallbackCode: 'UNKNOWN' });
+    expect(out.native_code).toBe('5');
+  });
+
+  it('maps plain object (not Error) with string code', () => {
+    const err = { code: 'START_FAILED', message: 'plain object' };
+    const out = mapNativeRejection(err, { fallbackCode: 'UNKNOWN' });
+    expect(out.code).toBe('OPERATION_FAILED');
+    expect(out.message).toBe('plain object');
+    expect(out.native_code).toBe('START_FAILED');
+  });
+
+  it('maps plain object with numeric code', () => {
+    const err = { code: 42, message: 'numeric obj' };
+    const out = mapNativeRejection(err, { fallbackCode: 'UNKNOWN' });
+    expect(out.native_code).toBe('42');
+    expect(out.message).toBe('numeric obj');
+  });
+
+  it('maps plain object with no code — message is String(obj) since no code triggers fallback path', () => {
+    const err = { message: 'no code here' };
+    const out = mapNativeRejection(err, { fallbackCode: 'OPERATION_FAILED' });
+    expect(out.code).toBe('OPERATION_FAILED');
+    expect(out.native_code).toBeUndefined();
+  });
+
+  it('maps plain string error using fallback code', () => {
+    const out = mapNativeRejection('something went wrong', { fallbackCode: 'TIMEOUT' });
+    expect(out.code).toBe('TIMEOUT');
+    expect(out.message).toBe('something went wrong');
+    expect(out.native_code).toBeUndefined();
+  });
+
+  it('maps non-screaming-snake unknown code to OPERATION_FAILED', () => {
+    const err = { code: 'some-mixed-vendor-code', message: 'bad' };
+    const out = mapNativeRejection(err, { fallbackCode: 'UNKNOWN' });
+    expect(out.code).toBe('OPERATION_FAILED');
+    expect(out.native_code).toBe('SOME-MIXED-VENDOR-CODE');
+  });
 });
