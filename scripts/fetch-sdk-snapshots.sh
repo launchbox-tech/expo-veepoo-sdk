@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # fetch-sdk-snapshots.sh
-# Sparse-clones the event-relevant source files from both upstream HBandSDK repos
+# Downloads the event-relevant source files from both upstream HBandSDK repos
 # at the SHAs pinned in vendor-manifest.json, writing them into vendor-sdk-snapshots/.
 #
-# Skips any repo whose snapshot is already present at the correct SHA (cache-friendly).
+# Uses GitHub raw content URLs (no git clone required — no git subprocess warnings).
+# Skips any file whose snapshot is already present at the correct SHA (cache-friendly).
 # Run manually or via CI after vendor-manifest.json SHA pins change.
 #
-# Requires: git, node (for JSON parsing), bash ≥ 3.2
+# Requires: curl, node (for JSON parsing), bash ≥ 3.2
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -17,8 +18,8 @@ DEST="$REPO_ROOT/vendor-sdk-snapshots"
 ANDROID_SHA="$(node -e "const m=require('$MANIFEST'); process.stdout.write(m.upstreamReference.androidBleSdk.lastReviewedHeadSha)")"
 IOS_SHA="$(node -e "const m=require('$MANIFEST'); process.stdout.write(m.upstreamReference.iosBleSdk.lastReviewedHeadSha)")"
 
-ANDROID_URL="https://github.com/HBandSDK/Android_Ble_SDK.git"
-IOS_URL="https://github.com/HBandSDK/iOS_Ble_SDK.git"
+ANDROID_RAW="https://raw.githubusercontent.com/HBandSDK/Android_Ble_SDK/${ANDROID_SHA}"
+IOS_RAW="https://raw.githubusercontent.com/HBandSDK/iOS_Ble_SDK/${IOS_SHA}"
 
 ANDROID_DEST="$DEST/android"
 IOS_DEST="$DEST/ios"
@@ -32,52 +33,33 @@ needs_fetch() {
   [[ ! -f "$stamp" ]] || [[ "$(cat "$stamp")" != "$sha" ]]
 }
 
-sparse_clone() {
-  local url="$1" sha="$2" dest="$3"
-  shift 3
-  local -a paths=("$@")
-
-  echo "→ fetching $(basename "$url") at $sha"
-  local tmp
-  tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' RETURN
-
-  git -C "$tmp" init -q
-  git -C "$tmp" remote add origin "$url"
-  git -C "$tmp" config core.sparseCheckout true
-
-  local sparse_file="$tmp/.git/info/sparse-checkout"
-  for p in "${paths[@]}"; do
-    echo "$p" >> "$sparse_file"
-  done
-
-  git -C "$tmp" fetch --depth=1 origin "$sha" 2>&1 | tail -1
-  git -C "$tmp" checkout FETCH_HEAD -- 2>/dev/null || true
-
-  rm -rf "$dest"
-  mkdir -p "$dest"
-  cp -r "$tmp"/. "$dest/"
-  echo "$sha" > "$(stamp_file "$dest")"
-  echo "  ✓ written to $dest"
+download_file() {
+  local url="$1" dest="$2"
+  mkdir -p "$(dirname "$dest")"
+  curl -fsSL --max-time 30 "$url" -o "$dest"
 }
 
 # ── Android ──────────────────────────────────────────────────────────────────
-# We fetch the demo Java service (registers all SDK listeners) and the Javadoc
-# HTML file listing (listener interface names without full HTML content).
-ANDROID_PATHS=(
+ANDROID_FILES=(
   "android_sdk_source/Demo/VpBluetoothSDK/app/src/main/java/com/timaimee/vpdemo/MyService.java"
 )
 
 if needs_fetch "$ANDROID_DEST" "$ANDROID_SHA"; then
-  sparse_clone "$ANDROID_URL" "$ANDROID_SHA" "$ANDROID_DEST" "${ANDROID_PATHS[@]}"
+  echo "→ fetching Android_Ble_SDK at $ANDROID_SHA"
+  rm -rf "$ANDROID_DEST"
+  for f in "${ANDROID_FILES[@]}"; do
+    echo "  downloading $f"
+    download_file "$ANDROID_RAW/$f" "$ANDROID_DEST/$f"
+  done
+  echo "$ANDROID_SHA" > "$(stamp_file "$ANDROID_DEST")"
+  echo "  ✓ written to $ANDROID_DEST"
 else
   echo "→ Android snapshot up-to-date ($ANDROID_SHA)"
 fi
 
 # ── iOS ───────────────────────────────────────────────────────────────────────
-# We fetch the primary manager headers that define all block callbacks.
 IOS_HEADER_BASE="iOS_sdk_source/Framework/2.2.XX.15/VeepooBleSDK.framework/Headers"
-IOS_PATHS=(
+IOS_FILES=(
   "$IOS_HEADER_BASE/VPBleCentralManage.h"
   "$IOS_HEADER_BASE/VPPeripheralBaseManage.h"
   "$IOS_HEADER_BASE/VPPeripheralManage.h"
@@ -88,7 +70,14 @@ IOS_PATHS=(
 )
 
 if needs_fetch "$IOS_DEST" "$IOS_SHA"; then
-  sparse_clone "$IOS_URL" "$IOS_SHA" "$IOS_DEST" "${IOS_PATHS[@]}"
+  echo "→ fetching iOS_Ble_SDK at $IOS_SHA"
+  rm -rf "$IOS_DEST"
+  for f in "${IOS_FILES[@]}"; do
+    echo "  downloading $f"
+    download_file "$IOS_RAW/$f" "$IOS_DEST/$f"
+  done
+  echo "$IOS_SHA" > "$(stamp_file "$IOS_DEST")"
+  echo "  ✓ written to $IOS_DEST"
 else
   echo "→ iOS snapshot up-to-date ($IOS_SHA)"
 fi
