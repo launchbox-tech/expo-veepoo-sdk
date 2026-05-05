@@ -1,7 +1,7 @@
 # PRD #166 — feat(react): VeepooSDKProvider + reactive state bridge (useSyncExternalStore)
 
-**Status:** Open
-**Labels:** needs-triage
+**Status:** Closed
+**Labels:** enhancement
 
 ## Problem Statement
 
