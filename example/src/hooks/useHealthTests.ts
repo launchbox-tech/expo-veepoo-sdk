@@ -127,7 +127,7 @@ export function useHealthTests(): {
   const clearLabLog = useCallback(() => setLabLog([]), []);
 
   useSDKEvent(
-    'heartRateTestResult',
+    'heart_rate_test_result',
     ({ device_id: _, result }) => {
       setHrResult(result);
       appendLog(`heartRateTestResult ${clipJson(result)}`);
@@ -139,7 +139,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'bloodPressureTestResult',
+    'blood_pressure_test_result',
     ({ device_id: _, result }) => {
       setBpResult(result);
       appendLog(`bloodPressureTestResult ${clipJson(result)}`);
@@ -151,7 +151,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'bloodOxygenTestResult',
+    'blood_oxygen_test_result',
     ({ device_id: _, result }) => {
       setSpo2Result(result);
       appendLog(`bloodOxygenTestResult ${clipJson(result)}`);
@@ -163,7 +163,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'temperatureTestResult',
+    'temperature_test_result',
     ({ device_id: _, result }) => {
       setTempResult(result);
       appendLog(`temperatureTestResult ${clipJson(result)}`);
@@ -175,7 +175,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'stressData',
+    'stress_data',
     ({ device_id: _, data }) => {
       setStressResult(data);
       appendLog(`stressData ${clipJson(data)}`);
@@ -187,7 +187,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'bloodGlucoseData',
+    'blood_glucose_data',
     ({ device_id: _, data }) => {
       setBloodGlucoseResult(data);
       appendLog(`bloodGlucoseData ${clipJson(data)}`);
@@ -199,7 +199,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'hrvTestResult',
+    'hrv_test_result',
     ({ device_id: _, result }) => {
       setHrvResult(result);
       appendLog(`hrvTestResult ${clipJson(result)}`);
@@ -211,7 +211,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'ecgTestResult',
+    'ecg_test_result',
     ({ device_id: _, result }) => {
       const slim =
         result.waveform && result.waveform.length > 0
@@ -227,7 +227,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'fatigueTestResult',
+    'fatigue_test_result',
     ({ device_id: _, result }) => {
       setFatigueResult(result);
       appendLog(`fatigueTestResult ${clipJson(result)}`);
@@ -239,7 +239,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'breathingTestResult',
+    'breathing_test_result',
     ({ device_id: _, result }) => {
       setBreathingResult(result);
       appendLog(`breathingTestResult ${clipJson(result)}`);
@@ -251,7 +251,7 @@ export function useHealthTests(): {
   );
 
   useSDKEvent(
-    'bodyCompositionTestResult',
+    'body_composition_test_result',
     ({ device_id: _, result }) => {
       setBodyCompositionResult(result);
       appendLog(`bodyCompositionTestResult ${clipJson(result)}`);

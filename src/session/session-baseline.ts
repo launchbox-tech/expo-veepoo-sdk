@@ -143,14 +143,14 @@ export function attachSessionBaseline(
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sdk.on('deviceReady', listener as (payload: any) => void);
+  sdk.on('device_ready', listener as (payload: any) => void);
 
   return {
     destroy() {
       if (destroyed) return;
       destroyed = true;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      sdk.off('deviceReady', listener as (payload: any) => void);
+      sdk.off('device_ready', listener as (payload: any) => void);
     },
   };
 }

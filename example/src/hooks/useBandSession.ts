@@ -39,7 +39,7 @@ export function useBandSession(
   const isActive = appState === 'connecting' || appState === 'ready';
 
   useSDKEvent(
-    'deviceReady',
+    'device_ready',
     async ({ device_id: _ }) => {
       setSyncDone(false);
       setBatteryInfo(null);
@@ -59,7 +59,7 @@ export function useBandSession(
   );
 
   useSDKEvent(
-    'deviceDisconnected',
+    'device_disconnected',
     ({ device_id: _ }) => {
       setConnectedDevice(null);
       setSyncDone(false);
@@ -71,7 +71,7 @@ export function useBandSession(
   );
 
   useSDKEvent(
-    'deviceConnectStatus',
+    'device_connect_status',
     ({ device_id: _, status, code }) => {
       if (status === 'error') {
         setConnectError(
@@ -87,7 +87,7 @@ export function useBandSession(
   );
 
   useSDKEvent(
-    'batteryData',
+    'battery_data',
     ({ device_id: _, data }) => {
       setBatteryInfo(data);
     },

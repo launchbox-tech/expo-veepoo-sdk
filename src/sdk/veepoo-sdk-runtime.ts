@@ -130,9 +130,9 @@ export class VeepooSDKRuntime {
   emitLocal(event: VeepooEvent, payload: unknown): void {
     const normalizedPayload = normalizeEventPayload(event, payload);
 
-    if (event === "readOriginProgress") {
+    if (event === "read_origin_progress") {
       if (!this.originReadPipeline.shouldEmit(
-        normalizedPayload as VeepooEventPayload["readOriginProgress"],
+        normalizedPayload as VeepooEventPayload["read_origin_progress"],
       )) {
         return;
       }
@@ -149,19 +149,19 @@ export class VeepooSDKRuntime {
       },
     );
 
-    if (event === "bluetoothStateChanged") {
+    if (event === "bluetooth_state_changed") {
       const bluetoothStatus = normalizedPayload as { is_scanning?: boolean };
       if (typeof bluetoothStatus.is_scanning === "boolean") {
         this.state.setScanning(bluetoothStatus.is_scanning);
       }
     }
 
-    if (event === "deviceConnected") {
+    if (event === "device_connected") {
       const device = normalizedPayload as { device_id?: string };
       this.state.onDeviceConnected(device.device_id ?? "");
     }
 
-    if (event === "deviceDisconnected") {
+    if (event === "device_disconnected") {
       const device = normalizedPayload as { device_id?: string };
       this.state.onDeviceDisconnected(device.device_id);
       if (device.device_id) {
@@ -170,8 +170,8 @@ export class VeepooSDKRuntime {
     }
 
     if (
-      event === "deviceConnectStatus" ||
-      event === "connectionStatusChanged"
+      event === "device_connect_status" ||
+      event === "connection_status_changed"
     ) {
       const connection = normalizedPayload as {
         device_id?: string;
@@ -186,44 +186,44 @@ export class VeepooSDKRuntime {
   }
 
   private getEventScope(event: VeepooEvent): LogScope {
-    if (event === "deviceFound") return "scan";
-    if (event === "bluetoothStateChanged") return "bluetooth";
+    if (event === "device_found") return "scan";
+    if (event === "bluetooth_state_changed") return "bluetooth";
     if (
-      event === "deviceConnected" ||
-      event === "deviceDisconnected" ||
-      event === "deviceConnectStatus" ||
-      event === "deviceReady" ||
-      event === "connectionStatusChanged"
+      event === "device_connected" ||
+      event === "device_disconnected" ||
+      event === "device_connect_status" ||
+      event === "device_ready" ||
+      event === "connection_status_changed"
     ) {
       return "connection";
     }
     if (
-      event === "readOriginProgress" ||
-      event === "readOriginComplete" ||
-      event === "originFiveMinuteData" ||
-      event === "originHalfHourData" ||
-      event === "sleepData" ||
-      event === "sportStepData"
+      event === "read_origin_progress" ||
+      event === "read_origin_complete" ||
+      event === "origin_five_minute_data" ||
+      event === "origin_half_hour_data" ||
+      event === "sleep_data" ||
+      event === "sport_step_data"
     ) {
       return "read";
     }
     if (
-      event === "heartRateTestResult" ||
-      event === "bloodPressureTestResult" ||
-      event === "bloodOxygenTestResult" ||
-      event === "temperatureTestResult" ||
-      event === "stressData" ||
-      event === "bloodGlucoseData" ||
-      event === "hrvTestResult" ||
-      event === "ecgTestResult" ||
-      event === "fatigueTestResult" ||
-      event === "breathingTestResult" ||
-      event === "bodyCompositionTestResult"
+      event === "heart_rate_test_result" ||
+      event === "blood_pressure_test_result" ||
+      event === "blood_oxygen_test_result" ||
+      event === "temperature_test_result" ||
+      event === "stress_data" ||
+      event === "blood_glucose_data" ||
+      event === "hrv_test_result" ||
+      event === "ecg_test_result" ||
+      event === "fatigue_test_result" ||
+      event === "breathing_test_result" ||
+      event === "body_composition_test_result"
     ) {
       return "test";
     }
-    if (event === "error" || event === "sdkInitialized") return "sdk";
-    if (event === "scanStarted" || event === "scanStopped") return "scan";
+    if (event === "error" || event === "sdk_initialized") return "sdk";
+    if (event === "scan_started" || event === "scan_stopped") return "scan";
     return "device";
   }
 

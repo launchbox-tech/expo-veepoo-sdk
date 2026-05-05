@@ -21,7 +21,7 @@ const FIRMWARE_DFU_STATE_VALUE_MAP: Record<string, FirmwareDfuState> = {
   dfuLangConnectFailed: 'dfu_lang_connect_failed',
 };
 
-export function normalizeFirmwareDfuProgress(value: unknown): VeepooEventPayload['firmwareDfuProgress'] {
+export function normalizeFirmwareDfuProgress(value: unknown): VeepooEventPayload['firmware_dfu_progress'] {
   const p = isRecord(value) ? value : {};
   const stateRaw = toStringValue(p.state, 'unknown');
   const stateMapped = FIRMWARE_DFU_STATE_VALUE_MAP[stateRaw] ?? stateRaw;
@@ -34,7 +34,7 @@ export function normalizeFirmwareDfuProgress(value: unknown): VeepooEventPayload
   if (p.message !== undefined && p.message !== null) {
     message = String(p.message);
   }
-  const out: VeepooEventPayload['firmwareDfuProgress'] = {
+  const out: VeepooEventPayload['firmware_dfu_progress'] = {
     device_id: toStringValue(p.deviceId ?? p.device_id) ?? '',
     progress: clamp(toInt(p.progress) ?? 0, 0, 100),
     state,

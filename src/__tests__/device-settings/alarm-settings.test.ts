@@ -32,7 +32,7 @@ describe('AlarmsCapability', () => {
     expect(native.readAlarms).toHaveBeenCalledTimes(1);
     expect(result).toEqual(alarms);
     expect(emitSpy).toHaveBeenCalledWith(
-      'alarmData',
+      'alarm_data',
       expect.objectContaining({ alarms }),
     );
   });
@@ -69,7 +69,7 @@ describe('AlarmsCapability', () => {
     expect(result.low_threshold).toBe(60);
     expect(result.enabled).toBe(true);
     expect(emitSpy).toHaveBeenCalledWith(
-      'heartRateAlarmData',
+      'heart_rate_alarm_data',
       expect.objectContaining({
         data: expect.objectContaining({ high_threshold: 120, low_threshold: 60, enabled: true }),
       }),
@@ -87,7 +87,7 @@ describe('AlarmsCapability', () => {
     expect(native.setHeartRateAlarm).toHaveBeenCalledWith({ enabled: true, highThreshold: 120, lowThreshold: 50 });
     expect(result).toBe('success');
     expect(emitSpy).toHaveBeenCalledWith(
-      'heartRateAlarmData',
+      'heart_rate_alarm_data',
       expect.objectContaining({ data: alarm }),
     );
   });

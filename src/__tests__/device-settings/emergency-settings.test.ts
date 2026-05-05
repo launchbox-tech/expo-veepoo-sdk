@@ -34,7 +34,7 @@ describe('EmergencySettings (split capabilities)', () => {
     expect(native.readContacts).toHaveBeenCalledTimes(1);
     expect(result).toEqual([]);
     expect(emitSpy).toHaveBeenCalledWith(
-      'contactsData',
+      'contacts_data',
       expect.objectContaining({ contacts: [] }),
     );
   });
@@ -75,7 +75,7 @@ describe('EmergencySettings (split capabilities)', () => {
     expect(native.readSosCallTimes).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ times: 3, min_times: 1, max_times: 9 });
     expect(emitSpy).toHaveBeenCalledWith(
-      'sosCallTimesData',
+      'sos_call_times_data',
       expect.objectContaining({ data: expect.objectContaining({ times: 3, min_times: 1, max_times: 9 }) }),
     );
   });

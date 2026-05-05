@@ -39,9 +39,9 @@ import {
 } from '@/capabilities/realtime-tests/normalizers';
 import { normalizeFirmwareDfuProgress } from '@/capabilities/dfu/normalizers';
 
-export function normalizeReadOriginProgressPayload(value: unknown): VeepooEventPayload['readOriginProgress'] {
+export function normalizeReadOriginProgressPayload(value: unknown): VeepooEventPayload['read_origin_progress'] {
   if (!isRecord(value) || !isRecord(value.progress)) {
-    return value as VeepooEventPayload['readOriginProgress'];
+    return value as VeepooEventPayload['read_origin_progress'];
   }
 
   const progress = value.progress;
@@ -70,7 +70,7 @@ export function normalizeReadOriginProgressPayload(value: unknown): VeepooEventP
         : 0,
   };
 
-  return { ...value, progress: normalized } as VeepooEventPayload['readOriginProgress'];
+  return { ...value, progress: normalized } as VeepooEventPayload['read_origin_progress'];
 }
 
 /**
@@ -82,166 +82,166 @@ const EVENT_NORMALIZERS: {
   [K in VeepooEvent]: (raw: unknown) => VeepooEventPayload[K];
 } = {
   // ── pass-throughs: no structural normalization needed ──────────────────────
-  deviceFound: (raw) => raw as VeepooEventPayload['deviceFound'],
-  deviceConnected: (raw) => raw as VeepooEventPayload['deviceConnected'],
-  deviceDisconnected: (raw) => raw as VeepooEventPayload['deviceDisconnected'],
-  deviceConnectStatus: (raw) => raw as VeepooEventPayload['deviceConnectStatus'],
-  deviceReady: (raw) => raw as VeepooEventPayload['deviceReady'],
-  readOriginComplete: (raw) => raw as VeepooEventPayload['readOriginComplete'],
-  connectionStatusChanged: (raw) => raw as VeepooEventPayload['connectionStatusChanged'],
-  deviceSosTriggered: (raw) => raw as VeepooEventPayload['deviceSosTriggered'],
-  customSettingsData: (raw) => raw as VeepooEventPayload['customSettingsData'],
-  healthRemindData: (raw) => raw as VeepooEventPayload['healthRemindData'],
-  apneaRemindData: (raw) => raw as VeepooEventPayload['apneaRemindData'],
-  sportModeData: (raw) => raw as VeepooEventPayload['sportModeData'],
-  bloodAnalysisTestResult: (raw) => raw as VeepooEventPayload['bloodAnalysisTestResult'],
-  gsrTestResult: (raw) => raw as VeepooEventPayload['gsrTestResult'],
-  exerciseSessionData: (raw) => raw as VeepooEventPayload['exerciseSessionData'],
-  accurateSleepData: (raw) => raw as VeepooEventPayload['accurateSleepData'],
-  storedTemperatureData: (raw) => raw as VeepooEventPayload['storedTemperatureData'],
-  storedBloodGlucoseData: (raw) => raw as VeepooEventPayload['storedBloodGlucoseData'],
-  storedHrvData: (raw) => raw as VeepooEventPayload['storedHrvData'],
-  storedEcgData: (raw) => raw as VeepooEventPayload['storedEcgData'],
-  storedBodyCompositionData: (raw) => raw as VeepooEventPayload['storedBodyCompositionData'],
-  pttTestResult: (raw) => raw as VeepooEventPayload['pttTestResult'],
-  pttStateChanged: (raw) => raw as VeepooEventPayload['pttStateChanged'],
+  device_found: (raw) => raw as VeepooEventPayload['device_found'],
+  device_connected: (raw) => raw as VeepooEventPayload['device_connected'],
+  device_disconnected: (raw) => raw as VeepooEventPayload['device_disconnected'],
+  device_connect_status: (raw) => raw as VeepooEventPayload['device_connect_status'],
+  device_ready: (raw) => raw as VeepooEventPayload['device_ready'],
+  read_origin_complete: (raw) => raw as VeepooEventPayload['read_origin_complete'],
+  connection_status_changed: (raw) => raw as VeepooEventPayload['connection_status_changed'],
+  device_sos_triggered: (raw) => raw as VeepooEventPayload['device_sos_triggered'],
+  custom_settings_data: (raw) => raw as VeepooEventPayload['custom_settings_data'],
+  health_remind_data: (raw) => raw as VeepooEventPayload['health_remind_data'],
+  apnea_remind_data: (raw) => raw as VeepooEventPayload['apnea_remind_data'],
+  sport_mode_data: (raw) => raw as VeepooEventPayload['sport_mode_data'],
+  blood_analysis_test_result: (raw) => raw as VeepooEventPayload['blood_analysis_test_result'],
+  gsr_test_result: (raw) => raw as VeepooEventPayload['gsr_test_result'],
+  exercise_session_data: (raw) => raw as VeepooEventPayload['exercise_session_data'],
+  accurate_sleep_data: (raw) => raw as VeepooEventPayload['accurate_sleep_data'],
+  stored_temperature_data: (raw) => raw as VeepooEventPayload['stored_temperature_data'],
+  stored_blood_glucose_data: (raw) => raw as VeepooEventPayload['stored_blood_glucose_data'],
+  stored_hrv_data: (raw) => raw as VeepooEventPayload['stored_hrv_data'],
+  stored_ecg_data: (raw) => raw as VeepooEventPayload['stored_ecg_data'],
+  stored_body_composition_data: (raw) => raw as VeepooEventPayload['stored_body_composition_data'],
+  ptt_test_result: (raw) => raw as VeepooEventPayload['ptt_test_result'],
+  ptt_state_changed: (raw) => raw as VeepooEventPayload['ptt_state_changed'],
   error: (raw) => raw as VeepooEventPayload['error'],
 
   // ── actively normalized ────────────────────────────────────────────────────
-  bluetoothStateChanged: (raw) => {
+  bluetooth_state_changed: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return normalizeBluetoothStatus(p) as VeepooEventPayload['bluetoothStateChanged'];
+    return normalizeBluetoothStatus(p) as VeepooEventPayload['bluetooth_state_changed'];
   },
-  readOriginProgress: (raw) => normalizeReadOriginProgressPayload(raw),
-  deviceFunction: (raw) => {
+  read_origin_progress: (raw) => normalizeReadOriginProgressPayload(raw),
+  device_function: (raw) => {
     const p = isRecord(raw) ? raw : {};
     return {
       ...p,
       data: normalizeDeviceFunctions(p.data ?? p.functions),
       functions: normalizeDeviceFunctions(p.functions ?? p.data),
-    } as VeepooEventPayload['deviceFunction'];
+    } as VeepooEventPayload['device_function'];
   },
-  deviceVersion: (raw) => {
+  device_version: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, version: normalizeDeviceVersion(p.version) } as VeepooEventPayload['deviceVersion'];
+    return { ...p, version: normalizeDeviceVersion(p.version) } as VeepooEventPayload['device_version'];
   },
-  passwordData: (raw) => {
+  password_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizePasswordData(p.data) } as VeepooEventPayload['passwordData'];
+    return { ...p, data: normalizePasswordData(p.data) } as VeepooEventPayload['password_data'];
   },
-  socialMsgData: (raw) => {
+  social_msg_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeSocialMsgData(p.data) } as VeepooEventPayload['socialMsgData'];
+    return { ...p, data: normalizeSocialMsgData(p.data) } as VeepooEventPayload['social_msg_data'];
   },
-  originFiveMinuteData: (raw) => {
+  origin_five_minute_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeOriginDataList([p.data])[0] } as VeepooEventPayload['originFiveMinuteData'];
+    return { ...p, data: normalizeOriginDataList([p.data])[0] } as VeepooEventPayload['origin_five_minute_data'];
   },
-  originHalfHourData: (raw) => {
+  origin_half_hour_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeHalfHourData(p.data) } as VeepooEventPayload['originHalfHourData'];
+    return { ...p, data: normalizeHalfHourData(p.data) } as VeepooEventPayload['origin_half_hour_data'];
   },
-  sleepData: (raw) => {
+  sleep_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeSleepDataList(p.data)[0] } as VeepooEventPayload['sleepData'];
+    return { ...p, data: normalizeSleepDataList(p.data)[0] } as VeepooEventPayload['sleep_data'];
   },
-  sportStepData: (raw) => {
+  sport_step_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeSportStepData(p.data) } as VeepooEventPayload['sportStepData'];
+    return { ...p, data: normalizeSportStepData(p.data) } as VeepooEventPayload['sport_step_data'];
   },
-  heartRateTestResult: (raw) => {
+  heart_rate_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeHeartRateTestResult(p.result) } as VeepooEventPayload['heartRateTestResult'];
+    return { ...p, result: normalizeHeartRateTestResult(p.result) } as VeepooEventPayload['heart_rate_test_result'];
   },
-  bloodPressureTestResult: (raw) => {
+  blood_pressure_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeBloodPressureTestResult(p.result) } as VeepooEventPayload['bloodPressureTestResult'];
+    return { ...p, result: normalizeBloodPressureTestResult(p.result) } as VeepooEventPayload['blood_pressure_test_result'];
   },
-  bloodOxygenTestResult: (raw) => {
+  blood_oxygen_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeBloodOxygenTestResult(p.result) } as VeepooEventPayload['bloodOxygenTestResult'];
+    return { ...p, result: normalizeBloodOxygenTestResult(p.result) } as VeepooEventPayload['blood_oxygen_test_result'];
   },
-  temperatureTestResult: (raw) => {
+  temperature_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeTemperatureTestResult(p.result) } as VeepooEventPayload['temperatureTestResult'];
+    return { ...p, result: normalizeTemperatureTestResult(p.result) } as VeepooEventPayload['temperature_test_result'];
   },
-  stressData: (raw) => {
+  stress_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeStressData(p.data) } as VeepooEventPayload['stressData'];
+    return { ...p, data: normalizeStressData(p.data) } as VeepooEventPayload['stress_data'];
   },
-  bloodGlucoseData: (raw) => {
+  blood_glucose_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeBloodGlucoseData(p.data) } as VeepooEventPayload['bloodGlucoseData'];
+    return { ...p, data: normalizeBloodGlucoseData(p.data) } as VeepooEventPayload['blood_glucose_data'];
   },
-  batteryData: (raw) => {
+  battery_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeBatteryInfo(p.data) } as VeepooEventPayload['batteryData'];
+    return { ...p, data: normalizeBatteryInfo(p.data) } as VeepooEventPayload['battery_data'];
   },
-  originSpo2Data: (raw) => {
+  origin_spo2_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeSpo2OriginData(p.data) } as VeepooEventPayload['originSpo2Data'];
+    return { ...p, data: normalizeSpo2OriginData(p.data) } as VeepooEventPayload['origin_spo2_data'];
   },
-  alarmData: (raw) => {
+  alarm_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, alarms: normalizeAlarmList(p.alarms ?? p.data) } as VeepooEventPayload['alarmData'];
+    return { ...p, alarms: normalizeAlarmList(p.alarms ?? p.data) } as VeepooEventPayload['alarm_data'];
   },
-  heartRateAlarmData: (raw) => {
+  heart_rate_alarm_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeHeartRateAlarm(p.data) } as VeepooEventPayload['heartRateAlarmData'];
+    return { ...p, data: normalizeHeartRateAlarm(p.data) } as VeepooEventPayload['heart_rate_alarm_data'];
   },
-  contactsData: (raw) => {
+  contacts_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, contacts: normalizeContactList(p.contacts ?? p.data) } as VeepooEventPayload['contactsData'];
+    return { ...p, contacts: normalizeContactList(p.contacts ?? p.data) } as VeepooEventPayload['contacts_data'];
   },
-  sosCallTimesData: (raw) => {
+  sos_call_times_data: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, data: normalizeSosCallTimesSettings(p.data) } as VeepooEventPayload['sosCallTimesData'];
+    return { ...p, data: normalizeSosCallTimesSettings(p.data) } as VeepooEventPayload['sos_call_times_data'];
   },
-  findDeviceState: (raw) => {
+  find_device_state: (raw) => {
     const p = isRecord(raw) ? raw : {};
     return normalizeFindDeviceStatePayload(p);
   },
-  firmwareDfuProgress: (raw) => normalizeFirmwareDfuProgress(raw),
-  cameraShutter: (raw) => {
+  firmware_dfu_progress: (raw) => normalizeFirmwareDfuProgress(raw),
+  camera_shutter: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, status: normalizeCameraShutterStatus(p.status) } as VeepooEventPayload['cameraShutter'];
+    return { ...p, status: normalizeCameraShutterStatus(p.status) } as VeepooEventPayload['camera_shutter'];
   },
-  musicRemoteCommand: (raw) => {
+  music_remote_command: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, command: normalizeMusicRemoteCommand(p.command) } as VeepooEventPayload['musicRemoteCommand'];
+    return { ...p, command: normalizeMusicRemoteCommand(p.command) } as VeepooEventPayload['music_remote_command'];
   },
-  deviceBTStateChanged: (raw) => {
+  device_bt_state_changed: (raw) => {
     const p = isRecord(raw) ? raw : {};
     return {
       ...p,
       state: normalizeDeviceBTState(p.state ?? p.btState),
       bt_switch_open: (p.btSwitchOpen ?? p.bt_switch_open) === true,
       media_switch_open: (p.mediaSwitchOpen ?? p.media_switch_open) === true,
-    } as VeepooEventPayload['deviceBTStateChanged'];
+    } as VeepooEventPayload['device_bt_state_changed'];
   },
-  hrvTestResult: (raw) => {
+  hrv_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeHrvTestResult(p.result) } as VeepooEventPayload['hrvTestResult'];
+    return { ...p, result: normalizeHrvTestResult(p.result) } as VeepooEventPayload['hrv_test_result'];
   },
-  ecgTestResult: (raw) => {
+  ecg_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeEcgTestResult(p.result) } as VeepooEventPayload['ecgTestResult'];
+    return { ...p, result: normalizeEcgTestResult(p.result) } as VeepooEventPayload['ecg_test_result'];
   },
-  fatigueTestResult: (raw) => {
+  fatigue_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeFatigueTestResult(p.result) } as VeepooEventPayload['fatigueTestResult'];
+    return { ...p, result: normalizeFatigueTestResult(p.result) } as VeepooEventPayload['fatigue_test_result'];
   },
-  breathingTestResult: (raw) => {
+  breathing_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeBreathingTestResult(p.result) } as VeepooEventPayload['breathingTestResult'];
+    return { ...p, result: normalizeBreathingTestResult(p.result) } as VeepooEventPayload['breathing_test_result'];
   },
-  bodyCompositionTestResult: (raw) => {
+  body_composition_test_result: (raw) => {
     const p = isRecord(raw) ? raw : {};
-    return { ...p, result: normalizeBodyCompositionTestResult(p.result) } as VeepooEventPayload['bodyCompositionTestResult'];
+    return { ...p, result: normalizeBodyCompositionTestResult(p.result) } as VeepooEventPayload['body_composition_test_result'];
   },
-  sdkInitialized: () => ({} as VeepooEventPayload['sdkInitialized']),
-  scanStarted: () => ({} as VeepooEventPayload['scanStarted']),
-  scanStopped: () => ({} as VeepooEventPayload['scanStopped']),
+  sdk_initialized: () => ({} as VeepooEventPayload['sdk_initialized']),
+  scan_started: () => ({} as VeepooEventPayload['scan_started']),
+  scan_stopped: () => ({} as VeepooEventPayload['scan_stopped']),
 };
 
 export function normalizeEventPayload<K extends VeepooEvent>(

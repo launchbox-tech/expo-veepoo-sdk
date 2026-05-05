@@ -67,7 +67,7 @@ describe('VeepooSDK', () => {
     it('destroy() clears JS listeners so post-destroy _emit has no effect', async () => {
       await sdk.init();
       const listener = jest.fn();
-      sdk.on('deviceFound', listener);
+      sdk.on('device_found', listener);
       sdk.destroy();
       native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
       expect(listener).not.toHaveBeenCalled();
@@ -192,7 +192,7 @@ describe('VeepooSDK', () => {
 
     it('on() registers a listener and returns this', () => {
       const listener = jest.fn();
-      const result = sdk.on('deviceFound', listener);
+      const result = sdk.on('device_found', listener);
       expect(result).toBe(sdk);
       native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
       expect(listener).toHaveBeenCalledTimes(1);
@@ -200,8 +200,8 @@ describe('VeepooSDK', () => {
 
     it('off() removes a listener and returns this', () => {
       const listener = jest.fn();
-      sdk.on('deviceFound', listener);
-      const result = sdk.off('deviceFound', listener);
+      sdk.on('device_found', listener);
+      const result = sdk.off('device_found', listener);
       expect(result).toBe(sdk);
       native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
       expect(listener).not.toHaveBeenCalled();
@@ -209,7 +209,7 @@ describe('VeepooSDK', () => {
 
     it('once() fires exactly once — regression test for the wrapper-deletion bug', () => {
       const listener = jest.fn();
-      sdk.once('deviceFound', listener);
+      sdk.once('device_found', listener);
       const payload = { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 };
       native._emit('deviceFound', payload);
       native._emit('deviceFound', payload);
@@ -217,14 +217,14 @@ describe('VeepooSDK', () => {
     });
 
     it('once() returns this', () => {
-      expect(sdk.once('deviceFound', jest.fn())).toBe(sdk);
+      expect(sdk.once('device_found', jest.fn())).toBe(sdk);
     });
 
     it('removeAllListeners() clears all events', () => {
       const l1 = jest.fn();
       const l2 = jest.fn();
-      sdk.on('deviceFound', l1);
-      sdk.on('deviceConnected', l2);
+      sdk.on('device_found', l1);
+      sdk.on('device_connected', l2);
       sdk.removeAllListeners();
       native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
       native._emit('deviceConnected', { deviceId: 'x' });
@@ -235,9 +235,9 @@ describe('VeepooSDK', () => {
     it('removeAllListeners(event) clears only that event', () => {
       const l1 = jest.fn();
       const l2 = jest.fn();
-      sdk.on('deviceFound', l1);
-      sdk.on('deviceConnected', l2);
-      sdk.removeAllListeners('deviceFound');
+      sdk.on('device_found', l1);
+      sdk.on('device_connected', l2);
+      sdk.removeAllListeners('device_found');
       native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
       native._emit('deviceConnected', { deviceId: 'x' });
       expect(l1).not.toHaveBeenCalled();
@@ -246,7 +246,7 @@ describe('VeepooSDK', () => {
 
     it('listener receives the normalized payload', () => {
       const listener = jest.fn();
-      sdk.on('bluetoothStateChanged', listener);
+      sdk.on('bluetooth_state_changed', listener);
       native._emit('bluetoothStateChanged', {
         state: 5, authorization: 3, isScanning: false, pendingScanStart: false,
       });
@@ -257,7 +257,7 @@ describe('VeepooSDK', () => {
 
     it('error thrown in a listener is caught and does not propagate', () => {
       const badListener = jest.fn().mockImplementation(() => { throw new Error('boom'); });
-      sdk.on('deviceFound', badListener);
+      sdk.on('device_found', badListener);
       expect(() => {
         native._emit('deviceFound', { device: { id: 'x', name: 'T', rssi: -50 }, timestamp: 1 });
       }).not.toThrow();
@@ -316,14 +316,14 @@ describe('VeepooSDK', () => {
 
       it('first event dispatches', () => {
         const listener = jest.fn();
-        sdk.on('readOriginProgress', listener);
+        sdk.on('read_origin_progress', listener);
         native._emit('readOriginProgress', progress(50));
         expect(listener).toHaveBeenCalledTimes(1);
       });
 
       it('exact duplicate value is suppressed', () => {
         const listener = jest.fn();
-        sdk.on('readOriginProgress', listener);
+        sdk.on('read_origin_progress', listener);
         native._emit('readOriginProgress', progress(50));
         native._emit('readOriginProgress', progress(50));
         expect(listener).toHaveBeenCalledTimes(1);
@@ -331,7 +331,7 @@ describe('VeepooSDK', () => {
 
       it('smaller value (backward reset) dispatches', () => {
         const listener = jest.fn();
-        sdk.on('readOriginProgress', listener);
+        sdk.on('read_origin_progress', listener);
         native._emit('readOriginProgress', progress(80));
         native._emit('readOriginProgress', progress(10));
         expect(listener).toHaveBeenCalledTimes(2);
@@ -339,7 +339,7 @@ describe('VeepooSDK', () => {
 
       it('readState "start" always dispatches regardless of repeated value', () => {
         const listener = jest.fn();
-        sdk.on('readOriginProgress', listener);
+        sdk.on('read_origin_progress', listener);
         native._emit('readOriginProgress', progress(50));
         native._emit('readOriginProgress', progress(50, 'start'));
         expect(listener).toHaveBeenCalledTimes(2);
@@ -444,7 +444,7 @@ describe('VeepooSDK', () => {
 
     it('readHeartRateAlarm delegates to native, normalizes, and emits heartRateAlarmData', async () => {
       const listener = jest.fn();
-      sdk.on('heartRateAlarmData', listener);
+      sdk.on('heart_rate_alarm_data', listener);
       const result = await sdk.readHeartRateAlarm();
       expect(native.readHeartRateAlarm).toHaveBeenCalled();
       expect(result.high_threshold).toBe(120);
@@ -459,7 +459,7 @@ describe('VeepooSDK', () => {
 
     it('setHeartRateAlarm validates then delegates to native and emits heartRateAlarmData', async () => {
       const listener = jest.fn();
-      sdk.on('heartRateAlarmData', listener);
+      sdk.on('heart_rate_alarm_data', listener);
       const alarm = { enabled: true, high_threshold: 120, low_threshold: 50 };
       const status = await sdk.setHeartRateAlarm(alarm);
       expect(native.setHeartRateAlarm).toHaveBeenCalledWith({ enabled: true, highThreshold: 120, lowThreshold: 50 });

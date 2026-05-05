@@ -23,7 +23,7 @@ export class OriginReadPipeline {
    * @param payload The already-normalized `readOriginProgress` payload.
    * @returns `true` if the event should be emitted, `false` if it should be suppressed.
    */
-  shouldEmit(payload: VeepooEventPayload["readOriginProgress"]): boolean {
+  shouldEmit(payload: VeepooEventPayload["read_origin_progress"]): boolean {
     const deviceId = payload.device_id;
     const progressField = payload.progress;
 

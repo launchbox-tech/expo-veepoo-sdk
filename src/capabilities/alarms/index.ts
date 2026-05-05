@@ -19,7 +19,7 @@ export class AlarmsCapability {
       invoke: () => this.ctx.native.readAlarms(),
       normalize: normalizeAlarmList,
       afterSuccess: (alarms) =>
-        this.ctx.emit("alarmData", { device_id: this.ctx.connectedDeviceId(), alarms }),
+        this.ctx.emit("alarm_data", { device_id: this.ctx.connectedDeviceId(), alarms }),
     });
   }
 
@@ -42,7 +42,7 @@ export class AlarmsCapability {
       invoke: () => this.ctx.native.readHeartRateAlarm(),
       normalize: normalizeHeartRateAlarm,
       afterSuccess: (data) =>
-        this.ctx.emit("heartRateAlarmData", { device_id: this.ctx.connectedDeviceId() ?? "", data }),
+        this.ctx.emit("heart_rate_alarm_data", { device_id: this.ctx.connectedDeviceId() ?? "", data }),
     });
   }
 
@@ -51,7 +51,7 @@ export class AlarmsCapability {
       validate: () => validateHeartRateAlarm(alarm),
       invoke: () => this.ctx.native.setHeartRateAlarm(deepCamelKeys(alarm) as HeartRateAlarm),
       afterSuccess: () =>
-        this.ctx.emit("heartRateAlarmData", { device_id: this.ctx.connectedDeviceId() ?? "", data: alarm }),
+        this.ctx.emit("heart_rate_alarm_data", { device_id: this.ctx.connectedDeviceId() ?? "", data: alarm }),
     });
   }
 }

@@ -9,6 +9,8 @@ import {
 } from "@/bridge-contract/verify-veepoo-events";
 import {
   NATIVE_EMITTED_EVENTS,
+  NATIVE_TO_JS_EVENT_MAP,
+  JS_EXPOSED_NATIVE_EVENTS,
   JS_LOCAL_ONLY_EVENTS,
   ALL_VEEPOO_EVENTS,
 } from "@/bridge/veepoo-events-registry";
@@ -20,13 +22,17 @@ describe("VeepooEvent bridge contract", () => {
     expect(verifyVeepooEventsContract(repoRoot)).toEqual([]);
   });
 
-  it("registry: ALL_VEEPOO_EVENTS = NATIVE_EMITTED_EVENTS ∪ JS_LOCAL_ONLY_EVENTS", () => {
+  it("registry: ALL_VEEPOO_EVENTS = JS_EXPOSED_NATIVE_EVENTS ∪ JS_LOCAL_ONLY_EVENTS", () => {
     const all = new Set(ALL_VEEPOO_EVENTS);
-    const native = new Set(NATIVE_EMITTED_EVENTS);
+    const jsExposed = new Set(JS_EXPOSED_NATIVE_EVENTS);
     const jsOnly = new Set(JS_LOCAL_ONLY_EVENTS);
-    for (const e of native) expect(all.has(e)).toBe(true);
+    // every native event maps to a JS snake_case name present in ALL_VEEPOO_EVENTS
+    for (const e of NATIVE_EMITTED_EVENTS) {
+      const jsName = NATIVE_TO_JS_EVENT_MAP[e];
+      expect(all.has(jsName)).toBe(true);
+    }
     for (const e of jsOnly) expect(all.has(e)).toBe(true);
-    expect(all.size).toBe(native.size + jsOnly.size);
+    expect(all.size).toBe(jsExposed.size + jsOnly.size);
   });
 
   it("registry: no overlap between NATIVE_EMITTED_EVENTS and JS_LOCAL_ONLY_EVENTS", () => {

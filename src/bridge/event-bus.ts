@@ -1,6 +1,6 @@
 import type { EventSubscription } from "expo-modules-core";
 import type { VeepooEvent, VeepooEventPayload } from "@/types/index";
-import { NATIVE_EMITTED_EVENTS } from "./veepoo-events-registry";
+import { NATIVE_EMITTED_EVENTS, NATIVE_TO_JS_EVENT_MAP } from "./veepoo-events-registry";
 
 export type EventListener = (payload: unknown) => void;
 
@@ -24,11 +24,10 @@ export class EventBus {
     if (this.listenersSetup) return;
     this.listenersSetup = true;
 
-    const events: VeepooEvent[] = [...NATIVE_EMITTED_EVENTS];
-
-    events.forEach(event => {
-      const subscription = native.addListener(event, (payload: unknown) => {
-        onEvent(event, payload);
+    NATIVE_EMITTED_EVENTS.forEach(nativeEvent => {
+      const jsEvent = NATIVE_TO_JS_EVENT_MAP[nativeEvent] as VeepooEvent;
+      const subscription = native.addListener(nativeEvent, (payload: unknown) => {
+        onEvent(jsEvent, payload);
       });
       this.nativeSubscriptions.push(subscription);
     });

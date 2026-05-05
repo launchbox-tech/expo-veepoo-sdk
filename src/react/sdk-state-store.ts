@@ -34,27 +34,27 @@ export class VeepooSDKStateStore {
       this.cleanups.push(() => sdk.off(event, handler));
     };
 
-    on("sdkInitialized", () => {
+    on("sdk_initialized", () => {
       this.update({ initialized: true });
     });
 
-    on("deviceConnected", ({ device_id }) => {
+    on("device_connected", ({ device_id }) => {
       this.update({ isConnected: true, connectedDeviceId: device_id });
     });
 
-    on("deviceReady", ({ device_id }) => {
+    on("device_ready", ({ device_id }) => {
       this.update({ isReady: true, connectedDeviceId: device_id });
     });
 
-    on("deviceDisconnected", () => {
+    on("device_disconnected", () => {
       this.update({ isConnected: false, isReady: false, connectedDeviceId: null });
     });
 
-    on("scanStarted", () => {
+    on("scan_started", () => {
       this.update({ isScanning: true });
     });
 
-    on("scanStopped", () => {
+    on("scan_stopped", () => {
       this.update({ isScanning: false });
     });
   }
