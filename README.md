@@ -209,11 +209,11 @@ The "latest ref" pattern (`handlerRef.current = handler` in the render body) ens
 Usage:
 
 ```tsx
-useSDKEvent('heartRateTestResult', ({ result }) => {
+useSDKEvent('heart_rate_test_result', ({ result }) => {
   setHrResult(result);
 }, isReady);
 
-useSDKEvent('deviceFound', ({ device }) => {
+useSDKEvent('device_found', ({ device }) => {
   setDevices(prev => [...prev, device]);
 }, isScanning);
 ```
@@ -242,7 +242,7 @@ export function ScanScreen() {
   const isScanning = useIsScanning();
   const [devices, setDevices] = useState<VeepooDevice[]>([]);
 
-  useSDKEvent('deviceFound', ({ device }) => {
+  useSDKEvent('device_found', ({ device }) => {
     setDevices(prev => {
       const idx = prev.findIndex(d => d.id === device.id);
       if (idx !== -1) {
@@ -289,7 +289,7 @@ await sdk.discovery.requestPermissions()   // → PermissionsResult
 await sdk.discovery.checkBluetoothStatus() // → boolean
 ```
 
-Events: `deviceFound`, `bluetoothStateChanged`
+Events: `device_found`, `bluetooth_state_changed`
 
 ### `sdk.session` — Session
 
@@ -298,7 +298,7 @@ await sdk.session.connect(deviceId: string)
 await sdk.session.disconnect()
 ```
 
-Events: `deviceConnected`, `deviceDisconnected`, `deviceReady`, `deviceConnectStatus`, `connectionStatusChanged`
+Events: `device_connected`, `device_disconnected`, `device_ready`, `device_connect_status`, `connection_status_changed`
 
 ### `sdk.personalInfo` — Personal Info
 
@@ -312,15 +312,15 @@ await sdk.personalInfo.syncPersonalInfo(info: PersonalInfo) // → boolean
 await sdk.battery.readBattery() // → BatteryInfo
 ```
 
-Events: `batteryData`
+Events: `battery_data`
 
-### `sdk.deviceVersion` — Device Version
+### `sdk.device_version` — Device Version
 
 ```ts
-await sdk.deviceVersion.readDeviceVersion() // → DeviceVersion
+await sdk.device_version.readDeviceVersion() // → DeviceVersion
 ```
 
-Events: `deviceVersion`
+Events: `device_version`
 
 ### `sdk.deviceFunctions` — Device Functions
 
@@ -328,7 +328,7 @@ Events: `deviceVersion`
 await sdk.deviceFunctions.readDeviceFunctions() // → DeviceFunctions
 ```
 
-Events: `deviceFunction`
+Events: `device_function`
 
 ### `sdk.deviceTime` — Device Time
 
@@ -355,7 +355,7 @@ await sdk.realtimeTests.stopEcgTest()
 
 `RealtimeTest` values: `HEART_RATE`, `BLOOD_PRESSURE`, `BLOOD_OXYGEN`, `TEMPERATURE`, `STRESS`, `BLOOD_GLUCOSE`, `HRV`, `FATIGUE`, `BREATHING`, `BODY_COMPOSITION`
 
-Events: `heartRateTestResult`, `bloodPressureTestResult`, `bloodOxygenTestResult`, `temperatureTestResult`, `stressData`, `bloodGlucoseData`, `hrvTestResult`, `ecgTestResult`, `fatigueTestResult`, `breathingTestResult`, `bodyCompositionTestResult`, `pttTestResult`, `pttStateChanged`, `gsrTestResult`
+Events: `heart_rate_test_result`, `blood_pressure_test_result`, `blood_oxygen_test_result`, `temperature_test_result`, `stress_data`, `blood_glucose_data`, `hrv_test_result`, `ecg_test_result`, `fatigue_test_result`, `breathing_test_result`, `body_composition_test_result`, `ptt_test_result`, `ptt_state_changed`, `gsr_test_result`
 
 ### `sdk.historicalQuery` — Historical Data
 
@@ -363,14 +363,14 @@ Events: `heartRateTestResult`, `bloodPressureTestResult`, `bloodOxygenTestResult
 await sdk.historicalQuery.startReadOriginData()
 ```
 
-Events: `readOriginProgress`, `readOriginComplete`, `originFiveMinuteData`, `originHalfHourData`, `originSpo2Data`, `sleepData`, `accurateSleepData`, `sportStepData`
+Events: `read_origin_progress`, `read_origin_complete`, `origin_five_minute_data`, `origin_half_hour_data`, `origin_spo2_data`, `sleep_data`, `accurate_sleep_data`, `sport_step_data`
 
-`readOriginProgress.progress` is an integer 0–100 (truncated, not rounded). Events fire only when the integer changes. Completion always sends 100.
+`read_origin_progress.progress` is an integer 0–100 (truncated, not rounded). Events fire only when the integer changes. Completion always sends 100.
 
-### `sdk.sleepData` — Sleep Data
+### `sdk.sleep_data` — Sleep Data
 
 ```ts
-await sdk.sleepData.readSleepData(date?: string) // → SleepData[]
+await sdk.sleep_data.readSleepData(date?: string) // → SleepData[]
 ```
 
 ### `sdk.sportSteps` — Sport / Steps
@@ -406,7 +406,7 @@ await sdk.socialMsg.readSocialMsgData()               // → SocialMsgData
 await sdk.socialMsg.writeSocialMsgData(Partial<SocialMsgData>) // → OperationStatus
 ```
 
-Events: `socialMsgData`
+Events: `social_msg_data`
 
 ### `sdk.alarms` — Alarms
 
@@ -418,7 +418,7 @@ await sdk.alarms.readHeartRateAlarm()              // → HeartRateAlarm
 await sdk.alarms.setHeartRateAlarm(alarm: HeartRateAlarm) // → OperationStatus
 ```
 
-Events: `alarmData`, `heartRateAlarmData` *(JS-local — emitted by `readHeartRateAlarm` / `setHeartRateAlarm`)*
+Events: `alarm_data`, `heart_rate_alarm_data` *(JS-local — emitted by `readHeartRateAlarm` / `setHeartRateAlarm`)*
 
 ### `sdk.screenLight` — Screen Brightness and On-time
 
@@ -474,7 +474,7 @@ await sdk.contacts.deleteContact(contactId: number)
 await sdk.contacts.setContactSosState(contactId: number, isOpen: boolean)
 ```
 
-Events: `contactsData`
+Events: `contacts_data`
 
 ### `sdk.sos` — SOS
 
@@ -483,7 +483,7 @@ await sdk.sos.readSosCallTimes()           // → SosCallTimesSettings
 await sdk.sos.setSosCallTimes(times: number)
 ```
 
-Events: `sosCallTimesData`, `deviceSosTriggered`
+Events: `sos_call_times_data`, `device_sos_triggered`
 
 ### `sdk.camera` — Camera
 
@@ -492,7 +492,7 @@ await sdk.camera.enterCameraMode()
 await sdk.camera.exitCameraMode()
 ```
 
-Events: `cameraShutter`
+Events: `camera_shutter`
 
 ### `sdk.music` — Music Remote
 
@@ -501,7 +501,7 @@ await sdk.music.setMusicControlEnabled(enabled: boolean)
 await sdk.music.pushMusicData(data: MusicData)
 ```
 
-Events: `musicRemoteCommand`
+Events: `music_remote_command`
 
 ### `sdk.findDevice` — Find Device
 
@@ -510,7 +510,7 @@ await sdk.findDevice.startFindDevice()
 await sdk.findDevice.stopFindDevice()
 ```
 
-Events: `findDeviceState`
+Events: `find_device_state`
 
 ### `sdk.btStatus` — Band Bluetooth
 
@@ -519,7 +519,7 @@ await sdk.btStatus.readDeviceBTStatus() // → DeviceBTStatus
 await sdk.btStatus.setDeviceBTSwitch(open: boolean)
 ```
 
-Events: `deviceBTStateChanged`
+Events: `device_bt_state_changed`
 
 ### `sdk.gpsTimezone` — GPS and Timezone
 
@@ -533,85 +533,85 @@ await sdk.gpsTimezone.setDeviceGPSAndTimezone(data: GPSAndTimezoneData)
 await sdk.dfu.startLocalFirmwareDfu(filePath: string)
 ```
 
-Events: `firmwareDfuProgress`
+Events: `firmware_dfu_progress`
 
 ## Events
 
 ### Session and connectivity
 
-- `deviceFound`
-- `deviceConnected`
-- `deviceDisconnected`
-- `deviceConnectStatus`
-- `connectionStatusChanged`
-- `deviceReady`
+- `device_found`
+- `device_connected`
+- `device_disconnected`
+- `device_connect_status`
+- `connection_status_changed`
+- `device_ready`
 
 ### Bluetooth
 
-- `bluetoothStateChanged`
-- `deviceBTStateChanged`
+- `bluetooth_state_changed`
+- `device_bt_state_changed`
 
 ### Band metadata
 
-- `deviceFunction`
-- `deviceVersion`
-- `passwordData`
-- `socialMsgData`
-- `batteryData`
-- `customSettingsData`
+- `device_function`
+- `device_version`
+- `password_data`
+- `social_msg_data`
+- `battery_data`
+- `custom_settings_data`
 
 ### Historical data reads
 
-- `readOriginProgress`
-- `readOriginComplete`
-- `originFiveMinuteData`
-- `originHalfHourData`
-- `originSpo2Data`
-- `sleepData`
-- `accurateSleepData`
-- `sportStepData`
+- `read_origin_progress`
+- `read_origin_complete`
+- `origin_five_minute_data`
+- `origin_half_hour_data`
+- `origin_spo2_data`
+- `sleep_data`
+- `accurate_sleep_data`
+- `sport_step_data`
 
 ### Realtime health tests
 
-- `heartRateTestResult`
-- `bloodPressureTestResult`
-- `bloodOxygenTestResult`
-- `temperatureTestResult`
-- `stressData`
-- `bloodGlucoseData`
-- `hrvTestResult`
-- `ecgTestResult`
-- `fatigueTestResult`
-- `breathingTestResult`
-- `bodyCompositionTestResult`
-- `bloodAnalysisTestResult`
-- `gsrTestResult`
-- `pttTestResult`
-- `pttStateChanged`
+- `heart_rate_test_result`
+- `blood_pressure_test_result`
+- `blood_oxygen_test_result`
+- `temperature_test_result`
+- `stress_data`
+- `blood_glucose_data`
+- `hrv_test_result`
+- `ecg_test_result`
+- `fatigue_test_result`
+- `breathing_test_result`
+- `body_composition_test_result`
+- `blood_analysis_test_result`
+- `gsr_test_result`
+- `ptt_test_result`
+- `ptt_state_changed`
 
 ### Stored vitals
 
-- `storedTemperatureData`
-- `storedBloodGlucoseData`
-- `storedHrvData`
-- `storedEcgData`
-- `storedBodyCompositionData`
+- `stored_temperature_data`
+- `stored_blood_glucose_data`
+- `stored_hrv_data`
+- `stored_ecg_data`
+- `stored_body_composition_data`
 
 ### Device settings and alerts
 
-- `alarmData`
-- `heartRateAlarmData` *(JS-local — emitted by `readHeartRateAlarm` / `setHeartRateAlarm`)*
-- `findDeviceState`
-- `firmwareDfuProgress`
-- `contactsData`
-- `sosCallTimesData`
-- `deviceSosTriggered`
-- `cameraShutter`
-- `musicRemoteCommand`
-- `healthRemindData`
-- `apneaRemindData`
-- `sportModeData`
-- `exerciseSessionData`
+- `alarm_data`
+- `heart_rate_alarm_data` *(JS-local — emitted by `readHeartRateAlarm` / `setHeartRateAlarm`)*
+- `find_device_state`
+- `firmware_dfu_progress`
+- `contacts_data`
+- `sos_call_times_data`
+- `device_sos_triggered`
+- `camera_shutter`
+- `music_remote_command`
+- `health_remind_data`
+- `apnea_remind_data`
+- `sport_mode_data`
+- `exercise_session_data`
 
 ### SDK
 
