@@ -42,11 +42,11 @@ describe('EmergencySettings (split capabilities)', () => {
   // ── addContact ────────────────────────────────────────────────────────────
 
   it('addContact delegates to native (happy path)', async () => {
-    const contact = { name: 'Alice', phoneNumber: '1234567890' };
+    const contact = { name: 'Alice', phone_number: '1234567890' };
 
     await contacts.addContact(contact);
 
-    expect(native.addContact).toHaveBeenCalledWith(contact);
+    expect(native.addContact).toHaveBeenCalledWith({ name: 'Alice', phoneNumber: '1234567890' });
   });
 
   // ── deleteContact ─────────────────────────────────────────────────────────
@@ -73,10 +73,10 @@ describe('EmergencySettings (split capabilities)', () => {
     const result = await sos.readSosCallTimes();
 
     expect(native.readSosCallTimes).toHaveBeenCalledTimes(1);
-    expect(result).toEqual({ times: 3, minTimes: 1, maxTimes: 9 });
+    expect(result).toEqual({ times: 3, min_times: 1, max_times: 9 });
     expect(emitSpy).toHaveBeenCalledWith(
       'sosCallTimesData',
-      expect.objectContaining({ data: expect.objectContaining({ times: 3, minTimes: 1, maxTimes: 9 }) }),
+      expect.objectContaining({ data: expect.objectContaining({ times: 3, min_times: 1, max_times: 9 }) }),
     );
   });
 

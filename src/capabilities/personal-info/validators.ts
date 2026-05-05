@@ -8,6 +8,8 @@ export function validatePersonalInfo(info: PersonalInfo): void {
   requireInRange(info.height, 'height', 50, 300);
   requireInRange(info.weight, 'weight', 1, 500);
   requireInRange(info.age, 'age', 1, 120);
-  requireInRange(info.stepAim, 'stepAim', 1, 100_000);
-  requireInRange(info.sleepAim, 'sleepAim', 0, 1_440);
+  const stepAim = info.step_aim ?? (info as any).stepAim;
+  requireInRange(stepAim, 'stepAim', 1, 100_000);
+  const sleepAim = info.sleep_aim ?? (info as any).sleepAim;
+  requireInRange(sleepAim, 'sleepAim', 0, 1_440);
 }

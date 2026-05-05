@@ -7,7 +7,7 @@ export function normalizeWeatherSettings(value: unknown): WeatherSettings {
   const unitRaw = toStringValue(record.unit, 'C').toUpperCase();
   const unit: WeatherUnit = unitRaw === 'F' ? 'F' : 'C';
   return {
-    isOpen: toBoolean(record.isOpen),
+    is_open: toBoolean(record.isOpen ?? record.is_open),
     unit,
     crc: toInt(record.crc),
   };

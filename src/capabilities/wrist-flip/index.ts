@@ -5,6 +5,7 @@ import type { WristFlipNativeMethods } from "./native.js";
 import { normalizeWristFlipWakeSettings } from "./normalizers.js";
 import { validateWristFlipWakeSettings } from "./validators.js";
 import type { WristFlipWakeSettings } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class WristFlipCapability {
   constructor(private readonly ctx: CapabilityContext<WristFlipNativeMethods>) {}
@@ -23,7 +24,7 @@ export class WristFlipCapability {
   setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void> {
     return this.call({
       validate: () => validateWristFlipWakeSettings(settings),
-      invoke: () => this.ctx.native.setWristFlipWakeSettings(settings),
+      invoke: () => this.ctx.native.setWristFlipWakeSettings(deepCamelKeys(settings) as WristFlipWakeSettings),
     });
   }
 }

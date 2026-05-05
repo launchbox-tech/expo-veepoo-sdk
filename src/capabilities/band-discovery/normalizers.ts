@@ -12,16 +12,26 @@ const bluetoothStatesByCode: BluetoothState[] = [
   'resetting',
   'unsupported',
   'unauthorized',
-  'poweredOff',
-  'poweredOn',
+  'powered_off',
+  'powered_on',
 ];
 
 const bluetoothAuthorizationsByCode: BluetoothAuthorization[] = [
-  'notDetermined',
+  'not_determined',
   'restricted',
   'denied',
-  'allowedAlways',
+  'allowed_always',
 ];
+
+const bluetoothStateValueMap: Record<string, BluetoothState> = {
+  poweredOff: 'powered_off',
+  poweredOn: 'powered_on',
+};
+
+const bluetoothAuthValueMap: Record<string, BluetoothAuthorization> = {
+  notDetermined: 'not_determined',
+  allowedAlways: 'allowed_always',
+};
 
 const validPermissionStatuses = new Set<PermissionStatus>([
   'granted',
@@ -37,7 +47,7 @@ export function normalizePermissionsResult(value: unknown): PermissionsResult {
     return {
       granted: value,
       status: value ? 'granted' : 'denied',
-      canAskAgain: !value,
+      can_ask_again: !value,
     };
   }
 
@@ -45,26 +55,26 @@ export function normalizePermissionsResult(value: unknown): PermissionsResult {
     const normalized = value.toLowerCase();
     switch (normalized) {
       case 'granted':
-        return { granted: true, status: 'granted', canAskAgain: false };
+        return { granted: true, status: 'granted', can_ask_again: false };
       case 'restricted':
-        return { granted: false, status: 'restricted', canAskAgain: false };
+        return { granted: false, status: 'restricted', can_ask_again: false };
       case 'never_ask_again':
-        return { granted: false, status: 'never_ask_again', canAskAgain: false };
+        return { granted: false, status: 'never_ask_again', can_ask_again: false };
       case 'poweredoff':
       case 'powered_off':
-        return { granted: false, status: 'powered_off', canAskAgain: false };
+        return { granted: false, status: 'powered_off', can_ask_again: false };
       case 'unknown':
-        return { granted: false, status: 'unknown', canAskAgain: true };
+        return { granted: false, status: 'unknown', can_ask_again: true };
       case 'denied':
       default:
-        return { granted: false, status: 'denied', canAskAgain: true };
+        return { granted: false, status: 'denied', can_ask_again: true };
     }
   }
 
   if (isRecord(value)) {
     const rawGranted = value.granted;
     const rawStatus = value.status;
-    const rawCanAskAgain = value.canAskAgain;
+    const rawCanAskAgain = value.canAskAgain ?? value.can_ask_again;
 
     const status =
       typeof rawStatus === 'string' && validPermissionStatuses.has(rawStatus as PermissionStatus)
@@ -76,7 +86,7 @@ export function normalizePermissionsResult(value: unknown): PermissionsResult {
     return {
       granted: typeof rawGranted === 'boolean' ? rawGranted : status === 'granted',
       status,
-      canAskAgain:
+      can_ask_again:
         typeof rawCanAskAgain === 'boolean'
           ? rawCanAskAgain
           : status !== 'granted' &&
@@ -86,7 +96,7 @@ export function normalizePermissionsResult(value: unknown): PermissionsResult {
     };
   }
 
-  return { granted: false, status: 'unknown', canAskAgain: true };
+  return { granted: false, status: 'unknown', can_ask_again: true };
 }
 
 export function normalizeBluetoothStatus(value: unknown): BluetoothStatus | unknown {
@@ -95,27 +105,27 @@ export function normalizeBluetoothStatus(value: unknown): BluetoothStatus | unkn
   const rawState = value.state;
   const rawAuthorization = value.authorization;
 
-  const state =
+  const stateRaw =
     typeof rawState === 'number'
       ? bluetoothStatesByCode[rawState] ?? 'unknown'
       : typeof rawState === 'string'
-        ? rawState
+        ? (bluetoothStateValueMap[rawState] ?? rawState)
         : 'unknown';
 
-  const authorization =
+  const authRaw =
     typeof rawAuthorization === 'number'
-      ? bluetoothAuthorizationsByCode[rawAuthorization] ?? 'notDetermined'
+      ? bluetoothAuthorizationsByCode[rawAuthorization] ?? 'not_determined'
       : typeof rawAuthorization === 'string'
-        ? rawAuthorization
-        : 'notDetermined';
+        ? (bluetoothAuthValueMap[rawAuthorization] ?? rawAuthorization)
+        : 'not_determined';
 
   return {
-    state: state as BluetoothState,
-    stateName: typeof value.stateName === 'string' ? value.stateName : state,
-    authorization: authorization as BluetoothAuthorization,
-    authorizationName:
-      typeof value.authorizationName === 'string' ? value.authorizationName : authorization,
-    isScanning: toBoolean(value.isScanning, false),
-    pendingScanStart: toBoolean(value.pendingScanStart, false),
+    state: stateRaw as BluetoothState,
+    state_name: typeof value.stateName === 'string' ? value.stateName : stateRaw,
+    authorization: authRaw as BluetoothAuthorization,
+    authorization_name:
+      typeof value.authorizationName === 'string' ? value.authorizationName : authRaw,
+    is_scanning: toBoolean(value.isScanning, false),
+    pending_scan_start: toBoolean(value.pendingScanStart, false),
   };
 }

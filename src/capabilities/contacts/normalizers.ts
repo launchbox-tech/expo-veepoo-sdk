@@ -4,15 +4,17 @@ import { isRecord, toInt, toBoolean, toStringValue } from "../../normalizers/pri
 function normalizeContact(raw: unknown): DeviceContact | null {
   if (!isRecord(raw)) return null;
   const name = toStringValue(raw.name ?? raw.nickName);
-  const phoneNumber = toStringValue(raw.phoneNumber);
-  if (!name && !phoneNumber) return null;
+  const phone_number = toStringValue(raw.phoneNumber ?? raw.phone_number);
+  if (!name && !phone_number) return null;
   return {
-    contactID: toInt(raw.contactID ?? raw.contactId ?? raw.id),
+    contact_id: toInt(raw.contactID ?? raw.contactId ?? raw.contact_id ?? raw.id),
     name,
-    phoneNumber,
-    isSOS: toBoolean(raw.isSOS ?? raw.isSettingSOS),
-    isSupportSOS:
-      raw.isSupportSOS !== undefined ? toBoolean(raw.isSupportSOS) : undefined,
+    phone_number,
+    is_sos: toBoolean(raw.isSOS ?? raw.is_sos ?? raw.isSettingSOS),
+    is_support_sos:
+      (raw.isSupportSOS !== undefined || raw.is_support_sos !== undefined)
+        ? toBoolean(raw.isSupportSOS ?? raw.is_support_sos)
+        : undefined,
   };
 }
 

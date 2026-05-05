@@ -5,6 +5,7 @@ import type { ContactsNativeMethods } from "./native.js";
 import { normalizeContactList } from "./normalizers.js";
 import { validateNewContact, validateContactId } from "./validators.js";
 import type { DeviceContact, NewDeviceContact } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class ContactsCapability {
   constructor(private readonly ctx: CapabilityContext<ContactsNativeMethods>) {}
@@ -18,14 +19,14 @@ export class ContactsCapability {
       invoke: () => this.ctx.native.readContacts(crc),
       normalize: normalizeContactList,
       afterSuccess: (contacts) =>
-        this.ctx.emit("contactsData", { deviceId: this.ctx.connectedDeviceId(), contacts }),
+        this.ctx.emit("contactsData", { device_id: this.ctx.connectedDeviceId(), contacts }),
     });
   }
 
   addContact(contact: NewDeviceContact): Promise<void> {
     return this.call({
       validate: () => validateNewContact(contact),
-      invoke: () => this.ctx.native.addContact(contact),
+      invoke: () => this.ctx.native.addContact(deepCamelKeys(contact) as NewDeviceContact),
     });
   }
 

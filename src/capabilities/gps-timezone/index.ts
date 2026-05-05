@@ -4,6 +4,7 @@ import type { CapabilityContext } from "../shared/context.js";
 import type { GpsTimezoneNativeMethods } from "./native.js";
 import { validateGPSAndTimezoneData } from "./validators.js";
 import type { GPSAndTimezoneData } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class GpsTimezoneCapability {
   constructor(private readonly ctx: CapabilityContext<GpsTimezoneNativeMethods>) {}
@@ -15,7 +16,7 @@ export class GpsTimezoneCapability {
   setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void> {
     return this.call({
       validate: () => validateGPSAndTimezoneData(data),
-      invoke: () => this.ctx.native.setDeviceGPSAndTimezone(data),
+      invoke: () => this.ctx.native.setDeviceGPSAndTimezone(deepCamelKeys(data) as GPSAndTimezoneData),
     });
   }
 }

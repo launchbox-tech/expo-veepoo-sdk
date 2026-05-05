@@ -5,6 +5,7 @@ import type { SedentaryReminderNativeMethods } from "./native.js";
 import { normalizeSedentaryReminderSettings } from "./normalizers.js";
 import { validateSedentaryReminderSettings } from "./validators.js";
 import type { SedentaryReminderSettings } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class SedentaryReminderCapability {
   constructor(private readonly ctx: CapabilityContext<SedentaryReminderNativeMethods>) {}
@@ -23,7 +24,7 @@ export class SedentaryReminderCapability {
   setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void> {
     return this.call({
       validate: () => validateSedentaryReminderSettings(settings),
-      invoke: () => this.ctx.native.setSedentaryReminder(settings),
+      invoke: () => this.ctx.native.setSedentaryReminder(deepCamelKeys(settings) as SedentaryReminderSettings),
     });
   }
 }

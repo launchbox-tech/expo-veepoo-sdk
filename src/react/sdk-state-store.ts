@@ -38,12 +38,12 @@ export class VeepooSDKStateStore {
       this.update({ initialized: true });
     });
 
-    on("deviceConnected", ({ deviceId }) => {
-      this.update({ isConnected: true, connectedDeviceId: deviceId });
+    on("deviceConnected", ({ device_id }) => {
+      this.update({ isConnected: true, connectedDeviceId: device_id });
     });
 
-    on("deviceReady", ({ deviceId }) => {
-      this.update({ isReady: true, connectedDeviceId: deviceId });
+    on("deviceReady", ({ device_id }) => {
+      this.update({ isReady: true, connectedDeviceId: device_id });
     });
 
     on("deviceDisconnected", () => {

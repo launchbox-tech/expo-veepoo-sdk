@@ -80,7 +80,7 @@ export class VeepooSDKRuntime {
       action,
       platform: this.getPlatform(),
       message,
-      deviceId: options?.deviceId,
+      device_id: options?.deviceId,
       data: options?.data,
       error:
         options?.error instanceof Error
@@ -150,22 +150,22 @@ export class VeepooSDKRuntime {
     );
 
     if (event === "bluetoothStateChanged") {
-      const bluetoothStatus = normalizedPayload as { isScanning?: boolean };
-      if (typeof bluetoothStatus.isScanning === "boolean") {
-        this.state.setScanning(bluetoothStatus.isScanning);
+      const bluetoothStatus = normalizedPayload as { is_scanning?: boolean };
+      if (typeof bluetoothStatus.is_scanning === "boolean") {
+        this.state.setScanning(bluetoothStatus.is_scanning);
       }
     }
 
     if (event === "deviceConnected") {
-      const device = normalizedPayload as { deviceId?: string };
-      this.state.onDeviceConnected(device.deviceId ?? "");
+      const device = normalizedPayload as { device_id?: string };
+      this.state.onDeviceConnected(device.device_id ?? "");
     }
 
     if (event === "deviceDisconnected") {
-      const device = normalizedPayload as { deviceId?: string };
-      this.state.onDeviceDisconnected(device.deviceId);
-      if (device.deviceId) {
-        this.originReadPipeline.clearDevice(device.deviceId);
+      const device = normalizedPayload as { device_id?: string };
+      this.state.onDeviceDisconnected(device.device_id);
+      if (device.device_id) {
+        this.originReadPipeline.clearDevice(device.device_id);
       }
     }
 
@@ -174,11 +174,11 @@ export class VeepooSDKRuntime {
       event === "connectionStatusChanged"
     ) {
       const connection = normalizedPayload as {
-        deviceId?: string;
+        device_id?: string;
         status?: ConnectionStatus;
       };
       if (connection.status) {
-        this.state.onConnectionStatusChanged(connection.deviceId, connection.status);
+        this.state.onConnectionStatusChanged(connection.device_id, connection.status);
       }
     }
 
@@ -231,7 +231,7 @@ export class VeepooSDKRuntime {
     if (typeof payload !== "object" || payload === null) {
       return undefined;
     }
-    const deviceId = (payload as { deviceId?: unknown }).deviceId;
+    const deviceId = (payload as { device_id?: unknown }).device_id;
     return typeof deviceId === "string" && deviceId.length > 0
       ? deviceId
       : undefined;
@@ -244,7 +244,7 @@ export class VeepooSDKRuntime {
   ): VeepooError {
     const veepooError = mapNativeRejection(error, { fallbackCode, deviceId });
     this.log("error", "sdk", `error.${veepooError.code}`, veepooError.message, {
-      deviceId: veepooError.deviceId,
+      deviceId: veepooError.device_id,
       error,
     });
     this.emitLocal("error", veepooError);

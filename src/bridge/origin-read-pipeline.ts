@@ -24,7 +24,7 @@ export class OriginReadPipeline {
    * @returns `true` if the event should be emitted, `false` if it should be suppressed.
    */
   shouldEmit(payload: VeepooEventPayload["readOriginProgress"]): boolean {
-    const deviceId = payload.deviceId;
+    const deviceId = payload.device_id;
     const progressField = payload.progress;
 
     // Pass-through: if the progress field is not an object, emit without
@@ -34,7 +34,7 @@ export class OriginReadPipeline {
     }
 
     const progress = progressField.progress;
-    const readState = progressField.readState;
+    const readState = progressField.read_state;
 
     // Non-finite / non-number progress → pass, no state change.
     if (typeof progress !== "number" || !Number.isFinite(progress)) {

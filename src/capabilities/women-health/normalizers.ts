@@ -31,28 +31,31 @@ export function normalizeWomenHealthSettings(value: unknown): WomenHealthSetting
   const out: WomenHealthSettings = {
     status: normalizeWomenHealthStatus(record.status),
   };
-  if (record.menstrualLengthDays !== undefined && record.menstrualLengthDays !== null) {
-    out.menstrualLengthDays = toInt(record.menstrualLengthDays);
+  const mld = record.menstrualLengthDays ?? record.menstrual_length_days;
+  if (mld !== undefined && mld !== null) {
+    out.menstrual_length_days = toInt(mld);
   }
-  if (record.menstrualCycleDays !== undefined && record.menstrualCycleDays !== null) {
-    out.menstrualCycleDays = toInt(record.menstrualCycleDays);
+  const mcd = record.menstrualCycleDays ?? record.menstrual_cycle_days;
+  if (mcd !== undefined && mcd !== null) {
+    out.menstrual_cycle_days = toInt(mcd);
   }
-  const lmd = toStringValue(record.lastMenstrualDate, '');
-  if (lmd !== '') out.lastMenstrualDate = lmd;
-  const edd = toStringValue(record.expectedDeliveryDate, '');
-  if (edd !== '') out.expectedDeliveryDate = edd;
-  const bb = toStringValue(record.babyBirthday, '');
-  if (bb !== '') out.babyBirthday = bb;
-  const sexRaw = toStringValue(record.babySex, '').toLowerCase();
+  const lmd = toStringValue(record.lastMenstrualDate ?? record.last_menstrual_date, '');
+  if (lmd !== '') out.last_menstrual_date = lmd;
+  const edd = toStringValue(record.expectedDeliveryDate ?? record.expected_delivery_date, '');
+  if (edd !== '') out.expected_delivery_date = edd;
+  const bb = toStringValue(record.babyBirthday ?? record.baby_birthday, '');
+  if (bb !== '') out.baby_birthday = bb;
+  const sexRaw = toStringValue(record.babySex ?? record.baby_sex, '').toLowerCase();
   if (sexRaw === 'male' || sexRaw === 'man') {
-    out.babySex = 'male';
+    out.baby_sex = 'male';
   } else if (sexRaw === 'female' || sexRaw === 'woman') {
-    out.babySex = 'female';
+    out.baby_sex = 'female';
   }
-  if (record.currentMenstrualDays !== undefined && record.currentMenstrualDays !== null) {
-    out.currentMenstrualDays = toInt(record.currentMenstrualDays);
+  const cmd = record.currentMenstrualDays ?? record.current_menstrual_days;
+  if (cmd !== undefined && cmd !== null) {
+    out.current_menstrual_days = toInt(cmd);
   }
-  const op = toStringValue(record.operationStatus, '');
-  if (op !== '') out.operationStatus = op;
+  const op = toStringValue(record.operationStatus ?? record.operation_status, '');
+  if (op !== '') out.operation_status = op;
   return out;
 }

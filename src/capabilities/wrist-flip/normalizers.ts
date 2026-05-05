@@ -5,17 +5,19 @@ export function normalizeWristFlipWakeSettings(value: unknown): WristFlipWakeSet
   const record = isRecord(value) ? value : {};
   const base: WristFlipWakeSettings = {
     enabled: toBoolean(record.enabled, false),
-    startHour: toInt(record.startHour),
-    startMinute: toInt(record.startMinute),
-    endHour: toInt(record.endHour),
-    endMinute: toInt(record.endMinute),
-    sensitivityLevel: toInt(record.sensitivityLevel, 5),
+    start_hour: toInt(record.startHour ?? record.start_hour),
+    start_minute: toInt(record.startMinute ?? record.start_minute),
+    end_hour: toInt(record.endHour ?? record.end_hour),
+    end_minute: toInt(record.endMinute ?? record.end_minute),
+    sensitivity_level: toInt(record.sensitivityLevel ?? record.sensitivity_level, 5),
   };
-  if (record.supportsCustomTimeWindow !== undefined && record.supportsCustomTimeWindow !== null) {
-    base.supportsCustomTimeWindow = toBoolean(record.supportsCustomTimeWindow, false);
+  const sctw = record.supportsCustomTimeWindow ?? record.supports_custom_time_window;
+  if (sctw !== undefined && sctw !== null) {
+    base.supports_custom_time_window = toBoolean(sctw, false);
   }
-  if (record.defaultSensitivityLevel !== undefined && record.defaultSensitivityLevel !== null) {
-    base.defaultSensitivityLevel = toInt(record.defaultSensitivityLevel);
+  const dsl = record.defaultSensitivityLevel ?? record.default_sensitivity_level;
+  if (dsl !== undefined && dsl !== null) {
+    base.default_sensitivity_level = toInt(dsl);
   }
   return base;
 }

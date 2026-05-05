@@ -5,6 +5,7 @@ import type { WeatherNativeMethods } from "./native.js";
 import { normalizeWeatherSettings } from "./normalizers.js";
 import { validateWeatherSettings, validateWeatherData } from "./validators.js";
 import type { WeatherData, WeatherSettings } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class WeatherCapability {
   constructor(private readonly ctx: CapabilityContext<WeatherNativeMethods>) {}
@@ -23,14 +24,14 @@ export class WeatherCapability {
   setWeatherSettings(settings: WeatherSettings): Promise<void> {
     return this.call({
       validate: () => validateWeatherSettings(settings),
-      invoke: () => this.ctx.native.setWeatherSettings(settings),
+      invoke: () => this.ctx.native.setWeatherSettings(deepCamelKeys(settings) as WeatherSettings),
     });
   }
 
   pushWeatherData(data: WeatherData): Promise<void> {
     return this.call({
       validate: () => validateWeatherData(data),
-      invoke: () => this.ctx.native.pushWeatherData(data),
+      invoke: () => this.ctx.native.pushWeatherData(deepCamelKeys(data) as WeatherData),
     });
   }
 }

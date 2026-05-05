@@ -75,8 +75,8 @@ export function normalizeTestState(value: unknown): TestState {
       normalized.includes('progress') ||
       normalized === 'calibration'
     ) return 'testing';
-    if (normalized.includes('wear')) return 'notWear';
-    if (normalized.includes('busy')) return 'deviceBusy';
+    if (normalized.includes('wear')) return 'not_wear';
+    if (normalized.includes('busy')) return 'device_busy';
     if (
       normalized.includes('over') ||
       normalized.includes('complete') ||
@@ -95,8 +95,8 @@ export function normalizeTestState(value: unknown): TestState {
     switch (Math.trunc(value)) {
       case 0: return 'start';
       case 1: return 'testing';
-      case 2: return 'notWear';
-      case 3: return 'deviceBusy';
+      case 2: return 'not_wear';
+      case 3: return 'device_busy';
       case 4: return 'over';
       default: return 'error';
     }

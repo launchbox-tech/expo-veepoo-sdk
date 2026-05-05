@@ -5,6 +5,7 @@ import type { AlarmNativeMethods } from "./native.js";
 import { normalizeAlarmList, normalizeHeartRateAlarm } from "./normalizers.js";
 import { validateAlarm, validateDeleteAlarm, validateHeartRateAlarm } from "./validators.js";
 import type { DeviceAlarm, HeartRateAlarm, OperationStatus } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class AlarmsCapability {
   constructor(private readonly ctx: CapabilityContext<AlarmNativeMethods>) {}
@@ -18,14 +19,14 @@ export class AlarmsCapability {
       invoke: () => this.ctx.native.readAlarms(),
       normalize: normalizeAlarmList,
       afterSuccess: (alarms) =>
-        this.ctx.emit("alarmData", { deviceId: this.ctx.connectedDeviceId(), alarms }),
+        this.ctx.emit("alarmData", { device_id: this.ctx.connectedDeviceId(), alarms }),
     });
   }
 
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> {
     return this.call({
       validate: () => validateAlarm(alarm),
-      invoke: () => this.ctx.native.setAlarm(alarm),
+      invoke: () => this.ctx.native.setAlarm(deepCamelKeys(alarm) as DeviceAlarm),
     });
   }
 
@@ -41,16 +42,16 @@ export class AlarmsCapability {
       invoke: () => this.ctx.native.readHeartRateAlarm(),
       normalize: normalizeHeartRateAlarm,
       afterSuccess: (data) =>
-        this.ctx.emit("heartRateAlarmData", { deviceId: this.ctx.connectedDeviceId() ?? "", data }),
+        this.ctx.emit("heartRateAlarmData", { device_id: this.ctx.connectedDeviceId() ?? "", data }),
     });
   }
 
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> {
     return this.call({
       validate: () => validateHeartRateAlarm(alarm),
-      invoke: () => this.ctx.native.setHeartRateAlarm(alarm),
+      invoke: () => this.ctx.native.setHeartRateAlarm(deepCamelKeys(alarm) as HeartRateAlarm),
       afterSuccess: () =>
-        this.ctx.emit("heartRateAlarmData", { deviceId: this.ctx.connectedDeviceId() ?? "", data: alarm }),
+        this.ctx.emit("heartRateAlarmData", { device_id: this.ctx.connectedDeviceId() ?? "", data: alarm }),
     });
   }
 }

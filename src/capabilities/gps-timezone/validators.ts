@@ -10,7 +10,8 @@ export function validateGPSAndTimezoneData(data: GPSAndTimezoneData): void {
   if (data.altitude !== undefined && (typeof data.altitude !== 'number' || !Number.isFinite(data.altitude))) {
     throw { code: 'INVALID_ARGUMENT', message: 'altitude must be a finite number when provided' };
   }
-  if (!Number.isInteger(data.timezoneOffsetMinutes) || data.timezoneOffsetMinutes % 15 !== 0) {
+  const timezoneOffsetMinutes = data.timezone_offset_minutes ?? (data as any).timezoneOffsetMinutes;
+  if (!Number.isInteger(timezoneOffsetMinutes) || timezoneOffsetMinutes % 15 !== 0) {
     throw { code: 'INVALID_ARGUMENT', message: 'timezoneOffsetMinutes must be an integer multiple of 15' };
   }
 }

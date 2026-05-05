@@ -2,13 +2,17 @@ import type { AutoMeasureSetting } from "../../types/index.js";
 import { requireInRange } from "../../validators/shared.js";
 
 export function validateAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): void {
-  if (setting.measureInterval !== undefined) {
-    requireInRange(setting.measureInterval, 'measureInterval', 1, 120);
+  const s = setting as any;
+  const measureInterval = setting.measure_interval ?? s.measureInterval;
+  if (measureInterval !== undefined) {
+    requireInRange(measureInterval, 'measureInterval', 1, 120);
   }
-  if (setting.currentStartMinute !== undefined) {
-    requireInRange(setting.currentStartMinute, 'currentStartMinute', 0, 1_439);
+  const currentStartMinute = setting.current_start_minute ?? s.currentStartMinute;
+  if (currentStartMinute !== undefined) {
+    requireInRange(currentStartMinute, 'currentStartMinute', 0, 1_439);
   }
-  if (setting.currentEndMinute !== undefined) {
-    requireInRange(setting.currentEndMinute, 'currentEndMinute', 0, 1_439);
+  const currentEndMinute = setting.current_end_minute ?? s.currentEndMinute;
+  if (currentEndMinute !== undefined) {
+    requireInRange(currentEndMinute, 'currentEndMinute', 0, 1_439);
   }
 }

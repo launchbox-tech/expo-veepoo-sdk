@@ -2,6 +2,7 @@ import { invokeOrThrow } from "../../bridge/native-invoke-pipeline.js";
 import type { CapabilityContext } from "../shared/context.js";
 import type { RealtimeTestsNativeMethods } from "./native.js";
 import type { EcgTestOptions, RealtimeTestModality } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 type Direction = "start" | "stop";
 
@@ -16,15 +17,15 @@ export class RealtimeTestsCapability {
   constructor(private readonly ctx: CapabilityContext<RealtimeTestsNativeMethods>) {
     const n = ctx.native;
     this.dispatch = {
-      heartRate: {
+      heart_rate: {
         start: () => n.startHeartRateTest(),
         stop: () => n.stopHeartRateTest(),
       },
-      bloodPressure: {
+      blood_pressure: {
         start: () => n.startBloodPressureTest(),
         stop: () => n.stopBloodPressureTest(),
       },
-      bloodOxygen: {
+      blood_oxygen: {
         start: () => n.startBloodOxygenTest(),
         stop: () => n.stopBloodOxygenTest(),
       },
@@ -36,7 +37,7 @@ export class RealtimeTestsCapability {
         start: () => n.startStressTest(),
         stop: () => n.stopStressTest(),
       },
-      bloodGlucose: {
+      blood_glucose: {
         start: () => n.startBloodGlucoseTest(),
         stop: () => n.stopBloodGlucoseTest(),
       },
@@ -52,7 +53,7 @@ export class RealtimeTestsCapability {
         start: () => n.startBreathingTest(),
         stop: () => n.stopBreathingTest(),
       },
-      bodyComposition: {
+      body_composition: {
         start: () => n.startBodyCompositionTest(),
         stop: () => n.stopBodyCompositionTest(),
       },
@@ -84,7 +85,7 @@ export class RealtimeTestsCapability {
       data: options,
     });
     await invokeOrThrow({
-      invoke: () => this.ctx.native.startEcgTest(options),
+      invoke: () => this.ctx.native.startEcgTest(options ? deepCamelKeys(options) as { includeWaveform?: boolean } : undefined),
       mapError: (e: unknown) => this.ctx.mapError(e),
     });
   }

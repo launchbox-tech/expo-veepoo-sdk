@@ -5,9 +5,9 @@ export function normalizeDaySummaryData(value: unknown): DaySummaryData {
   const record = isRecord(value) ? value : {};
   return {
     date: toStringValue(record.date),
-    allStep: toInt(record.allStep),
-    sportList: Array.isArray(record.sportList)
-      ? record.sportList
+    all_step: toInt(record.allStep ?? record.all_step),
+    sport_list: Array.isArray(record.sportList ?? record.sport_list)
+      ? ((record.sportList ?? record.sport_list) as unknown[])
           .filter(isRecord)
           .map((item) => ({
             time: toStringValue(item.time),
@@ -16,16 +16,16 @@ export function normalizeDaySummaryData(value: unknown): DaySummaryData {
             dis: toNumber(item.dis) ?? 0,
           }))
       : [],
-    rateList: Array.isArray(record.rateList)
-      ? record.rateList
+    rate_list: Array.isArray(record.rateList ?? record.rate_list)
+      ? ((record.rateList ?? record.rate_list) as unknown[])
           .filter(isRecord)
           .map((item) => ({
             time: toStringValue(item.time),
             rate: toInt(item.rate),
           }))
       : [],
-    bpList: Array.isArray(record.bpList)
-      ? record.bpList
+    bp_list: Array.isArray(record.bpList ?? record.bp_list)
+      ? ((record.bpList ?? record.bp_list) as unknown[])
           .filter(isRecord)
           .map((item) => ({
             time: toStringValue(item.time),

@@ -19,18 +19,18 @@ export function normalizeDeviceBTState(value: unknown): DeviceBTState {
 export function normalizeDeviceBTStatus(value: unknown): DeviceBTStatus {
   if (!isRecord(value)) {
     return {
-      isBTOpen: false,
-      isAutoConnect: false,
-      isAudioOpen: false,
-      hasPairInfo: false,
+      is_bt_open: false,
+      is_auto_connect: false,
+      is_audio_open: false,
+      has_pair_info: false,
       state: 'disconnected',
     };
   }
   return {
-    isBTOpen: toBoolean(value.isBTOpen),
-    isAutoConnect: toBoolean(value.isAutoCon ?? value.isAutoConnect),
-    isAudioOpen: toBoolean(value.isAudioOpen),
-    hasPairInfo: toBoolean(value.isHavePairInfo ?? value.hasPairInfo),
+    is_bt_open: toBoolean(value.isBTOpen ?? value.is_bt_open),
+    is_auto_connect: toBoolean(value.isAutoCon ?? value.isAutoConnect ?? value.is_auto_connect),
+    is_audio_open: toBoolean(value.isAudioOpen ?? value.is_audio_open),
+    has_pair_info: toBoolean(value.isHavePairInfo ?? value.hasPairInfo ?? value.has_pair_info),
     state: normalizeDeviceBTState(value.status ?? value.state),
   };
 }

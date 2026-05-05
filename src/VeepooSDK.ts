@@ -306,7 +306,7 @@ export class VeepooSDK implements VeepooSDKInterface {
 
   startLocalFirmwareDfu = (filePath: string): Promise<void> => this.dfu.startLocalFirmwareDfu(filePath);
 
-  readWatchFaceStyle = (options?: { dialType?: WatchFaceDialType }): Promise<WatchFaceStyle> => this.watchFace.readWatchFaceStyle(options);
+  readWatchFaceStyle = (options?: { dial_type?: WatchFaceDialType }): Promise<WatchFaceStyle> => this.watchFace.readWatchFaceStyle(options);
   setWatchFaceStyle = (settings: WatchFaceStyleSettings): Promise<void> => this.watchFace.setWatchFaceStyle(settings);
 
   readContacts = (crc?: number): Promise<DeviceContact[]> => this.contacts.readContacts(crc);

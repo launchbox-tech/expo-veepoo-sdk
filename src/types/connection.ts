@@ -21,14 +21,14 @@ export interface ConnectionResult {
   status: ConnectionStatus;
   code?: number;
   mac: string;
-  isOadModel?: boolean;
-  deviceVersion?: string;
-  deviceNumber?: string;
+  is_oad_model?: boolean;
+  device_version?: string;
+  device_number?: string;
 }
 
 export interface ScanOptions {
   timeout?: number;
-  allowDuplicates?: boolean;
+  allow_duplicates?: boolean;
 }
 
 export interface ScanResult {
@@ -48,8 +48,8 @@ export interface DeviceTimeSetting {
 
 export interface ConnectOptions {
   password?: string;
-  is24Hour?: boolean;
-  timeSetting?: DeviceTimeSetting;
+  use_24h?: boolean;
+  time_setting?: DeviceTimeSetting;
   uuid?: string;
 }
 
@@ -58,14 +58,14 @@ export type BluetoothState =
   | 'resetting'
   | 'unsupported'
   | 'unauthorized'
-  | 'poweredOff'
-  | 'poweredOn';
+  | 'powered_off'
+  | 'powered_on';
 
 export type BluetoothAuthorization =
-  | 'notDetermined'
+  | 'not_determined'
   | 'restricted'
   | 'denied'
-  | 'allowedAlways';
+  | 'allowed_always';
 
 export type PermissionStatus =
   | 'granted'
@@ -78,16 +78,16 @@ export type PermissionStatus =
 export interface PermissionsResult {
   granted: boolean;
   status: PermissionStatus;
-  canAskAgain?: boolean;
+  can_ask_again?: boolean;
 }
 
 export interface BluetoothStatus {
   state: BluetoothState;
-  stateName: string;
+  state_name: string;
   authorization: BluetoothAuthorization;
-  authorizationName: string;
-  isScanning: boolean;
-  pendingScanStart: boolean;
+  authorization_name: string;
+  is_scanning: boolean;
+  pending_scan_start: boolean;
 }
 
 export type PasswordStatus =
@@ -101,11 +101,11 @@ export type PasswordStatus =
 export interface PasswordData {
   status: PasswordStatus;
   password: string;
-  deviceNumber?: string;
-  deviceVersion?: string;
-  deviceTestVersion?: string;
-  isHaveDrinkData?: boolean;
-  isOpenNightTurnWrist?: FunctionStatus;
-  findPhoneFunction?: FunctionStatus;
-  wearDetectFunction?: FunctionStatus;
+  device_number?: string;
+  device_version?: string;
+  device_test_version?: string;
+  is_have_drink_data?: boolean;
+  is_open_night_turn_wrist?: FunctionStatus;
+  find_phone_function?: FunctionStatus;
+  wear_detect_function?: FunctionStatus;
 }

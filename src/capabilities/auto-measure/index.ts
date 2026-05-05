@@ -5,6 +5,7 @@ import type { AutoMeasureNativeMethods } from "./native.js";
 import { normalizeAutoMeasureSettings } from "./normalizers.js";
 import { validateAutoMeasureSetting } from "./validators.js";
 import type { AutoMeasureSetting } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class AutoMeasureCapability {
   constructor(private readonly ctx: CapabilityContext<AutoMeasureNativeMethods>) {}
@@ -35,7 +36,7 @@ export class AutoMeasureCapability {
           data: setting,
         });
       },
-      invoke: () => this.ctx.native.modifyAutoMeasureSetting(setting),
+      invoke: () => this.ctx.native.modifyAutoMeasureSetting(deepCamelKeys(setting) as Partial<AutoMeasureSetting>),
       normalize: normalizeAutoMeasureSettings,
       afterSuccess: (result) => {
         this.ctx.log("info", "device", "autoMeasure.modify.result", "Auto measure settings updated", {

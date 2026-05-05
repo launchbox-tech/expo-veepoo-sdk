@@ -5,6 +5,7 @@ import type { WomenHealthNativeMethods } from "./native.js";
 import { normalizeWomenHealthSettings } from "./normalizers.js";
 import { validateWomenHealthSettings } from "./validators.js";
 import type { WomenHealthSettings } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class WomenHealthCapability {
   constructor(private readonly ctx: CapabilityContext<WomenHealthNativeMethods>) {}
@@ -23,7 +24,7 @@ export class WomenHealthCapability {
   setWomenHealthSettings(settings: WomenHealthSettings): Promise<void> {
     return this.call({
       validate: () => validateWomenHealthSettings(settings),
-      invoke: () => this.ctx.native.setWomenHealthSettings(settings),
+      invoke: () => this.ctx.native.setWomenHealthSettings(deepCamelKeys(settings) as WomenHealthSettings),
     });
   }
 }

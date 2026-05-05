@@ -21,8 +21,8 @@ export interface VeepooError {
   code: VeepooErrorCode;
   message: string;
   /** Raw native rejection code when the bridge collapsed/aliased into `code` (ADR 0003). */
-  nativeCode?: string;
-  deviceId?: string;
+  native_code?: string;
+  device_id?: string;
 }
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
@@ -45,7 +45,7 @@ export interface LogEntry {
   action: string;
   platform: 'ios' | 'android' | 'web' | 'unknown';
   message: string;
-  deviceId?: string;
+  device_id?: string;
   data?: unknown;
   error?: string;
 }

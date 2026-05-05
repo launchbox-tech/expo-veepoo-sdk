@@ -25,22 +25,22 @@ export function normalizePasswordData(value: unknown): PasswordData {
   return {
     status,
     password: toStringValue(record.password ?? record.pwd),
-    deviceNumber: toStringValue(record.deviceNumber),
-    deviceVersion: toStringValue(record.deviceVersion),
-    deviceTestVersion: toStringValue(record.deviceTestVersion),
-    isHaveDrinkData:
-      record.isHaveDrinkData === undefined ? undefined : toBoolean(record.isHaveDrinkData),
-    isOpenNightTurnWrist:
-      record.isOpenNightTurnWrist === undefined && record.isOpenNightTurnWriste === undefined
+    device_number: toStringValue(record.deviceNumber ?? record.device_number),
+    device_version: toStringValue(record.deviceVersion ?? record.device_version),
+    device_test_version: toStringValue(record.deviceTestVersion ?? record.device_test_version),
+    is_have_drink_data:
+      (record.isHaveDrinkData ?? record.is_have_drink_data) === undefined ? undefined : toBoolean(record.isHaveDrinkData ?? record.is_have_drink_data),
+    is_open_night_turn_wrist:
+      (record.isOpenNightTurnWrist ?? record.isOpenNightTurnWriste ?? record.is_open_night_turn_wrist) === undefined
         ? undefined
-        : normalizeFunctionStatus(record.isOpenNightTurnWrist ?? record.isOpenNightTurnWriste),
-    findPhoneFunction:
-      record.findPhoneFunction === undefined
+        : normalizeFunctionStatus(record.isOpenNightTurnWrist ?? record.isOpenNightTurnWriste ?? record.is_open_night_turn_wrist),
+    find_phone_function:
+      (record.findPhoneFunction ?? record.find_phone_function) === undefined
         ? undefined
-        : normalizeFunctionStatus(record.findPhoneFunction),
-    wearDetectFunction:
-      record.wearDetectFunction === undefined
+        : normalizeFunctionStatus(record.findPhoneFunction ?? record.find_phone_function),
+    wear_detect_function:
+      (record.wearDetectFunction ?? record.wear_detect_function) === undefined
         ? undefined
-        : normalizeFunctionStatus(record.wearDetectFunction),
+        : normalizeFunctionStatus(record.wearDetectFunction ?? record.wear_detect_function),
   };
 }

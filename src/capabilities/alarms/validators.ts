@@ -23,9 +23,12 @@ export function validateDeleteAlarm(alarmId: number): void {
 }
 
 export function validateHeartRateAlarm(alarm: HeartRateAlarm): void {
-  requireInRange(alarm.highThreshold, 'highThreshold', 1, 300);
-  requireInRange(alarm.lowThreshold, 'lowThreshold', 1, 300);
-  if (alarm.highThreshold <= alarm.lowThreshold) {
+  const a = alarm as any;
+  const highThreshold = alarm.high_threshold ?? a.highThreshold;
+  const lowThreshold = alarm.low_threshold ?? a.lowThreshold;
+  requireInRange(highThreshold, 'highThreshold', 1, 300);
+  requireInRange(lowThreshold, 'lowThreshold', 1, 300);
+  if (highThreshold <= lowThreshold) {
     throw { code: 'INVALID_ARGUMENT', message: 'highThreshold must be greater than lowThreshold' };
   }
 }

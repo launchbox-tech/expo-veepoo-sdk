@@ -57,7 +57,7 @@ import type { VeepooError } from './errors.js';
 
 /** Normalized DFU / OTA progress (`firmwareDfuProgress` event). */
 export type FirmwareDfuState =
-  | 'fileNotExist'
+  | 'file_not_exist'
   | 'start'
   | 'updating'
   | 'success'
@@ -65,12 +65,12 @@ export type FirmwareDfuState =
   | 'prepared'
   | 'reboot'
   | 'reconnecting'
-  | 'dfuLangConnectSuccess'
-  | 'dfuLangConnectFailed'
+  | 'dfu_lang_connect_success'
+  | 'dfu_lang_connect_failed'
   | 'unknown';
 
 export type FirmwareDfuProgress = {
-  deviceId: string;
+  device_id: string;
   /** 0–100 */
   progress: number;
   state: FirmwareDfuState;
@@ -84,100 +84,100 @@ export type FirmwareDfuProgress = {
 export type VeepooEventPayload = {
   deviceFound: { device: VeepooDevice; timestamp: number };
   deviceConnected: {
-    deviceId: string;
-    deviceVersion?: string;
-    deviceNumber?: string;
-    isOadModel?: boolean;
+    device_id: string;
+    device_version?: string;
+    device_number?: string;
+    is_oad_model?: boolean;
   };
-  deviceDisconnected: { deviceId: string };
+  deviceDisconnected: { device_id: string };
   deviceConnectStatus: {
-    deviceId: string;
+    device_id: string;
     status: ConnectionStatus;
     code?: number;
   };
-  deviceReady: { deviceId: string; isOadModel?: boolean };
+  deviceReady: { device_id: string; is_oad_model?: boolean };
   bluetoothStateChanged: BluetoothStatus;
   deviceFunction: {
-    deviceId: string;
+    device_id: string;
     functions?: DeviceFunctions;
     data?: DeviceFunctions;
   };
-  deviceVersion: { deviceId: string; version: DeviceVersion };
-  passwordData: { deviceId: string; data: PasswordData };
-  socialMsgData: { deviceId: string; data: SocialMsgData };
-  readOriginProgress: { deviceId: string; progress: ReadOriginProgress };
-  readOriginComplete: { deviceId: string; success: boolean };
-  originFiveMinuteData: { deviceId: string; data: OriginData };
-  originHalfHourData: { deviceId: string; data: HalfHourData };
-  sleepData: { deviceId: string; date: string; data: SleepData };
-  sportStepData: { deviceId: string; date: string; data: SportStepData };
-  heartRateTestResult: { deviceId: string; result: HeartRateTestResult };
+  deviceVersion: { device_id: string; version: DeviceVersion };
+  passwordData: { device_id: string; data: PasswordData };
+  socialMsgData: { device_id: string; data: SocialMsgData };
+  readOriginProgress: { device_id: string; progress: ReadOriginProgress };
+  readOriginComplete: { device_id: string; success: boolean };
+  originFiveMinuteData: { device_id: string; data: OriginData };
+  originHalfHourData: { device_id: string; data: HalfHourData };
+  sleepData: { device_id: string; date: string; data: SleepData };
+  sportStepData: { device_id: string; date: string; data: SportStepData };
+  heartRateTestResult: { device_id: string; result: HeartRateTestResult };
   bloodPressureTestResult: {
-    deviceId: string;
+    device_id: string;
     result: BloodPressureTestResult;
   };
-  bloodOxygenTestResult: { deviceId: string; result: BloodOxygenTestResult };
-  temperatureTestResult: { deviceId: string; result: TemperatureTestResult };
-  stressData: { deviceId: string; data: StressData };
-  bloodGlucoseData: { deviceId: string; data: BloodGlucoseData };
-  hrvTestResult: { deviceId: string; result: HrvTestResult };
-  ecgTestResult: { deviceId: string; result: EcgTestResult };
-  fatigueTestResult: { deviceId: string; result: FatigueTestResult };
-  breathingTestResult: { deviceId: string; result: BreathingTestResult };
-  bodyCompositionTestResult: { deviceId: string; result: BodyCompositionTestResult };
-  batteryData: { deviceId: string; data: BatteryInfo };
-  connectionStatusChanged: { deviceId: string; status: ConnectionStatus };
-  originSpo2Data: { deviceId: string; data: Spo2OriginData };
-  alarmData: { deviceId: string; alarms: DeviceAlarm[] };
-  heartRateAlarmData: { deviceId: string; data: HeartRateAlarm };
+  bloodOxygenTestResult: { device_id: string; result: BloodOxygenTestResult };
+  temperatureTestResult: { device_id: string; result: TemperatureTestResult };
+  stressData: { device_id: string; data: StressData };
+  bloodGlucoseData: { device_id: string; data: BloodGlucoseData };
+  hrvTestResult: { device_id: string; result: HrvTestResult };
+  ecgTestResult: { device_id: string; result: EcgTestResult };
+  fatigueTestResult: { device_id: string; result: FatigueTestResult };
+  breathingTestResult: { device_id: string; result: BreathingTestResult };
+  bodyCompositionTestResult: { device_id: string; result: BodyCompositionTestResult };
+  batteryData: { device_id: string; data: BatteryInfo };
+  connectionStatusChanged: { device_id: string; status: ConnectionStatus };
+  originSpo2Data: { device_id: string; data: Spo2OriginData };
+  alarmData: { device_id: string; alarms: DeviceAlarm[] };
+  heartRateAlarmData: { device_id: string; data: HeartRateAlarm };
   findDeviceState: {
-    deviceId: string;
+    device_id: string;
     phase: FindDevicePhase;
-    rawState?: number;
+    raw_state?: number;
   };
   firmwareDfuProgress: FirmwareDfuProgress;
-  contactsData: { deviceId: string; contacts: DeviceContact[] };
-  sosCallTimesData: { deviceId: string; data: SosCallTimesSettings };
+  contactsData: { device_id: string; contacts: DeviceContact[] };
+  sosCallTimesData: { device_id: string; data: SosCallTimesSettings };
   /** Fired when the Band triggers a camera photo action. Cross-platform. */
-  cameraShutter: { deviceId: string; status: CameraShutterStatus };
+  cameraShutter: { device_id: string; status: CameraShutterStatus };
   /** Fired when the Band sends a music remote command. Android only. */
-  musicRemoteCommand: { deviceId: string; command: MusicRemoteCommand };
+  musicRemoteCommand: { device_id: string; command: MusicRemoteCommand };
   /** Fired when the Band's classic BT state changes. */
   deviceBTStateChanged: {
-    deviceId: string;
+    device_id: string;
     state: DeviceBTState;
-    btSwitchOpen: boolean;
-    mediaSwitchOpen: boolean;
+    bt_switch_open: boolean;
+    media_switch_open: boolean;
   };
   /** Fired when the Band triggers its hardware SOS button. iOS only — no vendor Android callback documented. */
-  deviceSosTriggered: { deviceId: string };
-  customSettingsData: { deviceId: string; data: CustomSettings };
-  healthRemindData: { deviceId: string; data: HealthReminder };
+  deviceSosTriggered: { device_id: string };
+  customSettingsData: { device_id: string; data: CustomSettings };
+  healthRemindData: { device_id: string; data: HealthReminder };
   /** iOS only — emitted on read response. Android vendor has no equivalent. */
-  apneaRemindData: { deviceId: string; data: ApneaRemindSettings };
+  apneaRemindData: { device_id: string; data: ApneaRemindSettings };
   /** Fired when the Band finishes/stops a sport session. Android: SportModelStateData; iOS: deviceSportDidFinishBlock. */
-  sportModeData: { deviceId: string; mode: SportMode | null };
-  bloodAnalysisTestResult: { deviceId: string; result: BloodAnalysisTestResult };
+  sportModeData: { device_id: string; mode: SportMode | null };
+  bloodAnalysisTestResult: { device_id: string; result: BloodAnalysisTestResult };
   /** GSR (Galvanic Skin Response) test. Android only — iOS rejects CAPABILITY_UNSUPPORTED. */
-  gsrTestResult: { deviceId: string; result: GsrTestResult };
+  gsrTestResult: { device_id: string; result: GsrTestResult };
   /** Emitted once per session as exercise history syncs from Band. */
-  exerciseSessionData: { deviceId: string; session: ExerciseSession };
+  exerciseSessionData: { device_id: string; session: ExerciseSession };
   /** Emitted per accurate sleep session (one per night). Gate: sleepType > 0 (iOS) / isSupportPreciseSleep (Android). */
-  accurateSleepData: { deviceId: string; date: string; data: AccurateSleepSession };
+  accurateSleepData: { device_id: string; date: string; data: AccurateSleepSession };
   /** Emitted per stored temperature record. Prerequisite: call startReadOriginData first. */
-  storedTemperatureData: { deviceId: string; data: StoredTemperatureData };
+  storedTemperatureData: { device_id: string; data: StoredTemperatureData };
   /** Emitted per stored blood glucose record. Prerequisite: call startReadOriginData first. */
-  storedBloodGlucoseData: { deviceId: string; data: StoredBloodGlucoseData };
+  storedBloodGlucoseData: { device_id: string; data: StoredBloodGlucoseData };
   /** Emitted per stored HRV record. Prerequisite: call startReadOriginData first. */
-  storedHrvData: { deviceId: string; data: StoredHrvData };
+  storedHrvData: { device_id: string; data: StoredHrvData };
   /** Emitted per stored offline ECG record. Prerequisite: call startReadOriginData first. */
-  storedEcgData: { deviceId: string; data: StoredEcgData };
+  storedEcgData: { device_id: string; data: StoredEcgData };
   /** Emitted per stored body composition record. Prerequisite: call startReadOriginData first. */
-  storedBodyCompositionData: { deviceId: string; data: StoredBodyCompositionData };
+  storedBodyCompositionData: { device_id: string; data: StoredBodyCompositionData };
   /** Fired on each PTT measurement update. iOS only. */
-  pttTestResult: { deviceId: string; result: PttTestResult };
+  pttTestResult: { device_id: string; result: PttTestResult };
   /** Fired when device autonomously enters or exits PTT mode. iOS only. */
-  pttStateChanged: { deviceId: string; state: PttState };
+  pttStateChanged: { device_id: string; state: PttState };
   error: VeepooError;
   sdkInitialized: Record<never, never>;
   scanStarted: Record<never, never>;

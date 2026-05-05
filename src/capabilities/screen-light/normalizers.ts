@@ -4,17 +4,18 @@ import { isRecord, toInt, toBoolean } from "../../normalizers/primitives.js";
 export function normalizeScreenLightSettings(value: unknown): ScreenLightSettings {
   const record = isRecord(value) ? value : {};
   const base: ScreenLightSettings = {
-    nightStartHour: toInt(record.nightStartHour),
-    nightStartMinute: toInt(record.nightStartMinute),
-    nightEndHour: toInt(record.nightEndHour),
-    nightEndMinute: toInt(record.nightEndMinute),
-    nightLevel: toInt(record.nightLevel),
-    dayLevel: toInt(record.dayLevel),
-    autoAdjust: toBoolean(record.autoAdjust, false),
-    maxLevel: toInt(record.maxLevel, 5),
+    night_start_hour: toInt(record.nightStartHour ?? record.night_start_hour),
+    night_start_minute: toInt(record.nightStartMinute ?? record.night_start_minute),
+    night_end_hour: toInt(record.nightEndHour ?? record.night_end_hour),
+    night_end_minute: toInt(record.nightEndMinute ?? record.night_end_minute),
+    night_level: toInt(record.nightLevel ?? record.night_level),
+    day_level: toInt(record.dayLevel ?? record.day_level),
+    auto_adjust: toBoolean(record.autoAdjust ?? record.auto_adjust, false),
+    max_level: toInt(record.maxLevel ?? record.max_level, 5),
   };
-  if (record.lastManualDayLevel !== undefined && record.lastManualDayLevel !== null) {
-    base.lastManualDayLevel = toInt(record.lastManualDayLevel);
+  const lastManual = record.lastManualDayLevel ?? record.last_manual_day_level;
+  if (lastManual !== undefined && lastManual !== null) {
+    base.last_manual_day_level = toInt(lastManual);
   }
   return base;
 }
@@ -22,12 +23,13 @@ export function normalizeScreenLightSettings(value: unknown): ScreenLightSetting
 export function normalizeScreenLightDuration(value: unknown): ScreenLightDuration {
   const record = isRecord(value) ? value : {};
   const out: ScreenLightDuration = {
-    currentSeconds: toInt(record.currentSeconds),
-    minSeconds: toInt(record.minSeconds),
-    maxSeconds: toInt(record.maxSeconds),
+    current_seconds: toInt(record.currentSeconds ?? record.current_seconds),
+    min_seconds: toInt(record.minSeconds ?? record.min_seconds),
+    max_seconds: toInt(record.maxSeconds ?? record.max_seconds),
   };
-  if (record.recommendSeconds !== undefined && record.recommendSeconds !== null) {
-    out.recommendSeconds = toInt(record.recommendSeconds);
+  const rec = record.recommendSeconds ?? record.recommend_seconds;
+  if (rec !== undefined && rec !== null) {
+    out.recommend_seconds = toInt(rec);
   }
   return out;
 }

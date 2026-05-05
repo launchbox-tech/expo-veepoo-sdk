@@ -5,6 +5,7 @@ import type { ScreenLightNativeMethods } from "./native.js";
 import { normalizeScreenLightSettings, normalizeScreenLightDuration } from "./normalizers.js";
 import { validateScreenLightSettings, validateScreenLightDurationSeconds } from "./validators.js";
 import type { ScreenLightDuration, ScreenLightSettings } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class ScreenLightCapability {
   constructor(private readonly ctx: CapabilityContext<ScreenLightNativeMethods>) {}
@@ -23,7 +24,7 @@ export class ScreenLightCapability {
   setScreenLightSettings(settings: ScreenLightSettings): Promise<void> {
     return this.call({
       validate: () => validateScreenLightSettings(settings),
-      invoke: () => this.ctx.native.setScreenLightSettings(settings),
+      invoke: () => this.ctx.native.setScreenLightSettings(deepCamelKeys(settings) as ScreenLightSettings),
     });
   }
 

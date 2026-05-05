@@ -10,9 +10,9 @@ const FIND_DEVICE_PHASES: readonly FindDevicePhase[] = [
 ];
 
 export function normalizeFindDeviceStatePayload(value: unknown): {
-  deviceId: string;
+  device_id: string;
   phase: FindDevicePhase;
-  rawState?: number;
+  raw_state?: number;
 } {
   const record = isRecord(value) ? value : {};
   const phaseRaw = toStringValue(record.phase);
@@ -21,12 +21,12 @@ export function normalizeFindDeviceStatePayload(value: unknown): {
   )
     ? (phaseRaw as FindDevicePhase)
     : 'unsupported';
-  const raw = record.rawState;
-  const rawState =
+  const raw = record.rawState ?? record.raw_state;
+  const raw_state =
     typeof raw === 'number' && Number.isFinite(raw) ? Math.trunc(raw) : undefined;
   return {
-    deviceId: toStringValue(record.deviceId),
+    device_id: toStringValue(record.deviceId ?? record.device_id),
     phase,
-    rawState,
+    raw_state,
   };
 }

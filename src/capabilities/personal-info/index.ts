@@ -4,6 +4,7 @@ import type { CapabilityContext } from "../shared/context.js";
 import type { PersonalInfoNativeMethods } from "./native.js";
 import { validatePersonalInfo } from "./validators.js";
 import type { PersonalInfo } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class PersonalInfoCapability {
   constructor(private readonly ctx: CapabilityContext<PersonalInfoNativeMethods>) {}
@@ -15,7 +16,7 @@ export class PersonalInfoCapability {
   syncPersonalInfo(info: PersonalInfo): Promise<boolean> {
     return this.call({
       validate: () => validatePersonalInfo(info),
-      invoke: () => this.ctx.native.syncPersonalInfo(info),
+      invoke: () => this.ctx.native.syncPersonalInfo(deepCamelKeys(info) as PersonalInfo),
     });
   }
 }

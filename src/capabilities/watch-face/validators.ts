@@ -10,16 +10,19 @@ function requireWatchFaceDialType(value: unknown, field: string): asserts value 
 }
 
 /** Optional filter for read; native may still return a unified snapshot (Android). */
-export function validateReadWatchFaceStyleOptions(options?: { dialType?: WatchFaceDialType }): void {
-  if (options?.dialType !== undefined) {
-    requireWatchFaceDialType(options.dialType, 'dialType');
+export function validateReadWatchFaceStyleOptions(options?: { dial_type?: WatchFaceDialType } | { dialType?: WatchFaceDialType }): void {
+  const dialType = (options as any)?.dial_type ?? (options as any)?.dialType;
+  if (dialType !== undefined) {
+    requireWatchFaceDialType(dialType, 'dialType');
   }
 }
 
 /** Vendor slot index; cap loosely — some Bands expose large enumerations. */
 export function validateWatchFaceStyleSettings(s: WatchFaceStyleSettings): void {
-  requireInRange(s.screenIndex, 'screenIndex', 0, 65_535);
-  if (s.dialType !== undefined) {
-    requireWatchFaceDialType(s.dialType, 'dialType');
+  const r = s as any;
+  requireInRange(s.screen_index ?? r.screenIndex, 'screenIndex', 0, 65_535);
+  const dialType = s.dial_type ?? r.dialType;
+  if (dialType !== undefined) {
+    requireWatchFaceDialType(dialType, 'dialType');
   }
 }

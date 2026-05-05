@@ -5,6 +5,7 @@ import type { SocialMsgNativeMethods } from "./native.js";
 import { normalizeSocialMsgData } from "./normalizers.js";
 import { validateSocialMsgData } from "./validators.js";
 import type { OperationStatus, SocialMsgData } from "../../types/index.js";
+import { deepCamelKeys } from "../../normalizers/deep-keys.js";
 
 export class SocialMsgCapability {
   constructor(private readonly ctx: CapabilityContext<SocialMsgNativeMethods>) {}
@@ -29,7 +30,7 @@ export class SocialMsgCapability {
   writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus> {
     return this.call({
       validate: () => validateSocialMsgData(data),
-      invoke: () => this.ctx.native.writeSocialMsgData(data),
+      invoke: () => this.ctx.native.writeSocialMsgData(deepCamelKeys(data) as Partial<SocialMsgData>),
     });
   }
 }

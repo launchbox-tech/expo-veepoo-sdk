@@ -49,7 +49,7 @@ export function normalizeTemperatureTestResult(value: unknown): TemperatureTestR
   return {
     state: normalizeTestState(record.rawState ?? record.state),
     value: toNumber(record.value ?? record.tempValue),
-    originalTemp: toNumber(record.originalTemp ?? record.originalTempValue),
+    original_temp: toNumber(record.originalTemp ?? record.original_temp ?? record.originalTempValue),
     progress: toInt(record.progress),
     enable: typeof record.enable === 'boolean' ? record.enable : undefined,
   };
@@ -71,7 +71,7 @@ export function normalizeHrvTestResult(value: unknown): HrvTestResult {
     state: normalizeTestState(record.rawState ?? record.state),
     value: toInt(record.value ?? record.hrv),
     progress: toInt(record.progress),
-    rawState: typeof record.rawState === 'string' ? record.rawState : undefined,
+    raw_state: typeof record.rawState === 'string' ? record.rawState : undefined,
   };
 }
 
@@ -80,9 +80,9 @@ export function normalizeEcgTestResult(value: unknown): EcgTestResult {
   return {
     state: normalizeTestState(record.rawState ?? record.state),
     progress: toInt(record.progress),
-    heartRate: toInt(record.heartRate ?? record.hr),
+    heart_rate: toInt(record.heartRate ?? record.hr),
     hrv: toInt(record.hrv),
-    rawState: typeof record.rawState === 'string' ? record.rawState : undefined,
+    raw_state: typeof record.rawState === 'string' ? record.rawState : undefined,
     waveform: normalizeWaveform(record.waveform),
   };
 }
@@ -93,7 +93,7 @@ export function normalizeFatigueTestResult(value: unknown): FatigueTestResult {
     state: normalizeTestState(record.rawState ?? record.state),
     progress: toInt(record.progress),
     level: toInt(record.level ?? record.fatigueLevel),
-    rawState: typeof record.rawState === 'string' ? record.rawState : undefined,
+    raw_state: typeof record.rawState === 'string' ? record.rawState : undefined,
   };
 }
 
@@ -103,7 +103,7 @@ export function normalizeBreathingTestResult(value: unknown): BreathingTestResul
     state: normalizeTestState(record.rawState ?? record.state),
     progress: toInt(record.progress),
     rate: toInt(record.rate ?? record.breathingRate),
-    rawState: typeof record.rawState === 'string' ? record.rawState : undefined,
+    raw_state: typeof record.rawState === 'string' ? record.rawState : undefined,
   };
 }
 
@@ -114,28 +114,28 @@ export function normalizeBodyCompositionMetrics(value: unknown): BodyComposition
   const timeRec = isRecord(mt) ? mt : undefined;
   return {
     date: typeof r.date === 'string' ? r.date : undefined,
-    testTime: typeof r.testTime === 'string' ? r.testTime : undefined,
-    isDeviceTest: typeof r.isDeviceTest === 'boolean' ? r.isDeviceTest : undefined,
-    statureCm: toInt(r.statureCm ?? r.stature),
-    weightKg: toInt(r.weightKg ?? r.weight),
+    test_time: typeof r.testTime === 'string' ? r.testTime : undefined,
+    is_device_test: typeof r.isDeviceTest === 'boolean' ? r.isDeviceTest : undefined,
+    stature_cm: toInt(r.statureCm ?? r.stature),
+    weight_kg: toInt(r.weightKg ?? r.weight),
     gender: toInt(r.gender),
     bmi: toNumber(r.bmi),
-    bodyFatPercentage: toNumber(r.bodyFatPercentage),
-    fatMassKg: toNumber(r.fatMassKg ?? r.fatMass),
-    leanBodyMassKg: toNumber(r.leanBodyMassKg ?? r.leanBodyMass),
-    muscleRate: toNumber(r.muscleRate),
-    muscleMassKg: toNumber(r.muscleMassKg ?? r.muscleMass),
-    subcutaneousFatPercentage: toNumber(r.subcutaneousFatPercentage ?? r.subcutaneousFat),
-    bodyWaterPercentage: toNumber(r.bodyWaterPercentage ?? r.bodyMoisture),
-    waterMassKg: toNumber(r.waterMassKg ?? r.waterContent),
-    skeletalMuscleRate: toNumber(r.skeletalMuscleRate),
-    boneMassKg: toNumber(r.boneMassKg ?? r.boneMass),
-    proteinPercentage: toNumber(r.proteinPercentage ?? r.proportionOfProtein),
-    proteinMassKg: toNumber(r.proteinMassKg ?? r.proteinAmount),
-    basalMetabolicRateKcal: toNumber(r.basalMetabolicRateKcal ?? r.basalMetabolicRate),
-    measurementDurationSeconds: toInt(r.measurementDurationSeconds ?? r.duration),
-    sourceIdType: toInt(r.sourceIdType ?? r.idType),
-    measurementTime:
+    body_fat_percentage: toNumber(r.bodyFatPercentage),
+    fat_mass_kg: toNumber(r.fatMassKg ?? r.fatMass),
+    lean_body_mass_kg: toNumber(r.leanBodyMassKg ?? r.leanBodyMass),
+    muscle_rate: toNumber(r.muscleRate),
+    muscle_mass_kg: toNumber(r.muscleMassKg ?? r.muscleMass),
+    subcutaneous_fat_percentage: toNumber(r.subcutaneousFatPercentage ?? r.subcutaneousFat),
+    body_water_percentage: toNumber(r.bodyWaterPercentage ?? r.bodyMoisture),
+    water_mass_kg: toNumber(r.waterMassKg ?? r.waterContent),
+    skeletal_muscle_rate: toNumber(r.skeletalMuscleRate),
+    bone_mass_kg: toNumber(r.boneMassKg ?? r.boneMass),
+    protein_percentage: toNumber(r.proteinPercentage ?? r.proportionOfProtein),
+    protein_mass_kg: toNumber(r.proteinMassKg ?? r.proteinAmount),
+    basal_metabolic_rate_kcal: toNumber(r.basalMetabolicRateKcal ?? r.basalMetabolicRate),
+    measurement_duration_seconds: toInt(r.measurementDurationSeconds ?? r.duration),
+    source_id_type: toInt(r.sourceIdType ?? r.idType),
+    measurement_time:
       timeRec ?
         {
           year: toInt(timeRec.year),
@@ -155,8 +155,8 @@ export function normalizeBodyCompositionTestResult(value: unknown): BodyComposit
     state: normalizeTestState(record.state),
     progress: toInt(record.progress),
     lead: toInt(record.lead),
-    rawState: typeof raw === 'string' || typeof raw === 'number' ? raw : undefined,
-    isEnd: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
+    raw_state: typeof raw === 'string' || typeof raw === 'number' ? raw : undefined,
+    is_end: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
     composition: normalizeBodyCompositionMetrics(record.composition),
   };
 }
@@ -168,7 +168,7 @@ export function normalizeStressData(value: unknown): StressData {
     timestamp: toInt(record.timestamp, Date.now()),
     progress: toInt(record.progress),
     status: toStringValue(record.status || normalizeTestState(record.rawState ?? record.state)),
-    isEnd: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
+    is_end: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
   };
 }
 
@@ -187,7 +187,7 @@ export function normalizeBloodGlucoseData(value: unknown): BloodGlucoseData {
         : normalizeTestState(record.rawState ?? record.state),
     status: toStringValue(record.status),
     timestamp: toInt(record.timestamp, Date.now()),
-    isEnd: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
+    is_end: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
     error: toStringValue(record.error),
   };
 }

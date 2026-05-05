@@ -29,28 +29,32 @@ export function validateWomenHealthSettings(s: WomenHealthSettings): void {
   if (!VALID_WOMEN_HEALTH_STATUS.has(s.status)) {
     throw { code: 'INVALID_ARGUMENT', message: 'status must be a valid WomenHealthStatus' };
   }
-  if (s.menstrualLengthDays !== undefined) {
-    requireInRange(s.menstrualLengthDays, 'menstrualLengthDays', 4, 28);
+  const r = s as any;
+  const menstrualLengthDays = s.menstrual_length_days ?? r.menstrualLengthDays;
+  const menstrualCycleDays = s.menstrual_cycle_days ?? r.menstrualCycleDays;
+  const lastMenstrualDate = s.last_menstrual_date ?? r.lastMenstrualDate;
+  const expectedDeliveryDate = s.expected_delivery_date ?? r.expectedDeliveryDate;
+  const babyBirthday = s.baby_birthday ?? r.babyBirthday;
+  const babySex = s.baby_sex ?? r.babySex;
+
+  if (menstrualLengthDays !== undefined) {
+    requireInRange(menstrualLengthDays, 'menstrualLengthDays', 4, 28);
   }
-  if (s.menstrualCycleDays !== undefined) {
-    requireInRange(s.menstrualCycleDays, 'menstrualCycleDays', 15, 50);
+  if (menstrualCycleDays !== undefined) {
+    requireInRange(menstrualCycleDays, 'menstrualCycleDays', 15, 50);
   }
-  if (s.lastMenstrualDate !== undefined && s.lastMenstrualDate !== '' && !YMD.test(s.lastMenstrualDate)) {
+  if (lastMenstrualDate !== undefined && lastMenstrualDate !== '' && !YMD.test(lastMenstrualDate)) {
     throw { code: 'INVALID_ARGUMENT', message: 'lastMenstrualDate must be yyyy-MM-dd' };
   }
-  if (
-    s.expectedDeliveryDate !== undefined &&
-    s.expectedDeliveryDate !== '' &&
-    !YMD.test(s.expectedDeliveryDate)
-  ) {
+  if (expectedDeliveryDate !== undefined && expectedDeliveryDate !== '' && !YMD.test(expectedDeliveryDate)) {
     throw { code: 'INVALID_ARGUMENT', message: 'expectedDeliveryDate must be yyyy-MM-dd' };
   }
-  if (s.babyBirthday !== undefined && s.babyBirthday !== '' && !YMD.test(s.babyBirthday)) {
+  if (babyBirthday !== undefined && babyBirthday !== '' && !YMD.test(babyBirthday)) {
     throw { code: 'INVALID_ARGUMENT', message: 'babyBirthday must be yyyy-MM-dd' };
   }
-  if (s.babySex !== undefined) {
+  if (babySex !== undefined) {
     const allowed: WomenHealthBabySex[] = ['female', 'male'];
-    if (!allowed.includes(s.babySex)) {
+    if (!allowed.includes(babySex)) {
       throw { code: 'INVALID_ARGUMENT', message: 'babySex must be female or male' };
     }
   }
@@ -58,28 +62,28 @@ export function validateWomenHealthSettings(s: WomenHealthSettings): void {
   switch (s.status) {
     case 'menstrual':
     case 'pregnancy_prep':
-      requireYmd(s.lastMenstrualDate, 'lastMenstrualDate');
-      if (s.menstrualLengthDays === undefined) {
+      requireYmd(lastMenstrualDate, 'lastMenstrualDate');
+      if (menstrualLengthDays === undefined) {
         throw { code: 'INVALID_ARGUMENT', message: 'menstrualLengthDays is required for this status' };
       }
-      if (s.menstrualCycleDays === undefined) {
+      if (menstrualCycleDays === undefined) {
         throw { code: 'INVALID_ARGUMENT', message: 'menstrualCycleDays is required for this status' };
       }
       break;
     case 'pregnancy':
-      requireYmd(s.lastMenstrualDate, 'lastMenstrualDate');
-      requireYmd(s.expectedDeliveryDate, 'expectedDeliveryDate');
+      requireYmd(lastMenstrualDate, 'lastMenstrualDate');
+      requireYmd(expectedDeliveryDate, 'expectedDeliveryDate');
       break;
     case 'postpartum':
-      requireYmd(s.lastMenstrualDate, 'lastMenstrualDate');
-      requireYmd(s.babyBirthday, 'babyBirthday');
-      if (s.menstrualLengthDays === undefined) {
+      requireYmd(lastMenstrualDate, 'lastMenstrualDate');
+      requireYmd(babyBirthday, 'babyBirthday');
+      if (menstrualLengthDays === undefined) {
         throw { code: 'INVALID_ARGUMENT', message: 'menstrualLengthDays is required for postpartum' };
       }
-      if (s.menstrualCycleDays === undefined) {
+      if (menstrualCycleDays === undefined) {
         throw { code: 'INVALID_ARGUMENT', message: 'menstrualCycleDays is required for postpartum' };
       }
-      if (s.babySex === undefined) {
+      if (babySex === undefined) {
         throw { code: 'INVALID_ARGUMENT', message: 'babySex is required for postpartum' };
       }
       break;

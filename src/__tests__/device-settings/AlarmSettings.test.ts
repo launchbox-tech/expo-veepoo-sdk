@@ -65,13 +65,13 @@ describe('AlarmsCapability', () => {
     const result = await alarmSettings.readHeartRateAlarm();
 
     expect(native.readHeartRateAlarm).toHaveBeenCalledTimes(1);
-    expect(result.highThreshold).toBe(120);
-    expect(result.lowThreshold).toBe(60);
+    expect(result.high_threshold).toBe(120);
+    expect(result.low_threshold).toBe(60);
     expect(result.enabled).toBe(true);
     expect(emitSpy).toHaveBeenCalledWith(
       'heartRateAlarmData',
       expect.objectContaining({
-        data: expect.objectContaining({ highThreshold: 120, lowThreshold: 60, enabled: true }),
+        data: expect.objectContaining({ high_threshold: 120, low_threshold: 60, enabled: true }),
       }),
     );
   });
@@ -80,11 +80,11 @@ describe('AlarmsCapability', () => {
 
   it('setHeartRateAlarm delegates to native and emits heartRateAlarmData', async () => {
     const emitSpy = jest.spyOn(runtime, 'emitLocal');
-    const alarm = { enabled: true, highThreshold: 120, lowThreshold: 50 };
+    const alarm = { enabled: true, high_threshold: 120, low_threshold: 50 };
 
     const result = await alarmSettings.setHeartRateAlarm(alarm);
 
-    expect(native.setHeartRateAlarm).toHaveBeenCalledWith(alarm);
+    expect(native.setHeartRateAlarm).toHaveBeenCalledWith({ enabled: true, highThreshold: 120, lowThreshold: 50 });
     expect(result).toBe('success');
     expect(emitSpy).toHaveBeenCalledWith(
       'heartRateAlarmData',

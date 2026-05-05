@@ -22,22 +22,27 @@ function requireDate(value: string, field: string): void {
 }
 
 function validateHourlyForecast(h: WeatherHourlyForecast, i: number): void {
+  const r = h as any;
   requireDatetime(h.time, `hourly[${i}].time`);
-  requireInRange(h.weatherState, `hourly[${i}].weatherState`, 0, 155);
-  requireInRange(h.uvIndex, `hourly[${i}].uvIndex`, 0, 20);
-  if (h.visibilityM < 0) {
+  requireInRange(h.weather_state ?? r.weatherState, `hourly[${i}].weatherState`, 0, 155);
+  requireInRange(h.uv_index ?? r.uvIndex, `hourly[${i}].uvIndex`, 0, 20);
+  const visibilityM = h.visibility_m ?? r.visibilityM;
+  if (visibilityM < 0) {
     throw { code: 'INVALID_ARGUMENT', message: `hourly[${i}].visibilityM must be >= 0` };
   }
 }
 
 function validateDailyForecast(d: WeatherDailyForecast, i: number): void {
+  const r = d as any;
   requireDate(d.date, `daily[${i}].date`);
-  requireInRange(d.weatherStateDay, `daily[${i}].weatherStateDay`, 0, 155);
-  requireInRange(d.weatherStateNight, `daily[${i}].weatherStateNight`, 0, 155);
-  if (d.uvIndex !== undefined) {
-    requireInRange(d.uvIndex, `daily[${i}].uvIndex`, 0, 20);
+  requireInRange(d.weather_state_day ?? r.weatherStateDay, `daily[${i}].weatherStateDay`, 0, 155);
+  requireInRange(d.weather_state_night ?? r.weatherStateNight, `daily[${i}].weatherStateNight`, 0, 155);
+  const uvIndex = d.uv_index ?? r.uvIndex;
+  if (uvIndex !== undefined) {
+    requireInRange(uvIndex, `daily[${i}].uvIndex`, 0, 20);
   }
-  if (d.visibilityM !== undefined && d.visibilityM < 0) {
+  const visibilityM = d.visibility_m ?? r.visibilityM;
+  if (visibilityM !== undefined && visibilityM < 0) {
     throw { code: 'INVALID_ARGUMENT', message: `daily[${i}].visibilityM must be >= 0` };
   }
 }
@@ -52,10 +57,12 @@ export function validateWeatherSettings(s: WeatherSettings): void {
 }
 
 export function validateWeatherData(d: WeatherData): void {
-  if (!d.cityName || d.cityName.trim().length === 0) {
+  const r = d as any;
+  const cityName = d.city_name ?? r.cityName;
+  if (!cityName || cityName.trim().length === 0) {
     throw { code: 'INVALID_ARGUMENT', message: 'cityName is required' };
   }
-  if (new TextEncoder().encode(d.cityName).byteLength > 64) {
+  if (new TextEncoder().encode(cityName).byteLength > 64) {
     throw { code: 'INVALID_ARGUMENT', message: 'cityName exceeds 64 bytes' };
   }
   if (!Number.isInteger(d.crc) || d.crc < 0) {

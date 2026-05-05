@@ -2,7 +2,7 @@ import type { FirmwareDfuState, VeepooEventPayload } from "../../types/index.js"
 import { isRecord, clamp, toInt, toStringValue } from "../../normalizers/primitives.js";
 
 const FIRMWARE_DFU_STATES: readonly FirmwareDfuState[] = [
-  'fileNotExist',
+  'file_not_exist',
   'start',
   'updating',
   'success',
@@ -10,25 +10,32 @@ const FIRMWARE_DFU_STATES: readonly FirmwareDfuState[] = [
   'prepared',
   'reboot',
   'reconnecting',
-  'dfuLangConnectSuccess',
-  'dfuLangConnectFailed',
+  'dfu_lang_connect_success',
+  'dfu_lang_connect_failed',
   'unknown',
 ];
+
+const FIRMWARE_DFU_STATE_VALUE_MAP: Record<string, FirmwareDfuState> = {
+  fileNotExist: 'file_not_exist',
+  dfuLangConnectSuccess: 'dfu_lang_connect_success',
+  dfuLangConnectFailed: 'dfu_lang_connect_failed',
+};
 
 export function normalizeFirmwareDfuProgress(value: unknown): VeepooEventPayload['firmwareDfuProgress'] {
   const p = isRecord(value) ? value : {};
   const stateRaw = toStringValue(p.state, 'unknown');
+  const stateMapped = FIRMWARE_DFU_STATE_VALUE_MAP[stateRaw] ?? stateRaw;
   const state: FirmwareDfuState = (FIRMWARE_DFU_STATES as readonly string[]).includes(
-    stateRaw
+    stateMapped
   )
-    ? (stateRaw as FirmwareDfuState)
+    ? (stateMapped as FirmwareDfuState)
     : 'unknown';
   let message: string | undefined;
   if (p.message !== undefined && p.message !== null) {
     message = String(p.message);
   }
   const out: VeepooEventPayload['firmwareDfuProgress'] = {
-    deviceId: toStringValue(p.deviceId) ?? '',
+    device_id: toStringValue(p.deviceId ?? p.device_id) ?? '',
     progress: clamp(toInt(p.progress) ?? 0, 0, 100),
     state,
   };

@@ -11,8 +11,9 @@ export function validateConnectOptions(options: ConnectOptions): void {
   if (options.password !== undefined) {
     requireNonEmptyString(options.password, 'options.password');
   }
-  if (options.timeSetting !== undefined) {
-    const t = options.timeSetting;
+  const timeSetting = options.time_setting ?? (options as any).timeSetting;
+  if (timeSetting !== undefined) {
+    const t = timeSetting;
     requireInRange(t.year, 'timeSetting.year', 2000, 2100);
     requireInRange(t.month, 'timeSetting.month', 1, 12);
     requireInRange(t.day, 'timeSetting.day', 1, 31);

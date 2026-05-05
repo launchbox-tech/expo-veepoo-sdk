@@ -5,7 +5,7 @@ export function normalizeSportStepData(value: unknown): SportStepData {
   const record = isRecord(value) ? value : {};
   return {
     date: toStringValue(record.date),
-    stepCount: toInt(record.stepCount ?? record.step),
+    step_count: toInt(record.stepCount ?? record.step_count ?? record.step),
     distance: toNumber(record.distance ?? record.dis) ?? 0,
     calories: toNumber(record.calories ?? record.kcal ?? record.cal) ?? 0,
   };

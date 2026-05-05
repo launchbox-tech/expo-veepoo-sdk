@@ -72,8 +72,8 @@ export class SessionCapability {
           deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: {
             status: result.status,
-            deviceNumber: result.deviceNumber,
-            deviceVersion: result.deviceVersion,
+            device_number: result.device_number,
+            device_version: result.device_version,
           },
         });
       },

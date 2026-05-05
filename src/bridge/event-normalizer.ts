@@ -4,6 +4,7 @@ import type {
   VeepooEventPayload,
 } from '../types/index.js';
 import { isRecord, clamp } from '../normalizers/primitives.js';
+import { deepSnakeKeys } from '../normalizers/deep-keys.js';
 import { normalizeBluetoothStatus, normalizePasswordData } from '../capabilities/session/normalizers.js';
 import { normalizeAlarmList, normalizeHeartRateAlarm } from '../capabilities/alarms/normalizers.js';
 import { normalizeBatteryInfo } from '../capabilities/battery/normalizers.js';
@@ -45,15 +46,15 @@ export function normalizeReadOriginProgressPayload(value: unknown): VeepooEventP
 
   const progress = value.progress;
   const normalized: ReadOriginProgress = {
-    readState:
+    read_state:
       typeof progress.readState === 'string'
-        ? (progress.readState as ReadOriginProgress['readState'])
+        ? (progress.readState as ReadOriginProgress['read_state'])
         : 'idle',
-    totalDays:
+    total_days:
       typeof progress.totalDays === 'number' && Number.isFinite(progress.totalDays)
         ? Math.max(1, Math.trunc(progress.totalDays))
         : 1,
-    currentDay:
+    current_day:
       typeof progress.currentDay === 'number' && Number.isFinite(progress.currentDay)
         ? Math.max(1, Math.trunc(progress.currentDay))
         : 1,
@@ -214,8 +215,8 @@ const EVENT_NORMALIZERS: {
     return {
       ...p,
       state: normalizeDeviceBTState(p.state ?? p.btState),
-      btSwitchOpen: p.btSwitchOpen === true,
-      mediaSwitchOpen: p.mediaSwitchOpen === true,
+      bt_switch_open: (p.btSwitchOpen ?? p.bt_switch_open) === true,
+      media_switch_open: (p.mediaSwitchOpen ?? p.media_switch_open) === true,
     } as VeepooEventPayload['deviceBTStateChanged'];
   },
   hrvTestResult: (raw) => {
@@ -247,5 +248,5 @@ export function normalizeEventPayload<K extends VeepooEvent>(
   event: K,
   payload: unknown
 ): VeepooEventPayload[K] {
-  return EVENT_NORMALIZERS[event](payload);
+  return deepSnakeKeys(EVENT_NORMALIZERS[event](payload)) as VeepooEventPayload[K];
 }

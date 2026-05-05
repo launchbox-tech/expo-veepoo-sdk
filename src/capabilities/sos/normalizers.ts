@@ -5,7 +5,7 @@ export function normalizeSosCallTimesSettings(value: unknown): SosCallTimesSetti
   const record = isRecord(value) ? value : {};
   return {
     times: toInt(record.times),
-    minTimes: toInt(record.minTimes),
-    maxTimes: toInt(record.maxTimes),
+    min_times: toInt(record.minTimes ?? record.min_times),
+    max_times: toInt(record.maxTimes ?? record.max_times),
   };
 }

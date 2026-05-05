@@ -42,7 +42,7 @@ export function normalizeHeartRateAlarm(value: unknown): HeartRateAlarm {
   const record = isRecord(value) ? value : {};
   return {
     enabled: toBoolean(record.enabled, false),
-    highThreshold: toInt(record.highThreshold),
-    lowThreshold: toInt(record.lowThreshold),
+    high_threshold: toInt(record.highThreshold ?? record.high_threshold),
+    low_threshold: toInt(record.lowThreshold ?? record.low_threshold),
   };
 }

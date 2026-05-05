@@ -251,7 +251,7 @@ describe('VeepooSDK', () => {
         state: 5, authorization: 3, isScanning: false, pendingScanStart: false,
       });
       expect(listener).toHaveBeenCalledWith(
-        expect.objectContaining({ state: 'poweredOn', authorization: 'allowedAlways' })
+        expect.objectContaining({ state: 'powered_on', authorization: 'allowed_always' })
       );
     });
 
@@ -447,12 +447,12 @@ describe('VeepooSDK', () => {
       sdk.on('heartRateAlarmData', listener);
       const result = await sdk.readHeartRateAlarm();
       expect(native.readHeartRateAlarm).toHaveBeenCalled();
-      expect(result.highThreshold).toBe(120);
-      expect(result.lowThreshold).toBe(60);
+      expect(result.high_threshold).toBe(120);
+      expect(result.low_threshold).toBe(60);
       expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
-          deviceId: '',
-          data: expect.objectContaining({ highThreshold: 120, lowThreshold: 60, enabled: true }),
+          device_id: '',
+          data: expect.objectContaining({ high_threshold: 120, low_threshold: 60, enabled: true }),
         }),
       );
     });
@@ -460,18 +460,18 @@ describe('VeepooSDK', () => {
     it('setHeartRateAlarm validates then delegates to native and emits heartRateAlarmData', async () => {
       const listener = jest.fn();
       sdk.on('heartRateAlarmData', listener);
-      const alarm = { enabled: true, highThreshold: 120, lowThreshold: 50 };
+      const alarm = { enabled: true, high_threshold: 120, low_threshold: 50 };
       const status = await sdk.setHeartRateAlarm(alarm);
-      expect(native.setHeartRateAlarm).toHaveBeenCalledWith(alarm);
+      expect(native.setHeartRateAlarm).toHaveBeenCalledWith({ enabled: true, highThreshold: 120, lowThreshold: 50 });
       expect(status).toBe('success');
       expect(listener).toHaveBeenCalledWith(
-        expect.objectContaining({ deviceId: '', data: alarm }),
+        expect.objectContaining({ device_id: '', data: alarm }),
       );
     });
 
-    it('setHeartRateAlarm throws INVALID_ARGUMENT when highThreshold <= lowThreshold', async () => {
+    it('setHeartRateAlarm throws INVALID_ARGUMENT when high_threshold <= low_threshold', async () => {
       await expect(
-        sdk.setHeartRateAlarm({ enabled: true, highThreshold: 80, lowThreshold: 100 }),
+        sdk.setHeartRateAlarm({ enabled: true, high_threshold: 80, low_threshold: 100 }),
       ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
       expect(native.setHeartRateAlarm).not.toHaveBeenCalled();
     });
@@ -484,8 +484,8 @@ describe('VeepooSDK', () => {
       });
       const r = await sdk.readWatchFaceStyle();
       expect(native.readWatchFaceStyle).toHaveBeenCalledWith(null);
-      expect(r.dialType).toBe('default');
-      expect(r.screenIndex).toBe(3);
+      expect(r.dial_type).toBe('default');
+      expect(r.screen_index).toBe(3);
     });
 
     it('readWatchFaceStyle passes dialType when set', async () => {
@@ -494,17 +494,17 @@ describe('VeepooSDK', () => {
         screenIndex: 0,
         operationSuccess: true,
       });
-      await sdk.readWatchFaceStyle({ dialType: 'market' });
+      await sdk.readWatchFaceStyle({ dial_type: 'market' });
       expect(native.readWatchFaceStyle).toHaveBeenCalledWith({ dialType: 'market' });
     });
 
     it('setWatchFaceStyle sends default dialType when omitted', async () => {
-      await sdk.setWatchFaceStyle({ screenIndex: 2 });
+      await sdk.setWatchFaceStyle({ screen_index: 2 });
       expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 2, dialType: 'default' });
     });
 
     it('setWatchFaceStyle forwards explicit dialType', async () => {
-      await sdk.setWatchFaceStyle({ screenIndex: 1, dialType: 'photo' });
+      await sdk.setWatchFaceStyle({ screen_index: 1, dial_type: 'photo' });
       expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 1, dialType: 'photo' });
     });
 
@@ -544,14 +544,14 @@ describe('VeepooSDK', () => {
       native.readOriginData.mockResolvedValueOnce([{ time: '12:00', heartValue: 72 }]);
       const result = await sdk.readOriginData(1);
       expect(native.readOriginData).toHaveBeenCalledWith(1);
-      expect(result[0].heartValue).toBe(72);
+      expect(result[0].heart_value).toBe(72);
     });
 
     it('readSportStepData(date) normalizes step alias to stepCount', async () => {
       native.readSportStepData.mockResolvedValueOnce({ date: '2024-01-02', step: 5000 });
       const result = await sdk.readSportStepData('2024-01-02');
       expect(native.readSportStepData).toHaveBeenCalledWith('2024-01-02');
-      expect(result.stepCount).toBe(5000);
+      expect(result.step_count).toBe(5000);
     });
 
     it('readDaySummaryData(dayOffset) returns normalized DaySummaryData', async () => {
@@ -565,7 +565,7 @@ describe('VeepooSDK', () => {
       const result = await sdk.readDaySummaryData(0);
       expect(native.readDaySummaryData).toHaveBeenCalledWith(0);
       expect(result.date).toBe('2024-06-01');
-      expect(result.allStep).toBe(100);
+      expect(result.all_step).toBe(100);
     });
 
     it('readDeviceVersion() returns normalized DeviceVersion', async () => {
@@ -575,8 +575,8 @@ describe('VeepooSDK', () => {
       });
       const result = await sdk.readDeviceVersion();
       expect(native.readDeviceVersion).toHaveBeenCalled();
-      expect(result.hardwareVersion).toBe('1');
-      expect(result.softwareVersion).toBe('2');
+      expect(result.hardware_version).toBe('1');
+      expect(result.software_version).toBe('2');
     });
 
     it('readAutoMeasureSetting() returns normalized list', async () => {
@@ -586,7 +586,7 @@ describe('VeepooSDK', () => {
       const result = await sdk.readAutoMeasureSetting();
       expect(native.readAutoMeasureSetting).toHaveBeenCalled();
       expect(result).toHaveLength(1);
-      expect(result[0].measureInterval).toBe(30);
+      expect(result[0].measure_interval).toBe(30);
     });
 
     it('startReadOriginData() delegates to native', async () => {

@@ -13,21 +13,21 @@ export function normalizePackage3(record: Record<string, unknown>): DeviceFuncti
   }
 
   return {
-    bigDataTranType: toInt(record.bitDataTranType ?? record.bigDataTranType),
-    watchUiServerCount: toInt(record.watchUiServerCount),
-    watchUiCustomCount: toInt(record.watchUiCoustomCount ?? record.watchUiCustomCount),
-    temperatureFunction: normalizeFunctionStatus(record.temperatureFunction),
-    temperatureType: toInt(record.temptureType ?? record.temperatureType),
-    cpuType: toInt(record.cpuType),
-    stressFunction: normalizeFunctionStatus(record.stress),
-    musicStyle: toInt(record.musicStyle),
-    findDeviceByPhoneFunction: normalizeFunctionStatus(
+    big_data_tran_type: toInt(record.bitDataTranType ?? record.bigDataTranType),
+    watch_ui_server_count: toInt(record.watchUiServerCount),
+    watch_ui_custom_count: toInt(record.watchUiCoustomCount ?? record.watchUiCustomCount),
+    temperature_function: normalizeFunctionStatus(record.temperatureFunction),
+    temperature_type: toInt(record.temptureType ?? record.temperatureType),
+    cpu_type: toInt(record.cpuType),
+    stress_function: normalizeFunctionStatus(record.stress),
+    music_style: toInt(record.musicStyle),
+    find_device_by_phone_function: normalizeFunctionStatus(
       record.findDeviceByPhone ?? record.findDeviceByPhoneFunction
     ),
-    agpsFunction: normalizeFunctionStatus(record.agps),
-    bloodGlucose: toInt(record.bloodGlucoseType ?? record.bloodGlucose),
-    bloodGlucoseAdjusting: normalizeFunctionStatus(record.bloodGlucoseAdjusting),
-    bloodComponent: normalizeFunctionStatus(record.bloodComponent),
-    bodyComponent: normalizeFunctionStatus(record.bodyComponent),
+    agps_function: normalizeFunctionStatus(record.agps),
+    blood_glucose: toInt(record.bloodGlucoseType ?? record.bloodGlucose),
+    blood_glucose_adjusting: normalizeFunctionStatus(record.bloodGlucoseAdjusting),
+    blood_component: normalizeFunctionStatus(record.bloodComponent),
+    body_component: normalizeFunctionStatus(record.bodyComponent),
   };
 }

@@ -60,13 +60,13 @@ describe('normalizePermissionsResult', () => {
     expect(normalizePermissionsResult('granted')).toEqual({
       granted: true,
       status: 'granted',
-      canAskAgain: false,
+      can_ask_again: false,
     });
 
     expect(normalizePermissionsResult('denied')).toEqual({
       granted: false,
       status: 'denied',
-      canAskAgain: true,
+      can_ask_again: true,
     });
   });
 
@@ -80,7 +80,7 @@ describe('normalizePermissionsResult', () => {
     ).toEqual({
       granted: false,
       status: 'never_ask_again',
-      canAskAgain: false,
+      can_ask_again: false,
     });
   });
 });
@@ -95,12 +95,12 @@ describe('normalizeBluetoothStatus', () => {
         pendingScanStart: false,
       })
     ).toEqual({
-      state: 'poweredOn',
-      stateName: 'poweredOn',
-      authorization: 'allowedAlways',
-      authorizationName: 'allowedAlways',
-      isScanning: true,
-      pendingScanStart: false,
+      state: 'powered_on',
+      state_name: 'powered_on',
+      authorization: 'allowed_always',
+      authorization_name: 'allowed_always',
+      is_scanning: true,
+      pending_scan_start: false,
     });
   });
 });
@@ -109,7 +109,7 @@ describe('normalizeReadOriginProgressPayload', () => {
   it('converts progress to an integer percentage', () => {
     expect(
       normalizeReadOriginProgressPayload({
-        deviceId: 'd1',
+        device_id: 'd1',
         progress: {
           readState: 'reading',
           totalDays: 3,
@@ -118,11 +118,11 @@ describe('normalizeReadOriginProgressPayload', () => {
         },
       })
     ).toEqual({
-      deviceId: 'd1',
+      device_id: 'd1',
       progress: {
-        readState: 'reading',
-        totalDays: 3,
-        currentDay: 2,
+        read_state: 'reading',
+        total_days: 3,
+        current_day: 2,
         progress: 67,
       },
     });
@@ -131,7 +131,7 @@ describe('normalizeReadOriginProgressPayload', () => {
   it('converts a completed fractional progress to 100', () => {
     expect(
       normalizeReadOriginProgressPayload({
-        deviceId: 'd1',
+        device_id: 'd1',
         progress: {
           readState: 'complete',
           totalDays: 1,
@@ -140,11 +140,11 @@ describe('normalizeReadOriginProgressPayload', () => {
         },
       })
     ).toEqual({
-      deviceId: 'd1',
+      device_id: 'd1',
       progress: {
-        readState: 'complete',
-        totalDays: 1,
-        currentDay: 1,
+        read_state: 'complete',
+        total_days: 1,
+        current_day: 1,
         progress: 100,
       },
     });
@@ -153,7 +153,7 @@ describe('normalizeReadOriginProgressPayload', () => {
   it('clamps percent-style values to 100', () => {
     expect(
       normalizeReadOriginProgressPayload({
-        deviceId: 'd1',
+        device_id: 'd1',
         progress: {
           readState: 'complete',
           totalDays: 1,
@@ -162,11 +162,11 @@ describe('normalizeReadOriginProgressPayload', () => {
         },
       })
     ).toEqual({
-      deviceId: 'd1',
+      device_id: 'd1',
       progress: {
-        readState: 'complete',
-        totalDays: 1,
-        currentDay: 1,
+        read_state: 'complete',
+        total_days: 1,
+        current_day: 1,
         progress: 100,
       },
     });
@@ -180,128 +180,149 @@ describe('normalizeEventPayload', () => {
     expect(normalizeEventPayload('deviceFound', 'str')).toBe('str');
   });
 
-  it('returns pass-through events unchanged (reference equality)', () => {
+  it('returns pass-through events with snake_case keys', () => {
     const payload = { deviceId: 'x', timestamp: 1 };
-    expect(normalizeEventPayload('deviceFound', payload)).toBe(payload);
-    expect(normalizeEventPayload('deviceConnected', payload)).toBe(payload);
-    expect(normalizeEventPayload('deviceDisconnected', payload)).toBe(payload);
-    expect(normalizeEventPayload('deviceReady', payload)).toBe(payload);
-    expect(normalizeEventPayload('readOriginComplete', payload)).toBe(payload);
-    expect(normalizeEventPayload('error', payload)).toBe(payload);
+    const expected = { device_id: 'x', timestamp: 1 };
+    expect(normalizeEventPayload('deviceFound', payload)).toEqual(expected);
+    expect(normalizeEventPayload('deviceConnected', payload)).toEqual(expected);
+    expect(normalizeEventPayload('deviceDisconnected', payload)).toEqual(expected);
+    expect(normalizeEventPayload('deviceReady', payload)).toEqual(expected);
+    expect(normalizeEventPayload('readOriginComplete', payload)).toEqual(expected);
+    expect(normalizeEventPayload('error', payload)).toEqual(expected);
   });
 
-  it('deviceConnectStatus: passes through raw payload unchanged', () => {
+  it('deviceConnectStatus: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', status: 'connected', code: 0 };
-    expect(normalizeEventPayload('deviceConnectStatus', raw)).toBe(raw);
+    expect(normalizeEventPayload('deviceConnectStatus', raw)).toEqual({ device_id: 'd1', status: 'connected', code: 0 });
   });
 
-  it('connectionStatusChanged: passes through raw payload unchanged', () => {
+  it('connectionStatusChanged: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', status: 'disconnected' };
-    expect(normalizeEventPayload('connectionStatusChanged', raw)).toBe(raw);
+    expect(normalizeEventPayload('connectionStatusChanged', raw)).toEqual({ device_id: 'd1', status: 'disconnected' });
   });
 
-  it('deviceSosTriggered: passes through raw payload unchanged', () => {
+  it('deviceSosTriggered: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1' };
-    expect(normalizeEventPayload('deviceSosTriggered', raw)).toBe(raw);
+    expect(normalizeEventPayload('deviceSosTriggered', raw)).toEqual({ device_id: 'd1' });
   });
 
-  it('customSettingsData: passes through raw payload unchanged', () => {
+  it('customSettingsData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', data: { wristOnBright: true } };
-    expect(normalizeEventPayload('customSettingsData', raw)).toBe(raw);
+    expect(normalizeEventPayload('customSettingsData', raw)).toEqual({ device_id: 'd1', data: { wrist_on_bright: true } });
   });
 
-  it('healthRemindData: passes through raw payload unchanged', () => {
+  it('healthRemindData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', data: { drinkEnabled: true } };
-    expect(normalizeEventPayload('healthRemindData', raw)).toBe(raw);
+    expect(normalizeEventPayload('healthRemindData', raw)).toEqual({ device_id: 'd1', data: { drink_enabled: true } });
   });
 
-  it('apneaRemindData: passes through raw payload unchanged', () => {
+  it('apneaRemindData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', data: { enabled: true, threshold: 10 } };
-    expect(normalizeEventPayload('apneaRemindData', raw)).toBe(raw);
+    expect(normalizeEventPayload('apneaRemindData', raw)).toEqual({ device_id: 'd1', data: { enabled: true, threshold: 10 } });
   });
 
-  it('sportModeData: passes through raw payload unchanged', () => {
+  it('sportModeData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', mode: 'walking' };
-    expect(normalizeEventPayload('sportModeData', raw)).toBe(raw);
+    expect(normalizeEventPayload('sportModeData', raw)).toEqual({ device_id: 'd1', mode: 'walking' });
   });
 
-  it('bloodAnalysisTestResult: passes through raw payload unchanged', () => {
+  it('bloodAnalysisTestResult: passes through raw payload with snake_case keys', () => {
     const raw = {
       deviceId: 'd1',
       result: { state: 'over', progress: 100, values: null },
     };
-    expect(normalizeEventPayload('bloodAnalysisTestResult', raw)).toBe(raw);
+    expect(normalizeEventPayload('bloodAnalysisTestResult', raw)).toEqual({ device_id: 'd1', result: { state: 'over', progress: 100, values: null } });
   });
 
-  it('gsrTestResult: passes through raw payload unchanged', () => {
+  it('gsrTestResult: passes through raw payload with snake_case keys', () => {
     const raw = {
       deviceId: 'd1',
       result: { state: 'over', progress: 100, emotionLevel: 5, skinMoisture: 60, snsActivation: 40, cortisolValue: null },
     };
-    expect(normalizeEventPayload('gsrTestResult', raw)).toBe(raw);
+    const result = normalizeEventPayload('gsrTestResult', raw) as any;
+    expect(result.device_id).toBe('d1');
+    expect(result.result.state).toBe('over');
   });
 
-  it('exerciseSessionData: passes through raw payload unchanged', () => {
+  it('exerciseSessionData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', session: { type: 'running', beginTime: '2024-01-01 08:00:00', endTime: '2024-01-01 09:00:00', totalSteps: 6000, totalDistance: 5000, totalCalories: 400, totalTime: 3600, averageHeartRate: 145, averagePace: 360, pauseCount: 0, pauseTotalTime: 0, minuteData: [] } };
-    expect(normalizeEventPayload('exerciseSessionData', raw)).toBe(raw);
+    const result = normalizeEventPayload('exerciseSessionData', raw) as any;
+    expect(result.device_id).toBe('d1');
   });
 
-  it('accurateSleepData: passes through raw payload unchanged', () => {
-    const raw = { deviceId: 'd1', date: '2024-01-01', data: { sleepTime: '2024-01-01 22:00:00', wakeTime: '2024-01-02 06:00:00', deepDuration: 90, lightDuration: 120, remDuration: 60, getUpDuration: 10, sleepDuration: 480, getUpTimes: 2, sleepQuality: 3, insomniaScore: 5, insomniaTimes: 1, fallAsleepScore: 80, sleepEfficiencyScore: 85, curve: [] } };
-    expect(normalizeEventPayload('accurateSleepData', raw)).toBe(raw);
+  it('accurateSleepData: passes through raw payload with snake_case keys', () => {
+    const raw = { deviceId: 'd1', date: '2024-01-01', data: { sleepTime: '2024-01-01 22:00:00', wakeTime: '2024-01-02 06:00:00' } };
+    const result = normalizeEventPayload('accurateSleepData', raw) as any;
+    expect(result.device_id).toBe('d1');
   });
 
-  it('storedTemperatureData: passes through raw payload unchanged', () => {
+  it('storedTemperatureData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00', temperature: 36.5 } };
-    expect(normalizeEventPayload('storedTemperatureData', raw)).toBe(raw);
+    const result = normalizeEventPayload('storedTemperatureData', raw) as any;
+    expect(result.device_id).toBe('d1');
   });
 
-  it('storedBloodGlucoseData: passes through raw payload unchanged', () => {
+  it('storedBloodGlucoseData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00', bloodGlucose: 5.4, level: 'normal' } };
-    expect(normalizeEventPayload('storedBloodGlucoseData', raw)).toBe(raw);
+    const result = normalizeEventPayload('storedBloodGlucoseData', raw) as any;
+    expect(result.device_id).toBe('d1');
   });
 
-  it('storedHrvData: passes through raw payload unchanged', () => {
+  it('storedHrvData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00', hrv: 42, rrIntervals: [820, 830, 810] } };
-    expect(normalizeEventPayload('storedHrvData', raw)).toBe(raw);
+    const result = normalizeEventPayload('storedHrvData', raw) as any;
+    expect(result.device_id).toBe('d1');
   });
 
-  it('storedEcgData: passes through raw payload unchanged', () => {
+  it('storedEcgData: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00:00', duration: 30, aveHeart: 72, aveHrv: 40, aveResRate: 16, filterSignals: [100, 200, 150] } };
-    expect(normalizeEventPayload('storedEcgData', raw)).toBe(raw);
+    const result = normalizeEventPayload('storedEcgData', raw) as any;
+    expect(result.device_id).toBe('d1');
   });
 
-  it('storedBodyCompositionData: passes through raw payload unchanged', () => {
-    const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00:00', bmi: 22.5, bodyFatPercentage: 18.0, fatMass: 12.0, leanBodyMass: 55.0, muscleRate: 40.0, muscleMass: 38.0, subcutaneousFat: 14.0, bodyMoisture: 55.0, waterContent: 36.0, skeletalMuscleRate: 36.0, boneMass: 2.5, proportionOfProtein: 18.0, proteinAmount: 12.0, basalMetabolicRate: 1600 } };
-    expect(normalizeEventPayload('storedBodyCompositionData', raw)).toBe(raw);
+  it('storedBodyCompositionData: passes through raw payload with snake_case keys', () => {
+    const raw = { deviceId: 'd1', data: { timestamp: '2024-01-01 08:00:00', bmi: 22.5 } };
+    const result = normalizeEventPayload('storedBodyCompositionData', raw) as any;
+    expect(result.device_id).toBe('d1');
   });
 
-  it('pttTestResult: passes through raw payload unchanged', () => {
+  it('pttTestResult: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', result: { heartRate: 72, hrv: 45, qtInterval: 380, signalQuality: 100, progress: 50 } };
-    expect(normalizeEventPayload('pttTestResult', raw)).toBe(raw);
+    const result = normalizeEventPayload('pttTestResult', raw) as any;
+    expect(result.device_id).toBe('d1');
   });
 
-  it('pttStateChanged: passes through raw payload unchanged', () => {
+  it('pttStateChanged: passes through raw payload with snake_case keys', () => {
     const raw = { deviceId: 'd1', state: 'active' };
-    expect(normalizeEventPayload('pttStateChanged', raw)).toBe(raw);
+    expect(normalizeEventPayload('pttStateChanged', raw)).toEqual({ device_id: 'd1', state: 'active' });
   });
 
   it('bluetoothStateChanged: normalizes numeric state and authorization', () => {
     const result = normalizeEventPayload('bluetoothStateChanged', {
       state: 5, authorization: 3, isScanning: false, pendingScanStart: false,
     }) as any;
-    expect(result.state).toBe('poweredOn');
-    expect(result.authorization).toBe('allowedAlways');
-    expect(result.isScanning).toBe(false);
+    expect(result.state).toBe('powered_on');
+    expect(result.authorization).toBe('allowed_always');
+    expect(result.is_scanning).toBe(false);
+  });
+
+  it('bluetoothStateChanged: converts camelCase string state/auth values to snake_case', () => {
+    const result = normalizeEventPayload('bluetoothStateChanged', {
+      state: 'poweredOff', authorization: 'notDetermined', isScanning: false, pendingScanStart: false,
+    }) as any;
+    expect(result.state).toBe('powered_off');
+    expect(result.authorization).toBe('not_determined');
+    expect(result.is_scanning).toBe(false);
+    expect(result.pending_scan_start).toBe(false);
   });
 
   it('readOriginProgress: converts decimal progress to integer percentage', () => {
     const result = normalizeEventPayload('readOriginProgress', {
-      deviceId: 'd1',
+      device_id: 'd1',
       progress: { readState: 'reading', totalDays: 3, currentDay: 2, progress: 0.5 },
     }) as any;
     expect(result.progress.progress).toBe(50);
-    expect(result.progress.readState).toBe('reading');
+    expect(result.progress.read_state).toBe('reading');
   });
 
   it('deviceFunction: normalizes data and functions fields', () => {
@@ -312,7 +333,7 @@ describe('normalizeEventPayload', () => {
     }) as any;
     expect(result.data).toBeDefined();
     expect(result.functions).toBeDefined();
-    expect(result.data.package1.bloodPressure).toBe('support');
+    expect(result.data.package1.blood_pressure).toBe('support');
   });
 
   it('deviceVersion: normalizes version sub-object', () => {
@@ -320,8 +341,8 @@ describe('normalizeEventPayload', () => {
       deviceId: 'd1',
       version: { hardwareVersion: 'hw1', firmwareVersion: 'fw2' },
     }) as any;
-    expect(result.version.hardwareVersion).toBe('hw1');
-    expect(result.version.firmwareVersion).toBe('fw2');
+    expect(result.version.hardware_version).toBe('hw1');
+    expect(result.version.firmware_version).toBe('fw2');
   });
 
   it('passwordData: normalizes status to uppercase enum', () => {
@@ -409,7 +430,7 @@ describe('normalizeEventPayload', () => {
       deviceId: 'd1',
       result: { state: 'testing', progress: 50, heartRate: 72, waveform: [1, 2, 3] },
     }) as any;
-    expect(result.result.heartRate).toBe(72);
+    expect(result.result.heart_rate).toBe(72);
     expect(result.result.waveform).toEqual([1, 2, 3]);
   });
 
@@ -419,7 +440,7 @@ describe('normalizeEventPayload', () => {
       data: { level: 75, state: 0 },
     }) as any;
     expect(result.data.level).toBe(75);
-    expect(result.data.chargeState).toBe('normal');
+    expect(result.data.charge_state).toBe('normal');
   });
 
   it('sleepData: normalizes single sleep record', () => {
@@ -431,12 +452,12 @@ describe('normalizeEventPayload', () => {
     expect(result.data).not.toBeNull();
   });
 
-  it('sportStepData: normalizes step alias to stepCount', () => {
+  it('sportStepData: normalizes step alias to step_count', () => {
     const result = normalizeEventPayload('sportStepData', {
       deviceId: 'd1',
       data: { step: 5000 },
     }) as any;
-    expect(result.data.stepCount).toBe(5000);
+    expect(result.data.step_count).toBe(5000);
   });
 
   it('originHalfHourData: normalizes half-hour item', () => {
@@ -444,7 +465,7 @@ describe('normalizeEventPayload', () => {
       deviceId: 'd1',
       data: { time: '12:00', heartValue: 70 },
     }) as any;
-    expect(result.data.heartValue).toBe(70);
+    expect(result.data.heart_value).toBe(70);
     expect(result.data.time).toBe('12:00');
   });
 
@@ -454,7 +475,7 @@ describe('normalizeEventPayload', () => {
       data: { time: '12:00', heartValue: 72 },
     }) as any;
     expect(result.data).toBeDefined();
-    expect(result.data.heartValue).toBe(72);
+    expect(result.data.heart_value).toBe(72);
   });
 
   it('alarmData: normalizes alarm list and converts repeat string', () => {
@@ -462,7 +483,7 @@ describe('normalizeEventPayload', () => {
       deviceId: 'd1',
       alarms: [{ id: 1, enabled: 1, hour: 7, minute: 30, repeat: '0000011' }],
     }) as any;
-    expect(result.deviceId).toBe('d1');
+    expect(result.device_id).toBe('d1');
     expect(result.alarms[0].repeat).toEqual([1, 2]);
     expect(result.alarms[0].hour).toBe(7);
   });
@@ -488,12 +509,12 @@ describe('normalizeEventPayload', () => {
         currentPackNumber: 1,
       },
     }) as any;
-    expect(result.deviceId).toBe('d1');
+    expect(result.device_id).toBe('d1');
     expect(result.data.time).toBe('08:00');
-    expect(result.data.heartValue).toBe(68);
+    expect(result.data.heart_value).toBe(68);
     expect(result.data.value).toBe(98);
-    expect(result.data.allPackNumber).toBe(10);
-    expect(result.data.currentPackNumber).toBe(1);
+    expect(result.data.all_pack_number).toBe(10);
+    expect(result.data.current_pack_number).toBe(1);
   });
 
   it('heartRateAlarmData: normalizes enabled and thresholds', () => {
@@ -501,21 +522,21 @@ describe('normalizeEventPayload', () => {
       deviceId: 'd1',
       data: { enabled: 1, highThreshold: 120, lowThreshold: 50 },
     }) as any;
-    expect(result.deviceId).toBe('d1');
+    expect(result.device_id).toBe('d1');
     expect(result.data.enabled).toBe(true);
-    expect(result.data.highThreshold).toBe(120);
-    expect(result.data.lowThreshold).toBe(50);
+    expect(result.data.high_threshold).toBe(120);
+    expect(result.data.low_threshold).toBe(50);
   });
 
-  it('findDeviceState: normalizes phase and rawState', () => {
+  it('findDeviceState: normalizes phase and raw_state', () => {
     const result = normalizeEventPayload('findDeviceState', {
       deviceId: 'd1',
       phase: 'searching',
       rawState: 1,
     }) as any;
-    expect(result.deviceId).toBe('d1');
+    expect(result.device_id).toBe('d1');
     expect(result.phase).toBe('searching');
-    expect(result.rawState).toBe(1);
+    expect(result.raw_state).toBe(1);
   });
 
   it('findDeviceState: unknown phase becomes unsupported', () => {
@@ -531,10 +552,10 @@ describe('normalizeEventPayload', () => {
       deviceId: 'd1',
       contacts: [{ contactID: 1, name: 'Alice', phoneNumber: '+1234', isSOS: true }],
     }) as any;
-    expect(result.deviceId).toBe('d1');
+    expect(result.device_id).toBe('d1');
     expect(result.contacts[0].name).toBe('Alice');
-    expect(result.contacts[0].phoneNumber).toBe('+1234');
-    expect(result.contacts[0].isSOS).toBe(true);
+    expect(result.contacts[0].phone_number).toBe('+1234');
+    expect(result.contacts[0].is_sos).toBe(true);
   });
 
   it('sosCallTimesData: normalizes SOS call times', () => {
@@ -542,10 +563,10 @@ describe('normalizeEventPayload', () => {
       deviceId: 'd1',
       data: { times: 3, minTimes: 1, maxTimes: 9 },
     }) as any;
-    expect(result.deviceId).toBe('d1');
+    expect(result.device_id).toBe('d1');
     expect(result.data.times).toBe(3);
-    expect(result.data.minTimes).toBe(1);
-    expect(result.data.maxTimes).toBe(9);
+    expect(result.data.min_times).toBe(1);
+    expect(result.data.max_times).toBe(9);
   });
 
   it('fatigueTestResult: normalizes fatigue level alias', () => {
@@ -577,22 +598,22 @@ describe('normalizeHeartRateAlarm', () => {
 
   it('coerces string thresholds to integers', () => {
     const result = normalizeHeartRateAlarm({ enabled: true, highThreshold: '120', lowThreshold: '50.9' });
-    expect(result.highThreshold).toBe(120);
-    expect(result.lowThreshold).toBe(50);
+    expect(result.high_threshold).toBe(120);
+    expect(result.low_threshold).toBe(50);
   });
 
   it('defaults missing fields to false / 0', () => {
     const result = normalizeHeartRateAlarm({});
     expect(result.enabled).toBe(false);
-    expect(result.highThreshold).toBe(0);
-    expect(result.lowThreshold).toBe(0);
+    expect(result.high_threshold).toBe(0);
+    expect(result.low_threshold).toBe(0);
   });
 
   it('defaults all fields for non-object input', () => {
     const result = normalizeHeartRateAlarm(null);
     expect(result.enabled).toBe(false);
-    expect(result.highThreshold).toBe(0);
-    expect(result.lowThreshold).toBe(0);
+    expect(result.high_threshold).toBe(0);
+    expect(result.low_threshold).toBe(0);
   });
 });
 
@@ -608,9 +629,9 @@ describe('normalizeScreenLightSettings', () => {
       autoAdjust: 1,
       maxLevel: 5,
     });
-    expect(r.nightStartHour).toBe(22);
-    expect(r.autoAdjust).toBe(true);
-    expect(r.maxLevel).toBe(5);
+    expect(r.night_start_hour).toBe(22);
+    expect(r.auto_adjust).toBe(true);
+    expect(r.max_level).toBe(5);
   });
 });
 
@@ -622,8 +643,8 @@ describe('normalizeScreenLightDuration', () => {
       maxSeconds: 60,
       recommendSeconds: 10,
     });
-    expect(r.currentSeconds).toBe(10);
-    expect(r.recommendSeconds).toBe(10);
+    expect(r.current_seconds).toBe(10);
+    expect(r.recommend_seconds).toBe(10);
   });
 });
 
@@ -637,8 +658,8 @@ describe('normalizeSedentaryReminderSettings', () => {
       thresholdMinutes: 45,
       enabled: 1,
     });
-    expect(r.startHour).toBe(8);
-    expect(r.thresholdMinutes).toBe(45);
+    expect(r.start_hour).toBe(8);
+    expect(r.threshold_minutes).toBe(45);
     expect(r.enabled).toBe(true);
   });
 });
@@ -654,10 +675,10 @@ describe('normalizeEventPayload bodyCompositionTestResult', () => {
         isEnd: true,
         composition: { bmi: '22.5', bodyFatPercentage: 18.2, fatMassKg: 12.3 },
       },
-    }) as { deviceId: string; result: { composition?: { bmi?: number; bodyFatPercentage?: number } } };
-    expect(result.deviceId).toBe('d1');
+    }) as any;
+    expect(result.device_id).toBe('d1');
     expect(result.result.composition?.bmi).toBe(22.5);
-    expect(result.result.composition?.bodyFatPercentage).toBe(18.2);
+    expect(result.result.composition?.body_fat_percentage).toBe(18.2);
   });
 });
 
@@ -667,8 +688,8 @@ describe('normalizeEventPayload firmwareDfuProgress', () => {
       deviceId: 'ab',
       progress: '50',
       state: 'updating',
-    }) as { deviceId: string; progress: number; state: string };
-    expect(result.deviceId).toBe('ab');
+    }) as any;
+    expect(result.device_id).toBe('ab');
     expect(result.progress).toBe(50);
     expect(result.state).toBe('updating');
   });
@@ -690,16 +711,16 @@ describe('normalizeWatchFaceStyle', () => {
       screenIndex: 4,
       operationSuccess: true,
     });
-    expect(r.dialType).toBe('market');
-    expect(r.screenIndex).toBe(4);
-    expect(r.operationSuccess).toBe(true);
+    expect(r.dial_type).toBe('market');
+    expect(r.screen_index).toBe(4);
+    expect(r.operation_success).toBe(true);
   });
 
-  it('defaults unknown dial to default and omits operationSuccess when absent', () => {
+  it('defaults unknown dial to default and omits operation_success when absent', () => {
     const r = normalizeWatchFaceStyle({ screenIndex: 1 });
-    expect(r.dialType).toBe('default');
-    expect(r.screenIndex).toBe(1);
-    expect(r.operationSuccess).toBeUndefined();
+    expect(r.dial_type).toBe('default');
+    expect(r.screen_index).toBe(1);
+    expect(r.operation_success).toBeUndefined();
   });
 });
 
@@ -716,9 +737,9 @@ describe('normalizeWristFlipWakeSettings', () => {
       defaultSensitivityLevel: 5,
     });
     expect(r.enabled).toBe(false);
-    expect(r.sensitivityLevel).toBe(3);
-    expect(r.supportsCustomTimeWindow).toBe(true);
-    expect(r.defaultSensitivityLevel).toBe(5);
+    expect(r.sensitivity_level).toBe(3);
+    expect(r.supports_custom_time_window).toBe(true);
+    expect(r.default_sensitivity_level).toBe(5);
   });
 });
 
@@ -736,14 +757,14 @@ describe('normalizeWomenHealthSettings', () => {
       operationStatus: 'READ_SUCCESS',
     });
     expect(r.status).toBe('menstrual');
-    expect(r.menstrualLengthDays).toBe(5);
-    expect(r.menstrualCycleDays).toBe(28);
-    expect(r.lastMenstrualDate).toBe('2026-04-01');
-    expect(r.expectedDeliveryDate).toBe('2026-12-01');
-    expect(r.babyBirthday).toBe('2025-06-15');
-    expect(r.babySex).toBe('male');
-    expect(r.currentMenstrualDays).toBe(3);
-    expect(r.operationStatus).toBe('READ_SUCCESS');
+    expect(r.menstrual_length_days).toBe(5);
+    expect(r.menstrual_cycle_days).toBe(28);
+    expect(r.last_menstrual_date).toBe('2026-04-01');
+    expect(r.expected_delivery_date).toBe('2026-12-01');
+    expect(r.baby_birthday).toBe('2025-06-15');
+    expect(r.baby_sex).toBe('male');
+    expect(r.current_menstrual_days).toBe(3);
+    expect(r.operation_status).toBe('READ_SUCCESS');
   });
 
   it('defaults unknown status to none', () => {
@@ -756,7 +777,7 @@ describe('normalizeWeatherSettings', () => {
 
   it('normalizes a valid weather settings object', () => {
     const r = normalizeWeatherSettings({ isOpen: true, unit: 'C', crc: 99 });
-    expect(r.isOpen).toBe(true);
+    expect(r.is_open).toBe(true);
     expect(r.unit).toBe('C');
     expect(r.crc).toBe(99);
   });
@@ -764,7 +785,7 @@ describe('normalizeWeatherSettings', () => {
   it('normalizes Fahrenheit unit', () => {
     const r = normalizeWeatherSettings({ isOpen: false, unit: 'f', crc: 0 });
     expect(r.unit).toBe('F');
-    expect(r.isOpen).toBe(false);
+    expect(r.is_open).toBe(false);
   });
 
   it('defaults to C for unknown unit', () => {
@@ -774,14 +795,14 @@ describe('normalizeWeatherSettings', () => {
 
   it('returns safe defaults for empty object', () => {
     const r = normalizeWeatherSettings({});
-    expect(r.isOpen).toBe(false);
+    expect(r.is_open).toBe(false);
     expect(r.unit).toBe('C');
     expect(r.crc).toBe(0);
   });
 
   it('returns safe defaults for non-object input', () => {
     const r = normalizeWeatherSettings(null);
-    expect(r.isOpen).toBe(false);
+    expect(r.is_open).toBe(false);
     expect(r.unit).toBe('C');
     expect(r.crc).toBe(0);
   });
@@ -798,19 +819,19 @@ describe('normalizeContactList', () => {
     const raw = [{ contactID: 1, name: 'Alice', phoneNumber: '+1234567890', isSettingSOS: true, isSupportSOS: true }];
     const result = normalizeContactList(raw);
     expect(result).toHaveLength(1);
-    expect(result[0].contactID).toBe(1);
+    expect(result[0].contact_id).toBe(1);
     expect(result[0].name).toBe('Alice');
-    expect(result[0].phoneNumber).toBe('+1234567890');
-    expect(result[0].isSOS).toBe(true);
-    expect(result[0].isSupportSOS).toBe(true);
+    expect(result[0].phone_number).toBe('+1234567890');
+    expect(result[0].is_sos).toBe(true);
+    expect(result[0].is_support_sos).toBe(true);
   });
 
   it('normalizes an iOS-shaped contact (nickName field)', () => {
     const raw = [{ contactID: 2, nickName: 'Bob', phoneNumber: '555-0100', isSOS: false }];
     const result = normalizeContactList(raw);
     expect(result[0].name).toBe('Bob');
-    expect(result[0].isSOS).toBe(false);
-    expect(result[0].isSupportSOS).toBeUndefined();
+    expect(result[0].is_sos).toBe(false);
+    expect(result[0].is_support_sos).toBeUndefined();
   });
 
   it('drops entries that have no name or phone', () => {
@@ -832,15 +853,15 @@ describe('normalizeSosCallTimesSettings', () => {
   it('normalizes a well-formed payload', () => {
     const r = normalizeSosCallTimesSettings({ times: 3, minTimes: 1, maxTimes: 9 });
     expect(r.times).toBe(3);
-    expect(r.minTimes).toBe(1);
-    expect(r.maxTimes).toBe(9);
+    expect(r.min_times).toBe(1);
+    expect(r.max_times).toBe(9);
   });
 
   it('returns zeros for non-object input', () => {
     const r = normalizeSosCallTimesSettings(null);
     expect(r.times).toBe(0);
-    expect(r.minTimes).toBe(0);
-    expect(r.maxTimes).toBe(0);
+    expect(r.min_times).toBe(0);
+    expect(r.max_times).toBe(0);
   });
 
   it('coerces string numbers', () => {
@@ -884,16 +905,16 @@ describe('normalizeMusicRemoteCommand', () => {
     expect(normalizeMusicRemoteCommand('previous')).toBe('previous');
   });
 
-  it('maps "pausePlay" → "pausePlay"', () => {
-    expect(normalizeMusicRemoteCommand('pausePlay')).toBe('pausePlay');
+  it('maps "pausePlay" → "pause_play"', () => {
+    expect(normalizeMusicRemoteCommand('pausePlay')).toBe('pause_play');
   });
 
-  it('maps unknown string → "pausePlay"', () => {
-    expect(normalizeMusicRemoteCommand('UNKNOWN')).toBe('pausePlay');
+  it('maps unknown string → "pause_play"', () => {
+    expect(normalizeMusicRemoteCommand('UNKNOWN')).toBe('pause_play');
   });
 
-  it('maps null → "pausePlay"', () => {
-    expect(normalizeMusicRemoteCommand(null)).toBe('pausePlay');
+  it('maps null → "pause_play"', () => {
+    expect(normalizeMusicRemoteCommand(null)).toBe('pause_play');
   });
 });
 
@@ -901,7 +922,7 @@ describe('normalizeEventPayload — cameraShutter', () => {
   it('normalizes canTake status', () => {
     const r = normalizeEventPayload('cameraShutter', { deviceId: 'd1', status: 'TAKEPHOTO_CAN' }) as any;
     expect(r.status).toBe('canTake');
-    expect(r.deviceId).toBe('d1');
+    expect(r.device_id).toBe('d1');
   });
 
   it('normalizes cannotTake status', () => {
@@ -923,7 +944,7 @@ describe('normalizeEventPayload — musicRemoteCommand', () => {
 
   it('normalizes pausePlay command', () => {
     const r = normalizeEventPayload('musicRemoteCommand', { deviceId: 'd1', command: 'pausePlay' }) as any;
-    expect(r.command).toBe('pausePlay');
+    expect(r.command).toBe('pause_play');
   });
 });
 
@@ -959,26 +980,26 @@ describe('normalizeDeviceBTStatus', () => {
       status: 1,
     });
     expect(result).toEqual({
-      isBTOpen: true,
-      isAutoConnect: true,
-      isAudioOpen: false,
-      hasPairInfo: true,
+      is_bt_open: true,
+      is_auto_connect: true,
+      is_audio_open: false,
+      has_pair_info: true,
       state: 'connected',
     });
   });
 
   it('handles missing/undefined fields gracefully', () => {
     const result = normalizeDeviceBTStatus({});
-    expect(result.isBTOpen).toBe(false);
-    expect(result.isAutoConnect).toBe(false);
-    expect(result.isAudioOpen).toBe(false);
-    expect(result.hasPairInfo).toBe(false);
+    expect(result.is_bt_open).toBe(false);
+    expect(result.is_auto_connect).toBe(false);
+    expect(result.is_audio_open).toBe(false);
+    expect(result.has_pair_info).toBe(false);
     expect(result.state).toBe('disconnected');
   });
 
   it('handles non-object input', () => {
     const result = normalizeDeviceBTStatus(null);
-    expect(result.isBTOpen).toBe(false);
+    expect(result.is_bt_open).toBe(false);
     expect(result.state).toBe('disconnected');
   });
 });
@@ -989,8 +1010,8 @@ describe('normalizeEventPayload — deviceBTStateChanged', () => {
       deviceId: 'd1', state: 1, btSwitchOpen: true, mediaSwitchOpen: false,
     }) as any;
     expect(r.state).toBe('connected');
-    expect(r.btSwitchOpen).toBe(true);
-    expect(r.mediaSwitchOpen).toBe(false);
+    expect(r.bt_switch_open).toBe(true);
+    expect(r.media_switch_open).toBe(false);
   });
 
   it('normalizes string state via btState fallback', () => {

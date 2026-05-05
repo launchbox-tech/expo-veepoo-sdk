@@ -39,19 +39,19 @@ describe('HealthConfig (split capabilities)', () => {
       height: 175,
       weight: 70,
       age: 30,
-      stepAim: 8000,
-      sleepAim: 480,
+      step_aim: 8000,
+      sleep_aim: 480,
     };
     const result = await personalInfo.syncPersonalInfo(info);
-    expect(native.syncPersonalInfo).toHaveBeenCalledWith(info);
+    expect(native.syncPersonalInfo).toHaveBeenCalledWith({ sex: 1, height: 175, weight: 70, age: 30, stepAim: 8000, sleepAim: 480 });
     expect(result).toBe(true);
   });
 
   // ── readAutoMeasureSetting ─────────────────────────────────────────
 
   it('readAutoMeasureSetting delegates to native and returns normalized array', async () => {
-    const raw: AutoMeasureSetting[] = [
-      { type: 'heartRate', enabled: true, measureInterval: 30, currentStartMinute: 0, currentEndMinute: 1439 },
+    const raw = [
+      { protocolType: 1, funType: 2, isSwitchOpen: true, stepUnit: 1, isSlotModify: false, isIntervalModify: true, supportStartMinute: 0, supportEndMinute: 1439, measureInterval: 30, currentStartMinute: 0, currentEndMinute: 1439 },
     ];
     native.readAutoMeasureSetting.mockResolvedValueOnce(raw);
     const result = await autoMeasure.readAutoMeasureSetting();
@@ -62,16 +62,16 @@ describe('HealthConfig (split capabilities)', () => {
   // ── modifyAutoMeasureSetting ───────────────────────────────────────
 
   it('modifyAutoMeasureSetting delegates to native (happy path)', async () => {
-    const setting: Partial<AutoMeasureSetting> = { measureInterval: 30 };
+    const setting: Partial<AutoMeasureSetting> = { measure_interval: 30 };
     native.modifyAutoMeasureSetting.mockResolvedValueOnce([]);
     await autoMeasure.modifyAutoMeasureSetting(setting);
-    expect(native.modifyAutoMeasureSetting).toHaveBeenCalledWith(setting);
+    expect(native.modifyAutoMeasureSetting).toHaveBeenCalledWith({ measureInterval: 30 });
   });
 
   it('modifyAutoMeasureSetting throws INVALID_ARGUMENT for out-of-range interval', async () => {
-    // measureInterval must be in range 1–120; 0 is invalid
+    // measure_interval must be in range 1–120; 0 is invalid
     await expect(
-      autoMeasure.modifyAutoMeasureSetting({ measureInterval: 0 }),
+      autoMeasure.modifyAutoMeasureSetting({ measure_interval: 0 }),
     ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
     expect(native.modifyAutoMeasureSetting).not.toHaveBeenCalled();
   });
@@ -89,7 +89,7 @@ describe('HealthConfig (split capabilities)', () => {
     });
     const result = await sedentaryReminder.readSedentaryReminder();
     expect(native.readSedentaryReminder).toHaveBeenCalled();
-    expect(result.thresholdMinutes).toBe(60);
+    expect(result.threshold_minutes).toBe(60);
   });
 
   // ── setSedentaryReminder ──────────────────────────────────────────
@@ -97,25 +97,32 @@ describe('HealthConfig (split capabilities)', () => {
   it('setSedentaryReminder delegates to native', async () => {
     const settings: SedentaryReminderSettings = {
       enabled: true,
-      startHour: 8,
-      startMinute: 0,
-      endHour: 20,
-      endMinute: 0,
-      thresholdMinutes: 60,
+      start_hour: 8,
+      start_minute: 0,
+      end_hour: 20,
+      end_minute: 0,
+      threshold_minutes: 60,
     };
     await sedentaryReminder.setSedentaryReminder(settings);
-    expect(native.setSedentaryReminder).toHaveBeenCalledWith(settings);
-  });
-
-  it('setSedentaryReminder throws INVALID_ARGUMENT for invalid settings', async () => {
-    // thresholdMinutes must be 30–240; 10 is invalid
-    const invalid: SedentaryReminderSettings = {
+    expect(native.setSedentaryReminder).toHaveBeenCalledWith({
       enabled: true,
       startHour: 8,
       startMinute: 0,
       endHour: 20,
       endMinute: 0,
-      thresholdMinutes: 10,
+      thresholdMinutes: 60,
+    });
+  });
+
+  it('setSedentaryReminder throws INVALID_ARGUMENT for invalid settings', async () => {
+    // threshold_minutes must be 30–240; 10 is invalid
+    const invalid: SedentaryReminderSettings = {
+      enabled: true,
+      start_hour: 8,
+      start_minute: 0,
+      end_hour: 20,
+      end_minute: 0,
+      threshold_minutes: 10,
     };
     await expect(
       sedentaryReminder.setSedentaryReminder(invalid),

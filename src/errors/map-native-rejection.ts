@@ -135,7 +135,7 @@ export function mapNativeRejection(error: unknown, ctx: MapNativeRejectionContex
   if (isVeepooErrorShape(error)) {
     return {
       ...error,
-      deviceId: error.deviceId ?? ctx.deviceId,
+      device_id: error.device_id ?? ctx.deviceId,
     };
   }
 
@@ -145,7 +145,7 @@ export function mapNativeRejection(error: unknown, ctx: MapNativeRejectionContex
     return {
       code: ctx.fallbackCode,
       message,
-      deviceId: ctx.deviceId,
+      device_id: ctx.deviceId,
     };
   }
 
@@ -154,10 +154,10 @@ export function mapNativeRejection(error: unknown, ctx: MapNativeRejectionContex
     const out: VeepooError = {
       code: known.code,
       message,
-      deviceId: ctx.deviceId,
+      device_id: ctx.deviceId,
     };
     if (known.nativeCode !== undefined) {
-      out.nativeCode = known.nativeCode;
+      out.native_code = known.nativeCode;
     }
     return out;
   }
@@ -166,15 +166,15 @@ export function mapNativeRejection(error: unknown, ctx: MapNativeRejectionContex
     return {
       code: "OPERATION_FAILED",
       message,
-      nativeCode: nativeNorm,
-      deviceId: ctx.deviceId,
+      native_code: nativeNorm,
+      device_id: ctx.deviceId,
     };
   }
 
   return {
     code: "OPERATION_FAILED",
     message,
-    nativeCode: nativeNorm,
-    deviceId: ctx.deviceId,
+    native_code: nativeNorm,
+    device_id: ctx.deviceId,
   };
 }

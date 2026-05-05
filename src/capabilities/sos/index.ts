@@ -18,7 +18,7 @@ export class SosCapability {
       invoke: () => this.ctx.native.readSosCallTimes(),
       normalize: normalizeSosCallTimesSettings,
       afterSuccess: (data) =>
-        this.ctx.emit("sosCallTimesData", { deviceId: this.ctx.connectedDeviceId(), data }),
+        this.ctx.emit("sosCallTimesData", { device_id: this.ctx.connectedDeviceId(), data }),
     });
   }
 

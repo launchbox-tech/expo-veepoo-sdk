@@ -6,15 +6,15 @@ import type { ReadOriginProgress } from '../types/health-tests';
  * Helper to build a well-formed `readOriginProgress` payload.
  */
 function makePayload(
-  deviceId: string,
+  device_id: string,
   progressValue: number,
-  readState: ReadOriginProgress['readState'] = 'reading',
-  totalDays = 7,
-  currentDay = 1,
+  read_state: ReadOriginProgress['read_state'] = 'reading',
+  total_days = 7,
+  current_day = 1,
 ): VeepooEventPayload['readOriginProgress'] {
   return {
-    deviceId,
-    progress: { readState, totalDays, currentDay, progress: progressValue },
+    device_id,
+    progress: { read_state, total_days, current_day, progress: progressValue },
   };
 }
 
@@ -53,7 +53,7 @@ describe('OriginReadPipeline', () => {
   it('readState "start" passes with same progress as previous, then suppresses the next equal value', () => {
     pipeline.shouldEmit(makePayload('dev1', 50));
     // "start" with the same value must pass (not be suppressed)
-    expect(pipeline.shouldEmit(makePayload('dev1', 50, 'start'))).toBe(true);
+    expect(pipeline.shouldEmit(makePayload('dev1', 50, 'start' as any))).toBe(true);
     // The state is now 50 again; a plain duplicate must be suppressed
     expect(pipeline.shouldEmit(makePayload('dev1', 50))).toBe(false);
   });
@@ -99,7 +99,7 @@ describe('OriginReadPipeline', () => {
   it('passes through a payload where progress is not an object, storing no state', () => {
     // Cast to simulate a normalization fallback that left progress as a raw number
     const passThrough = {
-      deviceId: 'dev1',
+      device_id: 'dev1',
       progress: 42 as unknown as ReadOriginProgress,
     } satisfies VeepooEventPayload['readOriginProgress'];
 

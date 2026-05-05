@@ -5,5 +5,6 @@ export function normalizeMusicRemoteCommand(value: unknown): MusicRemoteCommand 
   const s = typeof value === 'string' ? value : '';
   if (s === 'next') return 'next';
   if (s === 'previous') return 'previous';
-  return 'pausePlay';
+  if (s === 'pausePlay' || s === 'pause_play') return 'pause_play';
+  return 'pause_play';
 }
