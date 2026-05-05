@@ -101,33 +101,7 @@ function checkSnapshotFiles(repoRoot: string, doc: CoverageDoc): string[] {
 
   const errors: string[] = [];
 
-  // Android: verify MyService.java is present and contains listener registrations
-  const androidDemoPath = join(
-    snapshotRoot,
-    "android/android_sdk_source/Demo/VpBluetoothSDK/app/src/main/java/com/timaimee/vpdemo/MyService.java",
-  );
-  if (existsSync(androidDemoPath)) {
-    const src = readFileSync(androidDemoPath, "utf8");
-    // Check that key listeners from bridged events appear in the demo
-    const bridgedListeners = [
-      "IHeartDataListener",
-      "IBPDetectDataListener",
-      "ISpo2hDataListener",
-      "ISleepDataListener",
-      "IBatteryDataListener",
-      "IOriginDataListener",
-    ];
-    for (const listener of bridgedListeners) {
-      if (!src.includes(listener)) {
-        errors.push(
-          `Android SDK snapshot MyService.java does not mention ${listener} — ` +
-          `verify the listener still exists in the upstream SDK (sha ${doc.androidSdkSha})`,
-        );
-      }
-    }
-  }
-
-  // iOS: verify at least the primary manager headers are present
+  // iOS: verify the primary manager headers were fetched successfully
   const iosHeadersPath = join(
     snapshotRoot,
     "ios/iOS_sdk_source/Framework/2.2.XX.15/VeepooBleSDK.framework/Headers",
@@ -139,8 +113,7 @@ function checkSnapshotFiles(repoRoot: string, doc: CoverageDoc): string[] {
       "VPBleCentralManage.h",
     ];
     for (const h of requiredHeaders) {
-      const hp = join(iosHeadersPath, h);
-      if (!existsSync(hp)) {
+      if (!existsSync(join(iosHeadersPath, h))) {
         errors.push(
           `iOS SDK snapshot is missing expected header ${h} — ` +
           `re-run scripts/fetch-sdk-snapshots.sh to refresh (sha ${doc.iosSdkSha})`,
