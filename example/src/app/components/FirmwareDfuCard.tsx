@@ -41,7 +41,7 @@ export default function FirmwareDfuCard() {
   const { sdk } = useVeepooSDK();
   const [dfuInfo, setDfuInfo] = useState("—");
 
-  useSDKEvent("firmwareDfuProgress", ({ state, progress }) => {
+  useSDKEvent("firmware_dfu_progress", ({ state, progress }) => {
     setDfuInfo(`state=${state} progress=${progress}%`);
   }, true);
 

@@ -40,13 +40,18 @@ export default function AlarmsCard() {
   const { sdk } = useVeepooSDK();
   const [alarmsInfo, setAlarmsInfo] = useState("—");
   const [hrAlarmInfo, setHrAlarmInfo] = useState("—");
+  const [spo2AlarmInfo, setSpo2AlarmInfo] = useState("—");
 
-  useSDKEvent("alarmData", ({ alarms }) => {
+  useSDKEvent("alarm_data", ({ alarms }) => {
     setAlarmsInfo(`[event] ${JSON.stringify(alarms)}`);
   }, true);
 
-  useSDKEvent("heartRateAlarmData", ({ data }) => {
+  useSDKEvent("heart_rate_alarm_data", ({ data }) => {
     setHrAlarmInfo(`[event] ${JSON.stringify(data)}`);
+  }, true);
+
+  useSDKEvent("spo2_alarm_data", ({ data }) => {
+    setSpo2AlarmInfo(`[event] ${JSON.stringify(data)}`);
   }, true);
 
   return (
@@ -54,6 +59,7 @@ export default function AlarmsCard() {
       <Text style={styles.cardLabel}>Alarms</Text>
       <Text style={styles.info} numberOfLines={4}>Alarms: {alarmsInfo}</Text>
       <Text style={styles.info} numberOfLines={3}>HR Alarm: {hrAlarmInfo}</Text>
+      <Text style={styles.info} numberOfLines={3}>SpO₂ Alarm: {spo2AlarmInfo}</Text>
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => {
           setAlarmsInfo("reading…");
@@ -96,6 +102,24 @@ export default function AlarmsCard() {
             .catch((e: unknown) => setHrAlarmInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">
           <Text style={styles.buttonText}>Set HR alarm</Text>
+        </Pressable>
+      </View>
+      <View style={styles.row}>
+        <Pressable style={styles.button} onPress={() => {
+          setSpo2AlarmInfo("reading…");
+          void sdk.alarms.readSpo2Alarm()
+            .then(a => setSpo2AlarmInfo(JSON.stringify(a)))
+            .catch((e: unknown) => setSpo2AlarmInfo((e as Error)?.message ?? "error"));
+        }} accessibilityRole="button">
+          <Text style={styles.buttonText}>Read SpO₂ alarm</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={() => {
+          setSpo2AlarmInfo("setting…");
+          void sdk.alarms.setSpo2Alarm({ enabled: true, low_threshold: 90 })
+            .then(s => setSpo2AlarmInfo(`set: ${JSON.stringify(s)}`))
+            .catch((e: unknown) => setSpo2AlarmInfo((e as Error)?.message ?? "error"));
+        }} accessibilityRole="button">
+          <Text style={styles.buttonText}>Set SpO₂ &lt;90%</Text>
         </Pressable>
       </View>
     </View>

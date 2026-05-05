@@ -46,11 +46,11 @@ export default function CameraMusicCard() {
   const [musicCommandInfo, setMusicCommandInfo] = useState("—");
   const [musicEnabled, setMusicEnabled] = useState(false);
 
-  useSDKEvent("cameraShutter", ({ device_id: _, status }) => {
+  useSDKEvent("camera_shutter", ({ device_id: _, status }) => {
     setCameraInfo(`shutter: ${status}`);
   }, true);
 
-  useSDKEvent("musicRemoteCommand", ({ device_id: _, command }) => {
+  useSDKEvent("music_remote_command", ({ device_id: _, command }) => {
     const ts = new Date().toISOString().slice(11, 19);
     setMusicCommandInfo(`[${ts}] ${command}`);
   }, true);

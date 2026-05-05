@@ -33,6 +33,8 @@ export function usePassiveEvents(
   useSDKEvent('health_remind_data', p => log('health_remind_data', p), isReady);
   useSDKEvent('apnea_remind_data', p => log('apnea_remind_data', p), isReady);
   useSDKEvent('sport_mode_data', p => log('sport_mode_data', p), isReady);
+  useSDKEvent('device_switches_data', p => log('device_switches_data', p), isReady);
+  useSDKEvent('spo2_alarm_data', p => log('spo2_alarm_data', p), isReady);
   useSDKEvent('origin_five_minute_data', p => log('origin_five_minute_data', p), isReady);
   useSDKEvent('origin_half_hour_data', p => log('origin_half_hour_data', p), isReady);
   useSDKEvent('origin_spo2_data', p => log('origin_spo2_data', p), isReady);

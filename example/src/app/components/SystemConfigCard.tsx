@@ -43,11 +43,11 @@ export default function SystemConfigCard() {
   const [fnInfo, setFnInfo] = useState("—");
   const [sysInfo, setSysInfo] = useState("—");
 
-  useSDKEvent("bluetoothStateChanged", (payload) => {
+  useSDKEvent("bluetooth_state_changed", (payload) => {
     setBtInfo(`[event] ${JSON.stringify(payload)}`);
   }, true);
 
-  useSDKEvent("deviceFunction", (payload) => {
+  useSDKEvent("device_function", (payload) => {
     setFnInfo(`[event] ${JSON.stringify(payload.functions ?? payload.data)}`);
   }, true);
 

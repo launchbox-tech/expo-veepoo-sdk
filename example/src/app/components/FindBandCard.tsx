@@ -44,7 +44,7 @@ export default function FindBandCard() {
   const { sdk } = useVeepooSDK();
   const [findPhase, setFindPhase] = useState<string | null>(null);
 
-  useSDKEvent("findDeviceState", ({ device_id: _, phase }) => {
+  useSDKEvent("find_device_state", ({ device_id: _, phase }) => {
     setFindPhase(phase);
   }, true);
 

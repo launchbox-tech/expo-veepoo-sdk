@@ -41,11 +41,11 @@ export default function ContactsCard() {
   const [contactsInfo, setContactsInfo] = useState("—");
   const [sosInfo, setSosInfo] = useState("—");
 
-  useSDKEvent("contactsData", ({ contacts }) => {
+  useSDKEvent("contacts_data", ({ contacts }) => {
     setContactsInfo(`[event] ${contacts.length} contacts`);
   }, true);
 
-  useSDKEvent("sosCallTimesData", ({ data }) => {
+  useSDKEvent("sos_call_times_data", ({ data }) => {
     setSosInfo(`[event] ${JSON.stringify(data)}`);
   }, true);
 

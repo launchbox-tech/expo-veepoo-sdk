@@ -31,3 +31,8 @@ export { default as VitalsLabSection } from '../app/components/VitalsLabSection'
 export { default as EventLogCard } from '../app/components/EventLogCard';
 export { default as HistoricalDataSection } from '../app/components/HistoricalDataSection';
 export { default as DisconnectButton } from '../app/components/DisconnectButton';
+export { default as SportModeCard } from '../app/components/SportModeCard';
+export { default as DeviceSwitchesCard } from '../app/components/DeviceSwitchesCard';
+export { default as CalibrationCard } from '../app/components/CalibrationCard';
+export { default as WorldClockCard } from '../app/components/WorldClockCard';
+export { default as SessionUtilitiesCard } from '../app/components/SessionUtilitiesCard';

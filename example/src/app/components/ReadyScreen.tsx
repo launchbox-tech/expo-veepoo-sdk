@@ -35,6 +35,11 @@ import {
   EventLogCard,
   HistoricalDataSection,
   DisconnectButton,
+  SportModeCard,
+  DeviceSwitchesCard,
+  CalibrationCard,
+  WorldClockCard,
+  SessionUtilitiesCard,
 } from "../../components";
 import { useHealthTests } from "../../hooks/useHealthTests";
 import { useDataSync } from "../../hooks/useDataSync";
@@ -120,6 +125,12 @@ export default function ReadyScreen({
         <WeatherCard />
         <SocialMsgCard />
         <FirmwareDfuCard />
+
+        <SportModeCard />
+        <DeviceSwitchesCard />
+        <CalibrationCard />
+        <WorldClockCard />
+        <SessionUtilitiesCard />
 
         <PersonalInfoSync syncDone={syncDone} />
 
