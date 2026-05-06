@@ -661,25 +661,31 @@ describe("device settings events", () => {
   it("accurate_sleep_data: camelCase fields → snake_case", () => {
     const result = norm("accurate_sleep_data", {
       deviceId: "AA:BB",
+      date: "2024-01-01",
       data: {
-        date: "2024-01-01",
-        beginTime: "23:00",
-        endTime: "07:00",
-        deepSleepMinutes: 90,
-        lightSleepMinutes: 210,
-        remSleepMinutes: 60,
-        items: [],
+        sleepTime: "2024-01-01 23:00:00",
+        wakeTime: "2024-01-02 07:00:00",
+        deepDuration: 90,
+        lightDuration: 210,
+        remDuration: 60,
+        getUpDuration: 10,
+        sleepDuration: 360,
+        getUpTimes: 2,
+        sleepQuality: 3,
+        curve: [],
       },
     });
     expect(result).toMatchObject({
       device_id: "AA:BB",
+      date: "2024-01-01",
       data: {
-        date: "2024-01-01",
-        begin_time: "23:00",
-        end_time: "07:00",
-        deep_sleep_minutes: 90,
-        light_sleep_minutes: 210,
-        rem_sleep_minutes: 60,
+        sleep_time: "2024-01-01 23:00:00",
+        wake_time: "2024-01-02 07:00:00",
+        deep_duration: 90,
+        light_duration: 210,
+        rem_duration: 60,
+        get_up_times: 2,
+        sleep_quality: 3,
       },
     });
   });
@@ -687,26 +693,32 @@ describe("device settings events", () => {
   it("exercise_session_data: camelCase keys → snake_case", () => {
     const result = norm("exercise_session_data", {
       deviceId: "AA:BB",
-      data: [
-        {
-          beginTime: "2024-01-01 08:00:00",
-          endTime: "2024-01-01 09:00:00",
-          totalSteps: 5000,
-          totalDistance: 4000,
-          totalCalories: 250,
-          sportMode: "outdoor_run",
-        },
-      ],
+      session: {
+        type: "outdoorRun",
+        beginTime: "2024-01-01 08:00:00",
+        endTime: "2024-01-01 09:00:00",
+        totalSteps: 5000,
+        totalDistance: 4000,
+        totalCalories: 250,
+        totalTime: 3600,
+        averageHeartRate: 145,
+        averagePace: 360,
+        pauseCount: 0,
+        pauseTotalTime: 0,
+        minuteData: [],
+      },
     });
     expect(result).toMatchObject({
       device_id: "AA:BB",
-      data: [{
+      session: {
+        type: "outdoorRun",
         begin_time: "2024-01-01 08:00:00",
         end_time: "2024-01-01 09:00:00",
         total_steps: 5000,
         total_distance: 4000,
         total_calories: 250,
-      }],
+        average_heart_rate: 145,
+      },
     });
   });
 });
