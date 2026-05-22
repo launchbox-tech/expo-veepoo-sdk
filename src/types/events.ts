@@ -17,8 +17,6 @@ import type { FindDevicePhase } from '@/capabilities/find-device/types';
 import type { MusicRemoteCommand } from '@/capabilities/music/types';
 import type { SocialMsgData } from '@/capabilities/social-msg/types';
 import type { SosCallTimesSettings } from '@/capabilities/sos/types';
-import type { HealthReminder } from './device';
-import type { ApneaRemindSettings, CustomSettings } from './settings';
 import type { SportMode } from '@/capabilities/sport-mode/types';
 import type {
   AccurateSleepSession,
@@ -57,6 +55,61 @@ import type {
   TemperatureTestResult,
 } from '@/capabilities/realtime-tests/types';
 import type { VeepooError } from './errors';
+import type { BloodGlucoseUnit, SkinTone, TemperatureUnit } from './settings';
+
+// ── Orphan event-payload types ───────────────────────────────────────────────
+// Types consumed only by VeepooEventPayload below — no capability owns them,
+// so they live next to the event-payload registry where they're used.
+
+/** Generic key/value bag used by the `custom_settings_data` payload. */
+export interface CustomSettingData {
+  [key: string]: string | number | boolean;
+}
+
+/** Generic device-scoped envelope (public API only — kept for compat). */
+export interface DeviceData {
+  device_id: string;
+  data: unknown;
+}
+
+/** Reminder type passed to `readHealthReminder` / `setHealthReminder`. */
+export type HealthReminderType =
+  | 'sedentary'
+  | 'drink_water'
+  | 'look_far_away'
+  | 'sport'
+  | 'take_medicine'
+  | 'read'
+  | 'trip'
+  | 'wash_hands';
+
+export interface HealthReminder {
+  type: HealthReminderType;
+  start_hour: number;
+  start_minute: number;
+  end_hour: number;
+  end_minute: number;
+  /** Reminder interval in minutes. */
+  interval: number;
+  enabled: boolean;
+}
+
+/** SpO2 apnea alert settings. iOS only — Android rejects with CAPABILITY_UNSUPPORTED. Event-only payload. */
+export interface ApneaRemindSettings {
+  enabled: boolean;
+  /** SpO2 threshold (%) below which the apnea alert fires. */
+  threshold: number;
+}
+
+/**
+ * User preference bag pushed to the Band via `setCustomSettings`. Composed
+ * from cross-cutting unit conventions declared in `types/settings.ts`.
+ */
+export type CustomSettings = {
+  temperature_unit: TemperatureUnit;
+  blood_glucose_unit: BloodGlucoseUnit;
+  skin_tone: SkinTone;
+};
 
 /** Normalized DFU / OTA progress (`firmware_dfu_progress` event). */
 export type FirmwareDfuState =

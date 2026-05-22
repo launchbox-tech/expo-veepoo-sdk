@@ -60,12 +60,6 @@ export type { MusicData, MusicRemoteCommand } from '@/capabilities/music/types';
 export type { GPSAndTimezoneData } from '@/capabilities/gps-timezone/types';
 export type { DeviceBTState, DeviceBTStatus } from '@/capabilities/bt-status/types';
 export type { DeviceSwitchType, DeviceSwitches } from '@/capabilities/device-switches/types';
-export type {
-  CustomSettingData,
-  DeviceData,
-  HealthReminderType,
-  HealthReminder,
-} from './device';
 
 export type {
   TestState,
@@ -134,12 +128,16 @@ export type {
   TimeFormat,
   BloodGlucoseUnit,
   SkinTone,
-  CustomSettings,
-  ApneaRemindSettings,
   OperationStatus,
 } from './settings';
 
 export type {
+  ApneaRemindSettings,
+  CustomSettings,
+  CustomSettingData,
+  DeviceData,
+  HealthReminder,
+  HealthReminderType,
   VeepooEvent,
   VeepooEventPayload,
   FirmwareDfuState,
