@@ -1,6 +1,14 @@
-import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { NATIVE_EMITTED_EVENTS } from "../bridge/veepoo-events-registry";
+
+// Use `require("fs")` at call sites (not a top-level `import { existsSync, ... } from "fs"`)
+// so that `jest.spyOn(fs, ...)` from the test file can intercept these calls — destructured
+// imports get bound once at module load and bypass later spies under Bun's loader.
+type FsApi = Pick<typeof import("fs"), "existsSync" | "readFileSync">;
+function fs(): FsApi {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require("fs") as FsApi;
+}
 
 export type CoverageDoc = {
   schemaVersion: number;
@@ -15,10 +23,10 @@ export type CoverageDoc = {
 
 function loadCoverageDoc(repoRoot: string): CoverageDoc {
   const path = join(repoRoot, "docs/vendor-sdk-snapshot/sdk-callback-coverage.json");
-  if (!existsSync(path)) {
+  if (!fs().existsSync(path)) {
     throw new Error(`sdk-callback-coverage.json not found at ${path}`);
   }
-  return JSON.parse(readFileSync(path, "utf8")) as CoverageDoc;
+  return JSON.parse(fs().readFileSync(path, "utf8") as string) as CoverageDoc;
 }
 
 /**
@@ -27,9 +35,9 @@ function loadCoverageDoc(repoRoot: string): CoverageDoc {
  */
 function checkShaDrift(repoRoot: string, doc: CoverageDoc): string[] {
   const manifestPath = join(repoRoot, "vendor-manifest.json");
-  if (!existsSync(manifestPath)) return [];
+  if (!fs().existsSync(manifestPath)) return [];
 
-  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  const manifest = JSON.parse(fs().readFileSync(manifestPath, "utf8") as string);
   const errors: string[] = [];
 
   const androidPin: string = manifest?.upstreamReference?.androidBleSdk?.lastReviewedHeadSha ?? "";
@@ -97,7 +105,7 @@ function checkStaleDocEntries(doc: CoverageDoc): string[] {
  */
 function checkSnapshotFiles(repoRoot: string, doc: CoverageDoc): string[] {
   const snapshotRoot = join(repoRoot, "vendor-sdk-snapshots");
-  if (!existsSync(snapshotRoot)) return [];
+  if (!fs().existsSync(snapshotRoot)) return [];
 
   const errors: string[] = [];
 
@@ -106,14 +114,14 @@ function checkSnapshotFiles(repoRoot: string, doc: CoverageDoc): string[] {
     snapshotRoot,
     "ios/iOS_sdk_source/Framework/2.2.XX.15/VeepooBleSDK.framework/Headers",
   );
-  if (existsSync(iosHeadersPath)) {
+  if (fs().existsSync(iosHeadersPath)) {
     const requiredHeaders = [
       "VPPeripheralBaseManage.h",
       "VPPeripheralManage.h",
       "VPBleCentralManage.h",
     ];
     for (const h of requiredHeaders) {
-      if (!existsSync(join(iosHeadersPath, h))) {
+      if (!fs().existsSync(join(iosHeadersPath, h))) {
         errors.push(
           `iOS SDK snapshot is missing expected header ${h} — ` +
           `re-run scripts/fetch-sdk-snapshots.sh to refresh (sha ${doc.iosSdkSha})`,
