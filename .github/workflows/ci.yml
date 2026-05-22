@@ -35,6 +35,12 @@ jobs:
         # done anyway.
         run: bun install --frozen-lockfile --ignore-scripts
 
+      - name: Restore executable bits on expo-module-scripts bins
+        # The `expo-module` CLI delegates to sibling executables (expo-module-test,
+        # expo-module-jest, etc.) that aren't declared in expo-module-scripts' `bin`
+        # field, so bun leaves them non-executable on Linux. chmod them back.
+        run: chmod +x node_modules/expo-module-scripts/bin/expo-module-*
+
       - name: Lint
         run: bun run lint
 
