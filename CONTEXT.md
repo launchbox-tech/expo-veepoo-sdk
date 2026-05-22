@@ -26,6 +26,12 @@ Vocabulary for **Band**, **Session**, **Band Discovery**, and **Pairing** follow
 
 A small number of events have **non-uniform envelopes** (e.g. `device_function` writes the same value to two keys; `device_bt_state_changed` normalizes three keys; `find_device_state` and `bluetooth_state_changed` return the normalizer's output directly; `sport_mode_data` rewrites the `mode` field shape; `read_origin_progress` and `firmware_dfu_progress` have dedicated pipelines) — these stay as bespoke inline arrow entries in the dispatch table.
 
+## Realtime test definitions
+
+**`REALTIME_TEST_DEFINITIONS`** (in `src/capabilities/realtime-tests/registry.ts`) is the **single source of truth** for the realtime-test family (heart rate, blood pressure, blood oxygen, temperature, stress, blood glucose, HRV, ECG, fatigue, breathing, body composition, blood analysis, GSR, PTT). Each row binds a modality key to its result event name, the envelope field carrying the inner payload (`result` or `data`), the result normalizer, and — for tests the capability initiates — a `control` surface that dispatches the native start/stop methods. ECG carries its `EcgTestOptions` payload through a per-row escape hatch on `control.start`. **Receive-only tests** (`blood_analysis`, `gsr`, `ptt`) omit `control`; their result events are surfaced via the bridge but cannot be started/stopped from JS.
+
+`RealtimeTestsCapability` dispatches `startTest()` / `stopTest()` through each row's `control`. The bridge's event registry derives its 14 realtime-test result-event defs from the same table via `wrapInner(row.eventField, row.normalize)` and `eventNameToNative(row.event)`. Adding a new realtime test is one row.
+
 ## Bridge capability scope
 
 **Vendor parity:** The module targets **full coverage** of vendor-exposed Band capabilities for device personalization and advanced features (settings-style APIs, OTA/DFU, dial management, etc.), not a permanently capped subset. Individual capabilities remain **optional per Band model**: host apps should use **`readDeviceFunctions()`** (and related device metadata) to decide what to show; unsupported capabilities should fail with clear, documented errors rather than silent no-ops.

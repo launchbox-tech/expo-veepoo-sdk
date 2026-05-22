@@ -1,95 +1,62 @@
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { RealtimeTestsNativeMethods } from "./native";
-import type { EcgTestOptions, RealtimeTestModality } from "@/types/index";
-import { deepCamelKeys } from "@/shared/deep-keys";
+import type { EcgTestOptions } from "@/types/index";
+import {
+  REALTIME_TEST_DEFINITIONS,
+  type RealtimeTestModality,
+} from "./registry";
 
 type Direction = "start" | "stop";
 
-type DispatchEntry = {
-  start: () => Promise<void>;
-  stop: () => Promise<void>;
-};
-
+/**
+ * Drives the realtime-test family on the Band: start/stop a modality,
+ * including ECG with its optional options payload. Each modality's native
+ * binding lives in {@link REALTIME_TEST_DEFINITIONS} — see
+ * `src/capabilities/realtime-tests/registry.ts`.
+ */
 export class RealtimeTestsCapability {
-  private readonly dispatch: Record<RealtimeTestModality, DispatchEntry>;
+  constructor(private readonly ctx: CapabilityContext<RealtimeTestsNativeMethods>) {}
 
-  constructor(private readonly ctx: CapabilityContext<RealtimeTestsNativeMethods>) {
-    const n = ctx.native;
-    this.dispatch = {
-      heart_rate: {
-        start: () => n.startHeartRateTest(),
-        stop: () => n.stopHeartRateTest(),
-      },
-      blood_pressure: {
-        start: () => n.startBloodPressureTest(),
-        stop: () => n.stopBloodPressureTest(),
-      },
-      blood_oxygen: {
-        start: () => n.startBloodOxygenTest(),
-        stop: () => n.stopBloodOxygenTest(),
-      },
-      temperature: {
-        start: () => n.startTemperatureTest(),
-        stop: () => n.stopTemperatureTest(),
-      },
-      stress: {
-        start: () => n.startStressTest(),
-        stop: () => n.stopStressTest(),
-      },
-      blood_glucose: {
-        start: () => n.startBloodGlucoseTest(),
-        stop: () => n.stopBloodGlucoseTest(),
-      },
-      hrv: {
-        start: () => n.startHrvTest(),
-        stop: () => n.stopHrvTest(),
-      },
-      fatigue: {
-        start: () => n.startFatigueTest(),
-        stop: () => n.stopFatigueTest(),
-      },
-      breathing: {
-        start: () => n.startBreathingTest(),
-        stop: () => n.stopBreathingTest(),
-      },
-      body_composition: {
-        start: () => n.startBodyCompositionTest(),
-        stop: () => n.stopBodyCompositionTest(),
-      },
-    };
-  }
-
-  private runTest(modality: RealtimeTestModality, direction: Direction): Promise<void> {
-    const label = `test.${modality}.${direction}`;
-    this.ctx.log("info", "test", label, `${direction === "start" ? "Starting" : "Stopping"} ${modality} test`, {
-    });
-    return this.ctx.invoke({
-      invoke: () => this.dispatch[modality][direction](),
-    });
-  }
-
-  startTest(modality: RealtimeTestModality): Promise<void> {
-    return this.runTest(modality, "start");
+  // Overloads: ECG accepts an optional options payload; all other modalities take none.
+  startTest(modality: "ecg", options?: EcgTestOptions): Promise<void>;
+  startTest(modality: Exclude<RealtimeTestModality, "ecg">): Promise<void>;
+  startTest(modality: RealtimeTestModality, options?: EcgTestOptions): Promise<void> {
+    return this.runTest(modality, "start", options);
   }
 
   stopTest(modality: RealtimeTestModality): Promise<void> {
     return this.runTest(modality, "stop");
   }
 
-  async startEcgTest(options?: EcgTestOptions): Promise<void> {
-    this.ctx.log("info", "test", "test.ecg.start", "Starting ECG test", {
-      data: options,
-    });
-    await this.ctx.invoke({
-      invoke: () => this.ctx.native.startEcgTest(options ? deepCamelKeys(options) as { includeWaveform?: boolean } : undefined),
-    });
+  // ── Back-compat: ECG-specific helpers (one-liners over startTest/stopTest)
+
+  startEcgTest(options?: EcgTestOptions): Promise<void> {
+    return this.startTest("ecg", options);
   }
 
   stopEcgTest(): Promise<void> {
-    this.ctx.log("info", "test", "test.ecg.stop", "Stopping ECG test", {
-    });
+    return this.stopTest("ecg");
+  }
+
+  private runTest(
+    modality: RealtimeTestModality,
+    direction: Direction,
+    options?: EcgTestOptions,
+  ): Promise<void> {
+    const row = REALTIME_TEST_DEFINITIONS[modality];
+    const label = `test.${modality}.${direction}`;
+    this.ctx.log(
+      "info",
+      "test",
+      label,
+      `${direction === "start" ? "Starting" : "Stopping"} ${modality} test`,
+      direction === "start" && options ? { data: options } : {},
+    );
     return this.ctx.invoke({
-      invoke: () => this.ctx.native.stopEcgTest(),
+      invoke: () =>
+        direction === "start"
+          ? row.control!.start(this.ctx.native, options as never)
+          : row.control!.stop(this.ctx.native),
     });
   }
 }

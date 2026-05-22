@@ -25,21 +25,9 @@ import {
   normalizeSpo2OriginData,
 } from "@/capabilities/origin-data/normalizers";
 import {
-  normalizeBloodAnalysisTestResult,
-  normalizeBloodGlucoseData,
-  normalizeBloodOxygenTestResult,
-  normalizeBloodPressureTestResult,
-  normalizeBodyCompositionTestResult,
-  normalizeBreathingTestResult,
-  normalizeEcgTestResult,
-  normalizeFatigueTestResult,
-  normalizeGsrTestResult,
-  normalizeHeartRateTestResult,
-  normalizeHrvTestResult,
-  normalizePttTestResult,
-  normalizeStressData,
-  normalizeTemperatureTestResult,
-} from "@/capabilities/realtime-tests/normalizers";
+  REALTIME_TEST_DEFINITIONS,
+  eventNameToNative,
+} from "@/capabilities/realtime-tests/registry";
 import { normalizeBluetoothStatus, normalizePasswordData } from "@/capabilities/session/normalizers";
 import { normalizeSleepDataList } from "@/capabilities/sleep-data/normalizers";
 import { normalizeSocialMsgData } from "@/capabilities/social-msg";
@@ -77,7 +65,7 @@ function emptyPayload<K extends VeepooEvent>(): EventNormalizer<K> {
 
 // ── Single source of truth ────────────────────────────────────────────────
 
-export const EVENT_DEFINITIONS = {
+const EVENT_DEFINITIONS_CORE = {
   // ── scan / discovery ─────────────────────────────────────────────────
   device_found: defineEvent({
     jsName: "device_found",
@@ -232,90 +220,9 @@ export const EVENT_DEFINITIONS = {
   }),
 
   // ── realtime tests ───────────────────────────────────────────────────
-  heart_rate_test_result: defineEvent({
-    jsName: "heart_rate_test_result",
-    nativeName: "heartRateTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeHeartRateTestResult),
-  }),
-  blood_pressure_test_result: defineEvent({
-    jsName: "blood_pressure_test_result",
-    nativeName: "bloodPressureTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeBloodPressureTestResult),
-  }),
-  blood_oxygen_test_result: defineEvent({
-    jsName: "blood_oxygen_test_result",
-    nativeName: "bloodOxygenTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeBloodOxygenTestResult),
-  }),
-  temperature_test_result: defineEvent({
-    jsName: "temperature_test_result",
-    nativeName: "temperatureTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeTemperatureTestResult),
-  }),
-  stress_data: defineEvent({
-    jsName: "stress_data",
-    nativeName: "stressData",
-    logScope: "test",
-    normalize: wrapInner("data", normalizeStressData),
-  }),
-  blood_glucose_data: defineEvent({
-    jsName: "blood_glucose_data",
-    nativeName: "bloodGlucoseData",
-    logScope: "test",
-    normalize: wrapInner("data", normalizeBloodGlucoseData),
-  }),
-  hrv_test_result: defineEvent({
-    jsName: "hrv_test_result",
-    nativeName: "hrvTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeHrvTestResult),
-  }),
-  ecg_test_result: defineEvent({
-    jsName: "ecg_test_result",
-    nativeName: "ecgTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeEcgTestResult),
-  }),
-  fatigue_test_result: defineEvent({
-    jsName: "fatigue_test_result",
-    nativeName: "fatigueTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeFatigueTestResult),
-  }),
-  breathing_test_result: defineEvent({
-    jsName: "breathing_test_result",
-    nativeName: "breathingTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeBreathingTestResult),
-  }),
-  body_composition_test_result: defineEvent({
-    jsName: "body_composition_test_result",
-    nativeName: "bodyCompositionTestResult",
-    logScope: "test",
-    normalize: wrapInner("result", normalizeBodyCompositionTestResult),
-  }),
-  blood_analysis_test_result: defineEvent({
-    jsName: "blood_analysis_test_result",
-    nativeName: "bloodAnalysisTestResult",
-    logScope: "device",
-    normalize: wrapInner("result", normalizeBloodAnalysisTestResult),
-  }),
-  gsr_test_result: defineEvent({
-    jsName: "gsr_test_result",
-    nativeName: "gsrTestResult",
-    logScope: "device",
-    normalize: wrapInner("result", normalizeGsrTestResult),
-  }),
-  ptt_test_result: defineEvent({
-    jsName: "ptt_test_result",
-    nativeName: "pttTestResult",
-    logScope: "device",
-    normalize: wrapInner("result", normalizePttTestResult),
-  }),
+  // The 14 *_test_result / stress_data / blood_glucose_data event defs are
+  // derived from REALTIME_TEST_DEFINITIONS — see `realtimeTestEventDefs` below
+  // and the spread into EVENT_DEFINITIONS that follows this object.
   ptt_state_changed: defineEvent({
     jsName: "ptt_state_changed",
     nativeName: "pttStateChanged",
@@ -485,7 +392,34 @@ export const EVENT_DEFINITIONS = {
     logScope: "sdk",
     normalize: emptyPayload<"sdk_initialized">(),
   }),
-} as const satisfies { [K in VeepooEvent]: EventDef<K> };
+} as const;
+
+// ── Realtime-test event defs derived from REALTIME_TEST_DEFINITIONS ────────
+
+type RealtimeTestEventName =
+  (typeof REALTIME_TEST_DEFINITIONS)[keyof typeof REALTIME_TEST_DEFINITIONS]["event"];
+
+const REALTIME_TEST_EVENT_DEFINITIONS = Object.fromEntries(
+  Object.values(REALTIME_TEST_DEFINITIONS).map((row) => {
+    const def: EventDef<VeepooEvent> = defineEvent<VeepooEvent>({
+      jsName: row.event,
+      nativeName: eventNameToNative(row.event),
+      logScope: row.logScope,
+      normalize: wrapInner<VeepooEvent>(
+        row.eventField,
+        row.normalize as (raw: unknown) => unknown,
+      ),
+    });
+    return [row.event, def];
+  }),
+) as { [E in RealtimeTestEventName]: EventDef<E & VeepooEvent> };
+
+export const EVENT_DEFINITIONS = {
+  ...EVENT_DEFINITIONS_CORE,
+  ...REALTIME_TEST_EVENT_DEFINITIONS,
+} as { [K in VeepooEvent]: EventDef<K> } satisfies {
+  [K in VeepooEvent]: EventDef<K>;
+};
 
 // ── Derived tables ────────────────────────────────────────────────────────
 

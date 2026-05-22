@@ -215,17 +215,4 @@ export interface PttTestResult {
   progress: number;
 }
 
-export const RealtimeTest = {
-  heart_rate: 'heart_rate',
-  blood_pressure: 'blood_pressure',
-  blood_oxygen: 'blood_oxygen',
-  temperature: 'temperature',
-  stress: 'stress',
-  blood_glucose: 'blood_glucose',
-  hrv: 'hrv',
-  fatigue: 'fatigue',
-  breathing: 'breathing',
-  body_composition: 'body_composition',
-} as const;
-
-export type RealtimeTestModality = typeof RealtimeTest[keyof typeof RealtimeTest];
+export { RealtimeTest, type RealtimeTestModality } from './registry';
