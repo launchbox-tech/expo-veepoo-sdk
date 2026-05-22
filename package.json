@@ -19,7 +19,7 @@
   "scripts": {
     "prepare": "expo-module prepublishOnly",
     "prepublishOnly": "expo-module prepublishOnly",
-    "build": "tsdown --config-loader unrun && tsc --declaration --emitDeclarationOnly && tsc --project tsconfig.tools.json && node scripts/copy-native-rejection-json.cjs",
+    "build": "tsdown --config-loader unrun && tsc --declaration --emitDeclarationOnly && tsc --project tsconfig.tools.json",
     "build:watch": "tsdown --config-loader unrun --watch",
     "clean": "expo-module clean",
     "test": "expo-module test",

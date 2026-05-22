@@ -1,83 +1,43 @@
-import { readFileSync } from "fs";
-import { join } from "path";
+import { ALLOWED_NATIVE_REJECT_CODES } from "@/errors/native-rejection-mapping";
 
 import { extractNativeRejectCodes } from "./extract-native-reject-codes";
 
-export interface NativeRejectionMappingJson {
-  description?: string;
-  allowedNativeRejectCodes: string[];
-  mapping: {
-    directPublicCodes: string[];
-    aliasToPublic: Record<
-      string,
-      { code: string; emitNativeCode?: boolean }
-    >;
-    collapseToOperationFailed: string[];
-    collapseToInvalidArgument: string[];
-  };
-}
-
-export function loadNativeRejectionContract(repoRoot: string): NativeRejectionMappingJson {
-  const p = join(repoRoot, "src", "bridge-contract", "native-rejection-codes.json");
-  const data = JSON.parse(
-    readFileSync(p, "utf8"),
-  ) as NativeRejectionMappingJson;
-  if (!Array.isArray(data.allowedNativeRejectCodes) || !data.mapping) {
-    throw new Error("src/bridge-contract/native-rejection-codes.json: invalid shape");
-  }
-  return data;
-}
-
+/**
+ * Verify the native rejection bridge contract (ADR 0003).
+ *
+ * Cross-checks {@link ALLOWED_NATIVE_REJECT_CODES} (the audit allowlist of
+ * native codes we have explicitly OK'd) against a live regex scan of native
+ * source files in `android/src/main/kotlin/expo/modules/veepoo` and
+ * `ios/VeepooSDK`. Mapping entries in `NATIVE_REJECT_MAPPING` may include
+ * forward-looking direct entries (public codes native does not currently
+ * emit but we are prepared to pass through if it ever does) — those are not
+ * required to appear in the allowlist.
+ *
+ * Returns an array of human-readable error messages (empty when the contract
+ * holds). The legacy bucket-mutex checks are gone — by construction, a code
+ * has exactly one entry in `NATIVE_REJECT_MAPPING`.
+ */
 export function verifyNativeRejectionContract(repoRoot: string): string[] {
   const errors: string[] = [];
-  let contract: NativeRejectionMappingJson;
-  try {
-    contract = loadNativeRejectionContract(repoRoot);
-  } catch (e) {
-    return [String(e)];
-  }
-
   const extracted = extractNativeRejectCodes(repoRoot);
-  const allowed = new Set(contract.allowedNativeRejectCodes);
+  const allowed = new Set<string>(ALLOWED_NATIVE_REJECT_CODES);
+
   if (extracted.size !== allowed.size) {
     errors.push(
-      `Native reject code count: extracted ${extracted.size} vs contract ${allowed.size}`,
+      `Native reject code count: extracted ${extracted.size} vs allowlist ${allowed.size}`,
     );
   }
   for (const c of extracted) {
     if (!allowed.has(c)) {
       errors.push(
-        `Native sources emit "${c}" but it is not in allowedNativeRejectCodes — add to src/bridge-contract/native-rejection-codes.json`,
+        `Native sources emit "${c}" but it is not in ALLOWED_NATIVE_REJECT_CODES — add to src/errors/native-rejection-mapping.ts`,
       );
     }
   }
   for (const c of allowed) {
     if (!extracted.has(c)) {
       errors.push(
-        `allowedNativeRejectCodes includes "${c}" but no .reject("…") found — remove stale entry or restore native call`,
-      );
-    }
-  }
-
-  const m = contract.mapping;
-  for (const x of m.collapseToOperationFailed) {
-    if (m.directPublicCodes.includes(x)) {
-      errors.push(
-        `Invalid contract: "${x}" is both directPublicCodes and collapseToOperationFailed`,
-      );
-    }
-  }
-  for (const x of m.collapseToInvalidArgument) {
-    if (m.directPublicCodes.includes(x)) {
-      errors.push(
-        `Invalid contract: "${x}" is both directPublicCodes and collapseToInvalidArgument`,
-      );
-    }
-  }
-  for (const k of Object.keys(m.aliasToPublic)) {
-    if (m.directPublicCodes.includes(k)) {
-      errors.push(
-        `Invalid contract: alias key "${k}" is also in directPublicCodes`,
+        `ALLOWED_NATIVE_REJECT_CODES includes "${c}" but no .reject("…") found — remove stale entry or restore native call`,
       );
     }
   }
