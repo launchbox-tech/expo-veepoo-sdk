@@ -1,9 +1,13 @@
 # refactor(types): per-subsystem interfaces + VeepooSDKModuleInterface composition
 
 **Issue:** #136
-**Status:** Open
+**Status:** Closed (superseded by ADR 0005)
 **Labels:** needs-triage
 **Parent:** #130
+
+## Superseded
+
+This issue is superseded by **[ADR 0005](../adr/0005-facade-interface-composition-by-construction.md)** (2026-05-22). The codebase decomposed past the six sub-class layout this issue described — there is no `DeviceSettings` / `AlarmSettings` / `HealthConfig` class today, only 36 per-feature `*Capability` classes under `src/capabilities/<feature>/`. The intent of PRD #130 user story #10 ("adding a method to a subsystem propagates to the facade type automatically") is **already delivered by construction**: each capability class is its own interface, and `VeepooSDK.<capability>: <Capability>Class` makes the propagation typed. The 12 dead interfaces were deleted; `src/sdk/subsystem-interfaces.ts` was renamed to `src/sdk/runtime-interfaces.ts` and now contains only `SubsystemRuntime` and `LifecycleRuntime`.
 
 ## What to build
 
