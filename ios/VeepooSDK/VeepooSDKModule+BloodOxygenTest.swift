@@ -167,6 +167,17 @@ extension VeepooSDKModule {
     }
 
     promise.resolve(nil)
+    #else
+    promise.resolve(nil)
     #endif
+  }
+
+  // MARK: 停止血氧测试
+  func handleStopBloodOxygenTest(promise: Promise) {
+    #if !targetEnvironment(simulator)
+    self.peripheralManage?.veepooSDKTestOxygenStart(false) { _, _ in }
+    self.finishMeasurement(type: "bloodOxygen", reason: "manual_stop")
+    #endif
+    promise.resolve(nil)
   }
 }

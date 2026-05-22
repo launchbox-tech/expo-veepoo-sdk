@@ -85,6 +85,17 @@ extension VeepooSDKModule {
     }
     
     promise.resolve(nil)
+    #else
+    promise.resolve(nil)
     #endif
+  }
+
+  // MARK: 停止血糖测试
+  func handleStopBloodGlucoseTest(promise: Promise) {
+    #if !targetEnvironment(simulator)
+    self.peripheralManage?.veepooSDKTestBloodGlucoseStart(false, isPersonalModel: false) { _, _, _, _ in }
+    self.finishMeasurement(type: "bloodGlucose", reason: "manual_stop")
+    #endif
+    promise.resolve(nil)
   }
 }

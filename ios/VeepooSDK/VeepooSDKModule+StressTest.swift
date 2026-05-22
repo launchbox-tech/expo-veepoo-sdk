@@ -48,6 +48,17 @@ extension VeepooSDKModule {
     }
     
     promise.resolve(nil)
+    #else
+    promise.resolve(nil)
     #endif
+  }
+
+  // MARK: 停止压力测试
+  func handleStopStressTest(promise: Promise) {
+    #if !targetEnvironment(simulator)
+    self.peripheralManage?.veepooSDK_stressTestStart(false) { _, _, _ in }
+    self.finishMeasurement(type: "stress", reason: "manual_stop")
+    #endif
+    promise.resolve(nil)
   }
 }

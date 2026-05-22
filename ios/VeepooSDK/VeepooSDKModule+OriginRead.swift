@@ -221,6 +221,8 @@ extension VeepooSDKModule {
     ])
     
     promise.resolve(nil)
+    #else
+    promise.resolve(nil)
     #endif
   }
   // MARK: 读取原始数据（按天）
@@ -346,6 +348,8 @@ extension VeepooSDKModule {
     
     let sortedResult = resultList.sorted { ($0["time"] as? String ?? "") < ($1["time"] as? String ?? "") }
     promise.resolve(sortedResult)
+    #else
+    promise.resolve([])
     #endif
   }
 }

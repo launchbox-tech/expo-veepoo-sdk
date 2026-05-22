@@ -51,6 +51,8 @@ extension VeepooSDKModule {
         promise.resolve(result)
       }
     }
+    #else
+    promise.resolve(["date": "2024-01-01", "stepCount": 5000, "distance": 3500, "calories": 200.0])
     #endif
   }
 }

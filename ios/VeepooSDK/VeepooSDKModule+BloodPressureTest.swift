@@ -73,6 +73,17 @@ extension VeepooSDKModule {
     }
     
     promise.resolve(nil)
+    #else
+    promise.resolve(nil)
     #endif
+  }
+
+  // MARK: 停止血压测试
+  func handleStopBloodPressureTest(promise: Promise) {
+    #if !targetEnvironment(simulator)
+    self.peripheralManage?.veepooSDKTestBloodStart(false, testMode: 0) { _, _, _, _ in }
+    self.finishMeasurement(type: "bloodPressure", reason: "manual_stop")
+    #endif
+    promise.resolve(nil)
   }
 }

@@ -137,6 +137,30 @@ extension VeepooSDKModule {
     }
     
     promise.resolve(nil)
+    #else
+    promise.resolve(nil)
     #endif
+  }
+
+  // MARK: 停止心率测试
+  func handleStopHeartRateTest(promise: Promise) {
+    #if !targetEnvironment(simulator)
+    print("[HeartRate] Stopping test manually")
+    self.peripheralManage?.veepooSDKTestHeartStart(false) { [weak self] _, heartValue in
+      print("[HeartRate] Stop callback - final heartValue: \(heartValue)")
+      self?.finishMeasurement(type: "heartRate", reason: "manual_stop")
+      // 发送停止事件，使用实际的心率值（如果有效）
+      let finalValue = heartValue > 0 ? Int(heartValue) : 0
+      self?.sendEvent("heartRateTestResult", [
+        "deviceId": self?.connectedDeviceId ?? "",
+        "result": [
+          "state": "over",
+          "value": finalValue,
+          "progress": 100
+        ]
+      ])
+    }
+    #endif
+    promise.resolve(nil)
   }
 }

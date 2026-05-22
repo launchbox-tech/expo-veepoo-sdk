@@ -80,6 +80,20 @@ extension VeepooSDKModule {
     
     let resultList = [result]
     promise.resolve(resultList)
+    #else
+    let mock: [String: Any] = [
+      "date": date ?? self.getDateString(dayOffset: 0),
+      "items": [[
+        "date": "2024-01-01", "sleepTime": "22:30:00", "wakeTime": "07:00:00",
+        "deepSleepMinutes": 90, "lightSleepMinutes": 330, "totalSleepMinutes": 480,
+        "sleepQuality": 85, "sleepLine": "", "wakeUpCount": 2
+      ]],
+      "summary": [
+        "totalDeepSleepMinutes": 90, "totalLightSleepMinutes": 330,
+        "totalSleepMinutes": 480, "averageSleepQuality": 85, "totalWakeUpCount": 2
+      ]
+    ]
+    promise.resolve([mock])
     #endif
   }
 }

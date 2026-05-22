@@ -71,6 +71,18 @@ extension VeepooSDKModule {
     ]
     
     promise.resolve(result)
+    #else
+    let calendar = Calendar.current
+    let date = calendar.date(byAdding: .day, value: -dayOffset, to: Date()) ?? Date()
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    let dateStr = formatter.string(from: date)
+    promise.resolve([
+      "date": dateStr, "allStep": 8500,
+      "sportList": [["time": "08:00", "step": 500, "cal": 25.0, "dis": 350.0]],
+      "rateList": [["time": "08:00", "rate": 72]],
+      "bpList": [["time": "08:00", "high": 120, "low": 80]]
+    ])
     #endif
   }
 }

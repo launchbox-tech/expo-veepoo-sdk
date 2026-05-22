@@ -40,9 +40,11 @@ extension VeepooSDKModule {
       
       promise.resolve(result)
     }
+    #else
+    promise.resolve([])
     #endif
   }
-  
+
   // MARK: 修改自动测量设置
   func handleModifyAutoMeasureSetting(setting: [String: Any], promise: Promise) {
     #if !targetEnvironment(simulator)
@@ -116,6 +118,8 @@ extension VeepooSDKModule {
         promise.resolve(result)
       }
     }
+    #else
+    promise.resolve([])
     #endif
   }
 }

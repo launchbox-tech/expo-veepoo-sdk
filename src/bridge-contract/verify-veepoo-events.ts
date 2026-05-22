@@ -16,7 +16,7 @@ export function extractKotlinNativeEvents(source: string): Set<string> {
   return out;
 }
 
-/** Swift header before `PermissionDelegate`: `= "eventName"` literals only. */
+/** Swift event-constants file: `= "eventName"` string literals only. */
 export function extractSwiftNativeEvents(swiftHeader: string): Set<string> {
   const out = new Set<string>();
   for (const m of swiftHeader.matchAll(/= "([^"]+)"/g)) {
@@ -26,14 +26,17 @@ export function extractSwiftNativeEvents(swiftHeader: string): Set<string> {
   return out;
 }
 
+/**
+ * Until #194 the event constants lived inside VeepooSDK.swift and the
+ * verifier had to slice the top of the file. They now live in their own
+ * VeepooEvents.swift, but we keep this helper so older callers that still
+ * pass the whole module file see the same behaviour: take everything up to
+ * the permission-delegate marker if present, otherwise the whole file.
+ */
 export function sliceSwiftEventsHeader(swiftSource: string): string {
   const marker = "// MARK: - 权限";
   const idx = swiftSource.indexOf(marker);
-  if (idx === -1) {
-    throw new Error(
-      "ios/VeepooSDK/VeepooSDK.swift: missing expected // MARK: - 权限",
-    );
-  }
+  if (idx === -1) return swiftSource;
   return swiftSource.slice(0, idx);
 }
 
@@ -56,14 +59,14 @@ export function verifyVeepooEventsContract(repoRoot: string): string[] {
   );
   const kotlin = extractKotlinNativeEvents(readFileSync(kotlinPath, "utf8"));
 
-  const swiftPath = join(repoRoot, "ios/VeepooSDK/VeepooSDK.swift");
+  const swiftPath = join(repoRoot, "ios/VeepooSDK/VeepooEvents.swift");
   const swift = extractSwiftNativeEvents(
     sliceSwiftEventsHeader(readFileSync(swiftPath, "utf8")),
   );
 
   const checks: Array<[string, Set<string>, Set<string>]> = [
     ["Kotlin VeepooSDKConstants.kt", expectedNative, kotlin],
-    ["Swift VeepooSDK.swift (header)", expectedNative, swift],
+    ["Swift VeepooEvents.swift", expectedNative, swift],
   ];
 
   for (const [label, exp, act] of checks) {

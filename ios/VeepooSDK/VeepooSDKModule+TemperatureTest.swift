@@ -52,6 +52,17 @@ extension VeepooSDKModule {
     }
     
     promise.resolve(nil)
+    #else
+    promise.resolve(nil)
     #endif
+  }
+
+  // MARK: 停止体温测试
+  func handleStopTemperatureTest(promise: Promise) {
+    #if !targetEnvironment(simulator)
+    self.peripheralManage?.veepooSDK_temperatureTestStart(false) { _, _, _, _, _ in }
+    self.finishMeasurement(type: "temperature", reason: "manual_stop")
+    #endif
+    promise.resolve(nil)
   }
 }
