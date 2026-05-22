@@ -14,7 +14,7 @@ import {
 import {
   JS_LOCAL_ONLY_EVENTS,
   NATIVE_EMITTED_EVENTS,
-} from "../bridge/veepoo-events-registry";
+} from "../bridge/event-registry";
 
 import { verifyNativeRejectionContract } from "./verify-native-rejection-contract";
 import { verifyUpstreamSdkCoverage } from "./verify-upstream-sdk-coverage";

@@ -6,8 +6,8 @@ jest.mock('react-native', () => ({
 }));
 
 import { ScreenLightCapability } from '@/capabilities/screen-light/index';
-import { WristFlipCapability } from '@/capabilities/wrist-flip/index';
-import { WatchFaceCapability } from '@/capabilities/watch-face/index';
+import { WristFlipCapability } from '@/capabilities/wrist-flip';
+import { WatchFaceCapability } from '@/capabilities/watch-face';
 import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 

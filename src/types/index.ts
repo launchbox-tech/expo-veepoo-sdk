@@ -24,18 +24,18 @@ export type {
   DeviceFunctionPackage5,
   DeviceFunctions,
 } from '@/capabilities/device-functions/types';
-export type { DeviceVersion } from '@/capabilities/device-version/types';
-export type { ChargeState, BatteryInfo } from '@/capabilities/battery/types';
-export type { Sex, PersonalInfo } from '@/capabilities/personal-info/types';
-export type { SocialMsgData } from '@/capabilities/social-msg/types';
+export type { DeviceVersion } from '@/capabilities/device-version';
+export type { ChargeState, BatteryInfo } from '@/capabilities/battery';
+export type { Sex, PersonalInfo } from '@/capabilities/personal-info';
+export type { SocialMsgData } from '@/capabilities/social-msg';
 export type { DeviceAlarm, HeartRateAlarm, Spo2Alarm } from '@/capabilities/alarms/types';
-export type { FindDevicePhase } from '@/capabilities/find-device/types';
+export type { FindDevicePhase } from '@/capabilities/find-device';
 export type {
   ScreenLightSettings,
   ScreenLightDuration,
 } from '@/capabilities/screen-light/types';
-export type { SedentaryReminderSettings } from '@/capabilities/sedentary-reminder/types';
-export type { WristFlipWakeSettings } from '@/capabilities/wrist-flip/types';
+export type { SedentaryReminderSettings } from '@/capabilities/sedentary-reminder';
+export type { WristFlipWakeSettings } from '@/capabilities/wrist-flip';
 export type {
   WomenHealthBabySex,
   WomenHealthSettings,
@@ -45,7 +45,7 @@ export type {
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
-} from '@/capabilities/watch-face/types';
+} from '@/capabilities/watch-face';
 export type {
   WeatherUnit,
   WeatherSettings,
@@ -54,12 +54,12 @@ export type {
   WeatherData,
 } from '@/capabilities/weather/types';
 export type { DeviceContact, NewDeviceContact } from '@/capabilities/contacts/types';
-export type { SosCallTimesSettings } from '@/capabilities/sos/types';
-export type { CameraShutterStatus } from '@/capabilities/camera/types';
-export type { MusicData, MusicRemoteCommand } from '@/capabilities/music/types';
-export type { GPSAndTimezoneData } from '@/capabilities/gps-timezone/types';
-export type { DeviceBTState, DeviceBTStatus } from '@/capabilities/bt-status/types';
-export type { DeviceSwitchType, DeviceSwitches } from '@/capabilities/device-switches/types';
+export type { SosCallTimesSettings } from '@/capabilities/sos';
+export type { CameraShutterStatus } from '@/capabilities/camera';
+export type { MusicData, MusicRemoteCommand } from '@/capabilities/music';
+export type { GPSAndTimezoneData } from '@/capabilities/gps-timezone';
+export type { DeviceBTState, DeviceBTStatus } from '@/capabilities/bt-status';
+export type { DeviceSwitchType, DeviceSwitches } from '@/capabilities/device-switches';
 
 export type {
   TestState,
@@ -96,8 +96,8 @@ export type {
   SleepMinutePoint,
   AccurateSleepSession,
 } from '@/capabilities/sleep-data/types';
-export type { SportStepData } from '@/capabilities/sport-steps/types';
-export type { DaySummaryData } from '@/capabilities/day-summary/types';
+export type { SportStepData } from '@/capabilities/sport-steps';
+export type { DaySummaryData } from '@/capabilities/day-summary';
 export type {
   OriginData,
   HalfHourData,
@@ -116,12 +116,12 @@ export type {
   StoredBodyCompositionData,
 } from '@/capabilities/historical-query/types';
 
-export type { AutoMeasureSetting } from '@/capabilities/auto-measure/types';
-export type { Language } from '@/capabilities/language/types';
+export type { AutoMeasureSetting } from '@/capabilities/auto-measure';
+export type { Language } from '@/capabilities/language';
 export type { SportMode, SportModeStatus } from '@/capabilities/sport-mode/types';
 export { SPORT_MODE_ORDINALS } from '@/capabilities/sport-mode/types';
-export type { BloodGlucoseRiskConfig } from '@/capabilities/calibration/types';
-export type { WorldClockEntry } from '@/capabilities/world-clock/types';
+export type { BloodGlucoseRiskConfig } from '@/capabilities/calibration';
+export type { WorldClockEntry } from '@/capabilities/world-clock';
 export type {
   TemperatureUnit,
   DistanceUnit,

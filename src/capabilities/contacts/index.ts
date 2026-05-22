@@ -12,8 +12,7 @@ export class ContactsCapability {
     return this.ctx.invoke({
       invoke: () => this.ctx.native.readContacts(crc),
       normalize: normalizeContactList,
-      afterSuccess: (contacts) =>
-        this.ctx.emit("contacts_data", { device_id: this.ctx.connectedDeviceId(), contacts }),
+      afterSuccess: (contacts) => this.ctx.emitDeviceEvent("contacts_data", { contacts }),
     });
   }
 

@@ -7,8 +7,8 @@ import type {
 import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
 import type { VeepooSdkState } from "./veepoo-sdk-state";
 
-/** Minimal runtime surface all subsystems depend on. */
-export interface SubsystemRuntime {
+/** Runtime surface needed by `SdkLifecycle`. */
+export interface LifecycleRuntime {
   readonly native: NativeVeepooSDKInterface;
   readonly state: VeepooSdkState;
   log(
@@ -24,11 +24,6 @@ export interface SubsystemRuntime {
     fallbackCode: VeepooError["code"],
     deviceId?: string,
   ): VeepooError;
-  nativeOpFailed(error: unknown): VeepooError;
-}
-
-/** Runtime surface needed by `SdkLifecycle`. */
-export interface LifecycleRuntime extends SubsystemRuntime {
   setupEventListeners(): void;
   teardownNativeListeners(): void;
   resetAfterDestroy(): void;

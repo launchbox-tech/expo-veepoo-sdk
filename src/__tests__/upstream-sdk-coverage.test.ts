@@ -3,7 +3,7 @@ import {
   verifyUpstreamSdkCoverage,
   type CoverageDoc,
 } from "@/bridge-contract/verify-upstream-sdk-coverage";
-import { NATIVE_EMITTED_EVENTS } from "@/bridge/veepoo-events-registry";
+import { NATIVE_EMITTED_EVENTS } from "@/bridge/event-registry";
 import coverageDocJson from "../../docs/vendor-sdk-snapshot/sdk-callback-coverage.json";
 import manifestJson from "../../vendor-manifest.json";
 

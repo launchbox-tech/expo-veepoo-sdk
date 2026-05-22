@@ -1,0 +1,69 @@
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import { isRecord, toStringValue } from "@/shared/primitives";
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+/** Phone → Band find / anti-loss (vibrate, screen on). Emitted on `findDeviceState`. */
+export type FindDevicePhase =
+  | "unsupported"
+  | "searching"
+  | "found"
+  | "timeout"
+  | "stopped";
+
+// ── Native methods ──────────────────────────────────────────────────────────
+
+export interface FindDeviceNativeMethods {
+  startFindDevice(): Promise<void>;
+  stopFindDevice(): Promise<void>;
+}
+
+// ── Normalizers ─────────────────────────────────────────────────────────────
+
+const FIND_DEVICE_PHASES: readonly FindDevicePhase[] = [
+  "unsupported",
+  "searching",
+  "found",
+  "timeout",
+  "stopped",
+];
+
+export function normalizeFindDeviceStatePayload(value: unknown): {
+  device_id: string;
+  phase: FindDevicePhase;
+  raw_state?: number;
+} {
+  const record = isRecord(value) ? value : {};
+  const phaseRaw = toStringValue(record.phase);
+  const phase: FindDevicePhase = (FIND_DEVICE_PHASES as readonly string[]).includes(
+    phaseRaw,
+  )
+    ? (phaseRaw as FindDevicePhase)
+    : "unsupported";
+  const raw = record.rawState ?? record.raw_state;
+  const raw_state =
+    typeof raw === "number" && Number.isFinite(raw) ? Math.trunc(raw) : undefined;
+  return {
+    device_id: toStringValue(record.deviceId ?? record.device_id),
+    phase,
+    raw_state,
+  };
+}
+
+// ── Capability ──────────────────────────────────────────────────────────────
+
+export class FindDeviceCapability {
+  constructor(private readonly ctx: CapabilityContext<FindDeviceNativeMethods>) {}
+
+  startFindDevice(): Promise<void> {
+    return this.ctx.invoke({
+      invoke: () => this.ctx.native.startFindDevice(),
+    });
+  }
+
+  stopFindDevice(): Promise<void> {
+    return this.ctx.invoke({
+      invoke: () => this.ctx.native.stopFindDevice(),
+    });
+  }
+}

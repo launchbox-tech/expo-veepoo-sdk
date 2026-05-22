@@ -10,7 +10,7 @@ import type {
 } from "@/types/index";
 import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
 import type { LogListener } from "@/veepoo-sdk-module";
-import { EVENT_LOG_SCOPES } from "@/bridge/veepoo-events-registry";
+import { EVENT_LOG_SCOPES } from "@/bridge/event-registry";
 import { normalizeEventPayload } from "@/bridge/event-normalizer";
 import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
 import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
@@ -184,14 +184,6 @@ export class VeepooSDKRuntime {
     return veepooError;
   }
 
-  nativeOpFailed(error: unknown): VeepooError {
-    return this.handleError(
-      error,
-      "OPERATION_FAILED",
-      this.state.connectedDeviceId ?? undefined,
-    );
-  }
-
   setLogEnabled(enabled: boolean): void {
     this.logEnabled = enabled;
     this.log(
@@ -268,6 +260,11 @@ export class VeepooSDKRuntime {
       invoke: <T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> =>
         invokeOrThrow({ ...opts, mapError }),
       emit: (event, payload) => this.emitLocal(event, payload),
+      emitDeviceEvent: (event, payload) =>
+        this.emitLocal(event, {
+          device_id: this.state.connectedDeviceId ?? "",
+          ...payload,
+        }),
       connectedDeviceId: () => this.state.connectedDeviceId,
       setConnectedDeviceId: (id) => this.state.setConnectedDeviceId(id),
       isScanning: () => this.state.isScanning,

@@ -5,7 +5,7 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { DeviceSwitchesCapability } from '@/capabilities/device-switches/index';
+import { DeviceSwitchesCapability } from '@/capabilities/device-switches';
 import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 

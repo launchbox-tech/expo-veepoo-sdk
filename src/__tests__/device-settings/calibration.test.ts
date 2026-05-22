@@ -5,7 +5,7 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { CalibrationCapability } from '@/capabilities/calibration/index';
+import { CalibrationCapability } from '@/capabilities/calibration';
 import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 

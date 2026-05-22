@@ -1,5 +1,5 @@
 import { join } from "path";
-import { NATIVE_EMITTED_EVENTS } from "../bridge/veepoo-events-registry";
+import { NATIVE_EMITTED_EVENTS } from "../bridge/event-registry";
 
 // Use `require("fs")` at call sites (not a top-level `import { existsSync, ... } from "fs"`)
 // so that `jest.spyOn(fs, ...)` from the test file can intercept these calls — destructured

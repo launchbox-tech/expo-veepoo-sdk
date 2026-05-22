@@ -5,7 +5,7 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { WorldClockCapability } from '@/capabilities/world-clock/index';
+import { WorldClockCapability } from '@/capabilities/world-clock';
 import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 

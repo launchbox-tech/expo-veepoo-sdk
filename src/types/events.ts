@@ -1,28 +1,27 @@
-import type { ALL_VEEPOO_EVENTS } from '@/bridge/veepoo-events-registry';
 import type {
   VeepooDevice,
   ConnectionStatus,
   BluetoothStatus,
   PasswordData,
 } from './connection';
-import type { BatteryInfo } from '@/capabilities/battery/types';
-import type { CameraShutterStatus } from '@/capabilities/camera/types';
+import type { BatteryInfo } from '@/capabilities/battery';
+import type { CameraShutterStatus } from '@/capabilities/camera';
 import type { DeviceAlarm, HeartRateAlarm, Spo2Alarm } from '@/capabilities/alarms/types';
-import type { DeviceBTState } from '@/capabilities/bt-status/types';
+import type { DeviceBTState } from '@/capabilities/bt-status';
 import type { DeviceContact } from '@/capabilities/contacts/types';
 import type { DeviceFunctions } from '@/capabilities/device-functions/types';
-import type { DeviceVersion } from '@/capabilities/device-version/types';
-import type { DeviceSwitches } from '@/capabilities/device-switches/types';
-import type { FindDevicePhase } from '@/capabilities/find-device/types';
-import type { MusicRemoteCommand } from '@/capabilities/music/types';
-import type { SocialMsgData } from '@/capabilities/social-msg/types';
-import type { SosCallTimesSettings } from '@/capabilities/sos/types';
+import type { DeviceVersion } from '@/capabilities/device-version';
+import type { DeviceSwitches } from '@/capabilities/device-switches';
+import type { FindDevicePhase } from '@/capabilities/find-device';
+import type { MusicRemoteCommand } from '@/capabilities/music';
+import type { SocialMsgData } from '@/capabilities/social-msg';
+import type { SosCallTimesSettings } from '@/capabilities/sos';
 import type { SportMode } from '@/capabilities/sport-mode/types';
 import type {
   AccurateSleepSession,
   SleepData,
 } from '@/capabilities/sleep-data/types';
-import type { SportStepData } from '@/capabilities/sport-steps/types';
+import type { SportStepData } from '@/capabilities/sport-steps';
 import type {
   HalfHourData,
   OriginData,
@@ -244,12 +243,8 @@ export type VeepooEventPayload = {
 
 export type VeepooEvent = keyof VeepooEventPayload;
 
-// Compile-time parity check: VeepooEventPayload keys must exactly match ALL_VEEPOO_EVENTS.
-// Adding an event to one without the other produces a TypeScript error here.
-type _RegistryParity = [keyof VeepooEventPayload] extends [(typeof ALL_VEEPOO_EVENTS)[number]]
-  ? [(typeof ALL_VEEPOO_EVENTS)[number]] extends [keyof VeepooEventPayload]
-    ? true
-    : never
-  : never;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-declare const _: _RegistryParity;
+// Parity between `VeepooEventPayload` and the runtime event set is enforced
+// in `src/bridge/event-registry.ts` via
+// `EVENT_DEFINITIONS satisfies { [K in VeepooEvent]: EventDef<K> }`.
+// Adding or removing an event in one place without the other is a TS error
+// there — this file does not need a separate runtime-vs-type check.

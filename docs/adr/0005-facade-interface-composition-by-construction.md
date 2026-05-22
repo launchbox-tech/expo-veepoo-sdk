@@ -28,10 +28,19 @@ Architecturally, the **namespaced facade surface** (`sdk.battery.readBattery()`,
 - **Negative:** A consumer wanting to type-narrow ("I only depend on battery") must depend on `BatteryCapability` directly rather than on a `BatteryInterface`. In practice this is the same TypeScript ergonomic — a class type is a valid structural interface.
 - **Negative:** The hand-maintained `VeepooSDKInterface` legacy block (`sdk.readBattery()` and ~80 siblings) remains a manual surface until that delegation block is resolved separately.
 
+## Revised (2026-05-22)
+
+The original Decision retained both **`SubsystemRuntime`** and **`LifecycleRuntime`** in `src/sdk/runtime-interfaces.ts`, on the basis that both `SdkLifecycle` *and* capability contexts depended on them. In practice **capability contexts depend on `CapabilityContext`** (a focused, capability-tailored injection surface), not on `SubsystemRuntime`. `SubsystemRuntime` was only consumed via `LifecycleRuntime extends SubsystemRuntime`, with one downstream consumer (`SdkLifecycle`). The `SubsystemRuntime` chain was a pure pass-through.
+
+`VeepooSDKRuntime.nativeOpFailed(error)` was likewise dead (no callers).
+
+**Change:** Inlined `SubsystemRuntime`'s members into `LifecycleRuntime`; deleted `SubsystemRuntime` and `nativeOpFailed`. The single runtime-injection surface is now `LifecycleRuntime` for the lifecycle and `CapabilityContext` (from `src/capabilities/shared/context.ts`) for capabilities. The decomposition described by the original Decision (capability-class-as-interface) is unchanged.
+
 ## Links
 
 - Superseded issue: GitHub #136 (`docs/issues/0136-refactor-types-per-subsystem-interfaces.md`)
 - Parent PRD: GitHub #130 (`docs/prd/0130-architecture-js-layer-decomposition.md`)
 - Related (still applies): [`ADR 0001`](0001-package-and-module-name.md) — naming kept as-is; speed over branding
-- Runtime interfaces: [`src/sdk/runtime-interfaces.ts`](../../src/sdk/runtime-interfaces.ts)
+- Runtime interface: [`src/sdk/runtime-interfaces.ts`](../../src/sdk/runtime-interfaces.ts)
+- Capability injection surface: [`src/capabilities/shared/context.ts`](../../src/capabilities/shared/context.ts)
 - Facade: [`src/veepoo-sdk.ts`](../../src/veepoo-sdk.ts)

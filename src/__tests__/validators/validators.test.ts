@@ -1,19 +1,19 @@
 import { validateDeviceId, validateConnectOptions, validatePersonalInfo } from '@/capabilities/session/validators';
-import { validateAutoMeasureSetting } from '@/capabilities/auto-measure/validators';
+import { validateAutoMeasureSetting } from '@/capabilities/auto-measure';
 import { validateAlarm, validateDeleteAlarm, validateHeartRateAlarm } from '@/capabilities/alarms/validators';
-import { validateSocialMsgData } from '@/capabilities/social-msg/validators';
+import { validateSocialMsgData } from '@/capabilities/social-msg';
 import { validateScreenLightDurationSeconds, validateScreenLightSettings } from '@/capabilities/screen-light/validators';
-import { validateSedentaryReminderSettings } from '@/capabilities/sedentary-reminder/validators';
-import { validateWristFlipWakeSettings } from '@/capabilities/wrist-flip/validators';
+import { validateSedentaryReminderSettings } from '@/capabilities/sedentary-reminder';
+import { validateWristFlipWakeSettings } from '@/capabilities/wrist-flip';
 import { validateWomenHealthSettings } from '@/capabilities/women-health/validators';
-import { validateFirmwareDfuFilePath } from '@/capabilities/dfu/validators';
-import { validateReadWatchFaceStyleOptions, validateWatchFaceStyleSettings } from '@/capabilities/watch-face/validators';
-import { validateDeviceTime } from '@/capabilities/device-time/validators';
+import { validateFirmwareDfuFilePath } from '@/capabilities/dfu';
+import { validateReadWatchFaceStyleOptions, validateWatchFaceStyleSettings } from '@/capabilities/watch-face';
+import { validateDeviceTime } from '@/capabilities/device-time';
 import { validateWeatherSettings, validateWeatherData } from '@/capabilities/weather/validators';
 import { validateNewContact, validateContactId } from '@/capabilities/contacts/validators';
-import { validateSosCallTimes } from '@/capabilities/sos/validators';
-import { validateMusicData } from '@/capabilities/music/validators';
-import { validateGPSAndTimezoneData } from '@/capabilities/gps-timezone/validators';
+import { validateSosCallTimes } from '@/capabilities/sos';
+import { validateMusicData } from '@/capabilities/music';
+import { validateGPSAndTimezoneData } from '@/capabilities/gps-timezone';
 
 function expectInvalidArgument(fn: () => void, fieldHint?: string): void {
   let thrown: unknown;

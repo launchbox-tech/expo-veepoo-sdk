@@ -12,8 +12,7 @@ export class SportModeCapability {
     return this.ctx.invoke({
       invoke: () => this.ctx.native.readSportMode(),
       normalize: normalizeSportModeStatus,
-      afterSuccess: (result) =>
-        this.ctx.emit("sport_mode_data", { device_id: this.ctx.connectedDeviceId() ?? "", mode: result.mode }),
+      afterSuccess: (result) => this.ctx.emitDeviceEvent("sport_mode_data", { mode: result.mode }),
     });
   }
 

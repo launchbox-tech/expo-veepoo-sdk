@@ -13,7 +13,7 @@ import {
   JS_EXPOSED_NATIVE_EVENTS,
   JS_LOCAL_ONLY_EVENTS,
   ALL_VEEPOO_EVENTS,
-} from "@/bridge/veepoo-events-registry";
+} from "@/bridge/event-registry";
 
 const repoRoot = join(__dirname, "..", "..");
 

@@ -6,9 +6,9 @@ jest.mock('react-native', () => ({
 }));
 
 import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
-import { PersonalInfoCapability } from '@/capabilities/personal-info/index';
-import { AutoMeasureCapability } from '@/capabilities/auto-measure/index';
-import { SedentaryReminderCapability } from '@/capabilities/sedentary-reminder/index';
+import { PersonalInfoCapability } from '@/capabilities/personal-info';
+import { AutoMeasureCapability } from '@/capabilities/auto-measure';
+import { SedentaryReminderCapability } from '@/capabilities/sedentary-reminder';
 import { WomenHealthCapability } from '@/capabilities/women-health/index';
 import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 import type { AutoMeasureSetting, PersonalInfo, SedentaryReminderSettings, WomenHealthSettings } from '@/types/index';

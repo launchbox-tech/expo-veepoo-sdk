@@ -8,7 +8,6 @@ export class VeepooSdkState {
   private initialized = false;
   private scanning = false;
   private deviceId: string | null = null;
-  private readonly originProgressByDevice = new Map<string, number>();
 
   get isInitialized(): boolean {
     return this.initialized;
@@ -32,22 +31,6 @@ export class VeepooSdkState {
 
   setConnectedDeviceId(id: string | null): void {
     this.deviceId = id;
-  }
-
-  getLastReadOriginProgress(deviceId: string): number | undefined {
-    return this.originProgressByDevice.get(deviceId);
-  }
-
-  recordReadOriginProgress(deviceId: string, value: number): void {
-    this.originProgressByDevice.set(deviceId, value);
-  }
-
-  clearReadOriginProgressForDevice(deviceId: string): void {
-    this.originProgressByDevice.delete(deviceId);
-  }
-
-  clearAllReadOriginProgress(): void {
-    this.originProgressByDevice.clear();
   }
 
   // ── Session transition methods ───────────────────────────────────────
@@ -89,11 +72,10 @@ export class VeepooSdkState {
     }
   }
 
-  /** Clears connection/session scan fields and origin-read dedup map (e.g. destroy). */
+  /** Clears connection/session scan fields (e.g. destroy). */
   reset(): void {
     this.initialized = false;
     this.scanning = false;
     this.deviceId = null;
-    this.originProgressByDevice.clear();
   }
 }

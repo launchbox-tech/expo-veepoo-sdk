@@ -6,7 +6,7 @@ jest.mock('react-native', () => ({
 }));
 
 import { ContactsCapability } from '@/capabilities/contacts/index';
-import { SosCapability } from '@/capabilities/sos/index';
+import { SosCapability } from '@/capabilities/sos';
 import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 

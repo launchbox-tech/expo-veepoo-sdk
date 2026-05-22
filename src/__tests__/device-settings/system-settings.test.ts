@@ -5,12 +5,12 @@ jest.mock('react-native', () => ({
   Platform: { OS: 'ios' },
 }));
 
-import { LanguageCapability } from '@/capabilities/language/index';
-import { DeviceTimeCapability } from '@/capabilities/device-time/index';
-import { GpsTimezoneCapability } from '@/capabilities/gps-timezone/index';
-import { BtStatusCapability } from '@/capabilities/bt-status/index';
+import { LanguageCapability } from '@/capabilities/language';
+import { DeviceTimeCapability } from '@/capabilities/device-time';
+import { GpsTimezoneCapability } from '@/capabilities/gps-timezone';
+import { BtStatusCapability } from '@/capabilities/bt-status';
 import { WeatherCapability } from '@/capabilities/weather/index';
-import { DfuCapability } from '@/capabilities/dfu/index';
+import { DfuCapability } from '@/capabilities/dfu';
 import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
 import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 

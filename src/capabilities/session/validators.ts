@@ -1,7 +1,7 @@
 import type { ConnectOptions } from "@/types/index";
 import { requireNonEmptyString, requireInRange, requireValidHour, requireValidMinute } from "@/shared/assertions";
 
-export { validatePersonalInfo } from "@/capabilities/personal-info/validators";
+export { validatePersonalInfo } from "@/capabilities/personal-info";
 
 export function validateDeviceId(deviceId: unknown): asserts deviceId is string {
   requireNonEmptyString(deviceId, 'deviceId');
