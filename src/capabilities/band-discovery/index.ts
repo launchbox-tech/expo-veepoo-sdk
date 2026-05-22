@@ -1,4 +1,3 @@
-import { invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { BandDiscoveryNativeMethods } from "./native";
 import { normalizePermissionsResult } from "./normalizers";
@@ -8,12 +7,10 @@ export class BandDiscoveryCapability {
   constructor(private readonly ctx: CapabilityContext<BandDiscoveryNativeMethods>) {}
 
   async checkBluetoothStatus(): Promise<boolean> {
-    return invokeWithRecovery({
+    return this.ctx.invokeWithRecovery({
       invoke: () => this.ctx.native.isBluetoothEnabled(),
-      recover: (error: unknown) => {
-        this.ctx.mapError(error, { code: "UNKNOWN" });
-        return false;
-      },
+      errorCode: "UNKNOWN",
+      recoverWith: false,
       afterSuccess: (enabled: boolean) => {
         this.ctx.log("debug", "bluetooth", "bluetooth.check", "Checked Bluetooth status", {
           data: { enabled },
@@ -23,13 +20,11 @@ export class BandDiscoveryCapability {
   }
 
   async requestPermissions(): Promise<PermissionsResult> {
-    return invokeWithRecovery({
+    return this.ctx.invokeWithRecovery({
       invoke: () => this.ctx.native.requestPermissions(),
       normalize: normalizePermissionsResult,
-      recover: (error: unknown) => {
-        this.ctx.mapError(error, { code: "PERMISSION_DENIED" });
-        return { granted: false, status: "denied", canAskAgain: true };
-      },
+      errorCode: "PERMISSION_DENIED",
+      recoverWith: { granted: false, status: "denied", can_ask_again: true },
       afterSuccess: (result: PermissionsResult) => {
         this.ctx.log("info", "permissions", "permissions.request", "Requested Bluetooth permissions", {
           data: result,

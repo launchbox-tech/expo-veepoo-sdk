@@ -11,7 +11,7 @@ import type {
 } from "@/types/index";
 import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
 import { EVENT_LOG_SCOPES, normalizeEventPayload } from "@/bridge/event-registry";
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import { invokeOrThrow, invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
 import { mapNativeRejection } from "@/errors/map-native-rejection";
 import { VeepooSdkState } from "./veepoo-sdk-state";
 import { OriginReadPipeline } from "@/bridge/origin-read-pipeline";
@@ -19,6 +19,7 @@ import { EventBus } from "@/bridge/event-bus";
 import type {
   CapabilityContext,
   CapabilityInvokeOpts,
+  CapabilityRecoveryOpts,
 } from "@/capabilities/shared/context";
 
 /**
@@ -269,10 +270,10 @@ export class VeepooSDKRuntime {
   }
 
   createCapabilityContext(): CapabilityContext<NativeVeepooSDKInterface> {
-    const mapError: CapabilityContext<NativeVeepooSDKInterface>["mapError"] = (
-      error,
-      opts,
-    ) =>
+    const mapError = (
+      error: unknown,
+      opts?: { code?: VeepooError["code"]; deviceId?: string },
+    ): VeepooError =>
       this.handleError(
         error,
         opts?.code ?? "OPERATION_FAILED",
@@ -280,13 +281,22 @@ export class VeepooSDKRuntime {
       );
     return {
       native: this.native,
-      mapError,
       invoke: <T>(opts: CapabilityInvokeOpts<T>): Promise<T> => {
         const { errorCode, errorDeviceId, ...rest } = opts;
         return invokeOrThrow({
           ...rest,
           mapError: (error: unknown) =>
             mapError(error, { code: errorCode, deviceId: errorDeviceId }),
+        });
+      },
+      invokeWithRecovery: <T>(opts: CapabilityRecoveryOpts<T>): Promise<T> => {
+        const { errorCode, errorDeviceId, recoverWith, ...rest } = opts;
+        return invokeWithRecovery({
+          ...rest,
+          recover: (error: unknown) => {
+            mapError(error, { code: errorCode, deviceId: errorDeviceId });
+            return recoverWith;
+          },
         });
       },
       emit: (event, payload) => this.emitLocal(event, payload),

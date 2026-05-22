@@ -1,4 +1,3 @@
-import { invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { SessionNativeMethods } from "./native";
 import { normalizePasswordData } from "./normalizers";
@@ -45,12 +44,11 @@ export class SessionCapability {
     const id = deviceId || this.ctx.connectedDeviceId();
     if (!id) return "disconnected";
 
-    return invokeWithRecovery({
+    return this.ctx.invokeWithRecovery({
       invoke: () => this.ctx.native.getConnectionStatus(id),
-      recover: (error: unknown) => {
-        this.ctx.mapError(error, { code: "UNKNOWN", deviceId: id });
-        return "disconnected";
-      },
+      errorCode: "UNKNOWN",
+      errorDeviceId: id,
+      recoverWith: "disconnected",
       afterSuccess: (status: ConnectionStatus) => {
         this.ctx.log("debug", "connection", "connection.status", "Fetched connection status", {
           deviceId: id,

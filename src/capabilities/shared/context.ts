@@ -1,8 +1,10 @@
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
+import type {
+  RecoveringInvoke,
+  ThrowingInvoke,
+} from "@/bridge/native-invoke-pipeline";
 import type {
   LogLevel,
   LogScope,
-  VeepooError,
   VeepooErrorCode,
   VeepooEvent,
   VeepooEventPayload,
@@ -19,6 +21,17 @@ export type CapabilityInvokeOpts<T> = Omit<ThrowingInvoke<T>, "mapError"> & {
 };
 
 /**
+ * Recovering variant of {@link CapabilityInvokeOpts}: on failure the
+ * `VeepooError` is still emitted/logged through the runtime's error pipeline,
+ * but the operation resolves with `recoverWith` instead of throwing.
+ */
+export type CapabilityRecoveryOpts<T> = Omit<RecoveringInvoke<T>, "recover"> & {
+  errorCode?: VeepooErrorCode;
+  errorDeviceId?: string;
+  recoverWith: T;
+};
+
+/**
  * Events whose payload includes a `device_id: string` envelope. Capability
  * emit sites should use `emitDeviceEvent` for these so the bridge injects
  * `device_id` from `connectedDeviceId()` in one place instead of every
@@ -30,15 +43,20 @@ export type DeviceScopedEvent = {
 
 export interface CapabilityContext<TNative> {
   native: TNative;
-  /** Maps a native rejection to VeepooError. Defaults to OPERATION_FAILED + connectedDeviceId. */
-  mapError: (error: unknown, opts?: { code?: VeepooError["code"]; deviceId?: string }) => VeepooError;
   /**
-   * Runs the native-invoke pipeline with the context's default `mapError`.
-   * Pass `errorCode` / `errorDeviceId` to override the defaults
-   * (`OPERATION_FAILED` and `state.connectedDeviceId`) for this operation —
-   * the only way capabilities should reach the error pipeline.
+   * Runs the native-invoke pipeline. Failures are mapped through the
+   * runtime's error handler (logged + emitted as `error` event) and thrown
+   * to the caller. Pass `errorCode` / `errorDeviceId` to override the
+   * defaults (`OPERATION_FAILED` and `state.connectedDeviceId`) — the only
+   * way capabilities should reach the throwing error pipeline.
    */
   invoke: <T>(opts: CapabilityInvokeOpts<T>) => Promise<T>;
+  /**
+   * Like {@link invoke}, but on failure the error is logged and a
+   * `recoverWith` value is returned instead of throwing. Use for operations
+   * where a safe default exists and partial results are valid.
+   */
+  invokeWithRecovery: <T>(opts: CapabilityRecoveryOpts<T>) => Promise<T>;
   /**
    * Emit a JS-local event. Use for envelope-less events (e.g. `scan_started`).
    * Prefer `emitDeviceEvent` for any event whose payload includes `device_id`.
