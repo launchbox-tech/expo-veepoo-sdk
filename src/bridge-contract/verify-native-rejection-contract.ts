@@ -1,4 +1,4 @@
-import { ALLOWED_NATIVE_REJECT_CODES } from "@/errors/native-rejection-mapping";
+import { ALLOWED_NATIVE_REJECT_CODES } from "../errors/native-rejection-mapping";
 
 import { extractNativeRejectCodes } from "./extract-native-reject-codes";
 

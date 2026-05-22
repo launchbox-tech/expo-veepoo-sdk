@@ -4,7 +4,7 @@ export default defineConfig({
   entry: [
     'src/index.ts',
     'src/plugin/index.ts',
-    'src/bridge-contract/cli-check-upstream-sdk.ts',
+    'src/bridge-contract/run-contract-checks.ts',
   ],
   format: 'cjs',
   outDir: 'build',
