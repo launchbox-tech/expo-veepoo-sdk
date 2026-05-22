@@ -1,4 +1,13 @@
-import { normalizeDeviceBTState, normalizeDeviceBTStatus } from './bt-status';
+jest.mock('expo-modules-core', () => ({
+  requireNativeModule: jest.fn().mockReturnValue({}),
+}));
+jest.mock('react-native', () => ({
+  Platform: { OS: 'ios' },
+}));
+
+import { BtStatusCapability, normalizeDeviceBTState, normalizeDeviceBTStatus } from '@/capabilities/bt-status';
+import { VeepooSDKRuntime } from '@/sdk/veepoo-sdk-runtime';
+import { makeMockNative, type MockNative } from '@/__tests__/helpers/mock-native';
 
 describe('normalizeDeviceBTState', () => {
   it('maps 0 to disconnected', () => {
@@ -53,5 +62,31 @@ describe('normalizeDeviceBTStatus', () => {
     const result = normalizeDeviceBTStatus(null);
     expect(result.is_bt_open).toBe(false);
     expect(result.state).toBe('disconnected');
+  });
+});
+
+describe('BtStatusCapability', () => {
+  let native: MockNative;
+  let runtime: VeepooSDKRuntime;
+  let btStatus: BtStatusCapability;
+
+  beforeEach(() => {
+    native = makeMockNative();
+    runtime = new VeepooSDKRuntime(native);
+    btStatus = new BtStatusCapability(runtime.createCapabilityContext());
+  });
+
+  it('readDeviceBTStatus delegates to native', async () => {
+    native.readDeviceBTStatus.mockResolvedValueOnce({ btState: 1, classicBtEnabled: true });
+
+    await btStatus.readDeviceBTStatus();
+
+    expect(native.readDeviceBTStatus).toHaveBeenCalledTimes(1);
+  });
+
+  it('setDeviceBTSwitch(true) delegates to native', async () => {
+    await btStatus.setDeviceBTSwitch(true);
+
+    expect(native.setDeviceBTSwitch).toHaveBeenCalledWith(true);
   });
 });
