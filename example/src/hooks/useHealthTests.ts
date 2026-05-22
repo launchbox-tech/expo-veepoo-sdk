@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useVeepooSDK, useIsSessionReady, RealtimeTest } from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK, useSDKState, RealtimeTest } from "@gaozh1024/expo-veepoo-sdk";
 import type {
   BloodGlucoseData,
   BloodOxygenTestResult,
@@ -102,7 +102,7 @@ export function useHealthTests(): {
   stopBodyComposition: () => Promise<void>;
 } {
   const { sdk } = useVeepooSDK();
-  const isReady = useIsSessionReady();
+  const isReady = useSDKState((s) => s.isReady);
   const [hrResult, setHrResult] = useState<HeartRateTestResult | null>(null);
   const [bpResult, setBpResult] = useState<BloodPressureTestResult | null>(null);
   const [spo2Result, setSpo2Result] = useState<BloodOxygenTestResult | null>(null);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useVeepooSDK, useIsSessionReady } from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK, useSDKState } from '@gaozh1024/expo-veepoo-sdk';
 import type { ReadOriginProgress, SleepData, SportStepData } from '@gaozh1024/expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
 
@@ -11,7 +11,7 @@ export function useDataSync(): {
   syncData: () => Promise<void>;
 } {
   const { sdk } = useVeepooSDK();
-  const isReady = useIsSessionReady();
+  const isReady = useSDKState((s) => s.isReady);
   const [dataSyncing, setDataSyncing] = useState(false);
   const [dataSyncProgress, setDataSyncProgress] = useState<ReadOriginProgress | null>(null);
   const [sleepSummary, setSleepSummary] = useState<SleepData['summary'] | null>(null);

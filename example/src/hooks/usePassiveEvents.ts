@@ -1,4 +1,4 @@
-import { useIsSessionReady } from '@gaozh1024/expo-veepoo-sdk';
+import { useSDKState } from '@gaozh1024/expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
 
 function clipJson(payload: unknown, max = 160): string {
@@ -17,7 +17,7 @@ function clipJson(payload: unknown, max = 160): string {
 export function usePassiveEvents(
   appendLog: (line: string) => void,
 ): void {
-  const isReady = useIsSessionReady();
+  const isReady = useSDKState((s) => s.isReady);
 
   function log(name: string, payload: unknown) {
     appendLog(`${name} ${clipJson(payload)}`);

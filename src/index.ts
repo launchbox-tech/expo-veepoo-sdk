@@ -112,11 +112,6 @@ export {
   VeepooSDKProvider,
   useVeepooSDK,
   useSDKState,
-  useIsConnected,
-  useIsSessionReady,
-  useIsScanning,
-  useConnectedDeviceId,
-  useSDKInitialized,
 } from './react/index';
 export type { SDKStateSnapshot } from './react/index';
 

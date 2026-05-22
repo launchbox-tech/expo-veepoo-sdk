@@ -130,18 +130,16 @@ All hooks must be called inside `<VeepooSDKProvider>`.
 | --- | --- | --- |
 | `useVeepooSDK()` | `{ sdk, status, error }` | SDK instance, current state snapshot, and last error |
 | `useSDKState(selector)` | `T` | Reactive selector over the SDK state snapshot |
-| `useIsSessionReady()` | `boolean` | `true` when connected and Band is ready |
-| `useIsConnected()` | `boolean` | `true` when BLE connection is established |
-| `useIsScanning()` | `boolean` | `true` while Band Discovery is active |
-| `useConnectedDeviceId()` | `string \| null` | ID of the currently connected Band |
-| `useSDKInitialized()` | `boolean` | `true` after `sdk.init()` resolves |
 
-`useSDKState` accepts a selector function and re-renders only when the selected value changes:
+`useSDKState` accepts a selector function and re-renders only when the selected value changes. Use it for any flag, field, or computation against `SDKStateSnapshot`:
 
 ```ts
 import { useSDKState } from '@gaozh1024/expo-veepoo-sdk';
 
 const isReady = useSDKState(s => s.isReady);
+const isConnected = useSDKState(s => s.isConnected);
+const isScanning = useSDKState(s => s.isScanning);
+const initialized = useSDKState(s => s.initialized);
 const deviceId = useSDKState(s => s.connectedDeviceId);
 ```
 
