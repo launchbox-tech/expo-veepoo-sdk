@@ -12,7 +12,6 @@ export class OriginDataCapability {
       normalize: normalizeOriginDataList,
       afterSuccess: (result) => {
         this.ctx.log("debug", "read", "read.origin.result", "Origin data received", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: { dayOffset, count: result.length },
         });
       },

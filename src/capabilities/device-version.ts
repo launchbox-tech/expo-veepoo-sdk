@@ -43,7 +43,6 @@ export class DeviceVersionCapability {
       normalize: normalizeDeviceVersion,
       afterSuccess: (result) => {
         this.ctx.log("debug", "device", "device.version.read", "Device version received", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: result,
         });
       },

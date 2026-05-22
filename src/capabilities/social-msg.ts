@@ -88,7 +88,6 @@ export class SocialMsgCapability {
       normalize: normalizeSocialMsgData,
       afterSuccess: (result) => {
         this.ctx.log("debug", "device", "device.social.read", "Social message settings received", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: result,
         });
       },

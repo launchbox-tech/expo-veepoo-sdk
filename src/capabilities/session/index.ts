@@ -62,7 +62,6 @@ export class SessionCapability {
 
   async verifyPassword(password: string = "0000", is24Hour: boolean = false): Promise<PasswordData> {
     this.ctx.log("info", "connection", "password.verify.start", "Verifying device password", {
-      deviceId: this.ctx.connectedDeviceId() ?? undefined,
       data: { is24Hour },
     });
     return this.ctx.invoke({
@@ -70,7 +69,6 @@ export class SessionCapability {
       normalize: normalizePasswordData,
       afterSuccess: (result: PasswordData) => {
         this.ctx.log("info", "connection", "password.verify.result", "Device password verified", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: {
             status: result.status,
             device_number: result.device_number,

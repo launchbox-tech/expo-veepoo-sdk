@@ -12,7 +12,6 @@ export class SleepDataCapability {
       normalize: normalizeSleepDataList,
       afterSuccess: (result) => {
         this.ctx.log("debug", "read", "read.sleep.result", "Sleep data received", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: { date, count: result.length },
         });
       },

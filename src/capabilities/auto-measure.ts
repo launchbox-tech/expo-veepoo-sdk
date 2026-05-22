@@ -70,7 +70,6 @@ export class AutoMeasureCapability {
       normalize: normalizeAutoMeasureSettings,
       afterSuccess: (result) => {
         this.ctx.log("debug", "device", "autoMeasure.read", "Auto measure settings received", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: { count: result.length },
         });
       },
@@ -82,7 +81,6 @@ export class AutoMeasureCapability {
       validate: () => {
         validateAutoMeasureSetting(setting);
         this.ctx.log("info", "device", "autoMeasure.modify.start", "Modifying auto measure settings", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: setting,
         });
       },
@@ -90,7 +88,6 @@ export class AutoMeasureCapability {
       normalize: normalizeAutoMeasureSettings,
       afterSuccess: (result) => {
         this.ctx.log("info", "device", "autoMeasure.modify.result", "Auto measure settings updated", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: { count: result.length },
         });
       },

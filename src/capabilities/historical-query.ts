@@ -128,7 +128,6 @@ export class HistoricalQueryCapability {
 
   startReadOriginData(): Promise<void> {
     this.ctx.log("info", "read", "read.origin.start", "Starting origin data read", {
-      deviceId: this.ctx.connectedDeviceId() ?? undefined,
     });
     return this.ctx.invoke({
       invoke: () => this.ctx.native.startReadOriginData(),

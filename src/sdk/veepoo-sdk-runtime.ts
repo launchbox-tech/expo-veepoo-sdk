@@ -311,7 +311,11 @@ export class VeepooSDKRuntime {
       isScanning: () => this.state.isScanning,
       setScanning: (v) => this.state.setScanning(v),
       log: (level, scope, action, message, options) =>
-        this.log(level, scope, action, message, options),
+        this.log(level, scope, action, message, {
+          ...options,
+          deviceId:
+            options?.deviceId ?? this.state.connectedDeviceId ?? undefined,
+        }),
     };
   }
 }

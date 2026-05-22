@@ -77,7 +77,6 @@ export class DaySummaryCapability {
       normalize: normalizeDaySummaryData,
       afterSuccess: (result) => {
         this.ctx.log("debug", "read", "read.summary.result", "Day summary data received", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: { dayOffset, date: result.date },
         });
       },

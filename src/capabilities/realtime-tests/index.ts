@@ -62,7 +62,6 @@ export class RealtimeTestsCapability {
   private runTest(modality: RealtimeTestModality, direction: Direction): Promise<void> {
     const label = `test.${modality}.${direction}`;
     this.ctx.log("info", "test", label, `${direction === "start" ? "Starting" : "Stopping"} ${modality} test`, {
-      deviceId: this.ctx.connectedDeviceId() ?? undefined,
     });
     return this.ctx.invoke({
       invoke: () => this.dispatch[modality][direction](),
@@ -79,7 +78,6 @@ export class RealtimeTestsCapability {
 
   async startEcgTest(options?: EcgTestOptions): Promise<void> {
     this.ctx.log("info", "test", "test.ecg.start", "Starting ECG test", {
-      deviceId: this.ctx.connectedDeviceId() ?? undefined,
       data: options,
     });
     await this.ctx.invoke({
@@ -89,7 +87,6 @@ export class RealtimeTestsCapability {
 
   stopEcgTest(): Promise<void> {
     this.ctx.log("info", "test", "test.ecg.stop", "Stopping ECG test", {
-      deviceId: this.ctx.connectedDeviceId() ?? undefined,
     });
     return this.ctx.invoke({
       invoke: () => this.ctx.native.stopEcgTest(),

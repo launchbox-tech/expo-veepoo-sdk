@@ -39,7 +39,6 @@ export class SportStepsCapability {
       normalize: normalizeSportStepData,
       afterSuccess: (result) => {
         this.ctx.log("debug", "read", "read.sport.result", "Sport step data received", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: result,
         });
       },

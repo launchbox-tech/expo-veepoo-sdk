@@ -12,7 +12,6 @@ export class DeviceFunctionsCapability {
       normalize: normalizeDeviceFunctions,
       afterSuccess: (result) => {
         this.ctx.log("debug", "device", "device.functions.read", "Device functions received", {
-          deviceId: this.ctx.connectedDeviceId() ?? undefined,
           data: result,
         });
       },
