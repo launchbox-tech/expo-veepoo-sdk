@@ -6,7 +6,7 @@ import { NATIVE_EMITTED_EVENTS } from "../bridge/event-registry";
 // imports get bound once at module load and bypass later spies under Bun's loader.
 type FsApi = Pick<typeof import("fs"), "existsSync" | "readFileSync">;
 function fs(): FsApi {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   return require("fs") as FsApi;
 }
 
