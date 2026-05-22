@@ -121,11 +121,13 @@ jobs:
             file=/tmp/native-test-deps/$(basename "$spec")
             [ -f "$file" ] || curl -sSL "https://repo1.maven.org/maven2/$spec" -o "$file"
           done
-          export PATH="$HOME/.kotlinc-2.0.21/kotlinc/bin:$PATH"
+          KOTLINC=$HOME/.kotlinc-2.0.21/kotlinc
+          KOTLIN_STDLIB=$KOTLINC/lib/kotlin-stdlib.jar
+          export PATH="$KOTLINC/bin:$PATH"
           kotlinc -cp /tmp/native-test-deps/junit-4.13.2.jar \
             android/src/test/kotlin/expo/modules/veepoo/AsyncFunctionSurfaceTest.kt \
             -d /tmp/native-async-surface-test.jar
-          java -cp /tmp/native-async-surface-test.jar:/tmp/native-test-deps/junit-4.13.2.jar:/tmp/native-test-deps/hamcrest-core-1.3.jar \
+          java -cp "/tmp/native-async-surface-test.jar:/tmp/native-test-deps/junit-4.13.2.jar:/tmp/native-test-deps/hamcrest-core-1.3.jar:$KOTLIN_STDLIB" \
             org.junit.runner.JUnitCore expo.modules.veepoo.AsyncFunctionSurfaceTest
 
       - name: Upload coverage report
