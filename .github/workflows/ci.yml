@@ -88,6 +88,46 @@ jobs:
         env:
           CI: true
 
+      - name: Set up JDK (for Kotlin native-surface test)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Kotlin compiler
+        id: cache-kotlinc
+        uses: actions/cache@v5
+        with:
+          path: ~/.kotlinc-2.0.21
+          key: kotlinc-2.0.21
+
+      - name: Install Kotlin compiler
+        if: steps.cache-kotlinc.outputs.cache-hit != 'true'
+        run: |
+          curl -sSL https://github.com/JetBrains/kotlin/releases/download/v2.0.21/kotlin-compiler-2.0.21.zip -o /tmp/kotlinc.zip
+          mkdir -p ~/.kotlinc-2.0.21
+          unzip -q /tmp/kotlinc.zip -d ~/.kotlinc-2.0.21
+
+      - name: Run Kotlin AsyncFunction surface test
+        # JVM-only smoke test: compiles + runs the Kotlin scaffold in
+        # android/src/test against junit. No Android SDK, no vendor frameworks,
+        # no Gradle wrapper. Mirrors the JS test as a per-platform sanity
+        # check so a future Kotlin refactor that drops a method fails here too.
+        run: |
+          mkdir -p /tmp/native-test-deps
+          for spec in \
+            'junit/junit/4.13.2/junit-4.13.2.jar' \
+            'org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar'; do
+            file=/tmp/native-test-deps/$(basename "$spec")
+            [ -f "$file" ] || curl -sSL "https://repo1.maven.org/maven2/$spec" -o "$file"
+          done
+          export PATH="$HOME/.kotlinc-2.0.21/kotlinc/bin:$PATH"
+          kotlinc -cp /tmp/native-test-deps/junit-4.13.2.jar \
+            android/src/test/kotlin/expo/modules/veepoo/AsyncFunctionSurfaceTest.kt \
+            -d /tmp/native-async-surface-test.jar
+          java -cp /tmp/native-async-surface-test.jar:/tmp/native-test-deps/junit-4.13.2.jar:/tmp/native-test-deps/hamcrest-core-1.3.jar \
+            org.junit.runner.JUnitCore expo.modules.veepoo.AsyncFunctionSurfaceTest
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v5
         if: always()
