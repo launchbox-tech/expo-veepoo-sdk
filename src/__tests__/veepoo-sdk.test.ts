@@ -49,8 +49,8 @@ describe('VeepooSDK', () => {
 
     it('destroy() resets all state fields', async () => {
       await sdk.init();
-      await sdk.connect('device-1');
-      await sdk.startScan();
+      await sdk.session.connect('device-1');
+      await sdk.discovery.startScan();
       sdk.destroy();
       expect(sdk.isSDKInitialized()).toBe(false);
       expect(sdk.isScanningActive()).toBe(false);
@@ -79,32 +79,32 @@ describe('VeepooSDK', () => {
     beforeEach(async () => { await sdk.init(); });
 
     it('startScan() calls native.startScan and sets isScanningActive', async () => {
-      await sdk.startScan();
+      await sdk.discovery.startScan();
       expect(native.startScan).toHaveBeenCalledTimes(1);
       expect(sdk.isScanningActive()).toBe(true);
     });
 
     it('startScan() is idempotent when already scanning', async () => {
-      await sdk.startScan();
-      await sdk.startScan();
+      await sdk.discovery.startScan();
+      await sdk.discovery.startScan();
       expect(native.startScan).toHaveBeenCalledTimes(1);
     });
 
     it('startScan() clears isScanningActive on native error', async () => {
       native.startScan.mockRejectedValueOnce(new Error('BT error'));
-      await expect(sdk.startScan()).rejects.toBeDefined();
+      await expect(sdk.discovery.startScan()).rejects.toBeDefined();
       expect(sdk.isScanningActive()).toBe(false);
     });
 
     it('stopScan() calls native.stopScan and clears isScanningActive', async () => {
-      await sdk.startScan();
-      await sdk.stopScan();
+      await sdk.discovery.startScan();
+      await sdk.discovery.stopScan();
       expect(native.stopScan).toHaveBeenCalledTimes(1);
       expect(sdk.isScanningActive()).toBe(false);
     });
 
     it('stopScan() is idempotent when not scanning', async () => {
-      await sdk.stopScan();
+      await sdk.discovery.stopScan();
       expect(native.stopScan).not.toHaveBeenCalled();
     });
   });
@@ -114,7 +114,7 @@ describe('VeepooSDK', () => {
     beforeEach(async () => { await sdk.init(); });
 
     it('connect(id) calls native.connect and stores connectedDeviceId', async () => {
-      await sdk.connect('device-1');
+      await sdk.session.connect('device-1');
       expect(native.connect).toHaveBeenCalledWith('device-1', undefined);
       expect(sdk.getConnectedDeviceId()).toBe('device-1');
     });
@@ -123,7 +123,7 @@ describe('VeepooSDK', () => {
       native.connect.mockRejectedValueOnce(new Error('conn failed'));
       const errorListener = jest.fn();
       sdk.on('error', errorListener);
-      await expect(sdk.connect('device-1')).rejects.toBeDefined();
+      await expect(sdk.session.connect('device-1')).rejects.toBeDefined();
       expect(errorListener).toHaveBeenCalledWith(
         expect.objectContaining({ code: 'CONNECTION_FAILED' })
       );
@@ -135,7 +135,7 @@ describe('VeepooSDK', () => {
       );
       const errorListener = jest.fn();
       sdk.on('error', errorListener);
-      await expect(sdk.connect('device-1')).rejects.toMatchObject({
+      await expect(sdk.session.connect('device-1')).rejects.toMatchObject({
         code: 'CONNECTION_FAILED',
       });
       expect(errorListener).toHaveBeenCalledWith(
@@ -144,9 +144,9 @@ describe('VeepooSDK', () => {
     });
 
     it('handshake path: scan → connect → verifyPassword', async () => {
-      await sdk.startScan();
-      await sdk.connect('band-1');
-      const pwd = await sdk.verifyPassword('0000', false);
+      await sdk.discovery.startScan();
+      await sdk.session.connect('band-1');
+      const pwd = await sdk.session.verifyPassword('0000', false);
       expect(pwd.status).toBe('CHECK_SUCCESS');
       expect(native.startScan).toHaveBeenCalled();
       expect(native.connect).toHaveBeenCalledWith('band-1', undefined);
@@ -154,33 +154,33 @@ describe('VeepooSDK', () => {
     });
 
     it('disconnect(id) calls native.disconnect with the given ID', async () => {
-      await sdk.connect('device-1');
-      await sdk.disconnect('device-1');
+      await sdk.session.connect('device-1');
+      await sdk.session.disconnect('device-1');
       expect(native.disconnect).toHaveBeenCalledWith('device-1');
     });
 
     it('disconnect() falls back to stored connectedDeviceId and clears it', async () => {
-      await sdk.connect('device-1');
-      await sdk.disconnect();
+      await sdk.session.connect('device-1');
+      await sdk.session.disconnect();
       expect(native.disconnect).toHaveBeenCalledWith('device-1');
       expect(sdk.getConnectedDeviceId()).toBeNull();
     });
 
     it('disconnect() is a no-op when no Band is connected', async () => {
-      await sdk.disconnect();
+      await sdk.session.disconnect();
       expect(native.disconnect).not.toHaveBeenCalled();
     });
 
     it('getConnectionStatus() returns disconnected when no Band ID is available', async () => {
-      const status = await sdk.getConnectionStatus();
+      const status = await sdk.session.getConnectionStatus();
       expect(status).toBe('disconnected');
       expect(native.getConnectionStatus).not.toHaveBeenCalled();
     });
 
     it('getConnectionStatus() delegates to native when Band ID is available', async () => {
-      await sdk.connect('device-1');
+      await sdk.session.connect('device-1');
       native.getConnectionStatus.mockResolvedValueOnce('connected');
-      const status = await sdk.getConnectionStatus();
+      const status = await sdk.session.getConnectionStatus();
       expect(native.getConnectionStatus).toHaveBeenCalledWith('device-1');
       expect(status).toBe('connected');
     });
@@ -276,7 +276,7 @@ describe('VeepooSDK', () => {
     });
 
     it('bluetoothStateChanged { isScanning: false } clears isScanningActive', async () => {
-      await sdk.startScan();
+      await sdk.discovery.startScan();
       native._emit('bluetoothStateChanged', {
         state: 5, authorization: 3, isScanning: false, pendingScanStart: false,
       });
@@ -289,7 +289,7 @@ describe('VeepooSDK', () => {
     });
 
     it('deviceDisconnected clears connectedDeviceId and isScanningActive', async () => {
-      await sdk.startScan();
+      await sdk.discovery.startScan();
       native._emit('deviceConnected', { deviceId: 'device-99' });
       native._emit('deviceDisconnected', { deviceId: 'device-99' });
       expect(sdk.getConnectedDeviceId()).toBeNull();
@@ -355,7 +355,7 @@ describe('VeepooSDK', () => {
       native.isBluetoothEnabled.mockRejectedValueOnce(new Error('BT fail'));
       const errorListener = jest.fn();
       sdk.on('error', errorListener);
-      const result = await sdk.checkBluetoothStatus();
+      const result = await sdk.discovery.checkBluetoothStatus();
       expect(result).toBe(false);
       expect(errorListener).toHaveBeenCalledWith(
         expect.objectContaining({ code: 'UNKNOWN' })
@@ -364,7 +364,7 @@ describe('VeepooSDK', () => {
 
     it('requestPermissions() returns denied result on native failure', async () => {
       native.requestPermissions.mockRejectedValueOnce(new Error('perm fail'));
-      const result = await sdk.requestPermissions();
+      const result = await sdk.discovery.requestPermissions();
       expect(result.granted).toBe(false);
       expect(result.status).toBe('denied');
     });
@@ -426,26 +426,26 @@ describe('VeepooSDK', () => {
 
     it('syncPersonalInfo delegates to native.syncPersonalInfo', async () => {
       const info = { sex: 1 as const, height: 175, weight: 70, age: 30, step_aim: 8000, sleep_aim: 480 };
-      await sdk.syncPersonalInfo(info);
+      await sdk.personalInfo.syncPersonalInfo(info);
       expect(native.syncPersonalInfo).toHaveBeenCalledWith({ sex: 1, height: 175, weight: 70, age: 30, stepAim: 8000, sleepAim: 480 });
     });
 
     it('readDeviceAllData delegates to native.readDeviceAllData and returns result', async () => {
       native.readDeviceAllData.mockResolvedValueOnce(true);
-      const result = await sdk.readDeviceAllData();
+      const result = await sdk.historicalQuery.readDeviceAllData();
       expect(native.readDeviceAllData).toHaveBeenCalled();
       expect(result).toBe(true);
     });
 
     it('setLanguage delegates to native.setLanguage', async () => {
-      await sdk.setLanguage('english');
+      await sdk.language.setLanguage('english');
       expect(native.setLanguage).toHaveBeenCalledWith('english');
     });
 
     it('readHeartRateAlarm delegates to native, normalizes, and emits heartRateAlarmData', async () => {
       const listener = jest.fn();
       sdk.on('heart_rate_alarm_data', listener);
-      const result = await sdk.readHeartRateAlarm();
+      const result = await sdk.alarms.readHeartRateAlarm();
       expect(native.readHeartRateAlarm).toHaveBeenCalled();
       expect(result.high_threshold).toBe(120);
       expect(result.low_threshold).toBe(60);
@@ -461,7 +461,7 @@ describe('VeepooSDK', () => {
       const listener = jest.fn();
       sdk.on('heart_rate_alarm_data', listener);
       const alarm = { enabled: true, high_threshold: 120, low_threshold: 50 };
-      const status = await sdk.setHeartRateAlarm(alarm);
+      const status = await sdk.alarms.setHeartRateAlarm(alarm);
       expect(native.setHeartRateAlarm).toHaveBeenCalledWith({ enabled: true, highThreshold: 120, lowThreshold: 50 });
       expect(status).toBe('success');
       expect(listener).toHaveBeenCalledWith(
@@ -471,7 +471,7 @@ describe('VeepooSDK', () => {
 
     it('setHeartRateAlarm throws INVALID_ARGUMENT when high_threshold <= low_threshold', async () => {
       await expect(
-        sdk.setHeartRateAlarm({ enabled: true, high_threshold: 80, low_threshold: 100 }),
+        sdk.alarms.setHeartRateAlarm({ enabled: true, high_threshold: 80, low_threshold: 100 }),
       ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
       expect(native.setHeartRateAlarm).not.toHaveBeenCalled();
     });
@@ -482,7 +482,7 @@ describe('VeepooSDK', () => {
         screenIndex: 3,
         operationSuccess: true,
       });
-      const r = await sdk.readWatchFaceStyle();
+      const r = await sdk.watchFace.readWatchFaceStyle();
       expect(native.readWatchFaceStyle).toHaveBeenCalledWith(null);
       expect(r.dial_type).toBe('default');
       expect(r.screen_index).toBe(3);
@@ -494,27 +494,27 @@ describe('VeepooSDK', () => {
         screenIndex: 0,
         operationSuccess: true,
       });
-      await sdk.readWatchFaceStyle({ dial_type: 'market' });
+      await sdk.watchFace.readWatchFaceStyle({ dial_type: 'market' });
       expect(native.readWatchFaceStyle).toHaveBeenCalledWith({ dialType: 'market' });
     });
 
     it('setWatchFaceStyle sends default dialType when omitted', async () => {
-      await sdk.setWatchFaceStyle({ screen_index: 2 });
+      await sdk.watchFace.setWatchFaceStyle({ screen_index: 2 });
       expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 2, dialType: 'default' });
     });
 
     it('setWatchFaceStyle forwards explicit dialType', async () => {
-      await sdk.setWatchFaceStyle({ screen_index: 1, dial_type: 'photo' });
+      await sdk.watchFace.setWatchFaceStyle({ screen_index: 1, dial_type: 'photo' });
       expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 1, dialType: 'photo' });
     });
 
     it('startTest(RealtimeTest.body_composition) delegates to native', async () => {
-      await sdk.startTest(RealtimeTest.body_composition);
+      await sdk.realtimeTests.startTest(RealtimeTest.body_composition);
       expect(native.startBodyCompositionTest).toHaveBeenCalled();
     });
 
     it('stopTest(RealtimeTest.body_composition) delegates to native', async () => {
-      await sdk.stopTest(RealtimeTest.body_composition);
+      await sdk.realtimeTests.stopTest(RealtimeTest.body_composition);
       expect(native.stopBodyCompositionTest).toHaveBeenCalled();
     });
   });
@@ -525,31 +525,31 @@ describe('VeepooSDK', () => {
 
     it('readBattery() calls native and returns normalized BatteryInfo', async () => {
       native.readBattery.mockResolvedValueOnce({ level: 80, state: 0 });
-      const result = await sdk.readBattery();
+      const result = await sdk.battery.readBattery();
       expect(native.readBattery).toHaveBeenCalled();
       expect(result.level).toBe(80);
     });
 
     it('readSleepData(date) passes date to native', async () => {
-      await sdk.readSleepData('2024-01-01');
+      await sdk.sleepData.readSleepData('2024-01-01');
       expect(native.readSleepData).toHaveBeenCalledWith('2024-01-01');
     });
 
     it('readSleepData() without date passes undefined', async () => {
-      await sdk.readSleepData();
+      await sdk.sleepData.readSleepData();
       expect(native.readSleepData).toHaveBeenCalledWith(undefined);
     });
 
     it('readOriginData(dayOffset) passes offset and returns normalized list', async () => {
       native.readOriginData.mockResolvedValueOnce([{ time: '12:00', heartValue: 72 }]);
-      const result = await sdk.readOriginData(1);
+      const result = await sdk.originData.readOriginData(1);
       expect(native.readOriginData).toHaveBeenCalledWith(1);
       expect(result[0].heart_value).toBe(72);
     });
 
     it('readSportStepData(date) normalizes step alias to stepCount', async () => {
       native.readSportStepData.mockResolvedValueOnce({ date: '2024-01-02', step: 5000 });
-      const result = await sdk.readSportStepData('2024-01-02');
+      const result = await sdk.sportSteps.readSportStepData('2024-01-02');
       expect(native.readSportStepData).toHaveBeenCalledWith('2024-01-02');
       expect(result.step_count).toBe(5000);
     });
@@ -562,7 +562,7 @@ describe('VeepooSDK', () => {
         rateList: [],
         bpList: [],
       });
-      const result = await sdk.readDaySummaryData(0);
+      const result = await sdk.daySummary.readDaySummaryData(0);
       expect(native.readDaySummaryData).toHaveBeenCalledWith(0);
       expect(result.date).toBe('2024-06-01');
       expect(result.all_step).toBe(100);
@@ -573,7 +573,7 @@ describe('VeepooSDK', () => {
         hardwareVersion: '1',
         softwareVersion: '2',
       });
-      const result = await sdk.readDeviceVersion();
+      const result = await sdk.deviceVersion.readDeviceVersion();
       expect(native.readDeviceVersion).toHaveBeenCalled();
       expect(result.hardware_version).toBe('1');
       expect(result.software_version).toBe('2');
@@ -583,19 +583,19 @@ describe('VeepooSDK', () => {
       native.readAutoMeasureSetting.mockResolvedValueOnce([
         { funType: 1, measureInterval: 30 },
       ]);
-      const result = await sdk.readAutoMeasureSetting();
+      const result = await sdk.autoMeasure.readAutoMeasureSetting();
       expect(native.readAutoMeasureSetting).toHaveBeenCalled();
       expect(result).toHaveLength(1);
       expect(result[0].measure_interval).toBe(30);
     });
 
     it('startReadOriginData() delegates to native', async () => {
-      await sdk.startReadOriginData();
+      await sdk.historicalQuery.startReadOriginData();
       expect(native.startReadOriginData).toHaveBeenCalled();
     });
 
     it('startTest(RealtimeTest.heart_rate) delegates to native', async () => {
-      await sdk.startTest(RealtimeTest.heart_rate);
+      await sdk.realtimeTests.startTest(RealtimeTest.heart_rate);
       expect(native.startHeartRateTest).toHaveBeenCalled();
     });
 
@@ -604,28 +604,28 @@ describe('VeepooSDK', () => {
         code: 'REALTIME_TEST_IN_PROGRESS',
         message: 'Another realtime test is already in progress',
       });
-      await expect(sdk.startTest(RealtimeTest.heart_rate)).rejects.toMatchObject({
+      await expect(sdk.realtimeTests.startTest(RealtimeTest.heart_rate)).rejects.toMatchObject({
         code: 'REALTIME_TEST_IN_PROGRESS',
       });
     });
 
     it('stopTest(RealtimeTest.heart_rate) delegates to native', async () => {
-      await sdk.stopTest(RealtimeTest.heart_rate);
+      await sdk.realtimeTests.stopTest(RealtimeTest.heart_rate);
       expect(native.stopHeartRateTest).toHaveBeenCalled();
     });
 
     it('startTest(RealtimeTest.hrv) delegates to native', async () => {
-      await sdk.startTest(RealtimeTest.hrv);
+      await sdk.realtimeTests.startTest(RealtimeTest.hrv);
       expect(native.startHrvTest).toHaveBeenCalled();
     });
 
     it('startEcgTest({ includeWaveform: true }) passes options to native', async () => {
-      await sdk.startEcgTest({ includeWaveform: true });
+      await sdk.realtimeTests.startEcgTest({ includeWaveform: true });
       expect(native.startEcgTest).toHaveBeenCalledWith({ includeWaveform: true });
     });
 
     it('stopTest(RealtimeTest.fatigue) delegates to native', async () => {
-      await sdk.stopTest(RealtimeTest.fatigue);
+      await sdk.realtimeTests.stopTest(RealtimeTest.fatigue);
       expect(native.stopFatigueTest).toHaveBeenCalled();
     });
   });
