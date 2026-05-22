@@ -64,7 +64,7 @@ export class VeepooSDKRuntime {
     return "unknown";
   }
 
-  log(
+  private log(
     level: LogLevel,
     scope: LogScope,
     action: string,
@@ -125,7 +125,7 @@ export class VeepooSDKRuntime {
     }
   }
 
-  setupEventListeners(): void {
+  private setupEventListeners(): void {
     this.bus.setupEventListeners(this.native, (event, payload) =>
       this.emitLocal(event, payload),
     );
@@ -174,7 +174,7 @@ export class VeepooSDKRuntime {
       : undefined;
   }
 
-  handleError(
+  private handleError(
     error: unknown,
     fallbackCode: VeepooError["code"],
     deviceId?: string,
@@ -237,11 +237,11 @@ export class VeepooSDKRuntime {
     this.bus.removeAllListeners(event);
   }
 
-  teardownNativeListeners(): void {
+  private teardownNativeListeners(): void {
     this.bus.teardownNativeListeners();
   }
 
-  resetAfterDestroy(): void {
+  private resetAfterDestroy(): void {
     this.bus.removeAllListeners();
     this.state.reset();
     this.logger = null;

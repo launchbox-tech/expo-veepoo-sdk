@@ -39,7 +39,9 @@ export async function invokeOrThrow<T>(
  * fallback produced by `recover` on failure — no exception propagates.
  *
  * Use only when a safe default exists and partial results are valid.
- * `recover` must log via `rt.handleError` before returning the fallback.
+ * Capabilities reach this via `ctx.invokeWithRecovery`, which wraps the
+ * runtime's error pipeline so the failure is still logged + emitted as an
+ * `error` event before `recoverWith` resolves.
  */
 export async function invokeWithRecovery<T>(
   options: RecoveringInvoke<T>,
