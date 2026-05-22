@@ -1,5 +1,5 @@
-import type { LogScope, VeepooEvent, VeepooEventPayload } from "../types/index";
-import { isRecord } from "../shared/primitives";
+import type { LogScope, VeepooEvent, VeepooEventPayload } from "@/types/index";
+import { isRecord } from "@/shared/primitives";
 import {
   passthrough,
   wrapInner,
@@ -7,22 +7,22 @@ import {
 } from "./event-envelope";
 
 // ── Capability normalizers (functions only; events are declared below) ─────
-import { normalizeAlarmList, normalizeHeartRateAlarm } from "../capabilities/alarms/normalizers";
-import { normalizeBatteryInfo } from "../capabilities/battery";
-import { normalizeDeviceBTState } from "../capabilities/bt-status";
-import { normalizeCameraShutterStatus } from "../capabilities/camera";
-import { normalizeContactList } from "../capabilities/contacts/normalizers";
-import { normalizeDeviceFunctions } from "../capabilities/device-functions/normalizers/index";
-import { normalizeDeviceVersion } from "../capabilities/device-version";
-import { normalizeFirmwareDfuProgress } from "../capabilities/dfu";
-import { normalizeFindDeviceStatePayload } from "../capabilities/find-device";
-import { normalizeMusicRemoteCommand } from "../capabilities/music";
+import { normalizeAlarmList, normalizeHeartRateAlarm } from "@/capabilities/alarms/normalizers";
+import { normalizeBatteryInfo } from "@/capabilities/battery";
+import { normalizeDeviceBTState } from "@/capabilities/bt-status";
+import { normalizeCameraShutterStatus } from "@/capabilities/camera";
+import { normalizeContactList } from "@/capabilities/contacts/normalizers";
+import { normalizeDeviceFunctions } from "@/capabilities/device-functions/normalizers/index";
+import { normalizeDeviceVersion } from "@/capabilities/device-version";
+import { normalizeFirmwareDfuProgress } from "@/capabilities/dfu";
+import { normalizeFindDeviceStatePayload } from "@/capabilities/find-device";
+import { normalizeMusicRemoteCommand } from "@/capabilities/music";
 import {
   normalizeHalfHourData,
   normalizeOriginDataList,
   normalizeReadOriginProgressPayload,
   normalizeSpo2OriginData,
-} from "../capabilities/origin-data/normalizers";
+} from "@/capabilities/origin-data/normalizers";
 import {
   normalizeBloodAnalysisTestResult,
   normalizeBloodGlucoseData,
@@ -38,12 +38,12 @@ import {
   normalizePttTestResult,
   normalizeStressData,
   normalizeTemperatureTestResult,
-} from "../capabilities/realtime-tests/normalizers";
-import { normalizeBluetoothStatus, normalizePasswordData } from "../capabilities/session/normalizers";
-import { normalizeSleepDataList } from "../capabilities/sleep-data/normalizers";
-import { normalizeSocialMsgData } from "../capabilities/social-msg";
-import { normalizeSosCallTimesSettings } from "../capabilities/sos";
-import { normalizeSportStepData } from "../capabilities/sport-steps";
+} from "@/capabilities/realtime-tests/normalizers";
+import { normalizeBluetoothStatus, normalizePasswordData } from "@/capabilities/session/normalizers";
+import { normalizeSleepDataList } from "@/capabilities/sleep-data/normalizers";
+import { normalizeSocialMsgData } from "@/capabilities/social-msg";
+import { normalizeSosCallTimesSettings } from "@/capabilities/sos";
+import { normalizeSportStepData } from "@/capabilities/sport-steps";
 
 // ── defineEvent helper ─────────────────────────────────────────────────────
 

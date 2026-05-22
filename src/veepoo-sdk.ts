@@ -216,6 +216,3 @@ export class VeepooSDK implements VeepooSDKInterface {
     return this;
   }
 }
-
-const sdk = new VeepooSDK();
-export default sdk;

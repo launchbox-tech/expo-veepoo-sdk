@@ -1,5 +1,4 @@
-export { default } from './veepoo-sdk';
-export { default as VeepooSDK } from './veepoo-sdk';
+export { VeepooSDK } from './veepoo-sdk';
 
 export type {
   VeepooDevice,
