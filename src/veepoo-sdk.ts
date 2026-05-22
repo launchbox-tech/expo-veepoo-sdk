@@ -2,42 +2,43 @@ import type { LogListener, VeepooEvent, VeepooEventPayload } from "./types/index
 import type { NativeVeepooSDKInterface } from "./native-veepoo-sdk";
 import { NativeVeepooSDK } from "./native-veepoo-sdk";
 import { VeepooSDKRuntime } from "./sdk/veepoo-sdk-runtime";
+import { CAPABILITIES } from "./sdk/capability-registry";
 
-import { AlarmsCapability } from "./capabilities/alarms/index";
-import { AutoMeasureCapability } from "./capabilities/auto-measure";
-import { CalibrationCapability } from "./capabilities/calibration";
-import { DeviceSwitchesCapability } from "./capabilities/device-switches";
-import { BandDiscoveryCapability } from "./capabilities/band-discovery/index";
-import { BatteryCapability } from "./capabilities/battery";
-import { BtStatusCapability } from "./capabilities/bt-status";
-import { CameraCapability } from "./capabilities/camera";
-import { ContactsCapability } from "./capabilities/contacts/index";
-import { DaySummaryCapability } from "./capabilities/day-summary";
-import { DeviceFunctionsCapability } from "./capabilities/device-functions/index";
-import { DeviceTimeCapability } from "./capabilities/device-time";
-import { DeviceVersionCapability } from "./capabilities/device-version";
-import { DfuCapability } from "./capabilities/dfu";
-import { FindDeviceCapability } from "./capabilities/find-device";
-import { GpsTimezoneCapability } from "./capabilities/gps-timezone";
-import { HistoricalQueryCapability } from "./capabilities/historical-query";
-import { LanguageCapability } from "./capabilities/language";
-import { MusicCapability } from "./capabilities/music";
-import { OriginDataCapability } from "./capabilities/origin-data/index";
-import { PersonalInfoCapability } from "./capabilities/personal-info";
-import { RealtimeTestsCapability } from "./capabilities/realtime-tests/index";
-import { ScreenLightCapability } from "./capabilities/screen-light/index";
-import { SedentaryReminderCapability } from "./capabilities/sedentary-reminder";
-import { SessionCapability } from "./capabilities/session/index";
-import { SleepDataCapability } from "./capabilities/sleep-data/index";
-import { SocialMsgCapability } from "./capabilities/social-msg";
-import { SosCapability } from "./capabilities/sos";
-import { SportModeCapability } from "./capabilities/sport-mode/index";
-import { SportStepsCapability } from "./capabilities/sport-steps";
-import { WatchFaceCapability } from "./capabilities/watch-face";
-import { WeatherCapability } from "./capabilities/weather/index";
-import { WomenHealthCapability } from "./capabilities/women-health/index";
-import { WorldClockCapability } from "./capabilities/world-clock";
-import { WristFlipCapability } from "./capabilities/wrist-flip";
+import type { AlarmsCapability } from "./capabilities/alarms/index";
+import type { AutoMeasureCapability } from "./capabilities/auto-measure";
+import type { BandDiscoveryCapability } from "./capabilities/band-discovery/index";
+import type { BatteryCapability } from "./capabilities/battery";
+import type { BtStatusCapability } from "./capabilities/bt-status";
+import type { CalibrationCapability } from "./capabilities/calibration";
+import type { CameraCapability } from "./capabilities/camera";
+import type { ContactsCapability } from "./capabilities/contacts/index";
+import type { DaySummaryCapability } from "./capabilities/day-summary";
+import type { DeviceFunctionsCapability } from "./capabilities/device-functions/index";
+import type { DeviceSwitchesCapability } from "./capabilities/device-switches";
+import type { DeviceTimeCapability } from "./capabilities/device-time";
+import type { DeviceVersionCapability } from "./capabilities/device-version";
+import type { DfuCapability } from "./capabilities/dfu";
+import type { FindDeviceCapability } from "./capabilities/find-device";
+import type { GpsTimezoneCapability } from "./capabilities/gps-timezone";
+import type { HistoricalQueryCapability } from "./capabilities/historical-query";
+import type { LanguageCapability } from "./capabilities/language";
+import type { MusicCapability } from "./capabilities/music";
+import type { OriginDataCapability } from "./capabilities/origin-data/index";
+import type { PersonalInfoCapability } from "./capabilities/personal-info";
+import type { RealtimeTestsCapability } from "./capabilities/realtime-tests/index";
+import type { ScreenLightCapability } from "./capabilities/screen-light/index";
+import type { SedentaryReminderCapability } from "./capabilities/sedentary-reminder";
+import type { SessionCapability } from "./capabilities/session/index";
+import type { SleepDataCapability } from "./capabilities/sleep-data/index";
+import type { SocialMsgCapability } from "./capabilities/social-msg";
+import type { SosCapability } from "./capabilities/sos";
+import type { SportModeCapability } from "./capabilities/sport-mode/index";
+import type { SportStepsCapability } from "./capabilities/sport-steps";
+import type { WatchFaceCapability } from "./capabilities/watch-face";
+import type { WeatherCapability } from "./capabilities/weather/index";
+import type { WomenHealthCapability } from "./capabilities/women-health/index";
+import type { WorldClockCapability } from "./capabilities/world-clock";
+import type { WristFlipCapability } from "./capabilities/wrist-flip";
 
 export interface VeepooSDKInterface {
   // Lifecycle & event API
@@ -92,84 +93,60 @@ export interface VeepooSDKInterface {
   wristFlip: WristFlipCapability;
 }
 
+/**
+ * The capability properties (`sdk.battery`, `sdk.session`, …) are assigned by
+ * looping over `CAPABILITIES` in the constructor — see ADR 0010. The
+ * `readonly` declarations below stay hand-typed so `sdk.battery` resolves to
+ * `BatteryCapability` in one IDE hop. The constructor uses non-null assertion
+ * (`!`) on each declaration because the assignment happens in the loop, not
+ * inline.
+ */
 export class VeepooSDK implements VeepooSDKInterface {
   private readonly rt: VeepooSDKRuntime;
 
-  readonly alarms: AlarmsCapability;
-  readonly autoMeasure: AutoMeasureCapability;
-  readonly battery: BatteryCapability;
-  readonly calibration: CalibrationCapability;
-  readonly deviceSwitches: DeviceSwitchesCapability;
-  readonly btStatus: BtStatusCapability;
-  readonly camera: CameraCapability;
-  readonly contacts: ContactsCapability;
-  readonly daySummary: DaySummaryCapability;
-  readonly deviceFunctions: DeviceFunctionsCapability;
-  readonly deviceTime: DeviceTimeCapability;
-  readonly deviceVersion: DeviceVersionCapability;
-  readonly dfu: DfuCapability;
-  readonly discovery: BandDiscoveryCapability;
-  readonly findDevice: FindDeviceCapability;
-  readonly gpsTimezone: GpsTimezoneCapability;
-  readonly historicalQuery: HistoricalQueryCapability;
-  readonly language: LanguageCapability;
-  readonly music: MusicCapability;
-  readonly originData: OriginDataCapability;
-  readonly personalInfo: PersonalInfoCapability;
-  readonly realtimeTests: RealtimeTestsCapability;
-  readonly screenLight: ScreenLightCapability;
-  readonly sedentaryReminder: SedentaryReminderCapability;
-  readonly session: SessionCapability;
-  readonly sleepData: SleepDataCapability;
-  readonly socialMsg: SocialMsgCapability;
-  readonly sos: SosCapability;
-  readonly sportMode: SportModeCapability;
-  readonly sportSteps: SportStepsCapability;
-  readonly watchFace: WatchFaceCapability;
-  readonly weather: WeatherCapability;
-  readonly womenHealth: WomenHealthCapability;
-  readonly worldClock: WorldClockCapability;
-  readonly wristFlip: WristFlipCapability;
+  readonly alarms!: AlarmsCapability;
+  readonly autoMeasure!: AutoMeasureCapability;
+  readonly battery!: BatteryCapability;
+  readonly btStatus!: BtStatusCapability;
+  readonly calibration!: CalibrationCapability;
+  readonly camera!: CameraCapability;
+  readonly contacts!: ContactsCapability;
+  readonly daySummary!: DaySummaryCapability;
+  readonly deviceFunctions!: DeviceFunctionsCapability;
+  readonly deviceSwitches!: DeviceSwitchesCapability;
+  readonly deviceTime!: DeviceTimeCapability;
+  readonly deviceVersion!: DeviceVersionCapability;
+  readonly dfu!: DfuCapability;
+  readonly discovery!: BandDiscoveryCapability;
+  readonly findDevice!: FindDeviceCapability;
+  readonly gpsTimezone!: GpsTimezoneCapability;
+  readonly historicalQuery!: HistoricalQueryCapability;
+  readonly language!: LanguageCapability;
+  readonly music!: MusicCapability;
+  readonly originData!: OriginDataCapability;
+  readonly personalInfo!: PersonalInfoCapability;
+  readonly realtimeTests!: RealtimeTestsCapability;
+  readonly screenLight!: ScreenLightCapability;
+  readonly sedentaryReminder!: SedentaryReminderCapability;
+  readonly session!: SessionCapability;
+  readonly sleepData!: SleepDataCapability;
+  readonly socialMsg!: SocialMsgCapability;
+  readonly sos!: SosCapability;
+  readonly sportMode!: SportModeCapability;
+  readonly sportSteps!: SportStepsCapability;
+  readonly watchFace!: WatchFaceCapability;
+  readonly weather!: WeatherCapability;
+  readonly womenHealth!: WomenHealthCapability;
+  readonly worldClock!: WorldClockCapability;
+  readonly wristFlip!: WristFlipCapability;
 
   constructor(native: NativeVeepooSDKInterface = NativeVeepooSDK) {
     this.rt = new VeepooSDKRuntime(native);
     const ctx = this.rt.createCapabilityContext();
 
-    this.alarms = new AlarmsCapability(ctx);
-    this.autoMeasure = new AutoMeasureCapability(ctx);
-    this.battery = new BatteryCapability(ctx);
-    this.calibration = new CalibrationCapability(ctx);
-    this.deviceSwitches = new DeviceSwitchesCapability(ctx);
-    this.btStatus = new BtStatusCapability(ctx);
-    this.camera = new CameraCapability(ctx);
-    this.contacts = new ContactsCapability(ctx);
-    this.daySummary = new DaySummaryCapability(ctx);
-    this.deviceFunctions = new DeviceFunctionsCapability(ctx);
-    this.deviceTime = new DeviceTimeCapability(ctx);
-    this.deviceVersion = new DeviceVersionCapability(ctx);
-    this.dfu = new DfuCapability(ctx);
-    this.discovery = new BandDiscoveryCapability(ctx);
-    this.findDevice = new FindDeviceCapability(ctx);
-    this.gpsTimezone = new GpsTimezoneCapability(ctx);
-    this.historicalQuery = new HistoricalQueryCapability(ctx);
-    this.language = new LanguageCapability(ctx);
-    this.music = new MusicCapability(ctx);
-    this.originData = new OriginDataCapability(ctx);
-    this.personalInfo = new PersonalInfoCapability(ctx);
-    this.realtimeTests = new RealtimeTestsCapability(ctx);
-    this.screenLight = new ScreenLightCapability(ctx);
-    this.sedentaryReminder = new SedentaryReminderCapability(ctx);
-    this.session = new SessionCapability(ctx);
-    this.sleepData = new SleepDataCapability(ctx);
-    this.socialMsg = new SocialMsgCapability(ctx);
-    this.sos = new SosCapability(ctx);
-    this.sportMode = new SportModeCapability(ctx);
-    this.sportSteps = new SportStepsCapability(ctx);
-    this.watchFace = new WatchFaceCapability(ctx);
-    this.weather = new WeatherCapability(ctx);
-    this.womenHealth = new WomenHealthCapability(ctx);
-    this.worldClock = new WorldClockCapability(ctx);
-    this.wristFlip = new WristFlipCapability(ctx);
+    for (const [key, Ctor] of Object.entries(CAPABILITIES)) {
+      (this as unknown as Record<string, unknown>)[key] = new Ctor(ctx);
+    }
   }
 
   // ── Lifecycle ────────────────────────────────────────────────────────────────
