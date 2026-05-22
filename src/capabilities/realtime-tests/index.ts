@@ -1,4 +1,3 @@
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { RealtimeTestsNativeMethods } from "./native";
 import type { EcgTestOptions, RealtimeTestModality } from "@/types/index";
@@ -65,9 +64,8 @@ export class RealtimeTestsCapability {
     this.ctx.log("info", "test", label, `${direction === "start" ? "Starting" : "Stopping"} ${modality} test`, {
       deviceId: this.ctx.connectedDeviceId() ?? undefined,
     });
-    return invokeOrThrow({
+    return this.ctx.invoke({
       invoke: () => this.dispatch[modality][direction](),
-      mapError: (e: unknown) => this.ctx.mapError(e),
     });
   }
 
@@ -84,9 +82,8 @@ export class RealtimeTestsCapability {
       deviceId: this.ctx.connectedDeviceId() ?? undefined,
       data: options,
     });
-    await invokeOrThrow({
+    await this.ctx.invoke({
       invoke: () => this.ctx.native.startEcgTest(options ? deepCamelKeys(options) as { includeWaveform?: boolean } : undefined),
-      mapError: (e: unknown) => this.ctx.mapError(e),
     });
   }
 
@@ -94,9 +91,8 @@ export class RealtimeTestsCapability {
     this.ctx.log("info", "test", "test.ecg.stop", "Stopping ECG test", {
       deviceId: this.ctx.connectedDeviceId() ?? undefined,
     });
-    return invokeOrThrow({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.stopEcgTest(),
-      mapError: (e: unknown) => this.ctx.mapError(e),
     });
   }
 }

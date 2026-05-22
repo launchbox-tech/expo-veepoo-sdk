@@ -12,6 +12,8 @@ import type {
 import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
 import type { LogListener } from "@/veepoo-sdk-module";
 import { normalizeEventPayload } from "@/bridge/event-normalizer";
+import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
+import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import { mapNativeRejection } from "@/errors/map-native-rejection";
 import { VeepooSdkState } from "./veepoo-sdk-state";
 import { OriginReadPipeline } from "@/bridge/origin-read-pipeline";
@@ -320,14 +322,20 @@ export class VeepooSDKRuntime {
   }
 
   createCapabilityContext(): CapabilityContext<NativeVeepooSDKInterface> {
+    const mapError: CapabilityContext<NativeVeepooSDKInterface>["mapError"] = (
+      error,
+      opts,
+    ) =>
+      this.handleError(
+        error,
+        opts?.code ?? "OPERATION_FAILED",
+        opts?.deviceId ?? this.state.connectedDeviceId ?? undefined,
+      );
     return {
       native: this.native,
-      mapError: (error, opts) =>
-        this.handleError(
-          error,
-          opts?.code ?? "OPERATION_FAILED",
-          opts?.deviceId ?? this.state.connectedDeviceId ?? undefined,
-        ),
+      mapError,
+      invoke: <T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> =>
+        invokeOrThrow({ ...opts, mapError }),
       emit: (event, payload) => this.emitLocal(event, payload),
       connectedDeviceId: () => this.state.connectedDeviceId,
       setConnectedDeviceId: (id) => this.state.setConnectedDeviceId(id),

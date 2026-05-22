@@ -1,5 +1,3 @@
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { WatchFaceNativeMethods } from "./native";
 import { normalizeWatchFaceStyle } from "./normalizers";
@@ -10,12 +8,8 @@ import { deepCamelKeys } from "@/normalizers/deep-keys";
 export class WatchFaceCapability {
   constructor(private readonly ctx: CapabilityContext<WatchFaceNativeMethods>) {}
 
-  private call<T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> {
-    return invokeOrThrow({ ...opts, mapError: (e) => this.ctx.mapError(e) });
-  }
-
   readWatchFaceStyle(options?: { dial_type?: WatchFaceDialType }): Promise<WatchFaceStyle> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateReadWatchFaceStyleOptions(options),
       invoke: () =>
         this.ctx.native.readWatchFaceStyle(
@@ -26,7 +20,7 @@ export class WatchFaceCapability {
   }
 
   setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateWatchFaceStyleSettings(settings),
       invoke: () =>
         this.ctx.native.setWatchFaceStyle(deepCamelKeys({

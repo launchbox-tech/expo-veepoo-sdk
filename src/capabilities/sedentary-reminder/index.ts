@@ -1,5 +1,3 @@
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { SedentaryReminderNativeMethods } from "./native";
 import { normalizeSedentaryReminderSettings } from "./normalizers";
@@ -10,19 +8,15 @@ import { deepCamelKeys } from "@/normalizers/deep-keys";
 export class SedentaryReminderCapability {
   constructor(private readonly ctx: CapabilityContext<SedentaryReminderNativeMethods>) {}
 
-  private call<T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> {
-    return invokeOrThrow({ ...opts, mapError: (e) => this.ctx.mapError(e) });
-  }
-
   readSedentaryReminder(): Promise<SedentaryReminderSettings> {
-    return this.call({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.readSedentaryReminder(),
       normalize: normalizeSedentaryReminderSettings,
     });
   }
 
   setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateSedentaryReminderSettings(settings),
       invoke: () => this.ctx.native.setSedentaryReminder(deepCamelKeys(settings) as SedentaryReminderSettings),
     });

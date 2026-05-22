@@ -1,5 +1,3 @@
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { SosNativeMethods } from "./native";
 import { normalizeSosCallTimesSettings } from "./normalizers";
@@ -9,12 +7,8 @@ import type { SosCallTimesSettings } from "@/types/index";
 export class SosCapability {
   constructor(private readonly ctx: CapabilityContext<SosNativeMethods>) {}
 
-  private call<T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> {
-    return invokeOrThrow({ ...opts, mapError: (e) => this.ctx.mapError(e) });
-  }
-
   readSosCallTimes(): Promise<SosCallTimesSettings> {
-    return this.call({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.readSosCallTimes(),
       normalize: normalizeSosCallTimesSettings,
       afterSuccess: (data) =>
@@ -23,7 +17,7 @@ export class SosCapability {
   }
 
   setSosCallTimes(times: number): Promise<void> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateSosCallTimes(times),
       invoke: () => this.ctx.native.setSosCallTimes(times),
     });

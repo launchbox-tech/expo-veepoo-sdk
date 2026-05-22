@@ -1,5 +1,3 @@
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { SportModeNativeMethods } from "./native";
 import { normalizeSportModeStatus } from "./normalizers";
@@ -10,12 +8,8 @@ import { SPORT_MODE_ORDINALS } from "@/types/index";
 export class SportModeCapability {
   constructor(private readonly ctx: CapabilityContext<SportModeNativeMethods>) {}
 
-  private call<T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> {
-    return invokeOrThrow({ ...opts, mapError: (e) => this.ctx.mapError(e) });
-  }
-
   readSportMode(): Promise<SportModeStatus> {
-    return this.call({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.readSportMode(),
       normalize: normalizeSportModeStatus,
       afterSuccess: (result) =>
@@ -24,7 +18,7 @@ export class SportModeCapability {
   }
 
   setSportMode(mode: SportMode): Promise<OperationStatus> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateSportMode(mode),
       invoke: () => {
         const ordinal = SPORT_MODE_ORDINALS.indexOf(mode);
@@ -34,7 +28,7 @@ export class SportModeCapability {
   }
 
   stopSportMode(): Promise<OperationStatus> {
-    return this.call({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.stopSportMode(),
     });
   }

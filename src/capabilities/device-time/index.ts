@@ -1,5 +1,3 @@
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { DeviceTimeNativeMethods } from "./native";
 import { validateDeviceTime } from "./validators";
@@ -7,13 +5,9 @@ import { validateDeviceTime } from "./validators";
 export class DeviceTimeCapability {
   constructor(private readonly ctx: CapabilityContext<DeviceTimeNativeMethods>) {}
 
-  private call<T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> {
-    return invokeOrThrow({ ...opts, mapError: (e) => this.ctx.mapError(e) });
-  }
-
   async setDeviceTime(time?: Date): Promise<boolean> {
     validateDeviceTime(time);
-    return this.call({
+    return this.ctx.invoke({
       invoke: () =>
         this.ctx.native.setDeviceTime(
           time === undefined ? undefined : {

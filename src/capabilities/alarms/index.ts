@@ -1,5 +1,3 @@
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { AlarmNativeMethods } from "./native";
 import { normalizeAlarmList, normalizeHeartRateAlarm, normalizeSpo2Alarm } from "./normalizers";
@@ -10,12 +8,8 @@ import { deepCamelKeys } from "@/normalizers/deep-keys";
 export class AlarmsCapability {
   constructor(private readonly ctx: CapabilityContext<AlarmNativeMethods>) {}
 
-  private call<T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> {
-    return invokeOrThrow({ ...opts, mapError: (e) => this.ctx.mapError(e) });
-  }
-
   readAlarms(): Promise<DeviceAlarm[]> {
-    return this.call({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.readAlarms(),
       normalize: normalizeAlarmList,
       afterSuccess: (alarms) =>
@@ -24,21 +18,21 @@ export class AlarmsCapability {
   }
 
   setAlarm(alarm: DeviceAlarm): Promise<OperationStatus> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateAlarm(alarm),
       invoke: () => this.ctx.native.setAlarm(deepCamelKeys(alarm) as DeviceAlarm),
     });
   }
 
   deleteAlarm(alarmId: number): Promise<OperationStatus> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateDeleteAlarm(alarmId),
       invoke: () => this.ctx.native.deleteAlarm(alarmId),
     });
   }
 
   readHeartRateAlarm(): Promise<HeartRateAlarm> {
-    return this.call({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.readHeartRateAlarm(),
       normalize: normalizeHeartRateAlarm,
       afterSuccess: (data) =>
@@ -47,7 +41,7 @@ export class AlarmsCapability {
   }
 
   setHeartRateAlarm(alarm: HeartRateAlarm): Promise<OperationStatus> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateHeartRateAlarm(alarm),
       invoke: () => this.ctx.native.setHeartRateAlarm(deepCamelKeys(alarm) as HeartRateAlarm),
       afterSuccess: () =>
@@ -56,7 +50,7 @@ export class AlarmsCapability {
   }
 
   readSpo2Alarm(): Promise<Spo2Alarm> {
-    return this.call({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.readSpo2Alarm(),
       normalize: normalizeSpo2Alarm,
       afterSuccess: (data) =>
@@ -65,7 +59,7 @@ export class AlarmsCapability {
   }
 
   setSpo2Alarm(alarm: Spo2Alarm): Promise<OperationStatus> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => validateSpo2Alarm(alarm),
       invoke: () => this.ctx.native.setSpo2Alarm(deepCamelKeys(alarm) as Spo2Alarm),
       afterSuccess: () =>

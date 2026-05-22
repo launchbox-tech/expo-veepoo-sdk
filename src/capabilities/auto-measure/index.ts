@@ -1,5 +1,3 @@
-import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { AutoMeasureNativeMethods } from "./native";
 import { normalizeAutoMeasureSettings } from "./normalizers";
@@ -10,12 +8,8 @@ import { deepCamelKeys } from "@/normalizers/deep-keys";
 export class AutoMeasureCapability {
   constructor(private readonly ctx: CapabilityContext<AutoMeasureNativeMethods>) {}
 
-  private call<T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> {
-    return invokeOrThrow({ ...opts, mapError: (e) => this.ctx.mapError(e) });
-  }
-
   readAutoMeasureSetting(): Promise<AutoMeasureSetting[]> {
-    return this.call({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.readAutoMeasureSetting(),
       normalize: normalizeAutoMeasureSettings,
       afterSuccess: (result) => {
@@ -28,7 +22,7 @@ export class AutoMeasureCapability {
   }
 
   modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<AutoMeasureSetting[]> {
-    return this.call({
+    return this.ctx.invoke({
       validate: () => {
         validateAutoMeasureSetting(setting);
         this.ctx.log("info", "device", "autoMeasure.modify.start", "Modifying auto measure settings", {
