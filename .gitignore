@@ -1,6 +1,9 @@
 # Expo local tooling (expo-doctor: do not commit)
 .expo/
 
+# Claude Code agent state (worktrees, transcripts, scratch)
+.claude/
+
 # Logs
 logs
 *.log
