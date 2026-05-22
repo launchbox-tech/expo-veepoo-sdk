@@ -1,4 +1,4 @@
-import { normalizeSleepDataList } from '@/capabilities/sleep-data/normalizers';
+import { normalizeSleepDataList } from './normalizers';
 
 describe('normalizeSleepDataList', () => {
   it('returns empty array for non-array non-record input', () => {

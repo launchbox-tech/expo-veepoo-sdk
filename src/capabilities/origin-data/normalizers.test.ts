@@ -1,8 +1,9 @@
 import {
-  normalizeOriginDataList,
   normalizeHalfHourData,
+  normalizeOriginDataList,
+  normalizeReadOriginProgressPayload,
   normalizeSpo2OriginData,
-} from '@/capabilities/origin-data/normalizers';
+} from './normalizers';
 
 describe('normalizeOriginDataList', () => {
   it('returns empty array for non-array input', () => {
@@ -234,5 +235,73 @@ describe('normalizeSpo2OriginData', () => {
     expect(result.sport_value).toBe(2);
     expect(result.all_pack_number).toBe(50);
     expect(result.current_pack_number).toBe(5);
+  });
+});
+
+describe('normalizeReadOriginProgressPayload', () => {
+  it('converts progress to an integer percentage', () => {
+    expect(
+      normalizeReadOriginProgressPayload({
+        device_id: 'd1',
+        progress: {
+          readState: 'reading',
+          totalDays: 3,
+          currentDay: 2,
+          progress: 0.6789,
+        },
+      })
+    ).toEqual({
+      device_id: 'd1',
+      progress: {
+        read_state: 'reading',
+        total_days: 3,
+        current_day: 2,
+        progress: 67,
+      },
+    });
+  });
+
+  it('converts a completed fractional progress to 100', () => {
+    expect(
+      normalizeReadOriginProgressPayload({
+        device_id: 'd1',
+        progress: {
+          readState: 'complete',
+          totalDays: 1,
+          currentDay: 1,
+          progress: 1.0,
+        },
+      })
+    ).toEqual({
+      device_id: 'd1',
+      progress: {
+        read_state: 'complete',
+        total_days: 1,
+        current_day: 1,
+        progress: 100,
+      },
+    });
+  });
+
+  it('clamps percent-style values to 100', () => {
+    expect(
+      normalizeReadOriginProgressPayload({
+        device_id: 'd1',
+        progress: {
+          readState: 'complete',
+          totalDays: 1,
+          currentDay: 1,
+          progress: 120,
+        },
+      })
+    ).toEqual({
+      device_id: 'd1',
+      progress: {
+        read_state: 'complete',
+        total_days: 1,
+        current_day: 1,
+        progress: 100,
+      },
+    });
   });
 });

@@ -6,7 +6,7 @@
  * This verifies that every event, including pass-throughs, is correctly
  * normalized end-to-end (deepSnakeKeys + any value-level normalizer).
  */
-import { normalizeEventPayload } from "@/bridge/event-normalizer";
+import { normalizeEventPayload } from "./event-normalizer";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

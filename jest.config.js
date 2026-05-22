@@ -12,6 +12,7 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/**/__tests__/**',
     '!src/**/__mocks__/**',
+    '!src/**/*.test.{ts,tsx}',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'text-summary', 'html', 'lcov'],
