@@ -260,11 +260,22 @@ export class VeepooSDKRuntime {
       invoke: <T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> =>
         invokeOrThrow({ ...opts, mapError }),
       emit: (event, payload) => this.emitLocal(event, payload),
-      emitDeviceEvent: (event, payload) =>
+      emitDeviceEvent: (event, payload) => {
+        const deviceId = this.state.connectedDeviceId;
+        if (deviceId === null) {
+          this.log(
+            "warn",
+            "sdk",
+            `emit.${event}.no_device`,
+            `emitDeviceEvent("${event}") called with no connected Band`,
+            { data: payload },
+          );
+        }
         this.emitLocal(event, {
-          device_id: this.state.connectedDeviceId ?? "",
+          device_id: deviceId ?? "",
           ...payload,
-        }),
+        });
+      },
       connectedDeviceId: () => this.state.connectedDeviceId,
       setConnectedDeviceId: (id) => this.state.setConnectedDeviceId(id),
       isScanning: () => this.state.isScanning,

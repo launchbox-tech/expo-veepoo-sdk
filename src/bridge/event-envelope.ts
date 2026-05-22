@@ -10,9 +10,6 @@ import { isRecord } from '@/shared/primitives';
  */
 export type EventNormalizer<K extends VeepooEvent> = (raw: unknown) => VeepooEventPayload[K];
 
-/** Map of `Partial<EVENT_NORMALIZERS>` — what each capability exports as its slice. */
-export type PartialEventNormalizers = Partial<{ [K in VeepooEvent]: EventNormalizer<K> }>;
-
 /** Identity normalizer for events whose envelope needs no value-level rewriting. */
 export const passthrough = <K extends VeepooEvent>(): EventNormalizer<K> =>
   (raw) => raw as VeepooEventPayload[K];

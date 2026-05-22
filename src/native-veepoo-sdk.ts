@@ -18,7 +18,7 @@ import type { DeviceVersionNativeMethods } from "./capabilities/device-version";
 import type { DfuNativeMethods } from "./capabilities/dfu";
 import type { FindDeviceNativeMethods } from "./capabilities/find-device";
 import type { GpsTimezoneNativeMethods } from "./capabilities/gps-timezone";
-import type { HistoricalQueryNativeMethods } from "./capabilities/historical-query/native";
+import type { HistoricalQueryNativeMethods } from "./capabilities/historical-query";
 import type { LanguageNativeMethods } from "./capabilities/language";
 import type { MusicNativeMethods } from "./capabilities/music";
 import type { OriginDataNativeMethods } from "./capabilities/origin-data/native";

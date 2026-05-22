@@ -2,9 +2,10 @@ import { EventBus } from '@/bridge/event-bus';
 
 describe('EventBus', () => {
   let bus: EventBus;
+  const noopOnError = () => {};
 
   beforeEach(() => {
-    bus = new EventBus();
+    bus = new EventBus(noopOnError);
   });
 
   describe('on / emit', () => {

@@ -1,11 +1,14 @@
-import type { SportMode } from '@/capabilities/sport-mode/types';
+import type { CapabilityContext } from "@/capabilities/shared/context";
+import type { SportMode } from "@/capabilities/sport-mode/types";
 import type {
   BloodGlucoseData,
   BloodOxygenData,
   BloodPressureData,
   StressData,
   TemperatureData,
-} from '@/capabilities/realtime-tests/types';
+} from "@/capabilities/realtime-tests/types";
+
+// ── Types ────────────────────────────────────────────────────────────────────
 
 export interface DailyHealthData {
   date: string;
@@ -103,4 +106,32 @@ export interface ExerciseSession {
   /** Total paused time in seconds */
   pause_total_time: number;
   minute_data: ExerciseMinuteData[];
+}
+
+// ── Native methods ──────────────────────────────────────────────────────────
+
+export interface HistoricalQueryNativeMethods {
+  readDeviceAllData(): Promise<boolean>;
+  startReadOriginData(): Promise<void>;
+}
+
+// ── Capability ──────────────────────────────────────────────────────────────
+
+export class HistoricalQueryCapability {
+  constructor(private readonly ctx: CapabilityContext<HistoricalQueryNativeMethods>) {}
+
+  readDeviceAllData(): Promise<boolean> {
+    return this.ctx.invoke({
+      invoke: () => this.ctx.native.readDeviceAllData(),
+    });
+  }
+
+  startReadOriginData(): Promise<void> {
+    this.ctx.log("info", "read", "read.origin.start", "Starting origin data read", {
+      deviceId: this.ctx.connectedDeviceId() ?? undefined,
+    });
+    return this.ctx.invoke({
+      invoke: () => this.ctx.native.startReadOriginData(),
+    });
+  }
 }

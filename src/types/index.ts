@@ -114,7 +114,7 @@ export type {
   StoredHrvData,
   StoredEcgData,
   StoredBodyCompositionData,
-} from '@/capabilities/historical-query/types';
+} from '@/capabilities/historical-query';
 
 export type { AutoMeasureSetting } from '@/capabilities/auto-measure';
 export type { Language } from '@/capabilities/language';

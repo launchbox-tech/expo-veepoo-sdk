@@ -21,7 +21,7 @@ import { DeviceVersionCapability } from "./capabilities/device-version";
 import { DfuCapability } from "./capabilities/dfu";
 import { FindDeviceCapability } from "./capabilities/find-device";
 import { GpsTimezoneCapability } from "./capabilities/gps-timezone";
-import { HistoricalQueryCapability } from "./capabilities/historical-query/index";
+import { HistoricalQueryCapability } from "./capabilities/historical-query";
 import { LanguageCapability } from "./capabilities/language";
 import { MusicCapability } from "./capabilities/music";
 import { OriginDataCapability } from "./capabilities/origin-data/index";

@@ -10,7 +10,7 @@ export class EventBus {
   private listenersSetup = false;
 
   constructor(
-    private readonly onListenerError?: (
+    private readonly onListenerError: (
       error: unknown,
       event: VeepooEvent,
       payload: unknown,
@@ -46,11 +46,7 @@ export class EventBus {
       try {
         listener(payload);
       } catch (e) {
-        if (this.onListenerError) {
-          this.onListenerError(e, event, payload);
-        } else {
-          console.error(`Error in event listener for ${event}:`, e);
-        }
+        this.onListenerError(e, event, payload);
       }
     });
   }

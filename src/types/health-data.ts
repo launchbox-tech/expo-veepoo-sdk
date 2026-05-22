@@ -11,4 +11,4 @@
  * Kept as a stable import path via re-exports — the file itself
  * no longer declares any types.
  */
-export type {} from '@/capabilities/historical-query/types';
+export type {} from '@/capabilities/historical-query';

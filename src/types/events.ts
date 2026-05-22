@@ -35,7 +35,7 @@ import type {
   StoredHrvData,
   StoredEcgData,
   StoredBodyCompositionData,
-} from '@/capabilities/historical-query/types';
+} from '@/capabilities/historical-query';
 import type {
   BloodGlucoseData,
   StressData,
