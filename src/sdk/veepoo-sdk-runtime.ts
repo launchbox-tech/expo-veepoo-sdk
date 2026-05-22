@@ -10,6 +10,7 @@ import type {
 } from "@/types/index";
 import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
 import type { LogListener } from "@/veepoo-sdk-module";
+import { EVENT_LOG_SCOPES } from "@/bridge/veepoo-events-registry";
 import { normalizeEventPayload } from "@/bridge/event-normalizer";
 import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
 import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
@@ -142,7 +143,7 @@ export class VeepooSDKRuntime {
 
     this.log(
       "debug",
-      this.getEventScope(event),
+      EVENT_LOG_SCOPES[event],
       `event.${event}`,
       `Received ${event} event`,
       {
@@ -157,48 +158,6 @@ export class VeepooSDKRuntime {
     });
 
     this.bus.emit(event, normalizedPayload);
-  }
-
-  private getEventScope(event: VeepooEvent): LogScope {
-    if (event === "device_found") return "scan";
-    if (event === "bluetooth_state_changed") return "bluetooth";
-    if (
-      event === "device_connected" ||
-      event === "device_disconnected" ||
-      event === "device_connect_status" ||
-      event === "device_ready" ||
-      event === "connection_status_changed"
-    ) {
-      return "connection";
-    }
-    if (
-      event === "read_origin_progress" ||
-      event === "read_origin_complete" ||
-      event === "origin_five_minute_data" ||
-      event === "origin_half_hour_data" ||
-      event === "sleep_data" ||
-      event === "sport_step_data"
-    ) {
-      return "read";
-    }
-    if (
-      event === "heart_rate_test_result" ||
-      event === "blood_pressure_test_result" ||
-      event === "blood_oxygen_test_result" ||
-      event === "temperature_test_result" ||
-      event === "stress_data" ||
-      event === "blood_glucose_data" ||
-      event === "hrv_test_result" ||
-      event === "ecg_test_result" ||
-      event === "fatigue_test_result" ||
-      event === "breathing_test_result" ||
-      event === "body_composition_test_result"
-    ) {
-      return "test";
-    }
-    if (event === "error" || event === "sdk_initialized") return "sdk";
-    if (event === "scan_started" || event === "scan_stopped") return "scan";
-    return "device";
   }
 
   private getPayloadDeviceId(payload: unknown): string | undefined {
