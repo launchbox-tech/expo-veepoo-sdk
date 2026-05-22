@@ -12,12 +12,14 @@ import type {
 import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
 import { EVENT_LOG_SCOPES, normalizeEventPayload } from "@/bridge/event-registry";
 import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
-import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import { mapNativeRejection } from "@/errors/map-native-rejection";
 import { VeepooSdkState } from "./veepoo-sdk-state";
 import { OriginReadPipeline } from "@/bridge/origin-read-pipeline";
 import { EventBus } from "@/bridge/event-bus";
-import type { CapabilityContext } from "@/capabilities/shared/context";
+import type {
+  CapabilityContext,
+  CapabilityInvokeOpts,
+} from "@/capabilities/shared/context";
 
 /**
  * Shared **Session** / scan / init state (`state`), logging, and wiring between
@@ -279,8 +281,14 @@ export class VeepooSDKRuntime {
     return {
       native: this.native,
       mapError,
-      invoke: <T>(opts: Omit<ThrowingInvoke<T>, "mapError">): Promise<T> =>
-        invokeOrThrow({ ...opts, mapError }),
+      invoke: <T>(opts: CapabilityInvokeOpts<T>): Promise<T> => {
+        const { errorCode, errorDeviceId, ...rest } = opts;
+        return invokeOrThrow({
+          ...rest,
+          mapError: (error: unknown) =>
+            mapError(error, { code: errorCode, deviceId: errorDeviceId }),
+        });
+      },
       emit: (event, payload) => this.emitLocal(event, payload),
       emitDeviceEvent: (event, payload) => {
         const deviceId = this.state.connectedDeviceId;

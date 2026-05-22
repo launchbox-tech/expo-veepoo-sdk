@@ -1,4 +1,4 @@
-import { invokeOrThrow, invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
+import { invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { SessionNativeMethods } from "./native";
 import { normalizePasswordData } from "./normalizers";
@@ -12,9 +12,10 @@ export class SessionCapability {
     validateDeviceId(deviceId);
     if (options) validateConnectOptions(options);
     this.ctx.log("info", "connection", "connect.start", "Connecting device", { deviceId, data: options });
-    return invokeOrThrow({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.connect(deviceId, options),
-      mapError: (e) => this.ctx.mapError(e, { code: "CONNECTION_FAILED", deviceId }),
+      errorCode: "CONNECTION_FAILED",
+      errorDeviceId: deviceId,
       afterSuccess: () => {
         this.ctx.setConnectedDeviceId(deviceId);
         this.ctx.log("info", "connection", "connect.success", "Device connect request completed", { deviceId });
@@ -27,9 +28,10 @@ export class SessionCapability {
     if (!id) return;
 
     this.ctx.log("info", "connection", "disconnect.start", "Disconnecting device", { deviceId: id });
-    return invokeOrThrow({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.disconnect(id),
-      mapError: (e) => this.ctx.mapError(e, { code: "DISCONNECTION_FAILED", deviceId: id }),
+      errorCode: "DISCONNECTION_FAILED",
+      errorDeviceId: id,
       afterSuccess: () => {
         if (this.ctx.connectedDeviceId() === id) {
           this.ctx.setConnectedDeviceId(null);
@@ -63,10 +65,9 @@ export class SessionCapability {
       deviceId: this.ctx.connectedDeviceId() ?? undefined,
       data: { is24Hour },
     });
-    return invokeOrThrow({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.verifyPassword(password, is24Hour),
       normalize: normalizePasswordData,
-      mapError: (e) => this.ctx.mapError(e, { deviceId: this.ctx.connectedDeviceId() ?? undefined }),
       afterSuccess: (result: PasswordData) => {
         this.ctx.log("info", "connection", "password.verify.result", "Device password verified", {
           deviceId: this.ctx.connectedDeviceId() ?? undefined,

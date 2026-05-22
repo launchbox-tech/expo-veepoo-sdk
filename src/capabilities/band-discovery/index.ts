@@ -1,4 +1,4 @@
-import { invokeOrThrow, invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
+import { invokeWithRecovery } from "@/bridge/native-invoke-pipeline";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { BandDiscoveryNativeMethods } from "./native";
 import { normalizePermissionsResult } from "./normalizers";
@@ -43,15 +43,14 @@ export class BandDiscoveryCapability {
 
     this.ctx.setScanning(true);
     this.ctx.emit("scan_started", {});
+    this.ctx.log("info", "scan", "scan.start", "Starting device scan", { data: options });
     try {
-      this.ctx.log("info", "scan", "scan.start", "Starting device scan", { data: options });
-      await invokeOrThrow({
+      await this.ctx.invoke({
         invoke: () => this.ctx.native.startScan(options),
-        mapError: (error: unknown) => this.ctx.mapError(error, { code: "UNKNOWN" }),
+        errorCode: "UNKNOWN",
       });
     } catch (e) {
-      this.ctx.setScanning(false);
-      this.ctx.emit("scan_stopped", {});
+      this.endScan();
       throw e;
     }
   }
@@ -60,17 +59,18 @@ export class BandDiscoveryCapability {
     if (!this.ctx.isScanning()) return;
 
     try {
-      await invokeOrThrow({
+      await this.ctx.invoke({
         invoke: () => this.ctx.native.stopScan(),
-        mapError: (error: unknown) => this.ctx.mapError(error, { code: "UNKNOWN" }),
+        errorCode: "UNKNOWN",
       });
-      this.ctx.setScanning(false);
-      this.ctx.emit("scan_stopped", {});
       this.ctx.log("info", "scan", "scan.stop", "Stopped device scan");
-    } catch (e) {
-      this.ctx.setScanning(false);
-      this.ctx.emit("scan_stopped", {});
-      throw e;
+    } finally {
+      this.endScan();
     }
+  }
+
+  private endScan(): void {
+    this.ctx.setScanning(false);
+    this.ctx.emit("scan_stopped", {});
   }
 }

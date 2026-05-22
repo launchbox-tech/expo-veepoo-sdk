@@ -3,9 +3,20 @@ import type {
   LogLevel,
   LogScope,
   VeepooError,
+  VeepooErrorCode,
   VeepooEvent,
   VeepooEventPayload,
 } from "@/types/index";
+
+/**
+ * Pipeline opts plus optional error-context customization. Capabilities pass
+ * `errorCode` / `errorDeviceId` when they need something other than the
+ * defaults (`OPERATION_FAILED` + `state.connectedDeviceId`).
+ */
+export type CapabilityInvokeOpts<T> = Omit<ThrowingInvoke<T>, "mapError"> & {
+  errorCode?: VeepooErrorCode;
+  errorDeviceId?: string;
+};
 
 /**
  * Events whose payload includes a `device_id: string` envelope. Capability
@@ -23,11 +34,11 @@ export interface CapabilityContext<TNative> {
   mapError: (error: unknown, opts?: { code?: VeepooError["code"]; deviceId?: string }) => VeepooError;
   /**
    * Runs the native-invoke pipeline with the context's default `mapError`.
-   * Use this for the common path; capabilities that need a non-default
-   * `code` / `deviceId` (e.g. band-discovery, session) call `invokeOrThrow`
-   * directly with a custom `mapError`.
+   * Pass `errorCode` / `errorDeviceId` to override the defaults
+   * (`OPERATION_FAILED` and `state.connectedDeviceId`) for this operation —
+   * the only way capabilities should reach the error pipeline.
    */
-  invoke: <T>(opts: Omit<ThrowingInvoke<T>, "mapError">) => Promise<T>;
+  invoke: <T>(opts: CapabilityInvokeOpts<T>) => Promise<T>;
   /**
    * Emit a JS-local event. Use for envelope-less events (e.g. `scan_started`).
    * Prefer `emitDeviceEvent` for any event whose payload includes `device_id`.
