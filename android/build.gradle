@@ -23,6 +23,11 @@ android {
 }
 
 dependencies {
+  // JVM-only tests live in src/test/kotlin/. AndroidJUnitRunner tests would
+  // need androidTestImplementation and a real device/emulator — out of scope
+  // for these surface checks, which only parse source files.
+  testImplementation 'junit:junit:4.13.2'
+
   implementation "com.google.code.gson:gson:2.10.1"
 
   // AAR 子项目引用 - 使用正确的项目名称格式

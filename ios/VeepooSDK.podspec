@@ -100,4 +100,13 @@ SCRIPT
   s.subspec 'VeepooSDK' do |ss|
     ss.source_files = 'VeepooSDK/*.{swift,m,h}'
   end
+
+  # File-parsing tests that don't link against the vendored frameworks. Kept
+  # in a test_spec so `pod lib lint --include-tests` and consumer Xcode test
+  # targets can pick them up without forcing the binary frameworks onto the
+  # test scheme.
+  s.test_spec 'Tests' do |ts|
+    ts.source_files = 'Tests/*.swift'
+    ts.requires_app_host = false
+  end
 end
