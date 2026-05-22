@@ -18,9 +18,47 @@
  */
 
 import type { VeepooSDKInterface } from '@/veepoo-sdk';
-import type { PersonalInfo, BatteryInfo, DeviceVersion } from '@/types/index';
+import type {
+  PersonalInfo,
+  BatteryInfo,
+  DeviceVersion,
+  VeepooEventPayload,
+} from '@/types/index';
 
 // ── Public types ────────────────────────────────────────────────────
+
+/**
+ * Narrow dependency shape for {@link runSessionBaseline}. The three reads it
+ * actually performs — nothing more. `VeepooSDKInterface` satisfies this
+ * structurally; tests can inject a 3-method fake.
+ */
+export interface SessionBaselineDeps {
+  personalInfo: {
+    syncPersonalInfo: VeepooSDKInterface['personalInfo']['syncPersonalInfo'];
+  };
+  battery: {
+    readBattery: VeepooSDKInterface['battery']['readBattery'];
+  };
+  deviceVersion: {
+    readDeviceVersion: VeepooSDKInterface['deviceVersion']['readDeviceVersion'];
+  };
+}
+
+/**
+ * Event-subscription surface required by {@link attachSessionBaseline}. Just
+ * `on('device_ready', …)` / `off('device_ready', …)`. The Band facade
+ * satisfies this; tests can pass any EventEmitter-shaped fake.
+ */
+export interface SessionBaselineEventSource {
+  on(
+    event: 'device_ready',
+    listener: (payload: VeepooEventPayload['device_ready']) => void,
+  ): unknown;
+  off(
+    event: 'device_ready',
+    listener: (payload: VeepooEventPayload['device_ready']) => void,
+  ): unknown;
+}
 
 /** Configuration for the Session baseline. */
 export interface SessionBaselineConfig {
@@ -74,13 +112,13 @@ export interface SessionBaselineHandle {
  * reject the returned promise.
  */
 export async function runSessionBaseline(
-  sdk: VeepooSDKInterface,
+  deps: SessionBaselineDeps,
   config: SessionBaselineConfig,
 ): Promise<SessionBaselineResult> {
   const [syncResult, batteryResult, versionResult] = await Promise.allSettled([
-    sdk.personalInfo.syncPersonalInfo(config.personalInfo),
-    sdk.battery.readBattery(),
-    sdk.deviceVersion.readDeviceVersion(),
+    deps.personalInfo.syncPersonalInfo(config.personalInfo),
+    deps.battery.readBattery(),
+    deps.deviceVersion.readDeviceVersion(),
   ]);
 
   const errors: SessionBaselineResult['errors'] = {};
@@ -128,29 +166,27 @@ export async function runSessionBaseline(
  * policy; the host app owns those flows.
  */
 export function attachSessionBaseline(
-  sdk: VeepooSDKInterface,
+  source: SessionBaselineDeps & SessionBaselineEventSource,
   config: AttachSessionBaselineConfig,
 ): SessionBaselineHandle {
   let destroyed = false;
 
   const listener = () => {
     if (destroyed) return;
-    void runSessionBaseline(sdk, config).then((result) => {
+    void runSessionBaseline(source, config).then((result) => {
       if (!destroyed) {
         config.onResult?.(result);
       }
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sdk.on('device_ready', listener as (payload: any) => void);
+  source.on('device_ready', listener);
 
   return {
     destroy() {
       if (destroyed) return;
       destroyed = true;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      sdk.off('device_ready', listener as (payload: any) => void);
+      source.off('device_ready', listener);
     },
   };
 }
