@@ -1,5 +1,11 @@
-import type { HalfHourData, OriginData, Spo2OriginData } from "@/types/index";
-import { isRecord, toInt, toNumber, toStringValue } from "@/normalizers/primitives";
+import type {
+  HalfHourData,
+  OriginData,
+  ReadOriginProgress,
+  Spo2OriginData,
+} from "@/types/index";
+import type { VeepooEventPayload } from "@/types/index";
+import { clamp, isRecord, toInt, toNumber, toStringValue } from "@/normalizers/primitives";
 
 function normalizeOriginItem(value: Record<string, unknown>): OriginData {
   const rawBloodGlucose = toNumber(value.bloodGlucose ?? value.glucose);
@@ -60,6 +66,45 @@ export function normalizeHalfHourData(value: unknown): HalfHourData {
     stress_value: toInt(record.stressValue ?? record.stress_value),
     met: toNumber(record.met),
   };
+}
+
+/**
+ * Bespoke envelope for the `read_origin_progress` event: the inner payload
+ * lives under `progress` and carries camelCase keys that need clamping and
+ * sane defaults. Returns the original envelope with the normalized `progress`.
+ */
+export function normalizeReadOriginProgressPayload(value: unknown): VeepooEventPayload['read_origin_progress'] {
+  if (!isRecord(value) || !isRecord(value.progress)) {
+    return value as VeepooEventPayload['read_origin_progress'];
+  }
+
+  const progress = value.progress;
+  const normalized: ReadOriginProgress = {
+    read_state:
+      typeof progress.readState === 'string'
+        ? (progress.readState as ReadOriginProgress['read_state'])
+        : 'idle',
+    total_days:
+      typeof progress.totalDays === 'number' && Number.isFinite(progress.totalDays)
+        ? Math.max(1, Math.trunc(progress.totalDays))
+        : 1,
+    current_day:
+      typeof progress.currentDay === 'number' && Number.isFinite(progress.currentDay)
+        ? Math.max(1, Math.trunc(progress.currentDay))
+        : 1,
+    progress:
+      typeof progress.progress === 'number' && Number.isFinite(progress.progress)
+        ? Math.trunc(
+            clamp(
+              progress.progress <= 1 ? progress.progress * 100 : progress.progress,
+              0,
+              100
+            )
+          )
+        : 0,
+  };
+
+  return { ...value, progress: normalized } as VeepooEventPayload['read_origin_progress'];
 }
 
 export function normalizeSpo2OriginData(value: unknown): Spo2OriginData {

@@ -1,222 +1,83 @@
-import type {
-  ReadOriginProgress,
-  VeepooEvent,
-  VeepooEventPayload,
-} from '@/types/index';
-import { isRecord, clamp } from '@/normalizers/primitives';
+import type { VeepooEvent, VeepooEventPayload } from '@/types/index';
 import { deepSnakeKeys } from '@/normalizers/deep-keys';
-import { normalizeBluetoothStatus, normalizePasswordData } from '@/capabilities/session/normalizers';
-import { normalizeAlarmList, normalizeHeartRateAlarm } from '@/capabilities/alarms/normalizers';
-import { normalizeBatteryInfo } from '@/capabilities/battery/normalizers';
-import { normalizeCameraShutterStatus } from '@/capabilities/camera/normalizers';
-import { normalizeContactList } from '@/capabilities/contacts/normalizers';
-import { normalizeDeviceBTState } from '@/capabilities/bt-status/normalizers';
-import { normalizeDeviceFunctions } from '@/capabilities/device-functions/normalizers/index';
-import { normalizeDeviceVersion } from '@/capabilities/device-version/normalizers';
-import { normalizeFindDeviceStatePayload } from '@/capabilities/find-device/normalizers';
-import { normalizeMusicRemoteCommand } from '@/capabilities/music/normalizers';
-import { normalizeSocialMsgData } from '@/capabilities/social-msg/normalizers';
-import { normalizeSosCallTimesSettings } from '@/capabilities/sos/normalizers';
 import {
-  normalizeHalfHourData,
-  normalizeOriginDataList,
-  normalizeSpo2OriginData,
-} from '@/capabilities/origin-data/normalizers';
-import { normalizeSleepDataList } from '@/capabilities/sleep-data/normalizers';
-import { normalizeSportStepData } from '@/capabilities/sport-steps/normalizers';
-import {
-  normalizeBloodAnalysisTestResult,
-  normalizeBloodGlucoseData,
-  normalizeBloodOxygenTestResult,
-  normalizeBloodPressureTestResult,
-  normalizeBodyCompositionTestResult,
-  normalizeBreathingTestResult,
-  normalizeEcgTestResult,
-  normalizeFatigueTestResult,
-  normalizeGsrTestResult,
-  normalizeHeartRateTestResult,
-  normalizeHrvTestResult,
-  normalizePttTestResult,
-  normalizeStressData,
-  normalizeTemperatureTestResult,
-} from '@/capabilities/realtime-tests/normalizers';
-import { normalizeFirmwareDfuProgress } from '@/capabilities/dfu/normalizers';
+  passthrough,
+  type EventNormalizer,
+  type PartialEventNormalizers,
+} from './event-envelope';
 
-// ── Envelope helpers ─────────────────────────────────────────────────────────
-//
-// Every native-emitted event arrives as an `event envelope` — a record with
-// device/session-scoped keys (e.g. `deviceId`) plus a single `inner payload`
-// field that holds the capability-specific value. The bridge owns envelope
-// handling; capabilities own their inner-payload normalizers. See CONTEXT.md
-// for the canonical definitions.
+// Capability-owned event slices. Each capability declares the dispatch
+// entries for events it produces; the bridge merges them into one table.
+// See CONTEXT.md for the envelope / inner-payload split.
+import { EVENT_NORMALIZERS as ALARMS_EVENTS } from '@/capabilities/alarms/events';
+import { EVENT_NORMALIZERS as BAND_DISCOVERY_EVENTS } from '@/capabilities/band-discovery/events';
+import { EVENT_NORMALIZERS as BATTERY_EVENTS } from '@/capabilities/battery/events';
+import { EVENT_NORMALIZERS as BT_STATUS_EVENTS } from '@/capabilities/bt-status/events';
+import { EVENT_NORMALIZERS as CAMERA_EVENTS } from '@/capabilities/camera/events';
+import { EVENT_NORMALIZERS as CONTACTS_EVENTS } from '@/capabilities/contacts/events';
+import { EVENT_NORMALIZERS as DEVICE_FUNCTIONS_EVENTS } from '@/capabilities/device-functions/events';
+import { EVENT_NORMALIZERS as DEVICE_SWITCHES_EVENTS } from '@/capabilities/device-switches/events';
+import { EVENT_NORMALIZERS as DEVICE_VERSION_EVENTS } from '@/capabilities/device-version/events';
+import { EVENT_NORMALIZERS as DFU_EVENTS } from '@/capabilities/dfu/events';
+import { EVENT_NORMALIZERS as FIND_DEVICE_EVENTS } from '@/capabilities/find-device/events';
+import { EVENT_NORMALIZERS as HISTORICAL_QUERY_EVENTS } from '@/capabilities/historical-query/events';
+import { EVENT_NORMALIZERS as MUSIC_EVENTS } from '@/capabilities/music/events';
+import { EVENT_NORMALIZERS as ORIGIN_DATA_EVENTS } from '@/capabilities/origin-data/events';
+import { EVENT_NORMALIZERS as REALTIME_TESTS_EVENTS } from '@/capabilities/realtime-tests/events';
+import { EVENT_NORMALIZERS as SESSION_EVENTS } from '@/capabilities/session/events';
+import { EVENT_NORMALIZERS as SLEEP_DATA_EVENTS } from '@/capabilities/sleep-data/events';
+import { EVENT_NORMALIZERS as SOCIAL_MSG_EVENTS } from '@/capabilities/social-msg/events';
+import { EVENT_NORMALIZERS as SOS_EVENTS } from '@/capabilities/sos/events';
+import { EVENT_NORMALIZERS as SPORT_MODE_EVENTS } from '@/capabilities/sport-mode/events';
+import { EVENT_NORMALIZERS as SPORT_STEPS_EVENTS } from '@/capabilities/sport-steps/events';
 
-type EventNormalizer<K extends VeepooEvent> = (raw: unknown) => VeepooEventPayload[K];
-
-/** Identity normalizer for events whose envelope needs no value-level rewriting. */
-const passthrough = <K extends VeepooEvent>(): EventNormalizer<K> =>
-  (raw) => raw as VeepooEventPayload[K];
+// Re-exported so existing tests can still reach the helper.
+export { normalizeReadOriginProgressPayload } from '@/capabilities/origin-data/normalizers';
 
 /**
- * Spread the envelope, replace one inner-payload field with its normalized
- * shape. `fallbackKey` lets a few events tolerate native sending the inner
- * payload under either of two camelCase keys.
+ * Events without a capability owner: SDK-lifecycle (sdk_initialized,
+ * scan_started, scan_stopped) and orphan event payloads whose data shape
+ * lives in `types/` (custom_settings_data, health_remind_data,
+ * apnea_remind_data, error).
  */
-function wrapInner<K extends VeepooEvent>(
-  field: string,
-  normalize: (raw: unknown) => unknown,
-  options?: { fallbackKey?: string },
-): EventNormalizer<K> {
-  return (raw) => {
-    const p = isRecord(raw) ? raw : {};
-    const primary = (p as Record<string, unknown>)[field];
-    const value =
-      options?.fallbackKey !== undefined && primary === undefined
-        ? (p as Record<string, unknown>)[options.fallbackKey]
-        : primary;
-    return { ...p, [field]: normalize(value) } as VeepooEventPayload[K];
-  };
-}
-
-// ── Bespoke normalizers (kept inline for events with non-uniform envelopes) ──
-
-export function normalizeReadOriginProgressPayload(value: unknown): VeepooEventPayload['read_origin_progress'] {
-  if (!isRecord(value) || !isRecord(value.progress)) {
-    return value as VeepooEventPayload['read_origin_progress'];
-  }
-
-  const progress = value.progress;
-  const normalized: ReadOriginProgress = {
-    read_state:
-      typeof progress.readState === 'string'
-        ? (progress.readState as ReadOriginProgress['read_state'])
-        : 'idle',
-    total_days:
-      typeof progress.totalDays === 'number' && Number.isFinite(progress.totalDays)
-        ? Math.max(1, Math.trunc(progress.totalDays))
-        : 1,
-    current_day:
-      typeof progress.currentDay === 'number' && Number.isFinite(progress.currentDay)
-        ? Math.max(1, Math.trunc(progress.currentDay))
-        : 1,
-    progress:
-      typeof progress.progress === 'number' && Number.isFinite(progress.progress)
-        ? Math.trunc(
-            clamp(
-              progress.progress <= 1 ? progress.progress * 100 : progress.progress,
-              0,
-              100
-            )
-          )
-        : 0,
-  };
-
-  return { ...value, progress: normalized } as VeepooEventPayload['read_origin_progress'];
-}
-
-/**
- * Typed dispatch table — every `VeepooEvent` key must appear here, and each
- * entry's return type must satisfy `VeepooEventPayload[K]`.  TypeScript will
- * error at compile time if a key is missing or the return type is wrong.
- */
-const EVENT_NORMALIZERS = {
-  // ── pass-throughs ─────────────────────────────────────────────────────────
-  device_found: passthrough<'device_found'>(),
-  device_connected: passthrough<'device_connected'>(),
-  device_disconnected: passthrough<'device_disconnected'>(),
-  device_connect_status: passthrough<'device_connect_status'>(),
-  device_ready: passthrough<'device_ready'>(),
-  read_origin_complete: passthrough<'read_origin_complete'>(),
-  connection_status_changed: passthrough<'connection_status_changed'>(),
-  device_sos_triggered: passthrough<'device_sos_triggered'>(),
+const ORPHAN_EVENT_NORMALIZERS = {
   custom_settings_data: passthrough<'custom_settings_data'>(),
   health_remind_data: passthrough<'health_remind_data'>(),
   apnea_remind_data: passthrough<'apnea_remind_data'>(),
-  exercise_session_data: passthrough<'exercise_session_data'>(),
-  accurate_sleep_data: passthrough<'accurate_sleep_data'>(),
-  stored_temperature_data: passthrough<'stored_temperature_data'>(),
-  stored_blood_glucose_data: passthrough<'stored_blood_glucose_data'>(),
-  stored_hrv_data: passthrough<'stored_hrv_data'>(),
-  stored_ecg_data: passthrough<'stored_ecg_data'>(),
-  stored_body_composition_data: passthrough<'stored_body_composition_data'>(),
-  ptt_state_changed: passthrough<'ptt_state_changed'>(),
   error: passthrough<'error'>(),
-  spo2_alarm_data: passthrough<'spo2_alarm_data'>(),
-  device_switches_data: passthrough<'device_switches_data'>(),
-
-  // ── wrap-inner: envelope + one normalized inner-payload key ───────────────
-  password_data: wrapInner('data', normalizePasswordData),
-  social_msg_data: wrapInner('data', normalizeSocialMsgData),
-  device_version: wrapInner('version', normalizeDeviceVersion),
-  origin_five_minute_data: wrapInner('data', (raw) => normalizeOriginDataList([raw])[0]),
-  origin_half_hour_data: wrapInner('data', normalizeHalfHourData),
-  sleep_data: wrapInner('data', (raw) => normalizeSleepDataList(raw)[0]),
-  sport_step_data: wrapInner('data', normalizeSportStepData),
-  heart_rate_test_result: wrapInner('result', normalizeHeartRateTestResult),
-  blood_pressure_test_result: wrapInner('result', normalizeBloodPressureTestResult),
-  blood_oxygen_test_result: wrapInner('result', normalizeBloodOxygenTestResult),
-  temperature_test_result: wrapInner('result', normalizeTemperatureTestResult),
-  stress_data: wrapInner('data', normalizeStressData),
-  blood_glucose_data: wrapInner('data', normalizeBloodGlucoseData),
-  battery_data: wrapInner('data', normalizeBatteryInfo),
-  origin_spo2_data: wrapInner('data', normalizeSpo2OriginData),
-  alarm_data: wrapInner('alarms', normalizeAlarmList, { fallbackKey: 'data' }),
-  heart_rate_alarm_data: wrapInner('data', normalizeHeartRateAlarm),
-  contacts_data: wrapInner('contacts', normalizeContactList, { fallbackKey: 'data' }),
-  sos_call_times_data: wrapInner('data', normalizeSosCallTimesSettings),
-  camera_shutter: wrapInner('status', normalizeCameraShutterStatus),
-  music_remote_command: wrapInner('command', normalizeMusicRemoteCommand),
-  hrv_test_result: wrapInner('result', normalizeHrvTestResult),
-  ecg_test_result: wrapInner('result', normalizeEcgTestResult),
-  fatigue_test_result: wrapInner('result', normalizeFatigueTestResult),
-  breathing_test_result: wrapInner('result', normalizeBreathingTestResult),
-  body_composition_test_result: wrapInner('result', normalizeBodyCompositionTestResult),
-  blood_analysis_test_result: wrapInner('result', normalizeBloodAnalysisTestResult),
-  gsr_test_result: wrapInner('result', normalizeGsrTestResult),
-  ptt_test_result: wrapInner('result', normalizePttTestResult),
-
-  // ── bespoke (non-uniform envelopes) ───────────────────────────────────────
-  read_origin_progress: (raw) => normalizeReadOriginProgressPayload(raw),
-  firmware_dfu_progress: (raw) => normalizeFirmwareDfuProgress(raw),
-  bluetooth_state_changed: (raw) => {
-    const p = isRecord(raw) ? raw : {};
-    return normalizeBluetoothStatus(p) as VeepooEventPayload['bluetooth_state_changed'];
-  },
-  find_device_state: (raw) => {
-    const p = isRecord(raw) ? raw : {};
-    return normalizeFindDeviceStatePayload(p);
-  },
-  device_function: (raw) => {
-    const p = isRecord(raw) ? raw : {};
-    return {
-      ...p,
-      data: normalizeDeviceFunctions(p.data ?? p.functions),
-      functions: normalizeDeviceFunctions(p.functions ?? p.data),
-    } as VeepooEventPayload['device_function'];
-  },
-  sport_mode_data: (raw) => {
-    const p = isRecord(raw) ? raw : {};
-    const rawMode = p.mode;
-    // Native sends camelCase e.g. "outdoorRun"; TypeScript SportMode is snake_case "outdoor_run"
-    const mode =
-      typeof rawMode === 'string' && rawMode !== '' && rawMode !== 'common'
-        ? (rawMode.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`) as VeepooEventPayload['sport_mode_data']['mode'])
-        : null;
-    return { ...p, mode } as VeepooEventPayload['sport_mode_data'];
-  },
-  device_bt_state_changed: (raw) => {
-    const p = isRecord(raw) ? raw : {};
-    return {
-      ...p,
-      state: normalizeDeviceBTState(p.state ?? p.btState),
-      bt_switch_open: (p.btSwitchOpen ?? p.bt_switch_open) === true,
-      media_switch_open: (p.mediaSwitchOpen ?? p.media_switch_open) === true,
-    } as VeepooEventPayload['device_bt_state_changed'];
-  },
-
-  // ── JS-only events ────────────────────────────────────────────────────────
   sdk_initialized: () => ({} as VeepooEventPayload['sdk_initialized']),
   scan_started: () => ({} as VeepooEventPayload['scan_started']),
   scan_stopped: () => ({} as VeepooEventPayload['scan_stopped']),
+} satisfies PartialEventNormalizers;
+
+/**
+ * Typed dispatch table — every `VeepooEvent` key must appear, satisfied
+ * either by a capability slice or by ORPHAN_EVENT_NORMALIZERS. TypeScript
+ * errors at compile time if a key is missing or a return type is wrong.
+ */
+const EVENT_NORMALIZERS = {
+  ...ALARMS_EVENTS,
+  ...BAND_DISCOVERY_EVENTS,
+  ...BATTERY_EVENTS,
+  ...BT_STATUS_EVENTS,
+  ...CAMERA_EVENTS,
+  ...CONTACTS_EVENTS,
+  ...DEVICE_FUNCTIONS_EVENTS,
+  ...DEVICE_SWITCHES_EVENTS,
+  ...DEVICE_VERSION_EVENTS,
+  ...DFU_EVENTS,
+  ...FIND_DEVICE_EVENTS,
+  ...HISTORICAL_QUERY_EVENTS,
+  ...MUSIC_EVENTS,
+  ...ORIGIN_DATA_EVENTS,
+  ...REALTIME_TESTS_EVENTS,
+  ...SESSION_EVENTS,
+  ...SLEEP_DATA_EVENTS,
+  ...SOCIAL_MSG_EVENTS,
+  ...SOS_EVENTS,
+  ...SPORT_MODE_EVENTS,
+  ...SPORT_STEPS_EVENTS,
+  ...ORPHAN_EVENT_NORMALIZERS,
 } satisfies { [K in VeepooEvent]: EventNormalizer<K> };
 
 export function normalizeEventPayload<K extends VeepooEvent>(
