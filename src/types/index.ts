@@ -144,4 +144,4 @@ export type {
   FirmwareDfuProgress,
 } from './events';
 
-export type { VeepooErrorCode, VeepooError, LogLevel, LogScope, LogEntry } from './errors';
+export type { VeepooErrorCode, VeepooError, LogLevel, LogScope, LogEntry, LogListener } from './errors';

@@ -49,3 +49,5 @@ export interface LogEntry {
   data?: unknown;
   error?: string;
 }
+
+export type LogListener = (entry: LogEntry) => void;

@@ -3,13 +3,13 @@ import { Platform } from "react-native";
 import type {
   LogEntry,
   LogLevel,
+  LogListener,
   LogScope,
   VeepooError,
   VeepooEvent,
   VeepooEventPayload,
 } from "@/types/index";
 import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
-import type { LogListener } from "@/veepoo-sdk-module";
 import { EVENT_LOG_SCOPES, normalizeEventPayload } from "@/bridge/event-registry";
 import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
 import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";

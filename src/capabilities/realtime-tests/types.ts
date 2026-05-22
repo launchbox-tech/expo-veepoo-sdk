@@ -96,7 +96,7 @@ export interface HrvTestResult {
   raw_state?: string;
 }
 
-/** Options for {@link VeepooSDKModuleInterface.startEcgTest}. */
+/** Options for {@link VeepooSDKInterface.startEcgTest}. */
 export interface EcgTestOptions {
   /** When true, native may attach waveform samples to `ecgTestResult` events (Band + platform dependent). */
   include_waveform?: boolean;

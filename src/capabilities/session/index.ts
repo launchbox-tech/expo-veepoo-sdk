@@ -81,32 +81,28 @@ export class SessionCapability {
   }
 
   renameDevice(name: string): Promise<OperationStatus> {
-    return invokeOrThrow({
+    return this.ctx.invoke({
       validate: () => validateDeviceName(name),
       invoke: () => this.ctx.native.renameDevice(name),
-      mapError: (e) => this.ctx.mapError(e),
     });
   }
 
   isConnectionConfirmEnabled(): Promise<boolean> {
-    return invokeOrThrow({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.isConnectionConfirmEnabled(),
-      mapError: (e) => this.ctx.mapError(e),
     });
   }
 
   setConnectionConfirmEnabled(enabled: boolean): Promise<OperationStatus> {
-    return invokeOrThrow({
+    return this.ctx.invoke({
       invoke: () => this.ctx.native.setConnectionConfirmEnabled(enabled),
-      mapError: (e) => this.ctx.mapError(e),
     });
   }
 
   setConnectionConfirmTimeout(seconds: number): Promise<OperationStatus> {
-    return invokeOrThrow({
+    return this.ctx.invoke({
       validate: () => validateConnectionConfirmTimeout(seconds),
       invoke: () => this.ctx.native.setConnectionConfirmTimeout(seconds),
-      mapError: (e) => this.ctx.mapError(e),
     });
   }
 }

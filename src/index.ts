@@ -103,7 +103,7 @@ export type {
 export { RealtimeTest } from './types/index';
 export type { RealtimeTestModality } from './types/index';
 
-export type { VeepooSDKModuleInterface, LogListener } from './veepoo-sdk-module';
+export type { LogListener } from './types/index';
 
 export { mapNativeRejection, isVeepooErrorShape } from './errors/map-native-rejection';
 export type { MapNativeRejectionContext } from './errors/map-native-rejection';

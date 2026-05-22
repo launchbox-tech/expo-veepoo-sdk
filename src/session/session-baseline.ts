@@ -17,7 +17,7 @@
  * @module
  */
 
-import type { VeepooSDKModuleInterface } from '@/veepoo-sdk-module';
+import type { VeepooSDKInterface } from '@/veepoo-sdk';
 import type { PersonalInfo, BatteryInfo, DeviceVersion } from '@/types/index';
 
 // ── Public types ────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ export interface SessionBaselineHandle {
  * reject the returned promise.
  */
 export async function runSessionBaseline(
-  sdk: VeepooSDKModuleInterface,
+  sdk: VeepooSDKInterface,
   config: SessionBaselineConfig,
 ): Promise<SessionBaselineResult> {
   const [syncResult, batteryResult, versionResult] = await Promise.allSettled([
@@ -128,7 +128,7 @@ export async function runSessionBaseline(
  * policy; the host app owns those flows.
  */
 export function attachSessionBaseline(
-  sdk: VeepooSDKModuleInterface,
+  sdk: VeepooSDKInterface,
   config: AttachSessionBaselineConfig,
 ): SessionBaselineHandle {
   let destroyed = false;

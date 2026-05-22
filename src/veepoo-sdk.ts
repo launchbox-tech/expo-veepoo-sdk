@@ -1,7 +1,6 @@
-import type { VeepooEvent, VeepooEventPayload } from "./types/index";
+import type { LogListener, VeepooEvent, VeepooEventPayload } from "./types/index";
 import type { NativeVeepooSDKInterface } from "./native-veepoo-sdk";
 import { NativeVeepooSDK } from "./native-veepoo-sdk";
-import type { LogListener } from "./veepoo-sdk-module";
 import { VeepooSDKRuntime } from "./sdk/veepoo-sdk-runtime";
 
 import { AlarmsCapability } from "./capabilities/alarms/index";
