@@ -84,4 +84,4 @@ fi
 
 echo ""
 echo "SDK snapshots ready in $DEST"
-echo "Run 'node build/bridge-contract/cli-check-upstream-sdk.js' to verify coverage."
+echo "Run 'node build/bridge-contract/run-contract-checks.js upstream-sdk' to verify coverage."

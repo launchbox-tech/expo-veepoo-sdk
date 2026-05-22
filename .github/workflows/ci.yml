@@ -45,10 +45,10 @@ jobs:
         run: bun run build
 
       - name: Verify Veepoo events bridge contract
-        run: node build/bridge-contract/cli-check-veepoo-events.js
+        run: node build/bridge-contract/run-contract-checks.js veepoo-events
 
       - name: Verify native rejection bridge contract
-        run: node build/bridge-contract/cli-check-native-rejection.js
+        run: node build/bridge-contract/run-contract-checks.js native-rejection
 
       - name: Verify vendor manifest
         run: bun run vendor:check
@@ -75,7 +75,7 @@ jobs:
         run: bash scripts/fetch-sdk-snapshots.sh
 
       - name: Verify upstream SDK coverage
-        run: node build/bridge-contract/cli-check-upstream-sdk.js
+        run: node build/bridge-contract/run-contract-checks.js upstream-sdk
 
       - name: Test with coverage
         run: bun run test:coverage
