@@ -28,7 +28,12 @@ jobs:
             ${{ runner.os }}-bun-
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        # --ignore-scripts: bun on Linux doesn't set executable bits on subcommand
+        # bin files (e.g. expo-module-prepublishOnly) that aren't declared in the
+        # package's `bin` field, so the `prepare` hook crashes during install. We
+        # run `bun run build` explicitly below, which is what `prepare` would have
+        # done anyway.
+        run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Lint
         run: bun run lint
