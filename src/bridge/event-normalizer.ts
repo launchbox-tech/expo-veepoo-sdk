@@ -1,5 +1,5 @@
 import type { VeepooEvent, VeepooEventPayload } from '@/types/index';
-import { deepSnakeKeys } from '@/normalizers/deep-keys';
+import { deepSnakeKeys } from '@/shared/deep-keys';
 import {
   passthrough,
   type EventNormalizer,

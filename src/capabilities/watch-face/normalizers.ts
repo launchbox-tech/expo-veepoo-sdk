@@ -1,5 +1,5 @@
 import type { WatchFaceDialType, WatchFaceStyle } from "@/types/index";
-import { isRecord, toInt, toStringValue } from "@/normalizers/primitives";
+import { isRecord, toInt, toStringValue } from "@/shared/primitives";
 
 export function normalizeWatchFaceStyle(value: unknown): WatchFaceStyle {
   const record = isRecord(value) ? value : {};

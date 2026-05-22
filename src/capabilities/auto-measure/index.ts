@@ -3,7 +3,7 @@ import type { AutoMeasureNativeMethods } from "./native";
 import { normalizeAutoMeasureSettings } from "./normalizers";
 import { validateAutoMeasureSetting } from "./validators";
 import type { AutoMeasureSetting } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class AutoMeasureCapability {
   constructor(private readonly ctx: CapabilityContext<AutoMeasureNativeMethods>) {}

@@ -5,7 +5,7 @@ import type {
   PermissionStatus,
   PermissionsResult,
 } from "@/types/index";
-import { isRecord, toBoolean } from "@/normalizers/primitives";
+import { isRecord, toBoolean } from "@/shared/primitives";
 
 const bluetoothStatesByCode: BluetoothState[] = [
   'unknown',

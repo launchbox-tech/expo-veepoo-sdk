@@ -3,7 +3,7 @@ import type { WomenHealthNativeMethods } from "./native";
 import { normalizeWomenHealthSettings } from "./normalizers";
 import { validateWomenHealthSettings } from "./validators";
 import type { WomenHealthSettings } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class WomenHealthCapability {
   constructor(private readonly ctx: CapabilityContext<WomenHealthNativeMethods>) {}

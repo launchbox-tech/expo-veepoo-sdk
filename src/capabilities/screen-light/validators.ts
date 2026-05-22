@@ -1,5 +1,5 @@
 import type { ScreenLightSettings } from "@/types/index";
-import { requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
+import { requireInRange, requireValidHour, requireValidMinute } from "@/shared/assertions";
 
 export function validateScreenLightSettings(s: ScreenLightSettings): void {
   requireValidHour(s.night_start_hour, 'nightStartHour');

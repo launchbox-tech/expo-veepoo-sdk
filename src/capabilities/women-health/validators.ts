@@ -3,7 +3,7 @@ import type {
   WomenHealthSettings,
   WomenHealthStatus,
 } from "@/types/index";
-import { requireInRange } from "@/validators/shared";
+import { requireInRange } from "@/shared/assertions";
 
 const YMD = /^\d{4}-\d{2}-\d{2}$/;
 

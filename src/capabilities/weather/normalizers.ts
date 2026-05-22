@@ -1,5 +1,5 @@
 import type { WeatherSettings, WeatherUnit } from "@/types/index";
-import { isRecord, toInt, toBoolean, toStringValue } from "@/normalizers/primitives";
+import { isRecord, toInt, toBoolean, toStringValue } from "@/shared/primitives";
 
 /** Normalizes native `WeatherStatusData` / `VPWeatherConfigModel` read result. */
 export function normalizeWeatherSettings(value: unknown): WeatherSettings {

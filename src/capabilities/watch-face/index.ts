@@ -3,7 +3,7 @@ import type { WatchFaceNativeMethods } from "./native";
 import { normalizeWatchFaceStyle } from "./normalizers";
 import { validateReadWatchFaceStyleOptions, validateWatchFaceStyleSettings } from "./validators";
 import type { WatchFaceDialType, WatchFaceStyle, WatchFaceStyleSettings } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class WatchFaceCapability {
   constructor(private readonly ctx: CapabilityContext<WatchFaceNativeMethods>) {}

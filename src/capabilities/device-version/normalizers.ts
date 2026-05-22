@@ -1,5 +1,5 @@
 import type { DeviceVersion } from "@/types/index";
-import { isRecord, toStringValue } from "@/normalizers/primitives";
+import { isRecord, toStringValue } from "@/shared/primitives";
 
 export function normalizeDeviceVersion(value: unknown): DeviceVersion {
   const record = isRecord(value) ? value : {};

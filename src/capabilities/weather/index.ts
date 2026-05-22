@@ -3,7 +3,7 @@ import type { WeatherNativeMethods } from "./native";
 import { normalizeWeatherSettings } from "./normalizers";
 import { validateWeatherSettings, validateWeatherData } from "./validators";
 import type { WeatherData, WeatherSettings } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class WeatherCapability {
   constructor(private readonly ctx: CapabilityContext<WeatherNativeMethods>) {}

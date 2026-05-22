@@ -1,5 +1,5 @@
 import type { DaySummaryData } from "@/types/index";
-import { isRecord, toInt, toNumber, toStringValue } from "@/normalizers/primitives";
+import { isRecord, toInt, toNumber, toStringValue } from "@/shared/primitives";
 
 export function normalizeDaySummaryData(value: unknown): DaySummaryData {
   const record = isRecord(value) ? value : {};

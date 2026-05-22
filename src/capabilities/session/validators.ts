@@ -1,5 +1,5 @@
 import type { ConnectOptions } from "@/types/index";
-import { requireNonEmptyString, requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
+import { requireNonEmptyString, requireInRange, requireValidHour, requireValidMinute } from "@/shared/assertions";
 
 export { validatePersonalInfo } from "@/capabilities/personal-info/validators";
 

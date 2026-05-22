@@ -1,5 +1,5 @@
 import type { VeepooEventPayload } from '@/types/index';
-import { isRecord } from '@/normalizers/primitives';
+import { isRecord } from '@/shared/primitives';
 import { passthrough, wrapInner, type PartialEventNormalizers } from '@/bridge/event-envelope';
 import { normalizeBluetoothStatus, normalizePasswordData } from './normalizers';
 

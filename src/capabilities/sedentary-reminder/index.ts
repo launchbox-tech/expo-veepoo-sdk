@@ -3,7 +3,7 @@ import type { SedentaryReminderNativeMethods } from "./native";
 import { normalizeSedentaryReminderSettings } from "./normalizers";
 import { validateSedentaryReminderSettings } from "./validators";
 import type { SedentaryReminderSettings } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class SedentaryReminderCapability {
   constructor(private readonly ctx: CapabilityContext<SedentaryReminderNativeMethods>) {}

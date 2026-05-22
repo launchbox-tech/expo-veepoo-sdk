@@ -1,7 +1,7 @@
 import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { RealtimeTestsNativeMethods } from "./native";
 import type { EcgTestOptions, RealtimeTestModality } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 type Direction = "start" | "stop";
 

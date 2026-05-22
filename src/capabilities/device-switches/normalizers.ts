@@ -1,5 +1,5 @@
 import type { DeviceSwitches, DeviceSwitchType } from "@/types/index";
-import { isRecord, toBoolean } from "@/normalizers/primitives";
+import { isRecord, toBoolean } from "@/shared/primitives";
 
 const SWITCH_KEYS: DeviceSwitchType[] = [
   'auto_hr', 'auto_bp', 'auto_spo2', 'auto_temperature', 'auto_hrv',

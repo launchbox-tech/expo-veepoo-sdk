@@ -3,7 +3,7 @@ import type { ScreenLightNativeMethods } from "./native";
 import { normalizeScreenLightSettings, normalizeScreenLightDuration } from "./normalizers";
 import { validateScreenLightSettings, validateScreenLightDurationSeconds } from "./validators";
 import type { ScreenLightDuration, ScreenLightSettings } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class ScreenLightCapability {
   constructor(private readonly ctx: CapabilityContext<ScreenLightNativeMethods>) {}

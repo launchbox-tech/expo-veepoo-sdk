@@ -1,6 +1,6 @@
 import type { SportMode, SportModeStatus } from "@/types/index";
 import { SPORT_MODE_ORDINALS } from "@/types/index";
-import { isRecord, toBoolean } from "@/normalizers/primitives";
+import { isRecord, toBoolean } from "@/shared/primitives";
 
 export function normalizeSportModeStatus(value: unknown): SportModeStatus {
   const record = isRecord(value) ? value : {};

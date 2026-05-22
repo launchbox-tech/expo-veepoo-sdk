@@ -2,7 +2,7 @@ import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { MusicNativeMethods } from "./native";
 import { validateMusicData } from "./validators";
 import type { MusicData } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class MusicCapability {
   constructor(private readonly ctx: CapabilityContext<MusicNativeMethods>) {}

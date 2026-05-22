@@ -1,5 +1,5 @@
 import type { DeviceContact } from "@/types/index";
-import { isRecord, toInt, toBoolean, toStringValue } from "@/normalizers/primitives";
+import { isRecord, toInt, toBoolean, toStringValue } from "@/shared/primitives";
 
 function normalizeContact(raw: unknown): DeviceContact | null {
   if (!isRecord(raw)) return null;

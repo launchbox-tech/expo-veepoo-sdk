@@ -1,5 +1,5 @@
 import type { VeepooEvent, VeepooEventPayload } from '@/types/index';
-import { isRecord } from '@/normalizers/primitives';
+import { isRecord } from '@/shared/primitives';
 
 /**
  * Every native-emitted event arrives as an `event envelope` — a record with

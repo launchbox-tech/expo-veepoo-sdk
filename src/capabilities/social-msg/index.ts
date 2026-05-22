@@ -3,7 +3,7 @@ import type { SocialMsgNativeMethods } from "./native";
 import { normalizeSocialMsgData } from "./normalizers";
 import { validateSocialMsgData } from "./validators";
 import type { OperationStatus, SocialMsgData } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class SocialMsgCapability {
   constructor(private readonly ctx: CapabilityContext<SocialMsgNativeMethods>) {}

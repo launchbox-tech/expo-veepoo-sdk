@@ -7,7 +7,7 @@ import {
   toStringValue,
   normalizeFunctionStatus,
   normalizeTestState,
-} from '@/normalizers/primitives';
+} from '@/shared/primitives';
 
 describe('isRecord', () => {
   it('returns true for plain objects', () => {

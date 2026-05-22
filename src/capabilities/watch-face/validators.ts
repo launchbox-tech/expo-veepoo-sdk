@@ -1,5 +1,5 @@
 import type { WatchFaceDialType, WatchFaceStyleSettings } from "@/types/index";
-import { requireInRange } from "@/validators/shared";
+import { requireInRange } from "@/shared/assertions";
 
 const WATCH_FACE_DIAL_TYPES = new Set<WatchFaceDialType>(['default', 'market', 'photo']);
 

@@ -3,7 +3,7 @@ import type { AlarmNativeMethods } from "./native";
 import { normalizeAlarmList, normalizeHeartRateAlarm, normalizeSpo2Alarm } from "./normalizers";
 import { validateAlarm, validateDeleteAlarm, validateHeartRateAlarm, validateSpo2Alarm } from "./validators";
 import type { DeviceAlarm, HeartRateAlarm, OperationStatus, Spo2Alarm } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class AlarmsCapability {
   constructor(private readonly ctx: CapabilityContext<AlarmNativeMethods>) {}

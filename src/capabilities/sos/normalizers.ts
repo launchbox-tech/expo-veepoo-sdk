@@ -1,5 +1,5 @@
 import type { SosCallTimesSettings } from "@/types/index";
-import { isRecord, toInt } from "@/normalizers/primitives";
+import { isRecord, toInt } from "@/shared/primitives";
 
 export function normalizeSosCallTimesSettings(value: unknown): SosCallTimesSettings {
   const record = isRecord(value) ? value : {};

@@ -1,5 +1,5 @@
 import type { PasswordData } from "@/types/index";
-import { isRecord, toBoolean, toStringValue, normalizeFunctionStatus } from "@/normalizers/primitives";
+import { isRecord, toBoolean, toStringValue, normalizeFunctionStatus } from "@/shared/primitives";
 
 export { normalizePermissionsResult, normalizeBluetoothStatus } from "@/capabilities/band-discovery/normalizers";
 

@@ -1,5 +1,5 @@
 import type { SedentaryReminderSettings } from "@/types/index";
-import { requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
+import { requireInRange, requireValidHour, requireValidMinute } from "@/shared/assertions";
 
 /** Vendor long-sit gate is 30–240 minutes (iOS `longSeatGateValue`). */
 export function validateSedentaryReminderSettings(s: SedentaryReminderSettings): void {

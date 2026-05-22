@@ -1,5 +1,5 @@
 import type { BloodGlucoseRiskConfig } from "@/types/index";
-import { requireInRange } from "@/validators/shared";
+import { requireInRange } from "@/shared/assertions";
 
 export function validateBloodPressureCalibration(systolic: number, diastolic: number): void {
   requireInRange(systolic, 'systolic', 60, 250);

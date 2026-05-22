@@ -1,5 +1,5 @@
 import type { AutoMeasureSetting } from "@/types/index";
-import { requireInRange } from "@/validators/shared";
+import { requireInRange } from "@/shared/assertions";
 
 export function validateAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): void {
   if (setting.measure_interval !== undefined) {

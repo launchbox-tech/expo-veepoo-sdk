@@ -3,7 +3,7 @@ import type { WorldClockNativeMethods } from "./native";
 import { normalizeWorldClockList } from "./normalizers";
 import { validateWorldClockList } from "./validators";
 import type { WorldClockEntry, OperationStatus } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class WorldClockCapability {
   constructor(private readonly ctx: CapabilityContext<WorldClockNativeMethods>) {}

@@ -1,5 +1,5 @@
 import type { DeviceAlarm, HeartRateAlarm, Spo2Alarm } from "@/types/index";
-import { isRecord, toInt, toBoolean } from "@/normalizers/primitives";
+import { isRecord, toInt, toBoolean } from "@/shared/primitives";
 
 function repeatStringToWeekdays(repeatStr: string): number[] {
   const days: number[] = [];

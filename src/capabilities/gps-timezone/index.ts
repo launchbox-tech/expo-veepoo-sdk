@@ -2,7 +2,7 @@ import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { GpsTimezoneNativeMethods } from "./native";
 import { validateGPSAndTimezoneData } from "./validators";
 import type { GPSAndTimezoneData } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class GpsTimezoneCapability {
   constructor(private readonly ctx: CapabilityContext<GpsTimezoneNativeMethods>) {}

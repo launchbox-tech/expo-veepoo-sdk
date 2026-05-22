@@ -1,5 +1,5 @@
 import type { WorldClockEntry } from "@/types/index";
-import { requireInRange, requireNonEmptyString } from "@/validators/shared";
+import { requireInRange, requireNonEmptyString } from "@/shared/assertions";
 
 export function validateWorldClockList(clocks: WorldClockEntry[]): void {
   if (clocks.length > 4) {

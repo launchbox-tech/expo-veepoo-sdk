@@ -5,7 +5,7 @@ import type {
   Spo2OriginData,
 } from "@/types/index";
 import type { VeepooEventPayload } from "@/types/index";
-import { clamp, isRecord, toInt, toNumber, toStringValue } from "@/normalizers/primitives";
+import { clamp, isRecord, toInt, toNumber, toStringValue } from "@/shared/primitives";
 
 function normalizeOriginItem(value: Record<string, unknown>): OriginData {
   const rawBloodGlucose = toNumber(value.bloodGlucose ?? value.glucose);

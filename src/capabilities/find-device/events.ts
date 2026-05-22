@@ -1,4 +1,4 @@
-import { isRecord } from '@/normalizers/primitives';
+import { isRecord } from '@/shared/primitives';
 import { type PartialEventNormalizers } from '@/bridge/event-envelope';
 import { normalizeFindDeviceStatePayload } from './normalizers';
 

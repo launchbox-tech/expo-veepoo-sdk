@@ -1,5 +1,5 @@
 import type { FindDevicePhase } from "@/types/index";
-import { isRecord, toStringValue } from "@/normalizers/primitives";
+import { isRecord, toStringValue } from "@/shared/primitives";
 
 const FIND_DEVICE_PHASES: readonly FindDevicePhase[] = [
   'unsupported',

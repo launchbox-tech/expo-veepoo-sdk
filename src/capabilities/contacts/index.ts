@@ -3,7 +3,7 @@ import type { ContactsNativeMethods } from "./native";
 import { normalizeContactList } from "./normalizers";
 import { validateNewContact, validateContactId } from "./validators";
 import type { DeviceContact, NewDeviceContact } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class ContactsCapability {
   constructor(private readonly ctx: CapabilityContext<ContactsNativeMethods>) {}

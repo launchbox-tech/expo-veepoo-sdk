@@ -1,5 +1,5 @@
 import type { WorldClockEntry } from "@/types/index";
-import { isRecord, toInt } from "@/normalizers/primitives";
+import { isRecord, toInt } from "@/shared/primitives";
 
 export function normalizeWorldClockList(value: unknown): WorldClockEntry[] {
   if (!Array.isArray(value)) return [];

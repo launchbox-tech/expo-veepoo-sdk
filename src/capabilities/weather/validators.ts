@@ -4,7 +4,7 @@ import type {
   WeatherHourlyForecast,
   WeatherSettings,
 } from "@/types/index";
-import { requireInRange } from "@/validators/shared";
+import { requireInRange } from "@/shared/assertions";
 
 const DATETIME_RE = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;

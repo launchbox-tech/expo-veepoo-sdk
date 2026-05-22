@@ -1,5 +1,5 @@
 import type { DeviceFunctions } from "@/types/index";
-import { isRecord } from "@/normalizers/primitives";
+import { isRecord } from "@/shared/primitives";
 import { normalizePackage1 } from "./package1";
 import { normalizePackage2 } from "./package2";
 import { normalizePackage3 } from "./package3";

@@ -1,5 +1,5 @@
 import type { BatteryInfo } from "@/types/index";
-import { isRecord, toInt, toBoolean } from "@/normalizers/primitives";
+import { isRecord, toInt, toBoolean } from "@/shared/primitives";
 
 export function normalizeBatteryInfo(value: unknown): BatteryInfo {
   const record = isRecord(value) ? value : {};

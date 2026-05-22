@@ -1,5 +1,5 @@
 import type { WomenHealthSettings, WomenHealthStatus } from "@/types/index";
-import { isRecord, toInt, toStringValue } from "@/normalizers/primitives";
+import { isRecord, toInt, toStringValue } from "@/shared/primitives";
 
 const WH_STATUSES: readonly WomenHealthStatus[] = [
   'none',

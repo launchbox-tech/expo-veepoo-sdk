@@ -2,7 +2,7 @@ import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { PersonalInfoNativeMethods } from "./native";
 import { validatePersonalInfo } from "./validators";
 import type { PersonalInfo } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class PersonalInfoCapability {
   constructor(private readonly ctx: CapabilityContext<PersonalInfoNativeMethods>) {}

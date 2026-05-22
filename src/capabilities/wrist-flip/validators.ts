@@ -1,5 +1,5 @@
 import type { WristFlipWakeSettings } from "@/types/index";
-import { requireInRange, requireValidHour, requireValidMinute } from "@/validators/shared";
+import { requireInRange, requireValidHour, requireValidMinute } from "@/shared/assertions";
 
 export function validateWristFlipWakeSettings(s: WristFlipWakeSettings): void {
   requireValidHour(s.start_hour, 'startHour');

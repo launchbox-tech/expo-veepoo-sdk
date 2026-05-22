@@ -3,7 +3,7 @@ import type { WristFlipNativeMethods } from "./native";
 import { normalizeWristFlipWakeSettings } from "./normalizers";
 import { validateWristFlipWakeSettings } from "./validators";
 import type { WristFlipWakeSettings } from "@/types/index";
-import { deepCamelKeys } from "@/normalizers/deep-keys";
+import { deepCamelKeys } from "@/shared/deep-keys";
 
 export class WristFlipCapability {
   constructor(private readonly ctx: CapabilityContext<WristFlipNativeMethods>) {}

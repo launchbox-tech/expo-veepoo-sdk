@@ -1,5 +1,5 @@
 import type { SocialMsgData } from "@/types/index";
-import { normalizeFunctionStatus } from "@/normalizers/primitives";
+import { normalizeFunctionStatus } from "@/shared/primitives";
 
 const supportedFunctionKeys = [
   'phone',

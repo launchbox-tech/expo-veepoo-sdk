@@ -16,7 +16,7 @@ import type {
   StressData,
   TemperatureTestResult,
 } from "@/types/index";
-import { isRecord, toInt, toNumber, toStringValue, normalizeTestState } from "@/normalizers/primitives";
+import { isRecord, toInt, toNumber, toStringValue, normalizeTestState } from "@/shared/primitives";
 
 export function normalizeHeartRateTestResult(value: unknown): HeartRateTestResult {
   const record = isRecord(value) ? value : {};
