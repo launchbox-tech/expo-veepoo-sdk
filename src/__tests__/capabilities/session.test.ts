@@ -119,4 +119,45 @@ describe('SessionCapability — new utilities (#186)', () => {
       code: 'INVALID_ARGUMENT',
     });
   });
+
+  // ── connect (validateDeviceId + validateConnectOptions) ───────────────────
+
+  it.each([
+    { name: 'empty deviceId', deviceId: '', options: undefined },
+    { name: 'whitespace-only deviceId', deviceId: '   ', options: undefined },
+    { name: 'null deviceId', deviceId: null as unknown as string, options: undefined },
+    { name: 'undefined deviceId', deviceId: undefined as unknown as string, options: undefined },
+    { name: 'numeric deviceId', deviceId: 42 as unknown as string, options: undefined },
+    {
+      name: 'options.password empty string',
+      deviceId: 'AA:BB:CC:DD:EE:FF',
+      options: { password: '' },
+    },
+    {
+      name: 'options.time_setting.hour out of range',
+      deviceId: 'AA:BB:CC:DD:EE:FF',
+      options: {
+        time_setting: { year: 2024, month: 1, day: 1, hour: 24, minute: 0, second: 0 },
+      },
+    },
+    {
+      name: 'options.time_setting.minute out of range',
+      deviceId: 'AA:BB:CC:DD:EE:FF',
+      options: {
+        time_setting: { year: 2024, month: 1, day: 1, hour: 0, minute: 60, second: 0 },
+      },
+    },
+    {
+      name: 'options.time_setting.month out of range',
+      deviceId: 'AA:BB:CC:DD:EE:FF',
+      options: {
+        time_setting: { year: 2024, month: 13, day: 1, hour: 0, minute: 0, second: 0 },
+      },
+    },
+  ])('connect rejects $name → INVALID_ARGUMENT, no native call', async ({ deviceId, options }) => {
+    await expect(session.connect(deviceId, options)).rejects.toMatchObject({
+      code: 'INVALID_ARGUMENT',
+    });
+    expect(native.connect).not.toHaveBeenCalled();
+  });
 });

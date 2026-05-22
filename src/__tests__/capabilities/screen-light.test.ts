@@ -98,4 +98,20 @@ describe('ScreenLightCapability', () => {
     });
     expect(native.setScreenLightDuration).not.toHaveBeenCalled();
   });
+
+  it('setScreenLightSettings rejects max_level out of range without calling native', async () => {
+    await expect(
+      screenLight.setScreenLightSettings({
+        night_start_hour: 22,
+        night_start_minute: 0,
+        night_end_hour: 7,
+        night_end_minute: 0,
+        night_level: 2,
+        day_level: 4,
+        auto_adjust: false,
+        max_level: 0,
+      }),
+    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+    expect(native.setScreenLightSettings).not.toHaveBeenCalled();
+  });
 });

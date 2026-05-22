@@ -56,4 +56,18 @@ describe('WristFlipCapability', () => {
       sensitivityLevel: 5,
     });
   });
+
+  it('setWristFlipWakeSettings rejects sensitivity_level out of range without calling native', async () => {
+    await expect(
+      wristFlip.setWristFlipWakeSettings({
+        enabled: true,
+        start_hour: 22,
+        start_minute: 0,
+        end_hour: 8,
+        end_minute: 0,
+        sensitivity_level: 11,
+      }),
+    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+    expect(native.setWristFlipWakeSettings).not.toHaveBeenCalled();
+  });
 });

@@ -41,8 +41,12 @@ describe('SosCapability', () => {
     expect(native.setSosCallTimes).toHaveBeenCalledWith(3);
   });
 
-  it('setSosCallTimes(0) throws INVALID_ARGUMENT without calling native', async () => {
-    await expect(sos.setSosCallTimes(0)).rejects.toMatchObject({
+  it.each([
+    { name: 'zero', times: 0 },
+    { name: 'negative', times: -1 },
+    { name: 'non-integer', times: 2.5 },
+  ])('setSosCallTimes rejects $name → INVALID_ARGUMENT, no native call', async ({ times }) => {
+    await expect(sos.setSosCallTimes(times)).rejects.toMatchObject({
       code: 'INVALID_ARGUMENT',
     });
     expect(native.setSosCallTimes).not.toHaveBeenCalled();

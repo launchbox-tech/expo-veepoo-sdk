@@ -39,17 +39,19 @@ describe('MusicCapability', () => {
     expect(native.pushMusicData).toHaveBeenCalledWith(data);
   });
 
-  it('pushMusicData rejects empty name without calling native', async () => {
-    await expect(
-      music.pushMusicData({ name: '', artist: 'Queen', isPlaying: true, volume: 75 }),
-    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
-    expect(native.pushMusicData).not.toHaveBeenCalled();
-  });
+  const validMusic = { name: 'Song', artist: 'Artist', isPlaying: true, volume: 50 };
 
-  it('pushMusicData rejects empty artist without calling native', async () => {
-    await expect(
-      music.pushMusicData({ name: 'Bohemian Rhapsody', artist: '', isPlaying: true, volume: 75 }),
-    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+  it.each([
+    { name: 'empty name', input: { ...validMusic, name: '' } },
+    { name: 'whitespace-only name', input: { ...validMusic, name: '   ' } },
+    { name: 'empty artist', input: { ...validMusic, artist: '' } },
+    { name: 'volume 0', input: { ...validMusic, volume: 0 } },
+    { name: 'volume 101', input: { ...validMusic, volume: 101 } },
+    { name: 'non-integer volume', input: { ...validMusic, volume: 50.5 } },
+  ])('pushMusicData rejects $name → INVALID_ARGUMENT, no native call', async ({ input }) => {
+    await expect(music.pushMusicData(input)).rejects.toMatchObject({
+      code: 'INVALID_ARGUMENT',
+    });
     expect(native.pushMusicData).not.toHaveBeenCalled();
   });
 });

@@ -40,4 +40,15 @@ describe('DeviceTimeCapability', () => {
 
     expect(native.setDeviceTime).toHaveBeenCalledWith(undefined);
   });
+
+  it.each([
+    { name: 'invalid Date', input: new Date('invalid') },
+    { name: 'string', input: '2024-01-01' as unknown as Date },
+    { name: 'number', input: 1234567890 as unknown as Date },
+  ])('setDeviceTime rejects $name → INVALID_ARGUMENT, no native call', async ({ input }) => {
+    await expect(deviceTime.setDeviceTime(input)).rejects.toMatchObject({
+      code: 'INVALID_ARGUMENT',
+    });
+    expect(native.setDeviceTime).not.toHaveBeenCalled();
+  });
 });

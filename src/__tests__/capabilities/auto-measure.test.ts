@@ -84,22 +84,22 @@ describe('AutoMeasureCapability', () => {
     });
   });
 
-  it('modifyAutoMeasureSetting rejects measure_interval outside [1, 120] without calling native', async () => {
+  it.each([
+    { name: 'measure_interval below 1', input: { measure_interval: 0 } },
+    { name: 'measure_interval above 120', input: { measure_interval: 121 } },
+    { name: 'current_start_minute below 0', input: { current_start_minute: -1 } },
+    { name: 'current_start_minute above 1439', input: { current_start_minute: 1440 } },
+    { name: 'current_end_minute below 0', input: { current_end_minute: -1 } },
+    { name: 'current_end_minute above 1439', input: { current_end_minute: 1440 } },
+  ])('modifyAutoMeasureSetting rejects $name → INVALID_ARGUMENT, no native call', async ({ input }) => {
     await expect(
-      autoMeasure.modifyAutoMeasureSetting({ measure_interval: 0 }),
-    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
-    await expect(
-      autoMeasure.modifyAutoMeasureSetting({ measure_interval: 121 }),
+      autoMeasure.modifyAutoMeasureSetting(input),
     ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
     expect(native.modifyAutoMeasureSetting).not.toHaveBeenCalled();
   });
 
-  it('modifyAutoMeasureSetting rejects current_start_minute outside [0, 1439]', async () => {
-    await expect(
-      autoMeasure.modifyAutoMeasureSetting({ current_start_minute: -1 }),
-    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
-    await expect(
-      autoMeasure.modifyAutoMeasureSetting({ current_start_minute: 1440 }),
-    ).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+  it('modifyAutoMeasureSetting passes for empty partial', async () => {
+    native.modifyAutoMeasureSetting.mockResolvedValueOnce([]);
+    await expect(autoMeasure.modifyAutoMeasureSetting({})).resolves.toBeDefined();
   });
 });

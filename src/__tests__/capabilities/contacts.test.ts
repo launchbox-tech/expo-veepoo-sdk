@@ -51,10 +51,54 @@ describe('ContactsCapability', () => {
     expect(native.setContactSosState).toHaveBeenCalledWith(2, true);
   });
 
-  it('deleteContact(-1) throws INVALID_ARGUMENT without calling native', async () => {
-    await expect(contacts.deleteContact(-1)).rejects.toMatchObject({
-      code: 'INVALID_ARGUMENT',
-    });
-    expect(native.deleteContact).not.toHaveBeenCalled();
+  it.each([
+    {
+      name: 'addContact rejects empty name',
+      run: (c: ContactsCapability) => c.addContact({ name: '', phone_number: '123' }),
+      nativeMethod: 'addContact' as const,
+    },
+    {
+      name: 'addContact rejects whitespace-only name',
+      run: (c: ContactsCapability) => c.addContact({ name: '   ', phone_number: '123' }),
+      nativeMethod: 'addContact' as const,
+    },
+    {
+      name: 'addContact rejects name exceeding 20 bytes',
+      run: (c: ContactsCapability) => c.addContact({ name: 'A'.repeat(21), phone_number: '123' }),
+      nativeMethod: 'addContact' as const,
+    },
+    {
+      name: 'addContact rejects empty phone_number',
+      run: (c: ContactsCapability) => c.addContact({ name: 'Alice', phone_number: '' }),
+      nativeMethod: 'addContact' as const,
+    },
+    {
+      name: 'addContact rejects phone_number exceeding 20 characters',
+      run: (c: ContactsCapability) => c.addContact({ name: 'Alice', phone_number: '1'.repeat(21) }),
+      nativeMethod: 'addContact' as const,
+    },
+    {
+      name: 'deleteContact rejects negative id',
+      run: (c: ContactsCapability) => c.deleteContact(-1),
+      nativeMethod: 'deleteContact' as const,
+    },
+    {
+      name: 'deleteContact rejects non-integer id',
+      run: (c: ContactsCapability) => c.deleteContact(1.5),
+      nativeMethod: 'deleteContact' as const,
+    },
+    {
+      name: 'setContactSosState rejects negative id',
+      run: (c: ContactsCapability) => c.setContactSosState(-1, true),
+      nativeMethod: 'setContactSosState' as const,
+    },
+    {
+      name: 'setContactSosState rejects non-integer id',
+      run: (c: ContactsCapability) => c.setContactSosState(1.5, true),
+      nativeMethod: 'setContactSosState' as const,
+    },
+  ])('$name → INVALID_ARGUMENT, no native call', async ({ run, nativeMethod }) => {
+    await expect(run(contacts)).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+    expect(native[nativeMethod]).not.toHaveBeenCalled();
   });
 });

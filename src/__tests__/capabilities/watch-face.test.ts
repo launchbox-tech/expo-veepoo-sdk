@@ -58,4 +58,32 @@ describe('WatchFaceCapability', () => {
 
     expect(native.setWatchFaceStyle).toHaveBeenCalledWith({ screenIndex: 1, dialType: 'photo' });
   });
+
+  it.each([
+    {
+      name: 'readWatchFaceStyle rejects invalid dial_type',
+      run: (w: WatchFaceCapability) =>
+        w.readWatchFaceStyle({ dial_type: 'x' as never }),
+      nativeMethod: 'readWatchFaceStyle' as const,
+    },
+    {
+      name: 'setWatchFaceStyle rejects screen_index < 0',
+      run: (w: WatchFaceCapability) => w.setWatchFaceStyle({ screen_index: -1 }),
+      nativeMethod: 'setWatchFaceStyle' as const,
+    },
+    {
+      name: 'setWatchFaceStyle rejects screen_index above range',
+      run: (w: WatchFaceCapability) => w.setWatchFaceStyle({ screen_index: 66_000 }),
+      nativeMethod: 'setWatchFaceStyle' as const,
+    },
+    {
+      name: 'setWatchFaceStyle rejects invalid dial_type',
+      run: (w: WatchFaceCapability) =>
+        w.setWatchFaceStyle({ screen_index: 0, dial_type: 'oops' as never }),
+      nativeMethod: 'setWatchFaceStyle' as const,
+    },
+  ])('$name → INVALID_ARGUMENT, no native call', async ({ run, nativeMethod }) => {
+    await expect(run(watchFace)).rejects.toMatchObject({ code: 'INVALID_ARGUMENT' });
+    expect(native[nativeMethod]).not.toHaveBeenCalled();
+  });
 });
