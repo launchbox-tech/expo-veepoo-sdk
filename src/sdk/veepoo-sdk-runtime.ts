@@ -1,7 +1,6 @@
 import { Platform } from "react-native";
 
 import type {
-  ConnectionStatus,
   LogEntry,
   LogLevel,
   LogScope,
@@ -18,6 +17,7 @@ import { mapNativeRejection } from "@/errors/map-native-rejection";
 import { VeepooSdkState } from "./veepoo-sdk-state";
 import { OriginReadPipeline } from "@/bridge/origin-read-pipeline";
 import { EventBus } from "@/bridge/event-bus";
+import { applyStateEvent } from "./sdk-state-reducer";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 
 /**
@@ -151,38 +151,10 @@ export class VeepooSDKRuntime {
       },
     );
 
-    if (event === "bluetooth_state_changed") {
-      const bluetoothStatus = normalizedPayload as { is_scanning?: boolean };
-      if (typeof bluetoothStatus.is_scanning === "boolean") {
-        this.state.setScanning(bluetoothStatus.is_scanning);
-      }
-    }
-
-    if (event === "device_connected") {
-      const device = normalizedPayload as { device_id?: string };
-      this.state.onDeviceConnected(device.device_id ?? "");
-    }
-
-    if (event === "device_disconnected") {
-      const device = normalizedPayload as { device_id?: string };
-      this.state.onDeviceDisconnected(device.device_id);
-      if (device.device_id) {
-        this.originReadPipeline.clearDevice(device.device_id);
-      }
-    }
-
-    if (
-      event === "device_connect_status" ||
-      event === "connection_status_changed"
-    ) {
-      const connection = normalizedPayload as {
-        device_id?: string;
-        status?: ConnectionStatus;
-      };
-      if (connection.status) {
-        this.state.onConnectionStatusChanged(connection.device_id, connection.status);
-      }
-    }
+    applyStateEvent(event, normalizedPayload, {
+      state: this.state,
+      originReadPipeline: this.originReadPipeline,
+    });
 
     this.bus.emit(event, normalizedPayload);
   }
