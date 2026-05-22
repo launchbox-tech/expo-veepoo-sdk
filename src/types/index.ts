@@ -68,34 +68,13 @@ export type {
 } from './device';
 
 export type {
+  TestState,
   HeartRateData,
   BloodPressureData,
   BloodOxygenData,
   TemperatureData,
   StressData,
   BloodGlucoseData,
-  SleepDataItem,
-  SleepData,
-  DailyHealthData,
-  SportStepData,
-  DaySummaryData,
-  OriginData,
-  HalfHourData,
-  Spo2OriginData,
-  ExerciseMinuteData,
-  ExerciseSession,
-  SleepMinuteState,
-  SleepMinutePoint,
-  AccurateSleepSession,
-  StoredTemperatureData,
-  StoredBloodGlucoseData,
-  StoredHrvData,
-  StoredEcgData,
-  StoredBodyCompositionData,
-} from './health-data';
-
-export type {
-  TestState,
   HeartRateTestResult,
   BloodPressureTestResult,
   BloodOxygenTestResult,
@@ -113,15 +92,43 @@ export type {
   GsrTestResult,
   PttState,
   PttTestResult,
+  RealtimeTestModality,
+} from '@/capabilities/realtime-tests/types';
+export { RealtimeTest } from '@/capabilities/realtime-tests/types';
+export type {
+  SleepDataItem,
+  SleepData,
+  SleepMinuteState,
+  SleepMinutePoint,
+  AccurateSleepSession,
+} from '@/capabilities/sleep-data/types';
+export type { SportStepData } from '@/capabilities/sport-steps/types';
+export type { DaySummaryData } from '@/capabilities/day-summary/types';
+export type {
+  OriginData,
+  HalfHourData,
+  Spo2OriginData,
   ReadState,
   ReadOriginProgress,
-} from './health-tests';
-export { RealtimeTest } from './health-tests';
-export type { RealtimeTestModality } from './health-tests';
-
+} from '@/capabilities/origin-data/types';
 export type {
-  AutoMeasureSetting,
-  Language,
+  DailyHealthData,
+  ExerciseMinuteData,
+  ExerciseSession,
+  StoredTemperatureData,
+  StoredBloodGlucoseData,
+  StoredHrvData,
+  StoredEcgData,
+  StoredBodyCompositionData,
+} from '@/capabilities/historical-query/types';
+
+export type { AutoMeasureSetting } from '@/capabilities/auto-measure/types';
+export type { Language } from '@/capabilities/language/types';
+export type { SportMode, SportModeStatus } from '@/capabilities/sport-mode/types';
+export { SPORT_MODE_ORDINALS } from '@/capabilities/sport-mode/types';
+export type { BloodGlucoseRiskConfig } from '@/capabilities/calibration/types';
+export type { WorldClockEntry } from '@/capabilities/world-clock/types';
+export type {
   TemperatureUnit,
   DistanceUnit,
   TimeFormat,
@@ -130,12 +137,7 @@ export type {
   CustomSettings,
   ApneaRemindSettings,
   OperationStatus,
-  SportMode,
-  SportModeStatus,
-  BloodGlucoseRiskConfig,
-  WorldClockEntry,
 } from './settings';
-export { SPORT_MODE_ORDINALS } from './settings';
 
 export type {
   VeepooEvent,

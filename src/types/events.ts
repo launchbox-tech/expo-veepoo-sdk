@@ -18,24 +18,30 @@ import type { MusicRemoteCommand } from '@/capabilities/music/types';
 import type { SocialMsgData } from '@/capabilities/social-msg/types';
 import type { SosCallTimesSettings } from '@/capabilities/sos/types';
 import type { HealthReminder } from './device';
-import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings';
+import type { ApneaRemindSettings, CustomSettings } from './settings';
+import type { SportMode } from '@/capabilities/sport-mode/types';
 import type {
   AccurateSleepSession,
+  SleepData,
+} from '@/capabilities/sleep-data/types';
+import type { SportStepData } from '@/capabilities/sport-steps/types';
+import type {
+  HalfHourData,
+  OriginData,
+  Spo2OriginData,
+  ReadOriginProgress,
+} from '@/capabilities/origin-data/types';
+import type {
+  ExerciseSession,
   StoredTemperatureData,
   StoredBloodGlucoseData,
   StoredHrvData,
   StoredEcgData,
   StoredBodyCompositionData,
-  BloodGlucoseData,
-  ExerciseSession,
-  HalfHourData,
-  OriginData,
-  SleepData,
-  Spo2OriginData,
-  SportStepData,
-  StressData,
-} from './health-data';
+} from '@/capabilities/historical-query/types';
 import type {
+  BloodGlucoseData,
+  StressData,
   BloodAnalysisTestResult,
   BloodOxygenTestResult,
   GsrTestResult,
@@ -48,9 +54,8 @@ import type {
   FatigueTestResult,
   HeartRateTestResult,
   HrvTestResult,
-  ReadOriginProgress,
   TemperatureTestResult,
-} from './health-tests';
+} from '@/capabilities/realtime-tests/types';
 import type { VeepooError } from './errors';
 
 /** Normalized DFU / OTA progress (`firmware_dfu_progress` event). */
