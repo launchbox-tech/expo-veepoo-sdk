@@ -7,8 +7,11 @@ import { NATIVE_EMITTED_EVENTS, JS_LOCAL_ONLY_EVENTS } from "../bridge/veepoo-ev
 export function extractKotlinNativeEvents(source: string): Set<string> {
   const out = new Set<string>();
   for (const m of source.matchAll(/const val (\w+) = "([^"]+)"/g)) {
-    if (m[1] === "TAG") continue;
-    out.add(m[2]);
+    const name = m[1];
+    const value = m[2];
+    if (!name || !value) continue;
+    if (name === "TAG") continue;
+    out.add(value);
   }
   return out;
 }
@@ -18,7 +21,7 @@ export function extractSwiftNativeEvents(swiftHeader: string): Set<string> {
   const out = new Set<string>();
   for (const m of swiftHeader.matchAll(/= "([^"]+)"/g)) {
     const s = m[1];
-    if (/^[a-z][a-zA-Z0-9]*$/.test(s)) out.add(s);
+    if (s && /^[a-z][a-zA-Z0-9]*$/.test(s)) out.add(s);
   }
   return out;
 }

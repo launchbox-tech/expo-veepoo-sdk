@@ -29,7 +29,8 @@ export function extractNativeRejectCodes(repoRoot: string): Set<string> {
     let m: RegExpExecArray | null;
     const re = new RegExp(REJECT_FIRST_ARG.source, "g");
     while ((m = re.exec(src)) !== null) {
-      codes.add(m[1]);
+      const code = m[1];
+      if (code) codes.add(code);
     }
   }
   return codes;

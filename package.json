@@ -67,12 +67,12 @@
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
-    "@types/react": "~19.2.0",
+    "@types/react": "~19.2.14",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.1",
-    "expo-module-scripts": "~55.0.2",
+    "expo-module-scripts": "~56.0.2",
     "tsdown": "^0.21.10",
-    "typescript": "~5.9.0"
+    "typescript": "~6.0.3"
   }
 }

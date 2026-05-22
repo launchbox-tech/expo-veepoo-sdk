@@ -3,22 +3,22 @@
   "compilerOptions": {
     "outDir": "./build",
     "rootDir": "./src",
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
-    "module": "CommonJS",
+    "moduleResolution": "bundler",
+    "module": "esnext",
     "target": "ES2020",
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "verbatimModuleSyntax": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "build", "**/*.test.ts", "**/*.spec.ts"]

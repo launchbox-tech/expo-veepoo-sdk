@@ -1,7 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "noEmit": false
+    "noEmit": false,
+    "module": "CommonJS",
+    "moduleResolution": "node10",
+    "verbatimModuleSyntax": false
   },
   "include": ["src/bridge-contract/**/*"],
   "exclude": ["node_modules", "build"]
