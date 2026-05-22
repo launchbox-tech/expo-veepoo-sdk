@@ -344,6 +344,22 @@ describe('VeepooSDK', () => {
         native._emit('readOriginProgress', progress(50, 'start'));
         expect(listener).toHaveBeenCalledTimes(2);
       });
+
+      it('deviceDisconnected clears the per-device progress entry', () => {
+        const listener = jest.fn();
+        sdk.on('read_origin_progress', listener);
+        // First reading at 50% — emitted.
+        native._emit('readOriginProgress', progress(50));
+        // Same value would be deduped while the device is connected.
+        native._emit('readOriginProgress', progress(50));
+        expect(listener).toHaveBeenCalledTimes(1);
+
+        // Disconnect resets the pipeline entry for this device.
+        native._emit('deviceDisconnected', { deviceId: 'd1' });
+        // Same value emits again because the dedup state was cleared.
+        native._emit('readOriginProgress', progress(50));
+        expect(listener).toHaveBeenCalledTimes(2);
+      });
     });
   });
 

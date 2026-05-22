@@ -1,4 +1,4 @@
-import { normalizeEventPayload } from './event-normalizer';
+import { normalizeEventPayload } from './event-registry';
 
 describe('normalizeEventPayload', () => {
   it('returns non-object payloads unchanged', () => {

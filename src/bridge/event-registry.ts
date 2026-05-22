@@ -1,4 +1,5 @@
 import type { LogScope, VeepooEvent, VeepooEventPayload } from "@/types/index";
+import { deepSnakeKeys } from "@/shared/deep-keys";
 import { isRecord } from "@/shared/primitives";
 import {
   passthrough,
@@ -523,3 +524,14 @@ export const JS_EXPOSED_NATIVE_EVENTS: readonly VeepooEvent[] = nativeDefs.map((
 
 /** All JS event names (native-sourced + JS-local). */
 export const ALL_VEEPOO_EVENTS: readonly VeepooEvent[] = allDefs.map((d) => d.jsName);
+
+/**
+ * Apply the per-event inner-payload normalizer declared in {@link EVENT_DEFINITIONS}
+ * and then run `deepSnakeKeys` so consumers always see snake_case keys (ADR 0004).
+ */
+export function normalizeEventPayload<K extends VeepooEvent>(
+  event: K,
+  payload: unknown,
+): VeepooEventPayload[K] {
+  return deepSnakeKeys(EVENT_NORMALIZERS[event](payload)) as VeepooEventPayload[K];
+}

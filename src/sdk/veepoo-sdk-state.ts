@@ -1,8 +1,19 @@
-import type { ConnectionStatus } from "@/types/connection";
+import type {
+  ConnectionStatus,
+  VeepooEvent,
+  VeepooEventPayload,
+} from "@/types/index";
 
 /**
  * Mutable **Session** / scan / init fields driven by native events and host calls.
- * Controllers read via getters; mutations go through methods so the seam stays explicit.
+ *
+ * Two paths into the state, both part of the public interface:
+ *   - **Setters** (`setConnectedDeviceId`, `setScanning`, `markInitialized`, `reset`)
+ *     used by capabilities for explicit, operation-driven mutations
+ *     (e.g. `SessionCapability.connect` afterSuccess).
+ *   - **`applyEvent`** used by the bridge to fold a normalized native event
+ *     into state. The per-event dispatch lives inside the class — callers
+ *     and tests cross the same public interface the bridge does.
  */
 export class VeepooSdkState {
   private initialized = false;
@@ -33,10 +44,53 @@ export class VeepooSdkState {
     this.deviceId = id;
   }
 
-  // ── Session transition methods ───────────────────────────────────────
+  /** Clears connection/session scan fields (e.g. destroy). */
+  reset(): void {
+    this.initialized = false;
+    this.scanning = false;
+    this.deviceId = null;
+  }
 
-  /** Sets `connectedDeviceId` when `deviceId` is a non-empty string. */
-  onDeviceConnected(deviceId: string): void {
+  /**
+   * Folds a normalized event into Session/scan/init state.
+   * No-op for events that do not affect state.
+   */
+  applyEvent<K extends VeepooEvent>(event: K, payload: VeepooEventPayload[K]): void {
+    switch (event) {
+      case "bluetooth_state_changed": {
+        const p = payload as VeepooEventPayload["bluetooth_state_changed"];
+        if (typeof p.is_scanning === "boolean") {
+          this.scanning = p.is_scanning;
+        }
+        return;
+      }
+      case "device_connected": {
+        const p = payload as VeepooEventPayload["device_connected"];
+        this.onDeviceConnected(p.device_id ?? "");
+        return;
+      }
+      case "device_disconnected": {
+        const p = payload as VeepooEventPayload["device_disconnected"];
+        this.onDeviceDisconnected(p.device_id);
+        return;
+      }
+      case "device_connect_status":
+      case "connection_status_changed": {
+        const p = payload as VeepooEventPayload["connection_status_changed"];
+        if (p.status) {
+          this.onConnectionStatusChanged(p.device_id, p.status);
+        }
+        return;
+      }
+      default:
+        return;
+    }
+  }
+
+  // ── Internal transitions ─────────────────────────────────────────────
+  // Private so callers/tests cross the same seam (`applyEvent`) the bridge does.
+
+  private onDeviceConnected(deviceId: string): void {
     if (typeof deviceId === "string" && deviceId.length > 0) {
       this.deviceId = deviceId;
     }
@@ -49,7 +103,7 @@ export class VeepooSdkState {
    *
    * Also sets `scanning = false`.
    */
-  onDeviceDisconnected(deviceId: string | undefined): void {
+  private onDeviceDisconnected(deviceId: string | undefined): void {
     if (!deviceId || this.deviceId === deviceId) {
       this.deviceId = null;
     }
@@ -60,7 +114,7 @@ export class VeepooSdkState {
    * Clears `connectedDeviceId` only when `status === "disconnected"` AND
    * (`deviceId` is undefined/empty OR `deviceId` matches `connectedDeviceId`).
    */
-  onConnectionStatusChanged(
+  private onConnectionStatusChanged(
     deviceId: string | undefined,
     status: ConnectionStatus,
   ): void {
@@ -70,12 +124,5 @@ export class VeepooSdkState {
     ) {
       this.deviceId = null;
     }
-  }
-
-  /** Clears connection/session scan fields (e.g. destroy). */
-  reset(): void {
-    this.initialized = false;
-    this.scanning = false;
-    this.deviceId = null;
   }
 }

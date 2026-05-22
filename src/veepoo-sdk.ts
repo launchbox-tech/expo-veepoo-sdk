@@ -3,7 +3,6 @@ import type { NativeVeepooSDKInterface } from "./native-veepoo-sdk";
 import { NativeVeepooSDK } from "./native-veepoo-sdk";
 import type { LogListener } from "./veepoo-sdk-module";
 import { VeepooSDKRuntime } from "./sdk/veepoo-sdk-runtime";
-import { SdkLifecycle } from "./sdk/sdk-lifecycle";
 
 import { AlarmsCapability } from "./capabilities/alarms/index";
 import { AutoMeasureCapability } from "./capabilities/auto-measure";
@@ -96,7 +95,6 @@ export interface VeepooSDKInterface {
 
 export class VeepooSDK implements VeepooSDKInterface {
   private readonly rt: VeepooSDKRuntime;
-  private readonly lifecycle: SdkLifecycle;
 
   readonly alarms: AlarmsCapability;
   readonly autoMeasure: AutoMeasureCapability;
@@ -137,7 +135,6 @@ export class VeepooSDK implements VeepooSDKInterface {
   constructor(native: NativeVeepooSDKInterface = NativeVeepooSDK) {
     this.rt = new VeepooSDKRuntime(native);
     const ctx = this.rt.createCapabilityContext();
-    this.lifecycle = new SdkLifecycle(this.rt);
 
     this.alarms = new AlarmsCapability(ctx);
     this.autoMeasure = new AutoMeasureCapability(ctx);
@@ -177,8 +174,8 @@ export class VeepooSDK implements VeepooSDKInterface {
   }
 
   // ── Lifecycle ────────────────────────────────────────────────────────────────
-  init(): Promise<void> { return this.lifecycle.init(); }
-  destroy(): void { this.lifecycle.destroy(); }
+  init(): Promise<void> { return this.rt.init(); }
+  destroy(): void { this.rt.destroy(); }
 
   setLogEnabled(enabled: boolean): this {
     this.rt.setLogEnabled(enabled);

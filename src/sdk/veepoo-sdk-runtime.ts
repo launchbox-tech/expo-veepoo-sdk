@@ -10,15 +10,13 @@ import type {
 } from "@/types/index";
 import type { NativeVeepooSDKInterface } from "@/native-veepoo-sdk";
 import type { LogListener } from "@/veepoo-sdk-module";
-import { EVENT_LOG_SCOPES } from "@/bridge/event-registry";
-import { normalizeEventPayload } from "@/bridge/event-normalizer";
+import { EVENT_LOG_SCOPES, normalizeEventPayload } from "@/bridge/event-registry";
 import { invokeOrThrow } from "@/bridge/native-invoke-pipeline";
 import type { ThrowingInvoke } from "@/bridge/native-invoke-pipeline";
 import { mapNativeRejection } from "@/errors/map-native-rejection";
 import { VeepooSdkState } from "./veepoo-sdk-state";
 import { OriginReadPipeline } from "@/bridge/origin-read-pipeline";
 import { EventBus } from "@/bridge/event-bus";
-import { applyStateEvent } from "./sdk-state-reducer";
 import type { CapabilityContext } from "@/capabilities/shared/context";
 
 /**
@@ -152,10 +150,13 @@ export class VeepooSDKRuntime {
       },
     );
 
-    applyStateEvent(event, normalizedPayload, {
-      state: this.state,
-      originReadPipeline: this.originReadPipeline,
-    });
+    this.state.applyEvent(event, normalizedPayload);
+    if (event === "device_disconnected") {
+      const deviceId = (normalizedPayload as { device_id?: string }).device_id;
+      if (deviceId) {
+        this.originReadPipeline.clearDevice(deviceId);
+      }
+    }
 
     this.bus.emit(event, normalizedPayload);
   }
@@ -242,6 +243,27 @@ export class VeepooSDKRuntime {
     this.state.reset();
     this.logger = null;
     this.logEnabled = false;
+  }
+
+  async init(): Promise<void> {
+    if (this.state.isInitialized) return;
+    this.log("info", "sdk", "init.start", "Initializing SDK");
+    this.setupEventListeners();
+    await invokeOrThrow({
+      invoke: () => this.native.init(),
+      mapError: (error: unknown) => this.handleError(error, "UNKNOWN"),
+      afterSuccess: () => {
+        this.state.markInitialized(true);
+        this.emitLocal("sdk_initialized", {});
+        this.log("info", "sdk", "init.success", "SDK initialized");
+      },
+    });
+  }
+
+  destroy(): void {
+    this.log("info", "sdk", "destroy", "Destroying SDK instance");
+    this.teardownNativeListeners();
+    this.resetAfterDestroy();
   }
 
   createCapabilityContext(): CapabilityContext<NativeVeepooSDKInterface> {
