@@ -23,46 +23,48 @@ export type {
   DeviceFunctionPackage4,
   DeviceFunctionPackage5,
   DeviceFunctions,
-  DeviceVersion,
-  ChargeState,
-  BatteryInfo,
-  Sex,
-  PersonalInfo,
-  SocialMsgData,
-  CustomSettingData,
-  DeviceAlarm,
-  HeartRateAlarm,
-  FindDevicePhase,
+} from '@/capabilities/device-functions/types';
+export type { DeviceVersion } from '@/capabilities/device-version/types';
+export type { ChargeState, BatteryInfo } from '@/capabilities/battery/types';
+export type { Sex, PersonalInfo } from '@/capabilities/personal-info/types';
+export type { SocialMsgData } from '@/capabilities/social-msg/types';
+export type { DeviceAlarm, HeartRateAlarm, Spo2Alarm } from '@/capabilities/alarms/types';
+export type { FindDevicePhase } from '@/capabilities/find-device/types';
+export type {
   ScreenLightSettings,
   ScreenLightDuration,
-  SedentaryReminderSettings,
-  WristFlipWakeSettings,
+} from '@/capabilities/screen-light/types';
+export type { SedentaryReminderSettings } from '@/capabilities/sedentary-reminder/types';
+export type { WristFlipWakeSettings } from '@/capabilities/wrist-flip/types';
+export type {
   WomenHealthBabySex,
   WomenHealthSettings,
   WomenHealthStatus,
+} from '@/capabilities/women-health/types';
+export type {
   WatchFaceDialType,
   WatchFaceStyle,
   WatchFaceStyleSettings,
+} from '@/capabilities/watch-face/types';
+export type {
   WeatherUnit,
   WeatherSettings,
   WeatherHourlyForecast,
   WeatherDailyForecast,
   WeatherData,
+} from '@/capabilities/weather/types';
+export type { DeviceContact, NewDeviceContact } from '@/capabilities/contacts/types';
+export type { SosCallTimesSettings } from '@/capabilities/sos/types';
+export type { CameraShutterStatus } from '@/capabilities/camera/types';
+export type { MusicData, MusicRemoteCommand } from '@/capabilities/music/types';
+export type { GPSAndTimezoneData } from '@/capabilities/gps-timezone/types';
+export type { DeviceBTState, DeviceBTStatus } from '@/capabilities/bt-status/types';
+export type { DeviceSwitchType, DeviceSwitches } from '@/capabilities/device-switches/types';
+export type {
+  CustomSettingData,
   DeviceData,
-  DeviceContact,
-  NewDeviceContact,
-  SosCallTimesSettings,
-  CameraShutterStatus,
-  MusicData,
-  MusicRemoteCommand,
-  GPSAndTimezoneData,
-  DeviceBTState,
-  DeviceBTStatus,
   HealthReminderType,
   HealthReminder,
-  Spo2Alarm,
-  DeviceSwitchType,
-  DeviceSwitches,
 } from './device';
 
 export type {

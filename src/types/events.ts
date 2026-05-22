@@ -5,23 +5,19 @@ import type {
   BluetoothStatus,
   PasswordData,
 } from './connection';
-import type {
-  BatteryInfo,
-  CameraShutterStatus,
-  DeviceAlarm,
-  DeviceBTState,
-  DeviceContact,
-  DeviceFunctions,
-  DeviceVersion,
-  DeviceSwitches,
-  HeartRateAlarm,
-  FindDevicePhase,
-  HealthReminder,
-  MusicRemoteCommand,
-  SocialMsgData,
-  SosCallTimesSettings,
-  Spo2Alarm,
-} from './device';
+import type { BatteryInfo } from '@/capabilities/battery/types';
+import type { CameraShutterStatus } from '@/capabilities/camera/types';
+import type { DeviceAlarm, HeartRateAlarm, Spo2Alarm } from '@/capabilities/alarms/types';
+import type { DeviceBTState } from '@/capabilities/bt-status/types';
+import type { DeviceContact } from '@/capabilities/contacts/types';
+import type { DeviceFunctions } from '@/capabilities/device-functions/types';
+import type { DeviceVersion } from '@/capabilities/device-version/types';
+import type { DeviceSwitches } from '@/capabilities/device-switches/types';
+import type { FindDevicePhase } from '@/capabilities/find-device/types';
+import type { MusicRemoteCommand } from '@/capabilities/music/types';
+import type { SocialMsgData } from '@/capabilities/social-msg/types';
+import type { SosCallTimesSettings } from '@/capabilities/sos/types';
+import type { HealthReminder } from './device';
 import type { ApneaRemindSettings, CustomSettings, SportMode } from './settings';
 import type {
   AccurateSleepSession,

@@ -1,4 +1,4 @@
-import type { FunctionStatus } from './device';
+import type { FunctionStatus } from '@/capabilities/device-functions/types';
 
 export interface VeepooDevice {
   id: string;
