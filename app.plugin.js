@@ -1,3 +1,1 @@
-module.exports = require("./build/plugin");
-"use strict";
-module.exports = require('./build/plugin/index.js');
+module.exports = require("./build/plugin/index.cjs");
