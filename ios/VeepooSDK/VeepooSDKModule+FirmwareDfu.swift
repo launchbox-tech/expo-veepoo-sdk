@@ -46,7 +46,11 @@ extension VeepooSDKModule {
     }
 
     self.isFirmwareDfuActive = true
-    let op = VPDFUOperation.dfuOperationShare()
+    guard let op = VPDFUOperation.dfuOperationShare() else {
+      self.isFirmwareDfuActive = false
+      promise.reject("OPERATION_FAILED", "DFU operation unavailable")
+      return
+    }
     op.veepooSDKStartDfu(withFilePath: path, result: { [weak self] progress, state in
       guard let self = self else { return }
       let raw = Int(state.rawValue)

@@ -57,7 +57,7 @@ extension VeepooSDKModule {
       return
     }
     let model = VPDeviceBrightModel()
-    peripheralManage.veepooSDKSettingBright(withBrightModel: model, settingMode: 2, successResult: { bright in
+    peripheralManage.veepooSDKSettingBright(with: model, settingMode: 2, successResult: { bright in
       guard let bright = bright else {
         promise.reject("READ_FAILED", "Screen brightness read returned nil")
         return
@@ -87,7 +87,7 @@ extension VeepooSDKModule {
     }
     let model = VPDeviceBrightModel()
     self.applyBrightDict(settings, to: model)
-    peripheralManage.veepooSDKSettingBright(withBrightModel: model, settingMode: 1, successResult: { _ in
+    peripheralManage.veepooSDKSettingBright(with: model, settingMode: 1, successResult: { _ in
       promise.resolve(nil)
     }, failureResult: {
       promise.reject("SET_FAILED", "Set screen brightness failed")

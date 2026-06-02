@@ -122,7 +122,7 @@ extension VeepooSDKModule {
 
       peripheralManage.veepooSDKSettingDeviceTextAlarm(
         with: textModel,
-        settingMode: VPDeviceTextAlarmSettingModelAddOrChange,
+        settingMode: .addOrChange,
         successResult: { _ in promise.resolve("success") },
         failureResult: { promise.resolve("fail") }
       )

@@ -6,8 +6,9 @@ extension VeepooSDKModule {
   // MARK: - Helpers
 
   private func cameraSupported() -> Bool {
-    guard let model = peripheralManage?.peripheralModel else { return false }
-    return model.camera != 0
+    // VeepooBleSDK exposes no camera-capability flag on VPPeripheralModel;
+    // gate only on a connected model and let the device respond.
+    return peripheralManage?.peripheralModel != nil
   }
 
   // MARK: - enterCameraMode
@@ -105,16 +106,20 @@ extension VeepooSDKModule {
       return
     }
 
-    let state: VPSettingFunctionState = enabled ? .open : .close
+    // VPSettingFunctionState/CompleteState don't strip to .open/.close in Swift
+    // (the VPReadFunctionState case breaks the common prefix), so use rawValue.
+    // VPSettingFunctionState: 1=open, 2=close.
+    let state = VPSettingFunctionState(rawValue: enabled ? 1 : 2)!
     peripheralManage.veepooSDKSettingBaseFunctionType(.musicControl, settingState: state) { completeState in
-      switch completeState {
-      case .open, .close, .complete:
+      // VPSettingFunctionCompleteState: 0=unknown,1=open,2=close,3=failure,4=complete.
+      switch completeState.rawValue {
+      case 1, 2, 4:
         promise.resolve(nil)
-      case .failure:
+      case 3:
         promise.reject("OPERATION_FAILED", "Set music control failed")
-      case .unknown:
+      case 0:
         promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support music control toggle")
-      @unknown default:
+      default:
         promise.resolve(nil)
       }
     }

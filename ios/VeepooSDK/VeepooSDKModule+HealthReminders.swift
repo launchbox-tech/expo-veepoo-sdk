@@ -71,7 +71,7 @@ extension VeepooSDKModule {
     }
     let remindType = jsTypeToVPRemindType(typeStr)
     var promiseSettled = false
-    peripheralManage.veepooSDKSettingHealthRemind(with: remindType, opCode: 2, remindModel: nil) { [weak self] success, model in
+    peripheralManage.veepooSDKSettingHealthRemind(with: remindType, opCode: 2, remindModel: nil) { [weak self] success, _, model in
       guard let self = self, !promiseSettled else { return }
       promiseSettled = true
       if success, let model = model {
@@ -116,14 +116,14 @@ extension VeepooSDKModule {
     let remindType = jsTypeToVPRemindType(typeStr)
     let model = VPDeviceHealthRemindModel()
     model.type = remindType
-    model.startHour = (reminder["startHour"] as? Int) ?? 8
-    model.startMinute = (reminder["startMinute"] as? Int) ?? 0
-    model.endHour = (reminder["endHour"] as? Int) ?? 20
-    model.endMinute = (reminder["endMinute"] as? Int) ?? 0
-    model.remindInterval = (reminder["interval"] as? Int) ?? 60
+    model.startHour = UInt8(clamping: (reminder["startHour"] as? Int) ?? 8)
+    model.startMinute = UInt8(clamping: (reminder["startMinute"] as? Int) ?? 0)
+    model.endHour = UInt8(clamping: (reminder["endHour"] as? Int) ?? 20)
+    model.endMinute = UInt8(clamping: (reminder["endMinute"] as? Int) ?? 0)
+    model.remindInterval = UInt8(clamping: (reminder["interval"] as? Int) ?? 60)
     model.open = (reminder["enabled"] as? Bool) ?? true
     var promiseSettled = false
-    peripheralManage.veepooSDKSettingHealthRemind(with: remindType, opCode: 1, remindModel: model) { [weak self] success, _ in
+    peripheralManage.veepooSDKSettingHealthRemind(with: remindType, opCode: 1, remindModel: model) { [weak self] success, _, _ in
       guard !promiseSettled else { return }
       promiseSettled = true
       if success {

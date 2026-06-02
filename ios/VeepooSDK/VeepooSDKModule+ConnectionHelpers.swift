@@ -303,7 +303,7 @@ extension VeepooSDKModule {
       }
     }
 
-    self.peripheralManage?.ReceiveDeviceSOSCommand = { [weak self] in
+    self.peripheralManage?.receiveDeviceSOSCommand = { [weak self] in
       guard let self = self else { return }
       self.sendEvent(DEVICE_SOS_TRIGGERED, [
         "deviceId": self.connectedDeviceId ?? ""
@@ -319,7 +319,7 @@ extension VeepooSDKModule {
       ])
     }
 
-    self.peripheralManage?.deviceSportDidFinishBlock = { [weak self] runningMode in
+    self.peripheralManage?.deviceSportDidFinishBlock = { [weak self] _ in
       guard let self = self else { return }
       let ordinals: [String] = [
         "common",
@@ -350,7 +350,9 @@ extension VeepooSDKModule {
         "croquet", "cricket", "polo", "wallball", "takrawBall",
         "dodgeball", "waterPolo",
       ]
-      let idx = runningMode.rawValue
+      // deviceSportDidFinishBlock only carries a success Bool, not the mode.
+      // Best-effort: read the device's current runningType as the mode index.
+      let idx = self.peripheralManage?.peripheralModel?.runningType ?? 0
       let modeName: String? = (idx >= 1 && idx < ordinals.count) ? ordinals[idx] : nil
       self.sendEvent(SPORT_MODE_DATA, [
         "deviceId": self.connectedDeviceId ?? "",

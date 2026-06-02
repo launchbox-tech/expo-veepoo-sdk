@@ -42,7 +42,7 @@ extension VeepooSDKModule {
           "progress": 0,
         ]
       ])
-    } signalBlock: { [weak self] _ in
+    } signal: { [weak self] _ in
       // signal array used for waveform rendering — not exposed per issue spec
     }
 
@@ -55,7 +55,7 @@ extension VeepooSDKModule {
     promise.resolve(nil)
     #else
     finishMeasurement(type: "ptt", reason: "manual_stop")
-    peripheralManage?.veepooSDKPTTTest(false, valueBlock: nil, signalBlock: nil)
+    peripheralManage?.veepooSDKPTTTest(false, valueBlock: nil, signal: nil)
     promise.resolve(nil)
     #endif
   }

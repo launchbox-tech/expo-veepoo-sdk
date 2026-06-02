@@ -120,7 +120,7 @@ extension VeepooSDKModule {
       return
     }
     let blockNumber = slots[index]
-    peripheralManage.veepooSDK_readDeviceRunningDataWithBlockNumber(blockNumber) { [weak self] dict, totalPackage, currentReadPackage in
+    peripheralManage.veepooSDK_readDeviceRunningData(withBlockNumber: blockNumber) { [weak self] dict, totalPackage, currentReadPackage in
       guard let self = self, let dict = dict else { return }
       if currentReadPackage == totalPackage {
         let session = self.parseRunningDict(dict as NSDictionary)

@@ -30,7 +30,7 @@ extension VeepooSDKModule {
 
     // iOS doesn't have a dedicated readBTInfo API like Android.
     // Check CPUType == 1 (Jerry series supports classic BT).
-    guard model.CPUType == 1 else {
+    guard model.cpuType == 1 else {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support classic Bluetooth")
       return
     }
@@ -67,7 +67,7 @@ extension VeepooSDKModule {
     }
 
     guard let model = peripheralManage.peripheralModel,
-          model.CPUType == 1 else {
+          model.cpuType == 1 else {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support classic Bluetooth")
       return
     }
@@ -77,7 +77,7 @@ extension VeepooSDKModule {
       peripheralManage.veepooSDK_openDeviceBTSwitch()
 
       // Set up the BT state change callback to emit events
-      peripheralManage.VPBTConnectStateChangeBlock = { [weak self] btState, btSwitchOpen, mediaSwitchOpen in
+      peripheralManage.vpbtConnectStateChangeBlock = { [weak self] btState, btSwitchOpen, mediaSwitchOpen in
         guard let self = self else { return }
         let stateStr: String
         switch btState {

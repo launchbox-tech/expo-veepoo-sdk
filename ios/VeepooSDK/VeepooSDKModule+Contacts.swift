@@ -227,7 +227,7 @@ extension VeepooSDKModule {
     }
 
     peripheralManage.veepooSDKSettingDeviceContactsSOSInfo(
-      with: .read,
+      withOpCode: .read,
       times: 0
     ) { state, times, timesMin, timesMax in
       switch state {
@@ -270,7 +270,7 @@ extension VeepooSDKModule {
     }
 
     peripheralManage.veepooSDKSettingDeviceContactsSOSInfo(
-      with: .setting,
+      withOpCode: .setting,
       times: Int32(times)
     ) { state, _, _, _ in
       switch state {
