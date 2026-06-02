@@ -7,6 +7,6 @@
     "ignoreDeprecations": "6.0",
     "verbatimModuleSyntax": false
   },
-  "include": ["src/bridge-contract/**/*"],
+  "include": ["src/bridge-contract/**/*", "src/plugin/**/*"],
   "exclude": ["node_modules", "build"]
 }

@@ -3,7 +3,6 @@ import { defineConfig } from 'tsdown';
 export default defineConfig({
   entry: [
     'src/index.ts',
-    'src/plugin/index.ts',
     'src/bridge-contract/run-contract-checks.ts',
   ],
   format: 'cjs',

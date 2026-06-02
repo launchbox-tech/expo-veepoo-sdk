@@ -1,1 +1,1 @@
-module.exports = require("./build/plugin/index.cjs");
+module.exports = require("./build/plugin/index.js");
