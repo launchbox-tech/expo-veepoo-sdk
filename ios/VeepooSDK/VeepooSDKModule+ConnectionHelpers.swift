@@ -321,42 +321,16 @@ extension VeepooSDKModule {
 
     self.peripheralManage?.deviceSportDidFinishBlock = { [weak self] _ in
       guard let self = self else { return }
-      let ordinals: [String] = [
-        "common",
-        "outdoorRun", "outdoorWalk", "indoorRun", "indoorWalk", "hiking",
-        "stairStepper", "outdoorCycle", "stationaryBike", "elliptical", "rowingMachine",
-        "mountaineering", "swimming", "sitUps", "skiing", "jumpRope",
-        "yoga", "tableTennis", "basketball", "volleyball", "football",
-        "badminton", "tennis", "climbStairs", "fitness", "weightlifting",
-        "diving", "boxing", "gymBall", "squatTraining", "triathlon",
-        "dance", "hiit", "rockClimbing", "sports", "balls",
-        "fitnessGame", "freeTime", "aerobics", "gymnastics", "floorExercise",
-        "horizontalBar", "parallelBars", "trampoline", "trackAndField", "marathon",
-        "pushUps", "dumbbell", "rugby", "handball", "baseballSoftball",
-        "baseball", "hockey", "golf", "bowling", "billiards",
-        "rowing", "sailboat", "skating", "curling", "icePuck",
-        "sled", "strongWalk", "treadmill", "trailRunning", "raceWalking",
-        "mountainBiking", "bmx", "orienteering", "fishing", "hunting",
-        "skateboard", "rollerSkating", "parkour", "atv", "motocross",
-        "climbingMachine", "spinningBike", "indoorFitness", "mixedAerobic", "crossTraining",
-        "bodybuildingExercise", "groupGymnastics", "kickboxing", "strengthTraining", "steppingTraining",
-        "coreTraining", "flexibilityTraining", "freeTraining", "pilates", "battleRope",
-        "squareDance", "ballroomDancing", "bellyDance", "ballet", "hipHop",
-        "zumba", "latinDance", "jazz", "hipHopDance", "poleDancing",
-        "breakDance", "nationalDance", "modernDance", "disco", "tapDance",
-        "wrestling", "martialArts", "taiChi", "muayThai", "judo",
-        "taekwondo", "karate", "freeSparring", "swordsmanship", "jujitsu",
-        "fencing", "beachSoccer", "beachVolleyball", "softball", "squash",
-        "croquet", "cricket", "polo", "wallball", "takrawBall",
-        "dodgeball", "waterPolo",
-      ]
-      // deviceSportDidFinishBlock only carries a success Bool, not the mode.
-      // Best-effort: read the device's current runningType as the mode index.
-      let idx = self.peripheralManage?.peripheralModel?.runningType ?? 0
-      let modeName: String? = (idx >= 1 && idx < ordinals.count) ? ordinals[idx] : nil
+      // deviceSportDidFinishBlock only signals that a sport session ended
+      // (BOOL success). Unlike Android's SportModelStateData it carries no
+      // discipline, and the device's runningType is a 0-3 busy state (per the
+      // SDK header), not a mode index. The event contract is
+      // `mode: SportMode | null`, so report nil here rather than a fabricated
+      // discipline — the real discipline is read from the stored running data
+      // (readDeviceRunningData / Exercise).
       self.sendEvent(SPORT_MODE_DATA, [
         "deviceId": self.connectedDeviceId ?? "",
-        "mode": modeName as Any
+        "mode": nil as Any?
       ])
     }
     #endif
