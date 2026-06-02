@@ -42,12 +42,12 @@ case "${PLATFORM_NAME:-}" in
     ;;
 esac
 
-if [ -z "${TARGET_BUILD_DIR:-}" ] || [ -z "${FRAMEWORKS_FOLDER_PATH:-}" ] || [ -z "${PODS_TARGET_SRCROOT:-}" ]; then
+if [ -z "${TARGET_BUILD_DIR:-}" ] || [ -z "${FRAMEWORKS_FOLDER_PATH:-}" ] || [ -z "${VEEPOO_FRAMEWORKS_DIR:-}" ]; then
   exit 0
 fi
 
 FRAMEWORKS_DIR="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"
-SOURCE_DIR="${PODS_TARGET_SRCROOT}/VeepooSDK/Frameworks"
+SOURCE_DIR="${VEEPOO_FRAMEWORKS_DIR}"
 
 mkdir -p "${FRAMEWORKS_DIR}"
 
@@ -87,7 +87,8 @@ SCRIPT
     'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => veepoo_fw_search_user,
     'OTHER_LDFLAGS[sdk=iphoneos*]' => %($(inherited) #{linker_flags}),
     'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => veepoo_fw_search_user,
-    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)'
+    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)',
+    'VEEPOO_FRAMEWORKS_DIR[sdk=iphoneos*]' => frameworks_dir
   }
   s.script_phase = {
     :name => 'Embed VeepooSDK Dynamic Frameworks',
