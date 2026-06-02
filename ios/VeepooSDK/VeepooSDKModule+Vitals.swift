@@ -196,7 +196,7 @@ extension VeepooSDKModule {
 
     peripheralManage.veepooSDKTestBodyCompositionStart(true, progress: { [weak self] lead, nsProgress in
       guard let self = self else { return }
-      let pct = Int((nsProgress.fractionCompleted * 100.0).rounded())
+      let pct = Int(((nsProgress?.fractionCompleted ?? 0) * 100.0).rounded())
       self.sendEvent(BODY_COMPOSITION_TEST_RESULT, [
         "deviceId": self.connectedDeviceId ?? "",
         "result": [
