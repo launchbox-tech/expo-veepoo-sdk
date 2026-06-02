@@ -170,7 +170,7 @@ extension VeepooSDKModule {
       // iOS expects temp in °F
       entry.temp = (h["tempF"] as? NSNumber)?.doubleValue ?? 0
       if let uvi = h["uvIndex"] as? NSNumber { entry.uvi = uvi }
-      entry.code = (h["weatherState"] as? NSNumber)?.intValue ?? 0
+      entry.code = (h["weatherState"] as? NSNumber)?.int32Value ?? 0
       entry.wind_sc = h["windLevel"] as? String ?? ""
       if let vis = h["visibilityM"] as? NSNumber { entry.vis = NSNumber(value: vis.doubleValue / 1000.0) }
       return entry

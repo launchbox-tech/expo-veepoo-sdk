@@ -122,7 +122,7 @@ extension VeepooSDKModule {
     }
     let model = VPDeviceFemaleModel()
     peripheralManage.veepooSDKSettingDeviceFemale(
-      withFemaleModel: model,
+      with: model,
       settingMode: 2,
       successResult: { result in
         guard let result = result else {
@@ -157,7 +157,7 @@ extension VeepooSDKModule {
     let model = VPDeviceFemaleModel()
     self.applyWomenHealthDict(settings, to: model)
     peripheralManage.veepooSDKSettingDeviceFemale(
-      withFemaleModel: model,
+      with: model,
       settingMode: 1,
       successResult: { _ in
         promise.resolve(nil)

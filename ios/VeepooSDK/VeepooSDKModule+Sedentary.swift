@@ -47,7 +47,7 @@ extension VeepooSDKModule {
     }
     let model = VPDeviceLongSeatModel()
     peripheralManage.veepooSDKSettingDeviceLongSeat(
-      withLongSeatModel: model,
+      with: model,
       settingMode: 2,
       successResult: { result in
         guard let result = result else {
@@ -83,7 +83,7 @@ extension VeepooSDKModule {
     self.applySedentaryDict(settings, to: model)
     let mode: UInt = (settings["enabled"] as? Bool) == true ? 1 : 0
     peripheralManage.veepooSDKSettingDeviceLongSeat(
-      withLongSeatModel: model,
+      with: model,
       settingMode: mode,
       successResult: { _ in
         promise.resolve(nil)

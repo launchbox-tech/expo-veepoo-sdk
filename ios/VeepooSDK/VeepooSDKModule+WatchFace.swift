@@ -99,7 +99,7 @@ extension VeepooSDKModule {
     }
     let dial = dialKeyToVpType(extractDialKey(settings))
     peripheralManage.veepooSDKSettingDeviceScreenStyle(
-      screenIndex,
+      Int32(screenIndex),
       settingMode: 1,
       dialType: dial,
       result: { _, _, ok in

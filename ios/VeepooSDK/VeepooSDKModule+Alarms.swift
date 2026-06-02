@@ -61,8 +61,8 @@ extension VeepooSDKModule {
     }
 
     let defaultModel = VPDeviceNewAlarmModel()
-    peripheralManage.veepooSDKSettingDeviceNewAlarmWithNewAlarmModel(
-      defaultModel,
+    peripheralManage.veepooSDKSettingDeviceNewAlarm(
+      with: defaultModel,
       settingMode: 2,
       successResult: { [weak self] alarmArray in
         guard let self = self else { return }
@@ -120,8 +120,8 @@ extension VeepooSDKModule {
       textModel.alarmText = textContent
       textModel.alarmDate = "0000-00-00"
 
-      peripheralManage.veepooSDKSettingDeviceTextAlarmWithTextAlarmModel(
-        textModel,
+      peripheralManage.veepooSDKSettingDeviceTextAlarm(
+        with: textModel,
         settingMode: VPDeviceTextAlarmSettingModelAddOrChange,
         successResult: { _ in promise.resolve("success") },
         failureResult: { promise.resolve("fail") }
@@ -136,8 +136,8 @@ extension VeepooSDKModule {
       alarmModel.alarmScene = scene
       alarmModel.alarmDate = "0000-00-00"
 
-      peripheralManage.veepooSDKSettingDeviceNewAlarmWithNewAlarmModel(
-        alarmModel,
+      peripheralManage.veepooSDKSettingDeviceNewAlarm(
+        with: alarmModel,
         settingMode: 1,
         successResult: { _ in promise.resolve("success") },
         failureResult: { promise.resolve("fail") }
@@ -169,8 +169,8 @@ extension VeepooSDKModule {
     alarmModel.alarmScene = "0"
     alarmModel.alarmDate = "0000-00-00"
 
-    peripheralManage.veepooSDKSettingDeviceNewAlarmWithNewAlarmModel(
-      alarmModel,
+    peripheralManage.veepooSDKSettingDeviceNewAlarm(
+      with: alarmModel,
       settingMode: 0,
       successResult: { _ in promise.resolve("success") },
       failureResult: { promise.resolve("fail") }

@@ -59,7 +59,7 @@ extension VeepooSDKModule {
     }
     let model = VPDeviceRaiseHandModel()
     peripheralManage.veepooSDKSettingRaiseHand(
-      withRaiseHandModel: model,
+      with: model,
       settingMode: 2,
       successResult: { result in
         guard let result = result else {
@@ -95,7 +95,7 @@ extension VeepooSDKModule {
     self.applyWristFlipDict(settings, to: model)
     let mode: UInt = (settings["enabled"] as? Bool) == true ? 1 : 0
     peripheralManage.veepooSDKSettingRaiseHand(
-      withRaiseHandModel: model,
+      with: model,
       settingMode: mode,
       successResult: { _ in
         promise.resolve(nil)
