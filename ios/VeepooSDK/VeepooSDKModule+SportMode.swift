@@ -66,7 +66,7 @@ extension VeepooSDKModule {
       return
     }
     // settingType 2 = read; runMode ignored on read; callback returns runningType (0=off, 1=on)
-    peripheralManage.veepooSDKSettingDeviceRunning(2, run: .Common) { [weak self] runningType, _ in
+    peripheralManage.veepooSDKSettingDeviceRunning(2, run: .common) { [weak self] runningType, _ in
       guard let self = self else { return }
       let isActive = runningType == 1
       // iOS vendor only returns on/off status on read, not the specific mode
@@ -134,7 +134,7 @@ extension VeepooSDKModule {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support sport mode")
       return
     }
-    peripheralManage.veepooSDKSettingDeviceRunning(0, run: .Common) { [weak self] _, success in
+    peripheralManage.veepooSDKSettingDeviceRunning(0, run: .common) { [weak self] _, success in
       guard self != nil else { return }
       if success {
         promise.resolve(nil)

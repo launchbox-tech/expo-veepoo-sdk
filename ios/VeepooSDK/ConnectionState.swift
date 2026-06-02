@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - 连接状态枚举
-enum ConnectionState {
+enum ConnectionState: Equatable {
   case idle, scanning, connecting, connected, discoveringServices
   case authenticating, ready, disconnecting, disconnected
   case error(String)
