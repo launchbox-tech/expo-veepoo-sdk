@@ -8,6 +8,8 @@ export { default as ScanScreen } from '../app/components/ScanScreen';
 export { default as ReadyScreen } from '../app/components/ReadyScreen';
 export { default as ReadyHeader } from '../app/components/ReadyHeader';
 export { default as DeviceInfoCard } from '../app/components/DeviceInfoCard';
+export { default as HarvestCard } from '../app/components/HarvestCard';
+export { default as CapabilityExplorer } from '../app/components/CapabilityExplorer';
 export { default as FindBandCard } from '../app/components/FindBandCard';
 export { default as WatchFaceCard } from '../app/components/WatchFaceCard';
 export { default as ScreenLightCard } from '../app/components/ScreenLightCard';

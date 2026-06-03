@@ -12,6 +12,8 @@ import {
 import {
   ReadyHeader,
   DeviceInfoCard,
+  HarvestCard,
+  CapabilityExplorer,
   FindBandCard,
   WatchFaceCard,
   ScreenLightCard,
@@ -108,6 +110,9 @@ export default function ReadyScreen({
 
         <DeviceInfoCard batteryInfo={batteryInfo} deviceVersion={deviceVersion} />
 
+        <HarvestCard />
+
+        <CapabilityExplorer>
         <FindBandCard />
         <WatchFaceCard />
         <ScreenLightCard />
@@ -188,6 +193,7 @@ export default function ReadyScreen({
           stepData={stepData}
           syncData={syncData}
         />
+        </CapabilityExplorer>
 
         <DisconnectButton disconnect={disconnect} />
 
