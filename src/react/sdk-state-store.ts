@@ -57,6 +57,18 @@ export class VeepooSDKStateStore {
     on("scan_stopped", () => {
       this.update({ isScanning: false });
     });
+
+    // The native layer auto-stops a scan after its own timeout (iOS ~10s,
+    // Android's internal search window) and reports it via bluetooth_state_changed
+    // rather than scan_stopped. The SDK runtime already folds this in, so the
+    // stopScan() guard sees isScanning=false and early-returns — never emitting
+    // scan_stopped. Mirror the authoritative flag here so the UI can't get
+    // stranded showing "Stop Scan" after the scan has already ended.
+    on("bluetooth_state_changed", ({ is_scanning }) => {
+      if (this.snapshot.isScanning !== is_scanning) {
+        this.update({ isScanning: is_scanning });
+      }
+    });
   }
 
   private update(patch: Partial<SDKStateSnapshot>): void {

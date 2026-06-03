@@ -122,6 +122,26 @@ describe("VeepooSDKStateStore", () => {
       await sdk.discovery.stopScan();
       expect(store.getSnapshot().isScanning).toBe(false);
     });
+
+    it("clears isScanning when native auto-stops via bluetoothStateChanged", async () => {
+      // Regression: the native layer auto-stops a scan after its own timeout
+      // and reports it through bluetoothStateChanged (not scanStopped). The
+      // store must mirror it, otherwise the UI stays stuck on "Stop Scan".
+      const { sdk, native, store } = await makeInitializedStore();
+      await sdk.discovery.startScan();
+      expect(store.getSnapshot().isScanning).toBe(true);
+
+      native._emit("bluetoothStateChanged", { isScanning: false });
+      expect(store.getSnapshot().isScanning).toBe(false);
+    });
+
+    it("does not churn the snapshot on redundant bluetoothStateChanged", async () => {
+      const { native, store } = await makeInitializedStore();
+      const before = store.getSnapshot();
+      // Already not scanning; an is_scanning:false report must be a no-op.
+      native._emit("bluetoothStateChanged", { isScanning: false });
+      expect(store.getSnapshot()).toBe(before);
+    });
   });
 
   // ── subscribe ────────────────────────────────────────────────────────────
