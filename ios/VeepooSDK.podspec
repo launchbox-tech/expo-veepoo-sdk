@@ -26,54 +26,16 @@ Pod::Spec.new do |s|
     ABParTool
     ZipZap
   ]
-  dynamic_frameworks = %w[
-    ABParTool
-    GRDFUSDK
-    JLDialUnit
-    ZipZap
-  ]
   linker_flags = linked_frameworks.map { |name| %(-framework "#{name}") }.join(' ')
-  embed_frameworks_script = <<-'SCRIPT'
-set -eu
 
-case "${PLATFORM_NAME:-}" in
-  iphonesimulator*)
-    exit 0
-    ;;
-esac
-
-if [ -z "${TARGET_BUILD_DIR:-}" ] || [ -z "${FRAMEWORKS_FOLDER_PATH:-}" ] || [ -z "${VEEPOO_FRAMEWORKS_DIR:-}" ]; then
-  exit 0
-fi
-
-FRAMEWORKS_DIR="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"
-SOURCE_DIR="${VEEPOO_FRAMEWORKS_DIR}"
-
-mkdir -p "${FRAMEWORKS_DIR}"
-
-embed_framework() {
-  name="$1"
-  source="${SOURCE_DIR}/${name}.framework"
-  destination="${FRAMEWORKS_DIR}/${name}.framework"
-
-  if [ ! -d "${source}" ]; then
-    echo "warning: VeepooSDK missing framework ${source}"
-    return
-  fi
-
-  rm -rf "${destination}"
-  cp -R "${source}" "${destination}"
-
-  if [ -n "${EXPANDED_CODE_SIGN_IDENTITY:-}" ]; then
-    /usr/bin/codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" --preserve-metadata=identifier,entitlements "${destination}"
-  fi
-}
-
-embed_framework ABParTool
-embed_framework GRDFUSDK
-embed_framework JLDialUnit
-embed_framework ZipZap
-SCRIPT
+  # This spec only *links* the vendored frameworks (device-only). The four
+  # dynamic frameworks (ABParTool, GRDFUSDK, JLDialUnit, ZipZap) must also be
+  # *embedded* into the app's Frameworks/ folder or the app crashes at launch
+  # ("Library not loaded: @rpath/JLDialUnit.framework/JLDialUnit"). A pod
+  # script_phase cannot do that: this pod is a static library, so its build
+  # phases have no FRAMEWORKS_FOLDER_PATH and never reach the app bundle.
+  # Embedding therefore happens in the *app* target via the config plugin
+  # (src/plugin/index.ts -> withVeepooFrameworkEmbed).
 
   s.preserve_paths = 'VeepooSDK/Frameworks/**/*'
   s.pod_target_xcconfig = {
@@ -87,15 +49,8 @@ SCRIPT
     'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => veepoo_fw_search_user,
     'OTHER_LDFLAGS[sdk=iphoneos*]' => %($(inherited) #{linker_flags}),
     'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => veepoo_fw_search_user,
-    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)',
-    'VEEPOO_FRAMEWORKS_DIR[sdk=iphoneos*]' => frameworks_dir
+    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)'
   }
-  s.script_phase = {
-    :name => 'Embed VeepooSDK Dynamic Frameworks',
-    :script => embed_frameworks_script,
-    :execution_position => :after_compile
-  }
-
   s.frameworks = 'CoreBluetooth', 'CoreLocation', 'CoreMotion', 'CoreAudio', 'AVFoundation'
 
   s.subspec 'VeepooSDK' do |ss|
