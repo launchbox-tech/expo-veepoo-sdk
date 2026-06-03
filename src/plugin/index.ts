@@ -21,7 +21,8 @@ const EMBED_PHASE_NAME = 'Embed VeepooSDK Dynamic Frameworks';
 const EMBED_SCRIPT = [
   'set -eu',
   'case "${PLATFORM_NAME:-}" in iphonesimulator*) echo "VeepooSDK: skip embed on simulator"; exit 0 ;; esac',
-  'SRC="${SRCROOT}/../node_modules/@gaozh1024/expo-veepoo-sdk/ios/VeepooSDK/Frameworks"',
+  'SRC="${SRCROOT}/../node_modules/expo-veepoo-sdk/ios/VeepooSDK/Frameworks"',
+  '[ -d "${SRC}" ] || SRC="${SRCROOT}/../node_modules/@gaozh1024/expo-veepoo-sdk/ios/VeepooSDK/Frameworks"',
   'DST="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"',
   'mkdir -p "${DST}"',
   `for fw in ${DYNAMIC_FRAMEWORKS.join(' ')}; do`,
