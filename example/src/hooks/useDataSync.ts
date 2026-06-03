@@ -17,10 +17,10 @@ export function useDataSync(): {
   const [sleepSummary, setSleepSummary] = useState<SleepData['summary'] | null>(null);
   const [stepData, setStepData] = useState<SportStepData | null>(null);
 
-  useSDKEvent('readOriginProgress', ({ progress }) => setDataSyncProgress(progress), isReady);
-  useSDKEvent('readOriginComplete', () => setDataSyncing(false), isReady);
-  useSDKEvent('sleepData', ({ data }) => setSleepSummary(data.summary), isReady);
-  useSDKEvent('sportStepData', ({ data }) => setStepData(data), isReady);
+  useSDKEvent('read_origin_progress', ({ progress }) => setDataSyncProgress(progress), isReady);
+  useSDKEvent('read_origin_complete', () => setDataSyncing(false), isReady);
+  useSDKEvent('sleep_data', ({ data }) => setSleepSummary(data.summary), isReady);
+  useSDKEvent('sport_step_data', ({ data }) => setStepData(data), isReady);
 
   async function syncData() {
     setDataSyncing(true);

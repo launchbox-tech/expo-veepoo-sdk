@@ -13,7 +13,7 @@ export function useBandScan(appState: AppState): {
   const [devices, setDevices] = useState<VeepooDevice[]>([]);
 
   useSDKEvent(
-    'deviceFound',
+    'device_found',
     ({ device }) => {
       setDevices(prev => {
         const idx = prev.findIndex(d => d.id === device.id);
