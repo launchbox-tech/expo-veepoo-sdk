@@ -123,7 +123,7 @@ extension VeepooSDKModule {
     model.remindInterval = UInt8(clamping: (reminder["interval"] as? Int) ?? 60)
     model.open = (reminder["enabled"] as? Bool) ?? true
     var promiseSettled = false
-    peripheralManage.veepooSDKSettingHealthRemind(with: remindType, opCode: 1, remindModel: model) { [weak self] success, _, _ in
+    peripheralManage.veepooSDKSettingHealthRemind(with: remindType, opCode: 1, remindModel: model) { success, _, _ in
       guard !promiseSettled else { return }
       promiseSettled = true
       if success {

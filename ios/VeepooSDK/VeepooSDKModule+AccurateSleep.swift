@@ -29,19 +29,19 @@ extension VeepooSDKModule {
     for item in sessions {
       let curve = parseSleepLineToMinuteCurve(item.sleepLine)
       let session: [String: Any] = [
-        "sleepTime": item.sleepTime ?? "",
-        "wakeTime": item.wakeTime ?? "",
-        "deepDuration": Int(Double(item.deepDuration ?? "0") ?? 0),
-        "lightDuration": Int(Double(item.lightDuration ?? "0") ?? 0),
-        "remDuration": Int(Double(item.otherDuration ?? "0") ?? 0),
-        "getUpDuration": Int(Double(item.getUpDuration ?? "0") ?? 0),
-        "sleepDuration": Int(Double(item.sleepDuration ?? "0") ?? 0),
-        "getUpTimes": Int(Double(item.getUpTimes ?? "0") ?? 0),
-        "sleepQuality": Int(Double(item.sleepQuality ?? "0") ?? 0),
-        "insomniaScore": Int(Double(item.insomniaScore ?? "0") ?? 0),
-        "insomniaTimes": Int(Double(item.insomniaTimes ?? "0") ?? 0),
-        "fallAsleepScore": Int(Double(item.fallAsleepScore ?? "0") ?? 0),
-        "sleepEfficiencyScore": Int(Double(item.sleepEfficiencyScore ?? "0") ?? 0),
+        "sleepTime": item.sleepTime,
+        "wakeTime": item.wakeTime,
+        "deepDuration": Int(Double(item.deepDuration) ?? 0),
+        "lightDuration": Int(Double(item.lightDuration) ?? 0),
+        "remDuration": Int(Double(item.otherDuration) ?? 0),
+        "getUpDuration": Int(Double(item.getUpDuration) ?? 0),
+        "sleepDuration": Int(Double(item.sleepDuration) ?? 0),
+        "getUpTimes": Int(Double(item.getUpTimes) ?? 0),
+        "sleepQuality": Int(Double(item.sleepQuality) ?? 0),
+        "insomniaScore": Int(Double(item.insomniaScore) ?? 0),
+        "insomniaTimes": Int(Double(item.insomniaTimes) ?? 0),
+        "fallAsleepScore": Int(Double(item.fallAsleepScore) ?? 0),
+        "sleepEfficiencyScore": Int(Double(item.sleepEfficiencyScore) ?? 0),
         "curve": curve,
       ]
       sendEvent(ACCURATE_SLEEP_DATA, [

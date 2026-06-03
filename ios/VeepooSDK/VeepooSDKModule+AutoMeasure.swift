@@ -17,7 +17,7 @@ extension VeepooSDKModule {
     }
     
     peripheralManage.veepooSDKReadAutoMonitSwitchInfo { settingList in
-      guard let list = settingList as? [VPAutoMonitTestModel] else {
+      guard let list = settingList else {
         promise.reject("READ_FAILED", "Failed to read auto measure settings")
         return
       }
@@ -60,7 +60,7 @@ extension VeepooSDKModule {
     }
     
     peripheralManage.veepooSDKReadAutoMonitSwitchInfo { settingList in
-      guard let list = settingList as? [VPAutoMonitTestModel] else {
+      guard let list = settingList else {
         promise.reject("READ_FAILED", "Failed to read settings before modifying")
         return
       }

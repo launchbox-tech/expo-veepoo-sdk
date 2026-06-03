@@ -28,7 +28,7 @@ extension VeepooSDKModule {
         self.finishMeasurement(type: "bloodGlucose", reason: "terminal_state_\(state.rawValue)")
         
         let statusStr: String
-        var finalValue = Double(value) / 100.0
+        let finalValue = Double(value) / 100.0
         
         switch state {
         case .deviceBusy: statusStr = "deviceBusy"

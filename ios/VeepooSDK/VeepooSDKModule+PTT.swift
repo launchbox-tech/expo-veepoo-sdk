@@ -42,7 +42,7 @@ extension VeepooSDKModule {
           "progress": 0,
         ]
       ])
-    } signal: { [weak self] _ in
+    } signal: { _ in
       // signal array used for waveform rendering — not exposed per issue spec
     }
 

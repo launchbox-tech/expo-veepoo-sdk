@@ -19,7 +19,6 @@ extension VeepooSDKModule {
     let queryDate = date ?? getDateString(dayOffset: 0)
     let records = VPDataBaseOperation.veepooSDKGetDeviceTemperatureData(withDate: queryDate, andTableID: deviceAddress) as? [[String: Any]] ?? []
     let year = String(queryDate.prefix(4))
-    let monthDay = String(queryDate.dropFirst(5))
     for dict in records {
       let month = (dict["month"] as? NSNumber)?.intValue ?? 0
       let day = (dict["day"] as? NSNumber)?.intValue ?? 0
@@ -154,23 +153,23 @@ extension VeepooSDKModule {
     let queryDate = date ?? getDateString(dayOffset: 0)
     let records = VPDataBaseOperation.veepooSDKGetDeviceOffStoreBodyComposition(withDate: queryDate, andTableID: deviceAddress) ?? []
     for model in records {
-      let ts = "\(model.date ?? queryDate) \(model.testTime ?? "00:00:00")"
+      let ts = "\(model.date) \(model.testTime)"
       let data: [String: Any] = [
         "timestamp": ts,
-        "bmi": Double(model.bmi ?? "0") ?? 0,
-        "bodyFatPercentage": Double(model.bodyFatPercentage ?? "0") ?? 0,
-        "fatMass": Double(model.fatMass ?? "0") ?? 0,
-        "leanBodyMass": Double(model.leanBodyMass ?? "0") ?? 0,
-        "muscleRate": Double(model.muscleRate ?? "0") ?? 0,
-        "muscleMass": Double(model.muscleMass ?? "0") ?? 0,
-        "subcutaneousFat": Double(model.subcutaneousFat ?? "0") ?? 0,
-        "bodyMoisture": Double(model.bodyMoisture ?? "0") ?? 0,
-        "waterContent": Double(model.waterContent ?? "0") ?? 0,
-        "skeletalMuscleRate": Double(model.skeletalMuscleRate ?? "0") ?? 0,
-        "boneMass": Double(model.boneMass ?? "0") ?? 0,
-        "proportionOfProtein": Double(model.proportionOfProtein ?? "0") ?? 0,
-        "proteinAmount": Double(model.proteinAmount ?? "0") ?? 0,
-        "basalMetabolicRate": Double(model.basalMetabolicRate ?? "0") ?? 0,
+        "bmi": Double(model.bmi) ?? 0,
+        "bodyFatPercentage": Double(model.bodyFatPercentage) ?? 0,
+        "fatMass": Double(model.fatMass) ?? 0,
+        "leanBodyMass": Double(model.leanBodyMass) ?? 0,
+        "muscleRate": Double(model.muscleRate) ?? 0,
+        "muscleMass": Double(model.muscleMass) ?? 0,
+        "subcutaneousFat": Double(model.subcutaneousFat) ?? 0,
+        "bodyMoisture": Double(model.bodyMoisture) ?? 0,
+        "waterContent": Double(model.waterContent) ?? 0,
+        "skeletalMuscleRate": Double(model.skeletalMuscleRate) ?? 0,
+        "boneMass": Double(model.boneMass) ?? 0,
+        "proportionOfProtein": Double(model.proportionOfProtein) ?? 0,
+        "proteinAmount": Double(model.proteinAmount) ?? 0,
+        "basalMetabolicRate": Double(model.basalMetabolicRate) ?? 0,
       ]
       sendEvent(STORED_BODY_COMPOSITION_DATA, ["deviceId": connectedDeviceId ?? "", "data": data])
     }

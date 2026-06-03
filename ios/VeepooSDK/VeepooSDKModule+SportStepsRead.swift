@@ -27,9 +27,9 @@ extension VeepooSDKModule {
           return
         }
         
-        let stepValue: Any = dict["Step"]
-        let disValue: Any = dict["Dis"]
-        let calValue: Any = dict["Cal"]
+        let stepValue = dict["Step"]
+        let disValue = dict["Dis"]
+        let calValue = dict["Cal"]
         
         let step = self.getInt(stepValue)
         let disKm = self.getDouble(disValue)

@@ -67,7 +67,7 @@ extension VeepooSDKModule {
     }
     // settingType 2 = read; runMode ignored on read; callback returns runningType (0=off, 1=on)
     peripheralManage.veepooSDKSettingDeviceRunning(2, run: .common) { [weak self] runningType, _ in
-      guard let self = self else { return }
+      guard self != nil else { return }
       let isActive = runningType == 1
       // iOS vendor only returns on/off status on read, not the specific mode
       promise.resolve(["mode": nil as Any?, "isActive": isActive])

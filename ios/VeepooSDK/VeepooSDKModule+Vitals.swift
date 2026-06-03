@@ -39,19 +39,11 @@ extension VeepooSDKModule {
       ]
 
       if let model = testModel {
-        if let anyHeart = model.aveHeart {
-          if let s = anyHeart as? String, let v = Int(s) {
-            payload["heartRate"] = v
-          } else if let n = anyHeart as? NSNumber {
-            payload["heartRate"] = n.intValue
-          }
+        if let anyHeart = model.aveHeart, let v = Int(anyHeart) {
+          payload["heartRate"] = v
         }
-        if let anyHrv = model.aveHrv {
-          if let s = anyHrv as? String, let hv = Int(s) {
-            payload["hrv"] = hv
-          } else if let n = anyHrv as? NSNumber {
-            payload["hrv"] = n.intValue
-          }
+        if let anyHrv = model.aveHrv, let hv = Int(anyHrv) {
+          payload["hrv"] = hv
         }
         if includeWaveform, let fs = model.filterSignals as? [NSNumber] {
           payload["waveform"] = fs.map { $0.intValue }

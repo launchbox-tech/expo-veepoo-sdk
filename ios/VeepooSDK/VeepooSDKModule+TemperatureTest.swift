@@ -25,7 +25,7 @@ extension VeepooSDKModule {
       case .unsupported: statusStr = "unsupported"; isEnd = true
       case .open: statusStr = "testing"
       case .close: statusStr = "over"; isEnd = true
-      @unknown default: statusStr = "testing"
+      default: statusStr = "testing"
       }
       if isEnd {
         peripheralManage.veepooSDK_temperatureTestStart(false) { _, _, _, _, _ in }
@@ -35,7 +35,7 @@ extension VeepooSDKModule {
       var result: [String: Any] = [
         "state": statusStr,
         "rawState": state.rawValue,
-        "value": tempValue > 0 ? Double(tempValue) / 10.0 : nil,
+        "value": (tempValue > 0 ? Double(tempValue) / 10.0 : nil) as Any,
         "progress": progress,
         "isEnd": isEnd
       ]

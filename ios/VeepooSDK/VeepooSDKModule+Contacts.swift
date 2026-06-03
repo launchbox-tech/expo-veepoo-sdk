@@ -6,14 +6,12 @@ extension VeepooSDKModule {
   // MARK: - Helpers
 
   private func contactsSupported() -> Bool {
-    let functions = cachedDeviceFunctions as? [String: Any]
-    let pkg3 = functions?["pkg3"] as? [String: Any]
+    let pkg3 = cachedDeviceFunctions["pkg3"] as? [String: Any]
     return pkg3?["contactFunction"] as? String != "unsupported"
   }
 
   private func sosSupported() -> Bool {
-    let functions = cachedDeviceFunctions as? [String: Any]
-    let pkg3 = functions?["pkg3"] as? [String: Any]
+    let pkg3 = cachedDeviceFunctions["pkg3"] as? [String: Any]
     // contactType == 2 means SOS contacts supported
     let contactType = (pkg3?["contactType"] as? NSNumber)?.intValue ?? 0
     return contactType >= 2
@@ -22,8 +20,8 @@ extension VeepooSDKModule {
   private func contactModelToDict(_ model: VPDeviceContactsModel) -> [String: Any] {
     return [
       "contactID": model.contactID,
-      "name": model.nickName ?? "",
-      "phoneNumber": model.phoneNumber ?? "",
+      "name": model.nickName,
+      "phoneNumber": model.phoneNumber,
       "isSOS": model.isSOS,
     ]
   }
