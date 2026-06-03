@@ -10,7 +10,8 @@
     "ios": {
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "tech.launchbox.veepoo.example",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "appleTeamId": "665ZNY459C"
     },
     "android": {
       "package": "tech.launchbox.veepoo.example",
