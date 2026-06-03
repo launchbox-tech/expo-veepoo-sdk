@@ -4,7 +4,7 @@
     "noEmit": false,
     "module": "CommonJS",
     "moduleResolution": "node10",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "verbatimModuleSyntax": false
   },
   "include": ["src/bridge-contract/**/*", "src/plugin/**/*"],
