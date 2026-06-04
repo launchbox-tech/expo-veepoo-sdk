@@ -4,6 +4,7 @@ import {
   withAndroidManifest,
   withXcodeProject,
   AndroidConfig,
+  XcodeProject,
 } from 'expo/config-plugins';
 
 // The four VeepooBleSDK dependencies that ship as dynamic frameworks (DYLIBs).
@@ -76,8 +77,7 @@ const withVeepooSDK: ConfigPlugin<VeepooSDKPluginProps | void> = (
 // frameworks into the .app bundle. Idempotent — safe across repeated prebuilds.
 const withVeepooFrameworkEmbed: ConfigPlugin = (config) => {
   return withXcodeProject(config, (config) => {
-    // The xcode project model is loosely typed; cast to keep the traversal readable.
-    const project = config.modResults as any;
+    const project = config.modResults as XcodeProject;
 
     const nativeTargets = project.pbxNativeTargetSection();
     let appTargetUuid: string | undefined;
