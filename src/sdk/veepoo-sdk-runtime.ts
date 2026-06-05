@@ -33,7 +33,7 @@ export class VeepooSDKRuntime {
   private readonly bus = new EventBus(
     (error, event, payload) => {
       this.log(
-        "error",
+        "warn",
         "listener",
         `listener.${event}.failed`,
         `Event listener for ${event} threw`,
@@ -43,7 +43,7 @@ export class VeepooSDKRuntime {
           data: payload,
         },
       );
-      console.error(`Error in event listener for ${event}:`, error);
+      console.warn(`Error in event listener for ${event}:`, error);
     },
   );
   private logEnabled = false;
@@ -111,9 +111,9 @@ export class VeepooSDKRuntime {
         this.logger(entry);
       } catch (error) {
         if (this.logEnabled) {
-          console.error("[VeepooSDK]", {
+          console.warn("[VeepooSDK]", {
             timestamp: Date.now(),
-            level: "error",
+            level: "warn",
             scope: "listener",
             action: "logger.callback.failed",
             platform: this.getPlatform(),
@@ -180,7 +180,10 @@ export class VeepooSDKRuntime {
     deviceId?: string,
   ): VeepooError {
     const veepooError = mapNativeRejection(error, { fallbackCode, deviceId });
-    this.log("error", "sdk", `error.${veepooError.code}`, veepooError.message, {
+    // Operation failures are recoverable from the host app's perspective
+    // (callers get the rejection / `error` event and own the retry policy) —
+    // log at `warn` so the console stays free of red noise.
+    this.log("warn", "sdk", `error.${veepooError.code}`, veepooError.message, {
       deviceId: veepooError.device_id,
       error,
     });
