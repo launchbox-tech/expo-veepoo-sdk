@@ -19,9 +19,10 @@ extension VeepooSDKModule {
     pInfo.targetSleepDuration = Int32(info["sleepAim"] as? Int ?? 480)
     // Vendor completion is runloop-driven — always enter from main, or the
     // callback may never fire (same constraint as readBattery / setDeviceTime).
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       peripheralManage.veepooSDKSynchronousPersonalInformation(pInfo) { result in
-        promise.resolve(result == 1)
+        promiseBox.resolve(result == 1)
       }
     }
     #endif

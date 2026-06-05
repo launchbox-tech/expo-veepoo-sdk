@@ -67,41 +67,55 @@ extension VeepooSDKModule {
     // (G Band parity). performConnect still falls back to the hidden scan on
     // failure/timeout, so trusting the model never regresses.
     let shouldUseScanFallbackDirectly = modelSource == "none"
+    let capturedModel = peripheralModel
 
-    if shouldUseScanFallbackDirectly {
-      print("[VeepooSDK] connect - 当前仅有 UUID 恢复模型或无模型，直接进入隐藏扫描兜底, deviceId: \(deviceId), modelSource: \(modelSource)")
-      self.startScanConnectFallback(
-        deviceId: deviceId,
-        password: password,
-        is24Hour: is24Hour,
-        promise: promise
-      )
-    } else if let model = peripheralModel {
-      self.performConnect(
-        model: model,
-        deviceId: deviceId,
-        password: password,
-        is24Hour: is24Hour,
-        promise: promise,
-        fallbackToScan: { [weak self] in
-          guard let self = self else { return }
-          print("[VeepooSDK] connect - performConnect 失败，进入扫描兜底, deviceId: \(deviceId)")
-          self.startScanConnectFallback(
-            deviceId: deviceId,
-            password: password,
-            is24Hour: is24Hour,
-            promise: promise
-          )
-        }
-      )
-    } else {
-      print("[VeepooSDK] connect - 无可用模型，直接进入扫描兜底, deviceId: \(deviceId), uuid: \(uuidString ?? "nil")")
-      self.startScanConnectFallback(
-        deviceId: deviceId,
-        password: password,
-        is24Hour: is24Hour,
-        promise: promise
-      )
+    // Vendor SDK connect calls schedule Timers and invoke CoreBluetooth APIs
+    // that require a thread with an active run loop. ExpoModulesCore dispatches
+    // AsyncFunction calls on its module queue (a GCD serial queue — no run loop),
+    // so all three connect paths must hop to the main thread before touching the
+    // vendor SDK, the same pattern as handleInit. Without this, Timer.scheduledTimer
+    // inside performConnect crashes on the module queue thread.
+    DispatchQueue.main.async {
+      if shouldUseScanFallbackDirectly {
+        print("[VeepooSDK] connect - 当前仅有 UUID 恢复模型或无模型，直接进入隐藏扫描兜底, deviceId: \(deviceId), modelSource: \(modelSource)")
+        self.startScanConnectFallback(
+          deviceId: deviceId,
+          password: password,
+          is24Hour: is24Hour,
+          promise: promise
+        )
+      } else if let model = capturedModel {
+        self.performConnect(
+          model: model,
+          deviceId: deviceId,
+          password: password,
+          is24Hour: is24Hour,
+          promise: promise,
+          fallbackToScan: { [weak self] in
+            // Do NOT capture `promise` here — this closure is strongly held by
+            // the vendor deviceConnectBlock, and a captured Promise destroyed
+            // after HMR crashes (see performConnect). performConnect already
+            // parked the promise in pendingConnectPromise; read it from there.
+            // After cleanup() nils it, this guard makes the fallback a no-op.
+            guard let self = self, let pendingPromise = self.pendingConnectPromise else { return }
+            print("[VeepooSDK] connect - performConnect 失败，进入扫描兜底, deviceId: \(deviceId)")
+            self.startScanConnectFallback(
+              deviceId: deviceId,
+              password: password,
+              is24Hour: is24Hour,
+              promise: pendingPromise
+            )
+          }
+        )
+      } else {
+        print("[VeepooSDK] connect - 无可用模型，直接进入扫描兜底, deviceId: \(deviceId), uuid: \(uuidString ?? "nil")")
+        self.startScanConnectFallback(
+          deviceId: deviceId,
+          password: password,
+          is24Hour: is24Hour,
+          promise: promise
+        )
+      }
     }
     #endif
   }
@@ -156,6 +170,7 @@ extension VeepooSDKModule {
       promise.reject("PASSWORD_TYPE_ERROR", "Invalid password type")
       return
     }
+    let promiseBox = self.makePromiseBox(promise)
     manager.veepooSDKSynchronousPassword(with: passwordType, password: password) { [weak self] result in
       guard let self = self else { return }
       let success = (result.rawValue == 1) || (result.rawValue == 6)
@@ -176,7 +191,7 @@ extension VeepooSDKModule {
         self.activeConnectDeviceId = nil
         self.sendEvent(DEVICE_READY, ["deviceId": self.connectedDeviceId ?? "", "isOadModel": false])
       }
-      promise.resolve(resultData)
+      promiseBox.resolve(resultData)
     }
     #endif
   }

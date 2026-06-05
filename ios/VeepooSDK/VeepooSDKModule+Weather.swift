@@ -42,18 +42,19 @@ extension VeepooSDKModule {
     }
 
     let _ = peripheralManage // suppress unused warning; VPWeatherHandle uses shared BLE manager
+    let promiseBox = self.makePromiseBox(promise)
     handle.readWeatherInfo { state, configModel in
       switch state {
       case .success:
         if let model = configModel {
-          promise.resolve(self.weatherConfigToDict(model))
+          promiseBox.resolve(self.weatherConfigToDict(model))
         } else {
-          promise.resolve(["isOpen": false, "unit": "C", "crc": 0])
+          promiseBox.resolve(["isOpen": false, "unit": "C", "crc": 0])
         }
       case .failure:
-        promise.reject("READ_FAILED", "Read weather settings failed")
+        promiseBox.reject("READ_FAILED", "Read weather settings failed")
       default:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function")
       }
     }
     #endif
@@ -92,14 +93,15 @@ extension VeepooSDKModule {
     model.weatherUnit = unitStr == "F" ? 1 : 0
     model.crc = crc
 
+    let promiseBox = self.makePromiseBox(promise)
     handle.settingWeatherInfo(model) { state in
       switch state {
       case .success:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       case .failure:
-        promise.reject("OPERATION_FAILED", "Set weather settings failed")
+        promiseBox.reject("OPERATION_FAILED", "Set weather settings failed")
       default:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function")
       }
     }
     #endif
@@ -134,14 +136,15 @@ extension VeepooSDKModule {
       return
     }
 
+    let promiseBox = self.makePromiseBox(promise)
     handle.syncWeatherDataToDevice(with: serverModel) { state in
       switch state {
       case .success:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       case .failure:
-        promise.reject("OPERATION_FAILED", "Push weather data to Band failed")
+        promiseBox.reject("OPERATION_FAILED", "Push weather data to Band failed")
       default:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function")
       }
     }
     #endif

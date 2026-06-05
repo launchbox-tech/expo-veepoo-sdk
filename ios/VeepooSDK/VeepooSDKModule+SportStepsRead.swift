@@ -14,6 +14,7 @@ extension VeepooSDKModule {
     let queryDate = date ?? self.getDateString(dayOffset: 0)
     let userStature: UInt = manager.peripheralModel?.deviceStature ?? 170
     
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       VPDataBaseOperation.veepooSDKGetStepData(withDate: queryDate, andTableID: deviceAddress, changeUserStature: userStature) { stepDict in
         guard let dict = stepDict as? [String: Any] else {
@@ -23,7 +24,7 @@ extension VeepooSDKModule {
             "distance": 0.0,
             "calories": 0.0
           ]
-          promise.resolve(emptyResult)
+          promiseBox.resolve(emptyResult)
           return
         }
         
@@ -47,8 +48,8 @@ extension VeepooSDKModule {
           "date": queryDate,
           "data": result
         ])
-        
-        promise.resolve(result)
+
+        promiseBox.resolve(result)
       }
     }
     #else

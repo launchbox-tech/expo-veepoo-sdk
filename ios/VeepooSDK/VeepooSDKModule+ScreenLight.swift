@@ -57,14 +57,15 @@ extension VeepooSDKModule {
       return
     }
     let model = VPDeviceBrightModel()
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingBright(with: model, settingMode: 2, successResult: { bright in
       guard let bright = bright else {
-        promise.reject("READ_FAILED", "Screen brightness read returned nil")
+        promiseBox.reject("READ_FAILED", "Screen brightness read returned nil")
         return
       }
-      promise.resolve(self.brightModelToDict(bright))
+      promiseBox.resolve(self.brightModelToDict(bright))
     }, failureResult: {
-      promise.reject("READ_FAILED", "Read screen brightness failed")
+      promiseBox.reject("READ_FAILED", "Read screen brightness failed")
     })
     #endif
   }
@@ -87,10 +88,11 @@ extension VeepooSDKModule {
     }
     let model = VPDeviceBrightModel()
     self.applyBrightDict(settings, to: model)
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingBright(with: model, settingMode: 1, successResult: { _ in
-      promise.resolve(nil)
+      promiseBox.resolve(nil)
     }, failureResult: {
-      promise.reject("SET_FAILED", "Set screen brightness failed")
+      promiseBox.reject("SET_FAILED", "Set screen brightness failed")
     })
     #endif
   }
@@ -122,19 +124,20 @@ extension VeepooSDKModule {
       return
     }
     let model = VPScreenDurationModel()
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingScreenDuration(model, settingMode: 2, successResult: { m in
       guard let m = m else {
-        promise.reject("READ_FAILED", "Screen duration read returned nil")
+        promiseBox.reject("READ_FAILED", "Screen duration read returned nil")
         return
       }
-      promise.resolve([
+      promiseBox.resolve([
         "currentSeconds": m.currentDuration,
         "minSeconds": m.minDuration,
         "maxSeconds": m.maxDuration,
         "recommendSeconds": m.defaultDuration
       ])
     }, failureResult: {
-      promise.reject("READ_FAILED", "Read screen duration failed")
+      promiseBox.reject("READ_FAILED", "Read screen duration failed")
     })
     #endif
   }
@@ -162,10 +165,11 @@ extension VeepooSDKModule {
     }
     let model = VPScreenDurationModel()
     model.currentDuration = Int(seconds.rounded())
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingScreenDuration(model, settingMode: 1, successResult: { _ in
-      promise.resolve(nil)
+      promiseBox.resolve(nil)
     }, failureResult: {
-      promise.reject("SET_FAILED", "Set screen duration failed")
+      promiseBox.reject("SET_FAILED", "Set screen duration failed")
     })
     #endif
   }

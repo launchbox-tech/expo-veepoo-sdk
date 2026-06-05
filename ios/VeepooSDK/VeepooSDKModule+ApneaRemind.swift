@@ -33,9 +33,10 @@ extension VeepooSDKModule {
       return
     }
     let remindModel = VPOxygenApneaRemindModel()
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingOxygenApneaRemind(remindModel, settingMode: 2) { [weak self] result in
       guard let self = self, let result = result else {
-        promise.reject("READ_FAILED", "Apnea remind read returned nil")
+        promiseBox.reject("READ_FAILED", "Apnea remind read returned nil")
         return
       }
       let dict = self.apneaModelToDict(result)
@@ -43,9 +44,9 @@ extension VeepooSDKModule {
         "deviceId": self.connectedDeviceId ?? "",
         "data": dict
       ])
-      promise.resolve(dict)
+      promiseBox.resolve(dict)
     } failureResult: {
-      promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support SpO2 apnea remind")
+      promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support SpO2 apnea remind")
     }
     #endif
   }
@@ -76,10 +77,11 @@ extension VeepooSDKModule {
     remindModel.state = (settings["enabled"] as? Bool) == true ? 1 : 2
     remindModel.lowOxygenValue = (settings["threshold"] as? Int) ?? 90
     remindModel.defaultTime = true
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingOxygenApneaRemind(remindModel, settingMode: 1) { _ in
-      promise.resolve(nil)
+      promiseBox.resolve(nil)
     } failureResult: {
-      promise.reject("SET_FAILED", "Set apnea remind failed")
+      promiseBox.reject("SET_FAILED", "Set apnea remind failed")
     }
     #endif
   }

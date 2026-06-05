@@ -2,6 +2,59 @@ import ExpoModulesCore
 import CoreBluetooth
 import VeepooBleSDK
 
+// MARK: - PromiseBox
+//
+// A vendor-block-safe holder for an Expo `Promise`.
+//
+// The Veepoo SDK stores completion blocks as properties on its manager
+// objects and releases an old block only when the next call replaces it
+// (or at dealloc) — often on a BLE thread, long after a JS reload has torn
+// down the runtime that created the Promise. A Promise captured directly
+// in such a block is then destroyed against a dead runtime → SIGSEGV in
+// `JavaScriptPromise.deinit` (crashes 2026-06-05: `performConnect`,
+// `handleReadBattery`).
+//
+// Vendor blocks must capture a `PromiseBox` instead. The box is a plain
+// Swift class — destroying it at any time on any thread is safe once the
+// Promise inside has been settled or cleared. `VeepooSDKModule.cleanup()`
+// clears every live box while the runtime is still alive, turning late
+// vendor callbacks into no-ops.
+//
+// Lives in this file (not its own) so the generated Pods project — whose
+// file list is fixed at `pod install` time — picks it up without a
+// reinstall.
+final class PromiseBox {
+  private let lock = NSLock()
+  private var promise: Promise?
+
+  init(_ promise: Promise) {
+    self.promise = promise
+  }
+
+  private func take() -> Promise? {
+    lock.lock()
+    defer { lock.unlock() }
+    let taken = promise
+    promise = nil
+    return taken
+  }
+
+  /// Settles at most once; later calls (and calls after `clear()`) are no-ops.
+  func resolve(_ value: Any? = nil) {
+    take()?.resolve(value)
+  }
+
+  func reject(_ code: String, _ message: String) {
+    take()?.reject(code, message)
+  }
+
+  /// Drops the promise without settling (module teardown). Must run while
+  /// the JS runtime is still alive — `cleanup()` is the only caller.
+  func clear() {
+    _ = take()
+  }
+}
+
 // MARK: - 主模块
 //
 // This file is intentionally wiring-only: the `Module` subclass holds
@@ -53,6 +106,30 @@ public class VeepooSDKModule: Module {
   var connectionTimer: Timer?
   var authenticationRetryCount = 0
   let maxAuthenticationRetries = 3
+
+  // Registry of PromiseBoxes currently captured by vendor blocks. Weak:
+  // each box is kept alive by the vendor block that captured it and falls
+  // out of the table when the vendor releases the block. cleanup() clears
+  // every live box so late vendor callbacks become no-ops (see PromiseBox).
+  private let livePromiseBoxes = NSHashTable<PromiseBox>.weakObjects()
+  private let livePromiseBoxesLock = NSLock()
+
+  func makePromiseBox(_ promise: Promise) -> PromiseBox {
+    let box = PromiseBox(promise)
+    livePromiseBoxesLock.lock()
+    livePromiseBoxes.add(box)
+    livePromiseBoxesLock.unlock()
+    return box
+  }
+
+  func clearAllPromiseBoxes() {
+    livePromiseBoxesLock.lock()
+    let boxes = livePromiseBoxes.allObjects
+    livePromiseBoxesLock.unlock()
+    for box in boxes {
+      box.clear()
+    }
+  }
 
   func publicConnectionStatus(for state: ConnectionState) -> String {
     switch state {

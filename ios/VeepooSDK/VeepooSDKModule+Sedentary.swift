@@ -46,18 +46,19 @@ extension VeepooSDKModule {
       return
     }
     let model = VPDeviceLongSeatModel()
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceLongSeat(
       with: model,
       settingMode: 2,
       successResult: { result in
         guard let result = result else {
-          promise.reject("READ_FAILED", "Sedentary read returned nil")
+          promiseBox.reject("READ_FAILED", "Sedentary read returned nil")
           return
         }
-        promise.resolve(self.longSeatModelToDict(result))
+        promiseBox.resolve(self.longSeatModelToDict(result))
       },
       failureResult: {
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band may not support sedentary reminder")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band may not support sedentary reminder")
       }
     )
     #endif
@@ -82,14 +83,15 @@ extension VeepooSDKModule {
     let model = VPDeviceLongSeatModel()
     self.applySedentaryDict(settings, to: model)
     let mode: UInt = (settings["enabled"] as? Bool) == true ? 1 : 0
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceLongSeat(
       with: model,
       settingMode: mode,
       successResult: { _ in
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       },
       failureResult: {
-        promise.reject("SET_FAILED", "Set sedentary reminder failed")
+        promiseBox.reject("SET_FAILED", "Set sedentary reminder failed")
       }
     )
     #endif

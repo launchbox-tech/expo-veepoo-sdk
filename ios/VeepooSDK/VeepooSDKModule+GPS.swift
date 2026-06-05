@@ -41,16 +41,17 @@ extension VeepooSDKModule {
     gpsModel.altitude = Int16(altitude)
     gpsModel.timezone = Int16(timezoneOffsetMinutes)
 
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDK_setDeviceGPSAndTimezone(with: gpsModel) { resultState in
       switch resultState {
       case 0:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support GPS settings")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support GPS settings")
       case 1:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       case 2:
-        promise.reject("OPERATION_FAILED", "Set GPS and timezone failed")
+        promiseBox.reject("OPERATION_FAILED", "Set GPS and timezone failed")
       default:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       }
     }
     #endif

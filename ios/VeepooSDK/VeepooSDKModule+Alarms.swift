@@ -61,6 +61,7 @@ extension VeepooSDKModule {
     }
 
     let defaultModel = VPDeviceNewAlarmModel()
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceNewAlarm(
       with: defaultModel,
       settingMode: 2,
@@ -71,10 +72,10 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "alarms": alarms
         ])
-        promise.resolve(alarms)
+        promiseBox.resolve(alarms)
       },
       failureResult: {
-        promise.reject("READ_FAILED", "Failed to read alarms")
+        promiseBox.reject("READ_FAILED", "Failed to read alarms")
       }
     )
     #else
@@ -110,6 +111,7 @@ extension VeepooSDKModule {
       return false
     }()
 
+    let promiseBox = self.makePromiseBox(promise)
     if let textContent = text, !textContent.isEmpty, supportsTextAlarm {
       let textModel = VPDeviceTextAlarmModel()
       textModel.alarmID = alarmId
@@ -123,8 +125,8 @@ extension VeepooSDKModule {
       peripheralManage.veepooSDKSettingDeviceTextAlarm(
         with: textModel,
         settingMode: .addOrChange,
-        successResult: { _ in promise.resolve("success") },
-        failureResult: { promise.resolve("fail") }
+        successResult: { _ in promiseBox.resolve("success") },
+        failureResult: { promiseBox.resolve("fail") }
       )
     } else {
       let alarmModel = VPDeviceNewAlarmModel()
@@ -139,8 +141,8 @@ extension VeepooSDKModule {
       peripheralManage.veepooSDKSettingDeviceNewAlarm(
         with: alarmModel,
         settingMode: 1,
-        successResult: { _ in promise.resolve("success") },
-        failureResult: { promise.resolve("fail") }
+        successResult: { _ in promiseBox.resolve("success") },
+        failureResult: { promiseBox.resolve("fail") }
       )
     }
     #else
@@ -169,11 +171,12 @@ extension VeepooSDKModule {
     alarmModel.alarmScene = "0"
     alarmModel.alarmDate = "0000-00-00"
 
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceNewAlarm(
       with: alarmModel,
       settingMode: 0,
-      successResult: { _ in promise.resolve("success") },
-      failureResult: { promise.resolve("fail") }
+      successResult: { _ in promiseBox.resolve("success") },
+      failureResult: { promiseBox.resolve("fail") }
     )
     #else
     promise.resolve("success")

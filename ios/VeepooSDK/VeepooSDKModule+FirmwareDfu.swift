@@ -51,6 +51,7 @@ extension VeepooSDKModule {
       promise.reject("OPERATION_FAILED", "DFU operation unavailable")
       return
     }
+    let promiseBox = self.makePromiseBox(promise)
     op.veepooSDKStartDfu(withFilePath: path, result: { [weak self] progress, state in
       guard let self = self else { return }
       let raw = Int(state.rawValue)
@@ -67,7 +68,7 @@ extension VeepooSDKModule {
         case 3:
           if self.isFirmwareDfuActive {
             self.isFirmwareDfuActive = false
-            promise.resolve(nil)
+            promiseBox.resolve(nil)
           }
         case 0, 4:
           if self.isFirmwareDfuActive {
@@ -75,7 +76,7 @@ extension VeepooSDKModule {
             let msg = st == "fileNotExist"
               ? "Firmware file missing or invalid"
               : "Firmware update failed"
-            promise.reject("OPERATION_FAILED", msg)
+            promiseBox.reject("OPERATION_FAILED", msg)
           }
         default:
           break

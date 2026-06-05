@@ -39,11 +39,12 @@ extension VeepooSDKModule {
     }
 
     var promiseSettled = false
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingCameraType(.enter) { [weak self] cameraType in
       guard let self = self else { return }
       switch cameraType {
       case .enter:
-        if !promiseSettled { promiseSettled = true; promise.resolve(nil) }
+        if !promiseSettled { promiseSettled = true; promiseBox.resolve(nil) }
       case .photo:
         self.sendEvent(CAMERA_SHUTTER, [
           "deviceId": self.connectedDeviceId ?? "",
@@ -78,10 +79,11 @@ extension VeepooSDKModule {
     }
 
     var promiseSettled = false
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingCameraType(.exit) { cameraType in
       if !promiseSettled {
         promiseSettled = true
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       }
     }
     #endif
@@ -110,17 +112,18 @@ extension VeepooSDKModule {
     // (the VPReadFunctionState case breaks the common prefix), so use rawValue.
     // VPSettingFunctionState: 1=open, 2=close.
     let state = VPSettingFunctionState(rawValue: enabled ? 1 : 2)!
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingBaseFunctionType(.musicControl, settingState: state) { completeState in
       // VPSettingFunctionCompleteState: 0=unknown,1=open,2=close,3=failure,4=complete.
       switch completeState.rawValue {
       case 1, 2, 4:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       case 3:
-        promise.reject("OPERATION_FAILED", "Set music control failed")
+        promiseBox.reject("OPERATION_FAILED", "Set music control failed")
       case 0:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support music control toggle")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support music control toggle")
       default:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       }
     }
     #endif

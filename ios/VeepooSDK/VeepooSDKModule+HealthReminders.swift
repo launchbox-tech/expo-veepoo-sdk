@@ -71,6 +71,7 @@ extension VeepooSDKModule {
     }
     let remindType = jsTypeToVPRemindType(typeStr)
     var promiseSettled = false
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingHealthRemind(with: remindType, opCode: 2, remindModel: nil) { [weak self] success, _, model in
       guard let self = self, !promiseSettled else { return }
       promiseSettled = true
@@ -80,9 +81,9 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "data": dict
         ])
-        promise.resolve(dict)
+        promiseBox.resolve(dict)
       } else {
-        promise.reject("OPERATION_FAILED", "Read health reminder failed")
+        promiseBox.reject("OPERATION_FAILED", "Read health reminder failed")
       }
     } deviceInfoDidChange: { [weak self] model in
       guard let self = self, let model = model else { return }
@@ -123,13 +124,14 @@ extension VeepooSDKModule {
     model.remindInterval = UInt8(clamping: (reminder["interval"] as? Int) ?? 60)
     model.open = (reminder["enabled"] as? Bool) ?? true
     var promiseSettled = false
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingHealthRemind(with: remindType, opCode: 1, remindModel: model) { success, _, _ in
       guard !promiseSettled else { return }
       promiseSettled = true
       if success {
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       } else {
-        promise.reject("OPERATION_FAILED", "Set health reminder failed")
+        promiseBox.reject("OPERATION_FAILED", "Set health reminder failed")
       }
     } deviceInfoDidChange: { [weak self] model in
       guard let self = self, let model = model else { return }

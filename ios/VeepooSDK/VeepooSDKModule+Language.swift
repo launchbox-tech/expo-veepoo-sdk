@@ -27,8 +27,9 @@ extension VeepooSDKModule {
       promise.reject("INVALID_LANGUAGE", "Unknown language: \(language)")
       return
     }
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingLanguage(languageType) { success in
-      promise.resolve(success)
+      promiseBox.resolve(success)
     }
     #endif
   }

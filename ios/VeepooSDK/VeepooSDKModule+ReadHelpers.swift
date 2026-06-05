@@ -270,6 +270,7 @@ extension VeepooSDKModule {
     // timer) — invoked from the Expo module queue (no running runloop) its
     // state-change block never fires. Same constraint as the heart-rate
     // test timer; always enter from main.
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       manager.peripheralManage.veepooSdkStartReadDeviceAllData { [weak self] readState, totalDay, currentReadDayNumber, readCurrentDayProgress in
         guard let self = self else { return }
@@ -314,7 +315,7 @@ extension VeepooSDKModule {
             "success": true
           ])
 
-          promise.resolve(true)
+          promiseBox.resolve(true)
 
         case .invalid:
           self.sendEvent(READ_ORIGIN_PROGRESS, [
@@ -327,7 +328,7 @@ extension VeepooSDKModule {
             ]
           ])
 
-          promise.reject("READ_FAILED", "Read device data failed")
+          promiseBox.reject("READ_FAILED", "Read device data failed")
 
         default:
           break

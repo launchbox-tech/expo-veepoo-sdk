@@ -50,6 +50,7 @@ extension VeepooSDKModule {
     }
 
     // iOS API: read uses VPDeviceContactsOpCodeRead with a nil opModel
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceContacts(
       with: .read,
       opModel: nil,
@@ -58,11 +59,11 @@ extension VeepooSDKModule {
       switch state {
       case .complete:
         let result = (contactModels ?? []).map { self.contactModelToDict($0) }
-        promise.resolve(result)
+        promiseBox.resolve(result)
       case .noFunction:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts")
       default:
-        promise.reject("OPERATION_FAILED", "Read contacts failed")
+        promiseBox.reject("OPERATION_FAILED", "Read contacts failed")
       }
     }
     #endif
@@ -96,6 +97,7 @@ extension VeepooSDKModule {
     model.phoneNumber = (data["phoneNumber"] as? String) ?? ""
     model.isSOS = (data["isSOS"] as? Bool) ?? false
 
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceContacts(
       with: .add,
       opModel: model,
@@ -103,11 +105,11 @@ extension VeepooSDKModule {
     ) { state, _ in
       switch state {
       case .complete:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       case .noFunction:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts")
       default:
-        promise.reject("OPERATION_FAILED", "Add contact failed")
+        promiseBox.reject("OPERATION_FAILED", "Add contact failed")
       }
     }
     #endif
@@ -139,6 +141,7 @@ extension VeepooSDKModule {
     let model = VPDeviceContactsModel()
     model.contactID = Int32(contactId)
 
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceContacts(
       with: .delete,
       opModel: model,
@@ -146,11 +149,11 @@ extension VeepooSDKModule {
     ) { state, _ in
       switch state {
       case .complete:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       case .noFunction:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts")
       default:
-        promise.reject("OPERATION_FAILED", "Delete contact failed")
+        promiseBox.reject("OPERATION_FAILED", "Delete contact failed")
       }
     }
     #endif
@@ -184,6 +187,7 @@ extension VeepooSDKModule {
     model.isSOS = isOpen
 
     // .edit opCode sets the SOS status on an existing contact
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceContacts(
       with: .edit,
       opModel: model,
@@ -191,11 +195,11 @@ extension VeepooSDKModule {
     ) { state, _ in
       switch state {
       case .complete:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       case .noFunction:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts")
       default:
-        promise.reject("OPERATION_FAILED", "Set contact SOS state failed")
+        promiseBox.reject("OPERATION_FAILED", "Set contact SOS state failed")
       }
     }
     #endif
@@ -224,21 +228,22 @@ extension VeepooSDKModule {
       return
     }
 
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceContactsSOSInfo(
       withOpCode: .read,
       times: 0
     ) { state, times, timesMin, timesMax in
       switch state {
       case .complete:
-        promise.resolve([
+        promiseBox.resolve([
           "times": times,
           "minTimes": timesMin,
           "maxTimes": timesMax,
         ])
       case .noFunction:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts")
       default:
-        promise.reject("OPERATION_FAILED", "Read SOS call times failed")
+        promiseBox.reject("OPERATION_FAILED", "Read SOS call times failed")
       }
     }
     #endif
@@ -267,17 +272,18 @@ extension VeepooSDKModule {
       return
     }
 
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceContactsSOSInfo(
       withOpCode: .setting,
       times: Int32(times)
     ) { state, _, _, _ in
       switch state {
       case .complete:
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       case .noFunction:
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts")
       default:
-        promise.reject("OPERATION_FAILED", "Set SOS call times failed")
+        promiseBox.reject("OPERATION_FAILED", "Set SOS call times failed")
       }
     }
     #endif

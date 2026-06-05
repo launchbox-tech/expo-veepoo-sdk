@@ -5,13 +5,16 @@ import VeepooBleSDK
 extension VeepooSDKModule {
   // MARK: Initialization
   func handleInit(promise: Promise) {
+    #if !targetEnvironment(simulator)
+    let promiseBox = self.makePromiseBox(promise)
+    #endif
     DispatchQueue.main.async {
       #if targetEnvironment(simulator)
       self.isInitialized = true
       promise.resolve(nil)
       #else
       guard let manager = VPBleCentralManage.sharedBleManager() else {
-        promise.reject("SDK_NOT_AVAILABLE", "Failed to initialize Veepoo SDK")
+        promiseBox.reject("SDK_NOT_AVAILABLE", "Failed to initialize Veepoo SDK")
         return
       }
       self.bleManager = manager
@@ -22,7 +25,7 @@ extension VeepooSDKModule {
       self.setupVeepooCallbacks()
       self.isInitialized = true
       self.ensureCentralManager()
-      promise.resolve(nil)
+      promiseBox.resolve(nil)
       #endif
     }
   }

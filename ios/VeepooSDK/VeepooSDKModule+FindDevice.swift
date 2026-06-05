@@ -58,14 +58,15 @@ extension VeepooSDKModule {
     }
 
     var promiseSettled = false
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDK_searchDeviceFuntion(withState: true) { [weak self] _, state in
       guard let self = self else { return }
       if !promiseSettled {
         promiseSettled = true
         if state == .unsupported {
-          promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support find-device-from-phone")
+          promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support find-device-from-phone")
         } else {
-          promise.resolve(nil)
+          promiseBox.resolve(nil)
         }
       }
       self.emitFindDeviceState(state)
@@ -96,14 +97,15 @@ extension VeepooSDKModule {
     }
 
     var promiseSettled = false
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDK_searchDeviceFuntion(withState: false) { [weak self] _, state in
       guard let self = self else { return }
       if !promiseSettled {
         promiseSettled = true
         if state == .unsupported {
-          promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support find-device-from-phone")
+          promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support find-device-from-phone")
         } else {
-          promise.resolve(nil)
+          promiseBox.resolve(nil)
         }
       }
       self.emitFindDeviceState(state)

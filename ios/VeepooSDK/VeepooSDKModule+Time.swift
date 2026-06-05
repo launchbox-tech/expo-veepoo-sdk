@@ -15,6 +15,7 @@ extension VeepooSDKModule {
     // queue (no running runloop) it may never fire and the promise hangs.
     // Same constraint as readBattery / readDeviceAllData; always enter from
     // main. A silently un-set band clock corrupts every recorded_at.
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       if let timeMap = time {
         let year = timeMap["year"] as? Int ?? 0
@@ -32,11 +33,11 @@ extension VeepooSDKModule {
           second: Int32(second),
           timeSystem: 0
         ) { success in
-          promise.resolve(success)
+          promiseBox.resolve(success)
         }
       } else {
         peripheralManage.veepooSDKSettingTime { success in
-          promise.resolve(success)
+          promiseBox.resolve(success)
         }
       }
     }

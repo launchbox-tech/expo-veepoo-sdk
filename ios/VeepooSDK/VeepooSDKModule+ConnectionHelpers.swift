@@ -68,6 +68,14 @@ extension VeepooSDKModule {
 
     print("[VeepooSDK] performConnect - 调用 veepooSDKConnectDevice")
 
+    // The vendor SDK holds deviceConnectBlock past cleanup time. Any Promise
+    // captured (directly or transitively) inside that block is destroyed by
+    // ARC on a BLE thread after HMR kills the JS runtime → SIGSEGV in
+    // JavaScriptPromise.deinit. Route every settlement through
+    // self.pendingConnectPromise instead — cleanup() nils it, turning late
+    // vendor callbacks into no-ops.
+    self.pendingConnectPromise = promise
+
     var isSettled = false
 
     connectionTimer = Timer.scheduledTimer(withTimeInterval: 15.0, repeats: false) { [weak self] _ in
@@ -81,7 +89,8 @@ extension VeepooSDKModule {
       if let fallbackToScan = fallbackToScan {
         fallbackToScan()
       } else {
-        promise.reject("CONNECTION_TIMEOUT", "Connection timeout after 15 seconds")
+        self.pendingConnectPromise?.reject("CONNECTION_TIMEOUT", "Connection timeout after 15 seconds")
+        self.pendingConnectPromise = nil
       }
     }
 
@@ -108,7 +117,8 @@ extension VeepooSDKModule {
           self.verifyPasswordInternal(deviceId: deviceId, password: password, is24Hour: is24Hour)
         }
 
-        promise.resolve(nil)
+        self.pendingConnectPromise?.resolve(nil)
+        self.pendingConnectPromise = nil
 
       case 0:
         guard !isSettled else { return }
@@ -127,7 +137,8 @@ extension VeepooSDKModule {
           print("[VeepooSDK] performConnect - 连接前断开，改走隐藏扫描兜底")
           fallbackToScan()
         } else {
-          promise.reject("DEVICE_DISCONNECTED", "Device disconnected before connection completed")
+          self.pendingConnectPromise?.reject("DEVICE_DISCONNECTED", "Device disconnected before connection completed")
+          self.pendingConnectPromise = nil
         }
 
       case 1:
@@ -151,7 +162,8 @@ extension VeepooSDKModule {
         if let fallbackToScan = fallbackToScan {
           fallbackToScan()
         } else {
-          promise.reject("CONNECTION_FAILED", "Connection failed")
+          self.pendingConnectPromise?.reject("CONNECTION_FAILED", "Connection failed")
+          self.pendingConnectPromise = nil
         }
 
       case 6:
@@ -170,7 +182,8 @@ extension VeepooSDKModule {
         if let fallbackToScan = fallbackToScan {
           fallbackToScan()
         } else {
-          promise.reject("TIMEOUT", "Connection timeout")
+          self.pendingConnectPromise?.reject("TIMEOUT", "Connection timeout")
+          self.pendingConnectPromise = nil
         }
 
       default:
@@ -189,7 +202,8 @@ extension VeepooSDKModule {
         if let fallbackToScan = fallbackToScan {
           fallbackToScan()
         } else {
-          promise.reject("UNKNOWN", "Unknown connection error: \(connectState.rawValue)")
+          self.pendingConnectPromise?.reject("UNKNOWN", "Unknown connection error: \(connectState.rawValue)")
+          self.pendingConnectPromise = nil
         }
       }
     }
@@ -593,6 +607,8 @@ extension VeepooSDKModule {
     pendingConnectPassword = nil
     pendingConnectIs24Hour = false
     pendingConnectPromise = nil
+    permissionPromise = nil
+    clearAllPromiseBoxes()
     discoveredDevices.removeAll()
     connectionState = .idle
     emitBluetoothStatus()

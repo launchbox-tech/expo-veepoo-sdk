@@ -28,6 +28,7 @@ extension VeepooSDKModule {
 
     // Vendor completions are runloop-driven — always enter from main, or the
     // callbacks may never fire (same constraint as readBattery / readDeviceAllData).
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       var tempUnit: String? = nil
       var glucoseUnit: String? = nil
@@ -41,7 +42,7 @@ extension VeepooSDKModule {
           "deviceId": self.connectedDeviceId ?? "",
           "data": data
         ])
-        promise.resolve(data)
+        promiseBox.resolve(data)
       }
 
       peripheralManage.veepooSDKSettingBaseFunctionType(.temperatureUnit, settingState: .readFunctionState) { state in
@@ -49,7 +50,7 @@ extension VeepooSDKModule {
         switch state {
         case .functionCompleteUnknown:
           errorOccurred = true
-          promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support temperature unit setting")
+          promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band does not support temperature unit setting")
         case .functionCompleteOpen:
           tempUnit = "celsius"
           emitIfComplete()
@@ -58,7 +59,7 @@ extension VeepooSDKModule {
           emitIfComplete()
         case .functionCompleteFailure:
           errorOccurred = true
-          promise.reject("READ_FAILED", "Failed to read temperature unit")
+          promiseBox.reject("READ_FAILED", "Failed to read temperature unit")
         default:
           tempUnit = "celsius"
           emitIfComplete()
@@ -117,6 +118,7 @@ extension VeepooSDKModule {
     }
 
     // Vendor completions are runloop-driven — always enter from main (see above).
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       var pendingCount = 0
       var errorOccurred = false
@@ -124,7 +126,7 @@ extension VeepooSDKModule {
       func tryResolve() {
         pendingCount -= 1
         if pendingCount == 0 && !errorOccurred {
-          promise.resolve(nil)
+          promiseBox.resolve(nil)
         }
       }
 
@@ -136,7 +138,7 @@ extension VeepooSDKModule {
           switch completeState {
           case .functionCompleteFailure:
             errorOccurred = true
-            promise.reject("SET_FAILED", "Failed to set temperature unit")
+            promiseBox.reject("SET_FAILED", "Failed to set temperature unit")
           default:
             tryResolve()
           }
@@ -151,7 +153,7 @@ extension VeepooSDKModule {
           switch completeState {
           case .functionCompleteFailure:
             errorOccurred = true
-            promise.reject("SET_FAILED", "Failed to set blood glucose unit")
+            promiseBox.reject("SET_FAILED", "Failed to set blood glucose unit")
           default:
             tryResolve()
           }
@@ -167,7 +169,7 @@ extension VeepooSDKModule {
             switch completeState {
             case .functionCompleteFailure:
               errorOccurred = true
-              promise.reject("SET_FAILED", "Failed to set skin tone")
+              promiseBox.reject("SET_FAILED", "Failed to set skin tone")
             default:
               tryResolve()
             }
@@ -176,7 +178,7 @@ extension VeepooSDKModule {
       }
 
       if pendingCount == 0 {
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       }
     }
     #endif

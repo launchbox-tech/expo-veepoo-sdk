@@ -121,18 +121,19 @@ extension VeepooSDKModule {
       return
     }
     let model = VPDeviceFemaleModel()
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceFemale(
       with: model,
       settingMode: 2,
       successResult: { result in
         guard let result = result else {
-          promise.reject("READ_FAILED", "Women's health read returned nil")
+          promiseBox.reject("READ_FAILED", "Women's health read returned nil")
           return
         }
-        promise.resolve(self.femaleModelToDict(result))
+        promiseBox.resolve(self.femaleModelToDict(result))
       },
       failureResult: {
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band may not support women's health settings")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band may not support women's health settings")
       }
     )
     #endif
@@ -156,14 +157,15 @@ extension VeepooSDKModule {
     }
     let model = VPDeviceFemaleModel()
     self.applyWomenHealthDict(settings, to: model)
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceFemale(
       with: model,
       settingMode: 1,
       successResult: { _ in
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       },
       failureResult: {
-        promise.reject("OPERATION_FAILED", "Set women's health settings failed")
+        promiseBox.reject("OPERATION_FAILED", "Set women's health settings failed")
       }
     )
     #endif

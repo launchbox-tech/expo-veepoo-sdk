@@ -58,18 +58,19 @@ extension VeepooSDKModule {
       return
     }
     let model = VPDeviceRaiseHandModel()
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingRaiseHand(
       with: model,
       settingMode: 2,
       successResult: { result in
         guard let result = result else {
-          promise.reject("READ_FAILED", "Wrist-flip wake read returned nil")
+          promiseBox.reject("READ_FAILED", "Wrist-flip wake read returned nil")
           return
         }
-        promise.resolve(self.raiseHandModelToDict(result))
+        promiseBox.resolve(self.raiseHandModelToDict(result))
       },
       failureResult: {
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band may not support wrist-flip wake")
+        promiseBox.reject("CAPABILITY_UNSUPPORTED", "Band may not support wrist-flip wake")
       }
     )
     #endif
@@ -94,14 +95,15 @@ extension VeepooSDKModule {
     let model = VPDeviceRaiseHandModel()
     self.applyWristFlipDict(settings, to: model)
     let mode: UInt = (settings["enabled"] as? Bool) == true ? 1 : 0
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingRaiseHand(
       with: model,
       settingMode: mode,
       successResult: { _ in
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       },
       failureResult: {
-        promise.reject("SET_FAILED", "Set wrist-flip wake failed")
+        promiseBox.reject("SET_FAILED", "Set wrist-flip wake failed")
       }
     )
     #endif

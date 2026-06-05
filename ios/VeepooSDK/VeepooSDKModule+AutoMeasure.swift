@@ -18,10 +18,11 @@ extension VeepooSDKModule {
 
     // Vendor completion is runloop-driven — always enter from main, or the
     // callback may never fire (same constraint as readBattery / readDeviceAllData).
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       peripheralManage.veepooSDKReadAutoMonitSwitchInfo { settingList in
         guard let list = settingList else {
-          promise.reject("READ_FAILED", "Failed to read auto measure settings")
+          promiseBox.reject("READ_FAILED", "Failed to read auto measure settings")
           return
         }
 
@@ -41,7 +42,7 @@ extension VeepooSDKModule {
           ]
         }
 
-        promise.resolve(result)
+        promiseBox.resolve(result)
       }
     }
     #else
@@ -64,17 +65,18 @@ extension VeepooSDKModule {
     }
 
     // Vendor completion is runloop-driven — always enter from main (see above).
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       peripheralManage.veepooSDKReadAutoMonitSwitchInfo { settingList in
         guard let list = settingList else {
-          promise.reject("READ_FAILED", "Failed to read settings before modifying")
+          promiseBox.reject("READ_FAILED", "Failed to read settings before modifying")
           return
         }
 
         guard let funTypeInt = setting["funType"] as? Int,
               let targetType = VPAutoMonitTestType(rawValue: UInt(funTypeInt)),
               let model = list.first(where: { $0.type == targetType }) else {
-          promise.reject("INVALID_TYPE", "Function type not found or invalid")
+          promiseBox.reject("INVALID_TYPE", "Function type not found or invalid")
           return
         }
 
@@ -95,7 +97,7 @@ extension VeepooSDKModule {
 
         peripheralManage.veepooSDKSetAutoMonitSwitch(with: model) { (success, resultModel) in
           guard success else {
-            promise.reject("MODIFY_FAILED", "Device returned failure")
+            promiseBox.reject("MODIFY_FAILED", "Device returned failure")
             return
           }
 
@@ -121,7 +123,7 @@ extension VeepooSDKModule {
             ]
           }
 
-          promise.resolve(result)
+          promiseBox.resolve(result)
         }
       }
     }

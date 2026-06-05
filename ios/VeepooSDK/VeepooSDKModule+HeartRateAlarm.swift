@@ -20,22 +20,23 @@ extension VeepooSDKModule {
     }
 
     let model = VPDeviceHeartAlarmModel()
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceHeartAlarm(
       with: model,
       settingMode: 2,
       successResult: { result in
         guard let m = result else {
-          promise.reject("READ_FAILED", "Heart alarm read returned nil")
+          promiseBox.reject("READ_FAILED", "Heart alarm read returned nil")
           return
         }
-        promise.resolve([
+        promiseBox.resolve([
           "enabled": m.isOpen,
           "highThreshold": Int(m.heartMaxValue),
           "lowThreshold": Int(m.heartMinValue)
         ])
       },
       failureResult: {
-        promise.reject("READ_FAILED", "Failed to read heart rate alarm")
+        promiseBox.reject("READ_FAILED", "Failed to read heart rate alarm")
       }
     )
     #endif
@@ -64,14 +65,15 @@ extension VeepooSDKModule {
     model.heartMinValue = UInt(max(0, low))
     model.isOpen = enabled
 
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceHeartAlarm(
       with: model,
       settingMode: mode,
       successResult: { _ in
-        promise.resolve("success")
+        promiseBox.resolve("success")
       },
       failureResult: {
-        promise.resolve("fail")
+        promiseBox.resolve("fail")
       }
     )
     #endif

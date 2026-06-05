@@ -51,6 +51,7 @@ extension VeepooSDKModule {
       return
     }
     let dial = dialKeyToVpType(extractDialKey(options))
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceScreenStyle(
       0,
       settingMode: 2,
@@ -58,13 +59,13 @@ extension VeepooSDKModule {
       result: { dt, screenStyle, ok in
         DispatchQueue.main.async {
           if ok {
-            promise.resolve([
+            promiseBox.resolve([
               "dialType": self.vpDialTypeToKey(dt),
               "screenIndex": screenStyle,
               "operationSuccess": true
             ])
           } else {
-            promise.reject("READ_FAILED", "Read watch face style failed")
+            promiseBox.reject("READ_FAILED", "Read watch face style failed")
           }
         }
       }
@@ -98,6 +99,7 @@ extension VeepooSDKModule {
       return
     }
     let dial = dialKeyToVpType(extractDialKey(settings))
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceScreenStyle(
       Int32(screenIndex),
       settingMode: 1,
@@ -105,9 +107,9 @@ extension VeepooSDKModule {
       result: { _, _, ok in
         DispatchQueue.main.async {
           if ok {
-            promise.resolve(nil)
+            promiseBox.resolve(nil)
           } else {
-            promise.reject("SET_FAILED", "Set watch face style failed")
+            promiseBox.reject("SET_FAILED", "Set watch face style failed")
           }
         }
       }

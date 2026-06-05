@@ -66,11 +66,12 @@ extension VeepooSDKModule {
       return
     }
     // settingType 2 = read; runMode ignored on read; callback returns runningType (0=off, 1=on)
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceRunning(2, run: .common) { [weak self] runningType, _ in
       guard self != nil else { return }
       let isActive = runningType == 1
       // iOS vendor only returns on/off status on read, not the specific mode
-      promise.resolve(["mode": nil as Any?, "isActive": isActive])
+      promiseBox.resolve(["mode": nil as Any?, "isActive": isActive])
     }
     #endif
   }
@@ -101,12 +102,13 @@ extension VeepooSDKModule {
       promise.reject("INVALID_ARGUMENT", "Unknown sport mode: \(mode)")
       return
     }
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceRunning(1, run: runMode) { [weak self] _, success in
       guard self != nil else { return }
       if success {
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       } else {
-        promise.reject("SET_FAILED", "setSportMode failed")
+        promiseBox.reject("SET_FAILED", "setSportMode failed")
       }
     }
     #endif
@@ -134,12 +136,13 @@ extension VeepooSDKModule {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support sport mode")
       return
     }
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKSettingDeviceRunning(0, run: .common) { [weak self] _, success in
       guard self != nil else { return }
       if success {
-        promise.resolve(nil)
+        promiseBox.resolve(nil)
       } else {
-        promise.reject("STOP_FAILED", "stopSportMode failed")
+        promiseBox.reject("STOP_FAILED", "stopSportMode failed")
       }
     }
     #endif

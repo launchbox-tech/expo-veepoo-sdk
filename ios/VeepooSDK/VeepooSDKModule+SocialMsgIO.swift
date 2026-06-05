@@ -64,10 +64,11 @@ extension VeepooSDKModule {
       return
     }
 
+    let promiseBox = self.makePromiseBox(promise)
     peripheralManage.veepooSDKBatchSetting(with: models) { completeState in
       // 1=open, 2=close, 4=complete → success; 0=unknown, 3=failure → fail
       let success = completeState.rawValue == 1 || completeState.rawValue == 2 || completeState.rawValue == 4
-      promise.resolve(success ? "success" : "fail")
+      promiseBox.resolve(success ? "success" : "fail")
     }
     #endif
   }

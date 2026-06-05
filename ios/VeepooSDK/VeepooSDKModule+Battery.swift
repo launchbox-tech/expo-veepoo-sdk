@@ -19,6 +19,7 @@ extension VeepooSDKModule {
     // hangs forever (observed 2026-06-05: "battery.read.start" with no
     // completion and no rejection). Same constraint as readDeviceAllData
     // and the heart-rate test timer; always enter from main.
+    let promiseBox = self.makePromiseBox(promise)
     DispatchQueue.main.async {
       peripheralManage.veepooSDKReadDeviceBatteryAndChargeInfo { isPercent, chargeState, percenTypeIsLowBat, battery in
         if hasResolved { return }
@@ -33,7 +34,7 @@ extension VeepooSDKModule {
           "isLowBattery": percenTypeIsLowBat
         ]
         self.sendEvent(BATTERY_DATA, ["deviceId": self.connectedDeviceId ?? "", "data": payload])
-        promise.resolve(payload)
+        promiseBox.resolve(payload)
       }
     }
     #endif
