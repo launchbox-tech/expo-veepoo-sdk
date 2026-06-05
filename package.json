@@ -19,6 +19,7 @@
   "scripts": {
     "prepublishOnly": "expo-module prepublishOnly",
     "build": "tsdown --config-loader unrun && tsc --declaration --emitDeclarationOnly && tsc --project tsconfig.tools.json && tsc-alias --project tsconfig.tools.json",
+    "build:plugin": "tsc --project tsconfig.tools.json && tsc-alias --project tsconfig.tools.json",
     "build:watch": "tsdown --config-loader unrun --watch",
     "clean": "expo-module clean",
     "test": "expo-module test",
