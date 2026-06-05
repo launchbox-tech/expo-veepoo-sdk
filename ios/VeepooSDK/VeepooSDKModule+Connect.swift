@@ -38,9 +38,15 @@ extension VeepooSDKModule {
         modelSource = "cache:uuid"
       }
     }
-    if peripheralModel == nil, let uuidStr = uuidString, let uuid = UUID(uuidString: uuidStr), let central = self.centralManager {
-      let peripherals = central.retrievePeripherals(withIdentifiers: [uuid])
-      print("[VeepooSDK] connect - retrievePeripherals, uuid: \(uuidStr), count: \(peripherals.count)")
+    // ADR-0014: retrieve on the VENDOR's central — a CBPeripheral is bound to
+    // the central that created it; the old code retrieved on self.centralManager
+    // (a separate permission-probe central) and handed the vendor a FOREIGN
+    // peripheral, which is the likely root of the "retrieved models are
+    // unstable" distrust that forced every UUID connect through a scan.
+    if peripheralModel == nil, let uuidStr = uuidString, let uuid = UUID(uuidString: uuidStr),
+       let vendorCentral = self.bleManager?.centralManager {
+      let peripherals = vendorCentral.retrievePeripherals(withIdentifiers: [uuid])
+      print("[VeepooSDK] connect - retrievePeripherals(vendor central), uuid: \(uuidStr), count: \(peripherals.count), state: \(peripherals.first?.state.rawValue ?? -1)")
       if let peripheral = peripherals.first {
         peripheralModel = VPPeripheralModel(peripher: peripheral)
         if let recoveredModel = peripheralModel {
@@ -53,7 +59,14 @@ extension VeepooSDKModule {
 
     print("[VeepooSDK] connect - 模型解析结果, deviceId: \(deviceId), modelSource: \(modelSource), uuid: \(uuidString ?? "nil"), foundModel: \(peripheralModel != nil)")
 
-    let shouldUseScanFallbackDirectly = modelSource == "retrieved:uuid" || modelSource == "none"
+    // ADR-0014: TRUST retrieved peripherals — direct connect works whether or
+    // not the band is advertising. A band still holding a stale link from a
+    // killed process is INVISIBLE to scans (it doesn't advertise), so the old
+    // scan-first policy produced "Device not found after scanning" churn on
+    // every relaunch — while a direct connect reattaches in milliseconds
+    // (G Band parity). performConnect still falls back to the hidden scan on
+    // failure/timeout, so trusting the model never regresses.
+    let shouldUseScanFallbackDirectly = modelSource == "none"
 
     if shouldUseScanFallbackDirectly {
       print("[VeepooSDK] connect - 当前仅有 UUID 恢复模型或无模型，直接进入隐藏扫描兜底, deviceId: \(deviceId), modelSource: \(modelSource)")
