@@ -1,4 +1,5 @@
 export { VeepooSDK } from './veepoo-sdk';
+export type { VeepooSDKInterface } from './veepoo-sdk';
 
 export type {
   VeepooDevice,

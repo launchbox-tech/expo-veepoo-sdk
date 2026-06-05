@@ -50,7 +50,6 @@ const withVeepooSDK = (config, props) => {
 // frameworks into the .app bundle. Idempotent — safe across repeated prebuilds.
 const withVeepooFrameworkEmbed = (config) => {
     return (0, config_plugins_1.withXcodeProject)(config, (config) => {
-        // The xcode project model is loosely typed; cast to keep the traversal readable.
         const project = config.modResults;
         const nativeTargets = project.pbxNativeTargetSection();
         let appTargetUuid;
