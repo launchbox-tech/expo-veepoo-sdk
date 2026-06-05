@@ -26,9 +26,12 @@ extension VeepooSDKModule {
       promise.reject("DEVICE_NOT_CONNECTED", "No device connected or model unavailable")
       return
     }
+    // VPPeripheralModel.deviceVersion is "the display version of the device"
+    // (per the framework header) — the firmware version shown to users. The
+    // model exposes no separate hardware/software version.
     let result: [String: Any] = [
-      "hardwareVersion": model.deviceVersion ?? "unknown",
-      "firmwareVersion": "",
+      "hardwareVersion": "",
+      "firmwareVersion": model.deviceVersion ?? "",
       "softwareVersion": "",
       "deviceNumber": String(model.deviceNumber),
       "newVersion": model.deviceNetVersion ?? "",

@@ -90,30 +90,31 @@ extension VeepooSDKModule {
           item["glucose"] = Double(bloodGlucose)
         }
         
-        if let ppgs = data["ppgs"] as? [Int] {
+        // 厂商 DB 存字符串数组（如 ppgs ["88","0"]）—— getIntArray 转换
+        if let ppgs = getIntArray(data["ppgs"]) {
           item["ppgs"] = ppgs
         }
-        if let ecgs = data["ecgs"] as? [Int] {
+        if let ecgs = getIntArray(data["ecgs"]) {
           item["ecgs"] = ecgs
         }
-        if let oxygens = data["oxygens"] as? [Int] {
+        if let oxygens = getIntArray(data["oxygens"]) {
           item["oxygens"] = oxygens
         }
 
         // 处理扩展数组类型的原始数据（与 Android 保持一致）
-        if let resRates = data["resRates"] as? [Int] {
+        if let resRates = getIntArray(data["resRates"]) {
           item["resRates"] = resRates
         }
-        if let sleepStates = data["sleepStates"] as? [Int] {
+        if let sleepStates = getIntArray(data["sleepStates"]) {
           item["sleepStates"] = sleepStates
         }
-        if let apneaResults = data["apneaResults"] as? [Int] {
+        if let apneaResults = getIntArray(data["apneaResults"]) {
           item["apneaResults"] = apneaResults
         }
-        if let hypoxiaTimes = data["hypoxiaTimes"] as? [Int] {
+        if let hypoxiaTimes = getIntArray(data["hypoxiaTimes"]) {
           item["hypoxiaTimes"] = hypoxiaTimes
         }
-        if let cardiacLoads = data["cardiacLoads"] as? [Int] {
+        if let cardiacLoads = getIntArray(data["cardiacLoads"]) {
           item["cardiacLoads"] = cardiacLoads
         }
 
@@ -315,30 +316,31 @@ extension VeepooSDKModule {
           }
         }
         
-        if let ppgs = data["ppgs"] as? [Int] {
+        // 厂商 DB 存字符串数组（如 ppgs ["88","0"]）—— getIntArray 转换
+        if let ppgs = getIntArray(data["ppgs"]) {
           item["ppgs"] = ppgs
         }
-        if let ecgs = data["ecgs"] as? [Int] {
+        if let ecgs = getIntArray(data["ecgs"]) {
           item["ecgs"] = ecgs
         }
-        if let oxygens = data["oxygens"] as? [Int] {
+        if let oxygens = getIntArray(data["oxygens"]) {
           item["oxygens"] = oxygens
         }
 
         // 处理扩展数组类型的原始数据（与 Android 保持一致）
-        if let resRates = data["resRates"] as? [Int] {
+        if let resRates = getIntArray(data["resRates"]) {
           item["resRates"] = resRates
         }
-        if let sleepStates = data["sleepStates"] as? [Int] {
+        if let sleepStates = getIntArray(data["sleepStates"]) {
           item["sleepStates"] = sleepStates
         }
-        if let apneaResults = data["apneaResults"] as? [Int] {
+        if let apneaResults = getIntArray(data["apneaResults"]) {
           item["apneaResults"] = apneaResults
         }
-        if let hypoxiaTimes = data["hypoxiaTimes"] as? [Int] {
+        if let hypoxiaTimes = getIntArray(data["hypoxiaTimes"]) {
           item["hypoxiaTimes"] = hypoxiaTimes
         }
-        if let cardiacLoads = data["cardiacLoads"] as? [Int] {
+        if let cardiacLoads = getIntArray(data["cardiacLoads"]) {
           item["cardiacLoads"] = cardiacLoads
         }
 

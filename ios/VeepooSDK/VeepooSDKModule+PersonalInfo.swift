@@ -17,8 +17,12 @@ extension VeepooSDKModule {
     pInfo.age = Int32(info["age"] as? Int ?? 25)
     pInfo.targetStep = Int32(info["stepAim"] as? Int ?? 8000)
     pInfo.targetSleepDuration = Int32(info["sleepAim"] as? Int ?? 480)
-    peripheralManage.veepooSDKSynchronousPersonalInformation(pInfo) { result in
-      promise.resolve(result == 1)
+    // Vendor completion is runloop-driven — always enter from main, or the
+    // callback may never fire (same constraint as readBattery / setDeviceTime).
+    DispatchQueue.main.async {
+      peripheralManage.veepooSDKSynchronousPersonalInformation(pInfo) { result in
+        promise.resolve(result == 1)
+      }
     }
     #endif
   }

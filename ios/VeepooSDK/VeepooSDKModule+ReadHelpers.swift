@@ -208,31 +208,31 @@ extension VeepooSDKModule {
           item["glucose"] = Double(bloodGlucose)
         }
         
-        // 处理数组类型的原始数据
-        if let ppgs = data["ppgs"] as? [Int] {
+        // 处理数组类型的原始数据（厂商 DB 存字符串数组，需 getIntArray 转换）
+        if let ppgs = getIntArray(data["ppgs"]) {
           item["ppgs"] = ppgs
         }
-        if let ecgs = data["ecgs"] as? [Int] {
+        if let ecgs = getIntArray(data["ecgs"]) {
           item["ecgs"] = ecgs
         }
-        if let oxygens = data["oxygens"] as? [Int] {
+        if let oxygens = getIntArray(data["oxygens"]) {
           item["oxygens"] = oxygens
         }
-        
+
         // 处理扩展数组类型的原始数据（与 Android 保持一致）
-        if let resRates = data["resRates"] as? [Int] {
+        if let resRates = getIntArray(data["resRates"]) {
           item["resRates"] = resRates
         }
-        if let sleepStates = data["sleepStates"] as? [Int] {
+        if let sleepStates = getIntArray(data["sleepStates"]) {
           item["sleepStates"] = sleepStates
         }
-        if let apneaResults = data["apneaResults"] as? [Int] {
+        if let apneaResults = getIntArray(data["apneaResults"]) {
           item["apneaResults"] = apneaResults
         }
-        if let hypoxiaTimes = data["hypoxiaTimes"] as? [Int] {
+        if let hypoxiaTimes = getIntArray(data["hypoxiaTimes"]) {
           item["hypoxiaTimes"] = hypoxiaTimes
         }
-        if let cardiacLoads = data["cardiacLoads"] as? [Int] {
+        if let cardiacLoads = getIntArray(data["cardiacLoads"]) {
           item["cardiacLoads"] = cardiacLoads
         }
 
@@ -262,67 +262,76 @@ extension VeepooSDKModule {
         "progress": 0
       ]
     ])
-    
-    manager.peripheralManage.veepooSdkStartReadDeviceAllData { [weak self] readState, totalDay, currentReadDayNumber, readCurrentDayProgress in
-      guard let self = self else { return }
-      
-      switch readState {
-      case .reading:
-        let progressInDay = min(max(Double(readCurrentDayProgress), 0.0), 100.0)
-        let completedDays = max(Double(currentReadDayNumber) - 1.0, 0.0)
-        let overallProgress = totalDay > 0
-          ? min(max(((completedDays * 100.0) + progressInDay) / Double(totalDay), 0.0), 100.0)
-          : 0.0
-        
-        self.sendEvent(READ_ORIGIN_PROGRESS, [
-          "deviceId": self.connectedDeviceId ?? "",
-          "progress": [
-            "readState": "reading" as NSString,
-            "totalDays": totalDay,
-            "currentDay": currentReadDayNumber,
-            "progress": overallProgress
-          ]
-        ])
-        
-      case .complete:
-        self.sendEvent(READ_ORIGIN_PROGRESS, [
-          "deviceId": self.connectedDeviceId ?? "",
-          "progress": [
-            "readState": "complete" as NSString,
-            "totalDays": totalDay,
-            "currentDay": totalDay,
-            "progress": 100
-          ]
-        ])
-        
-        let days = max(Int(totalDay), 1)
-        for i in 0..<days {
-          self.emitFiveMinuteData(dayOffset: i)
-          self.emitHalfHourData(dayOffset: i)
+
+    // 厂商的读取状态机依赖 RunLoop（内部有超时 Timer）——从 Expo 模块队列
+    // （无运行 RunLoop）调用时回调永远不会触发（同步卡在 0%）。
+    // 与心率测试的 Timer 同样的约束：必须从主线程进入。
+    // The vendor read state machine is runloop-driven (internal timeout
+    // timer) — invoked from the Expo module queue (no running runloop) its
+    // state-change block never fires. Same constraint as the heart-rate
+    // test timer; always enter from main.
+    DispatchQueue.main.async {
+      manager.peripheralManage.veepooSdkStartReadDeviceAllData { [weak self] readState, totalDay, currentReadDayNumber, readCurrentDayProgress in
+        guard let self = self else { return }
+
+        switch readState {
+        case .reading:
+          let progressInDay = min(max(Double(readCurrentDayProgress), 0.0), 100.0)
+          let completedDays = max(Double(currentReadDayNumber) - 1.0, 0.0)
+          let overallProgress = totalDay > 0
+            ? min(max(((completedDays * 100.0) + progressInDay) / Double(totalDay), 0.0), 100.0)
+            : 0.0
+
+          self.sendEvent(READ_ORIGIN_PROGRESS, [
+            "deviceId": self.connectedDeviceId ?? "",
+            "progress": [
+              "readState": "reading" as NSString,
+              "totalDays": totalDay,
+              "currentDay": currentReadDayNumber,
+              "progress": overallProgress
+            ]
+          ])
+
+        case .complete:
+          self.sendEvent(READ_ORIGIN_PROGRESS, [
+            "deviceId": self.connectedDeviceId ?? "",
+            "progress": [
+              "readState": "complete" as NSString,
+              "totalDays": totalDay,
+              "currentDay": totalDay,
+              "progress": 100
+            ]
+          ])
+
+          let days = max(Int(totalDay), 1)
+          for i in 0..<days {
+            self.emitFiveMinuteData(dayOffset: i)
+            self.emitHalfHourData(dayOffset: i)
+          }
+
+          self.sendEvent(READ_ORIGIN_COMPLETE, [
+            "deviceId": self.connectedDeviceId ?? "",
+            "success": true
+          ])
+
+          promise.resolve(true)
+
+        case .invalid:
+          self.sendEvent(READ_ORIGIN_PROGRESS, [
+            "deviceId": self.connectedDeviceId ?? "",
+            "progress": [
+              "readState": "invalid" as NSString,
+              "totalDays": 1,
+              "currentDay": 1,
+              "progress": 0.0
+            ]
+          ])
+
+          promise.reject("READ_FAILED", "Read device data failed")
+
+        default:
+          break
         }
-        
-        self.sendEvent(READ_ORIGIN_COMPLETE, [
-          "deviceId": self.connectedDeviceId ?? "",
-          "success": true
-        ])
-        
-        promise.resolve(true)
-        
-      case .invalid:
-        self.sendEvent(READ_ORIGIN_PROGRESS, [
-          "deviceId": self.connectedDeviceId ?? "",
-          "progress": [
-            "readState": "invalid" as NSString,
-            "totalDays": 1,
-            "currentDay": 1,
-            "progress": 0.0
-          ]
-        ])
-        
-        promise.reject("READ_FAILED", "Read device data failed")
-        
-      default:
-        break
       }
     }
     #endif
@@ -475,6 +484,16 @@ extension VeepooSDKModule {
       return d
     }
     return 0.0
+  }
+
+  /// 厂商 DB 的数组值是字符串（如 ppgs ["88","0","91"]）——`as? [Int]` 静默失败，
+  /// 心率数据因此从未到达 JS。逐元素经 getInt 转换。
+  /// The vendor DB stores array values as strings (e.g. ppgs ["88","0","91"]) —
+  /// a direct `as? [Int]` cast silently fails and heart-rate data never reached
+  /// JS. Convert element-wise via getInt.
+  func getIntArray(_ value: Any?) -> [Int]? {
+    guard let arr = value as? [Any] else { return nil }
+    return arr.map { getInt($0) }
   }
   
   // 解析社交消息数据

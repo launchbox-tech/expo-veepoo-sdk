@@ -11,27 +11,33 @@ extension VeepooSDKModule {
       return
     }
 
-    if let timeMap = time {
-      let year = timeMap["year"] as? Int ?? 0
-      let month = timeMap["month"] as? Int ?? 0
-      let day = timeMap["day"] as? Int ?? 0
-      let hour = timeMap["hour"] as? Int ?? 0
-      let minute = timeMap["minute"] as? Int ?? 0
-      let second = timeMap["second"] as? Int ?? 0
-      peripheralManage.veepooSDKSettingTime(
-        withYear: Int32(year),
-        month: Int32(month),
-        day: Int32(day),
-        hour: Int32(hour),
-        minute: Int32(minute),
-        second: Int32(second),
-        timeSystem: 0
-      ) { success in
-        promise.resolve(success)
-      }
-    } else {
-      peripheralManage.veepooSDKSettingTime { success in
-        promise.resolve(success)
+    // Vendor completion is runloop-driven — entered from the Expo module
+    // queue (no running runloop) it may never fire and the promise hangs.
+    // Same constraint as readBattery / readDeviceAllData; always enter from
+    // main. A silently un-set band clock corrupts every recorded_at.
+    DispatchQueue.main.async {
+      if let timeMap = time {
+        let year = timeMap["year"] as? Int ?? 0
+        let month = timeMap["month"] as? Int ?? 0
+        let day = timeMap["day"] as? Int ?? 0
+        let hour = timeMap["hour"] as? Int ?? 0
+        let minute = timeMap["minute"] as? Int ?? 0
+        let second = timeMap["second"] as? Int ?? 0
+        peripheralManage.veepooSDKSettingTime(
+          withYear: Int32(year),
+          month: Int32(month),
+          day: Int32(day),
+          hour: Int32(hour),
+          minute: Int32(minute),
+          second: Int32(second),
+          timeSystem: 0
+        ) { success in
+          promise.resolve(success)
+        }
+      } else {
+        peripheralManage.veepooSDKSettingTime { success in
+          promise.resolve(success)
+        }
       }
     }
     #endif

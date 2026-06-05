@@ -26,69 +26,73 @@ extension VeepooSDKModule {
       return
     }
 
-    var tempUnit: String? = nil
-    var glucoseUnit: String? = nil
-    var skinTone: Int? = nil
-    var errorOccurred = false
+    // Vendor completions are runloop-driven — always enter from main, or the
+    // callbacks may never fire (same constraint as readBattery / readDeviceAllData).
+    DispatchQueue.main.async {
+      var tempUnit: String? = nil
+      var glucoseUnit: String? = nil
+      var skinTone: Int? = nil
+      var errorOccurred = false
 
-    func emitIfComplete() {
-      guard !errorOccurred, let t = tempUnit, let g = glucoseUnit, let s = skinTone else { return }
-      let data: [String: Any] = ["temperatureUnit": t, "bloodGlucoseUnit": g, "skinTone": s]
-      self.sendEvent(CUSTOM_SETTINGS_DATA, [
-        "deviceId": self.connectedDeviceId ?? "",
-        "data": data
-      ])
-      promise.resolve(data)
-    }
+      func emitIfComplete() {
+        guard !errorOccurred, let t = tempUnit, let g = glucoseUnit, let s = skinTone else { return }
+        let data: [String: Any] = ["temperatureUnit": t, "bloodGlucoseUnit": g, "skinTone": s]
+        self.sendEvent(CUSTOM_SETTINGS_DATA, [
+          "deviceId": self.connectedDeviceId ?? "",
+          "data": data
+        ])
+        promise.resolve(data)
+      }
 
-    peripheralManage.veepooSDKSettingBaseFunctionType(.temperatureUnit, settingState: .readFunctionState) { state in
-      guard !errorOccurred else { return }
-      switch state {
-      case .functionCompleteUnknown:
-        errorOccurred = true
-        promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support temperature unit setting")
-      case .functionCompleteOpen:
-        tempUnit = "celsius"
-        emitIfComplete()
-      case .functionCompleteClose:
-        tempUnit = "fahrenheit"
-        emitIfComplete()
-      case .functionCompleteFailure:
-        errorOccurred = true
-        promise.reject("READ_FAILED", "Failed to read temperature unit")
-      default:
-        tempUnit = "celsius"
+      peripheralManage.veepooSDKSettingBaseFunctionType(.temperatureUnit, settingState: .readFunctionState) { state in
+        guard !errorOccurred else { return }
+        switch state {
+        case .functionCompleteUnknown:
+          errorOccurred = true
+          promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support temperature unit setting")
+        case .functionCompleteOpen:
+          tempUnit = "celsius"
+          emitIfComplete()
+        case .functionCompleteClose:
+          tempUnit = "fahrenheit"
+          emitIfComplete()
+        case .functionCompleteFailure:
+          errorOccurred = true
+          promise.reject("READ_FAILED", "Failed to read temperature unit")
+        default:
+          tempUnit = "celsius"
+          emitIfComplete()
+        }
+      }
+
+      peripheralManage.veepooSDKSettingBaseFunctionType(.bloodGlucoseUnit, settingState: .readFunctionState) { state in
+        guard !errorOccurred else { return }
+        switch state {
+        case .functionCompleteUnknown:
+          glucoseUnit = "mmolL"
+          emitIfComplete()
+        case .functionCompleteOpen:
+          glucoseUnit = "mmolL"
+          emitIfComplete()
+        case .functionCompleteClose:
+          glucoseUnit = "mgdL"
+          emitIfComplete()
+        default:
+          glucoseUnit = "mmolL"
+          emitIfComplete()
+        }
+      }
+
+      peripheralManage.veepooSDKSettingBaseFunctionType(.ledGrade, settingState: .readFunctionState) { state in
+        guard !errorOccurred else { return }
+        let rawValue = state.rawValue
+        if rawValue >= 1 && rawValue <= 6 {
+          skinTone = rawValue
+        } else {
+          skinTone = state == .functionCompleteClose ? 6 : 1
+        }
         emitIfComplete()
       }
-    }
-
-    peripheralManage.veepooSDKSettingBaseFunctionType(.bloodGlucoseUnit, settingState: .readFunctionState) { state in
-      guard !errorOccurred else { return }
-      switch state {
-      case .functionCompleteUnknown:
-        glucoseUnit = "mmolL"
-        emitIfComplete()
-      case .functionCompleteOpen:
-        glucoseUnit = "mmolL"
-        emitIfComplete()
-      case .functionCompleteClose:
-        glucoseUnit = "mgdL"
-        emitIfComplete()
-      default:
-        glucoseUnit = "mmolL"
-        emitIfComplete()
-      }
-    }
-
-    peripheralManage.veepooSDKSettingBaseFunctionType(.ledGrade, settingState: .readFunctionState) { state in
-      guard !errorOccurred else { return }
-      let rawValue = state.rawValue
-      if rawValue >= 1 && rawValue <= 6 {
-        skinTone = rawValue
-      } else {
-        skinTone = state == .functionCompleteClose ? 6 : 1
-      }
-      emitIfComplete()
     }
     #endif
   }
@@ -112,65 +116,68 @@ extension VeepooSDKModule {
       return
     }
 
-    var pendingCount = 0
-    var errorOccurred = false
+    // Vendor completions are runloop-driven — always enter from main (see above).
+    DispatchQueue.main.async {
+      var pendingCount = 0
+      var errorOccurred = false
 
-    func tryResolve() {
-      pendingCount -= 1
-      if pendingCount == 0 && !errorOccurred {
-        promise.resolve(nil)
-      }
-    }
-
-    if let tempUnitStr = settings["temperatureUnit"] as? String {
-      let state: VPSettingFunctionState = tempUnitStr == "fahrenheit" ? .settingFunctionClose : .settingFunctionOpen
-      pendingCount += 1
-      peripheralManage.veepooSDKSettingBaseFunctionType(.temperatureUnit, settingState: state) { completeState in
-        guard !errorOccurred else { return }
-        switch completeState {
-        case .functionCompleteFailure:
-          errorOccurred = true
-          promise.reject("SET_FAILED", "Failed to set temperature unit")
-        default:
-          tryResolve()
+      func tryResolve() {
+        pendingCount -= 1
+        if pendingCount == 0 && !errorOccurred {
+          promise.resolve(nil)
         }
       }
-    }
 
-    if let glucoseUnitStr = settings["bloodGlucoseUnit"] as? String {
-      let state: VPSettingFunctionState = glucoseUnitStr == "mgdL" ? .settingFunctionClose : .settingFunctionOpen
-      pendingCount += 1
-      peripheralManage.veepooSDKSettingBaseFunctionType(.bloodGlucoseUnit, settingState: state) { completeState in
-        guard !errorOccurred else { return }
-        switch completeState {
-        case .functionCompleteFailure:
-          errorOccurred = true
-          promise.reject("SET_FAILED", "Failed to set blood glucose unit")
-        default:
-          tryResolve()
-        }
-      }
-    }
-
-    if let skinToneValue = settings["skinTone"] as? Int {
-      let clamped = max(1, min(6, skinToneValue))
-      if let state = VPSettingFunctionState(rawValue: clamped) {
+      if let tempUnitStr = settings["temperatureUnit"] as? String {
+        let state: VPSettingFunctionState = tempUnitStr == "fahrenheit" ? .settingFunctionClose : .settingFunctionOpen
         pendingCount += 1
-        peripheralManage.veepooSDKSettingBaseFunctionType(.ledGrade, settingState: state) { completeState in
+        peripheralManage.veepooSDKSettingBaseFunctionType(.temperatureUnit, settingState: state) { completeState in
           guard !errorOccurred else { return }
           switch completeState {
           case .functionCompleteFailure:
             errorOccurred = true
-            promise.reject("SET_FAILED", "Failed to set skin tone")
+            promise.reject("SET_FAILED", "Failed to set temperature unit")
           default:
             tryResolve()
           }
         }
       }
-    }
 
-    if pendingCount == 0 {
-      promise.resolve(nil)
+      if let glucoseUnitStr = settings["bloodGlucoseUnit"] as? String {
+        let state: VPSettingFunctionState = glucoseUnitStr == "mgdL" ? .settingFunctionClose : .settingFunctionOpen
+        pendingCount += 1
+        peripheralManage.veepooSDKSettingBaseFunctionType(.bloodGlucoseUnit, settingState: state) { completeState in
+          guard !errorOccurred else { return }
+          switch completeState {
+          case .functionCompleteFailure:
+            errorOccurred = true
+            promise.reject("SET_FAILED", "Failed to set blood glucose unit")
+          default:
+            tryResolve()
+          }
+        }
+      }
+
+      if let skinToneValue = settings["skinTone"] as? Int {
+        let clamped = max(1, min(6, skinToneValue))
+        if let state = VPSettingFunctionState(rawValue: clamped) {
+          pendingCount += 1
+          peripheralManage.veepooSDKSettingBaseFunctionType(.ledGrade, settingState: state) { completeState in
+            guard !errorOccurred else { return }
+            switch completeState {
+            case .functionCompleteFailure:
+              errorOccurred = true
+              promise.reject("SET_FAILED", "Failed to set skin tone")
+            default:
+              tryResolve()
+            }
+          }
+        }
+      }
+
+      if pendingCount == 0 {
+        promise.resolve(nil)
+      }
     }
     #endif
   }
