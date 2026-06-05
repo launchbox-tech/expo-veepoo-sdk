@@ -57,3 +57,13 @@ A small number of events have **non-uniform envelopes** (e.g. `device_function` 
 **Optional helper (`expo-veepoo-sdk/session`):** `runSessionBaseline(sdk, config)` executes a single baseline run; `attachSessionBaseline(sdk, config)` auto-subscribes to `deviceReady` and returns a disposable handle. Both are **tree-shakeable**—importing only from `expo-veepoo-sdk` adds zero bytes for the session module. The helper **does not** implement **reconnection**, **retry loops**, **Band Discovery**, or stored **`deviceId`** / **Pairing** policy; the host app owns those flows.
 
 _(Grill-with-docs #4 — Q1–Q6.)_
+
+## Harvest (example app)
+
+**Harvest:** A one-button operation in the **example app** that, within an active **Session**, gathers every data point the connected **Band** model supports. It probes **`readDeviceFunctions()`**, runs each *supported* controllable **realtime test** in sequence (the Band measures one at a time), passively captures **receive-only** test results that happen to arrive during the run, and reads all **historical** data and **device config**. A Harvest is a **demo / diagnostic** flow **owned by the example app**: the module exposes only the per-capability methods it composes — there is deliberately **no `runHarvest` in the SDK surface** (the order, timeouts, and per-model gating are host-app opinions, per "host app owns those flows").
+
+**HarvestResult:** The single structured artifact one **Harvest** produces — a record aggregating every gathered value plus the per-data-point **Harvest outcome**. Surfaced live on screen as values arrive and exportable as JSON. **Not persisted** across runs.
+
+**Harvest outcome:** The disposition of one data point in a **Harvest**: *measured*, *not-worn* (Band off wrist), *busy* (Band declined; retried), *error*, or *skipped* (unsupported by this Band model, or a **receive-only** test that emitted nothing). The first four mirror the SDK's **`TestState`** (`over` / `not_wear` / `device_busy` / `error`); *skipped* is the example app's own bucket.
+
+_(Grill-with-docs #5 — Harvest flow.)_
