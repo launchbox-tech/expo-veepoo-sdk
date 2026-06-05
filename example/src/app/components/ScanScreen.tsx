@@ -1,4 +1,4 @@
-import type { VeepooDevice, PermissionsResult } from "@gaozh1024/expo-veepoo-sdk";
+import type { VeepooDevice, PermissionsResult } from "expo-veepoo-sdk";
 import {
   ActivityIndicator,
   FlatList,
@@ -73,7 +73,7 @@ export default function ScanScreen({
 
       <View style={styles.header}>
         <Text style={styles.title}>HBand Connect</Text>
-        <Text style={styles.version}>@gaozh1024/expo-veepoo-sdk v1.2.11</Text>
+        <Text style={styles.version}>expo-veepoo-sdk v1.2.11</Text>
       </View>
 
       <View style={styles.scanControls}>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useVeepooSDK, useSDKState } from '@gaozh1024/expo-veepoo-sdk';
-import type { ReadOriginProgress, SleepData, SportStepData } from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK, useSDKState } from 'expo-veepoo-sdk';
+import type { ReadOriginProgress, SleepData, SportStepData } from 'expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
 
 export function useDataSync(): {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { BLUE } from "../../components/theme";
-import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "expo-veepoo-sdk";
 import { useSDKEvent } from "../../hooks/useSDKEvent";
 
 const styles = StyleSheet.create({

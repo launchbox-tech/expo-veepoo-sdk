@@ -7,7 +7,7 @@ import type {
   HrvTestResult,
   StressData,
   TemperatureTestResult,
-} from "@gaozh1024/expo-veepoo-sdk";
+} from "expo-veepoo-sdk";
 import { StyleSheet, Switch, Text, View } from "react-native";
 import { BLUE } from "../../components/theme";
 import { HealthTestCard } from "../../components";

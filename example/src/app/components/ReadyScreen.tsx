@@ -2,7 +2,7 @@ import type {
   BatteryInfo,
   DeviceVersion,
   VeepooDevice,
-} from "@gaozh1024/expo-veepoo-sdk";
+} from "expo-veepoo-sdk";
 import {
   SafeAreaView,
   ScrollView,

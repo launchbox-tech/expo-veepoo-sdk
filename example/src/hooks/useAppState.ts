@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSDKState } from '@gaozh1024/expo-veepoo-sdk';
+import { useSDKState } from 'expo-veepoo-sdk';
 
 export type AppState =
   | 'initializing'

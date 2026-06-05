@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { VeepooSDKProvider } from '@gaozh1024/expo-veepoo-sdk';
+import { VeepooSDKProvider } from 'expo-veepoo-sdk';
 
 export default function RootLayout() {
   return (

@@ -39,7 +39,7 @@ import type { WorldClockNativeMethods } from "./capabilities/world-clock";
 import type { WristFlipNativeMethods } from "./capabilities/wrist-flip";
 
 const LINKING_ERROR =
-  "The package '@gaozh1024/expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +
+  "The package 'expo-veepoo-sdk' doesn't seem to be linked. Make sure:\n\n" +
   "- You rebuilt the app after installing the package\n" +
   "- You are not using Expo Go (this module requires a development build)\n";
 

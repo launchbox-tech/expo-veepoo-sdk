@@ -1,4 +1,4 @@
-import { useSDKState } from '@gaozh1024/expo-veepoo-sdk';
+import { useSDKState } from 'expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
 
 function clipJson(payload: unknown, max = 160): string {

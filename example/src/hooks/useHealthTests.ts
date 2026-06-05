@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useVeepooSDK, useSDKState, RealtimeTest } from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK, useSDKState, RealtimeTest } from "expo-veepoo-sdk";
 import type {
   BloodGlucoseData,
   BloodOxygenTestResult,
@@ -12,7 +12,7 @@ import type {
   HrvTestResult,
   StressData,
   TemperatureTestResult,
-} from "@gaozh1024/expo-veepoo-sdk";
+} from "expo-veepoo-sdk";
 import { useSDKEvent } from './useSDKEvent';
 
 /** One active realtime test across HR / SpO₂ / BP / vitals (native mutex matches). */

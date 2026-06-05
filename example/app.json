@@ -29,7 +29,7 @@
     },
     "plugins": [
       "expo-router",
-      "@gaozh1024/expo-veepoo-sdk",
+      "expo-veepoo-sdk",
       [
         "expo-splash-screen",
         {

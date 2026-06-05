@@ -2,8 +2,8 @@
 // read each result. This is deliberately app-side opinion (docs/adr/0011) — the
 // SDK exposes only startTest/stopTest + the result events this table wires up.
 
-import { RealtimeTest } from '@gaozh1024/expo-veepoo-sdk';
-import type { RealtimeTestModality, VeepooEvent } from '@gaozh1024/expo-veepoo-sdk';
+import { RealtimeTest } from 'expo-veepoo-sdk';
+import type { RealtimeTestModality, VeepooEvent } from 'expo-veepoo-sdk';
 import type { HarvestOutcome } from './types';
 
 /** Where the inner payload sits on the event envelope: most tests use `result`, stress/glucose use `data`. */

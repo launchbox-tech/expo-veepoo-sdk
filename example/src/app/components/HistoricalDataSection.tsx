@@ -1,4 +1,4 @@
-import type { ReadOriginProgress, SleepData, SportStepData } from "@gaozh1024/expo-veepoo-sdk";
+import type { ReadOriginProgress, SleepData, SportStepData } from "expo-veepoo-sdk";
 import { ActivityIndicator, StyleSheet, Text, View, Pressable } from "react-native";
 import { BLUE } from "../../components/theme";
 

@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { Share } from 'react-native';
-import { useVeepooSDK, useSDKState } from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK, useSDKState } from 'expo-veepoo-sdk';
 import { runHarvest, harvestToJson, failedKeys, mergePoints, summarizePoints } from '../harvest';
 import type { HarvestProgress, HarvestResult } from '../harvest';
 

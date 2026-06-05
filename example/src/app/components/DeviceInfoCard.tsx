@@ -1,4 +1,4 @@
-import type { BatteryInfo, DeviceVersion } from "@gaozh1024/expo-veepoo-sdk";
+import type { BatteryInfo, DeviceVersion } from "expo-veepoo-sdk";
 import { View, Text, StyleSheet } from "react-native";
 import { GREEN } from "../../components/theme";
 import { InfoRow } from "../../components";

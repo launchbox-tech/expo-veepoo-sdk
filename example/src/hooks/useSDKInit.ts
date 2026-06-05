@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useVeepooSDK, useSDKState } from '@gaozh1024/expo-veepoo-sdk';
-import type { PermissionsResult } from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK, useSDKState } from 'expo-veepoo-sdk';
+import type { PermissionsResult } from 'expo-veepoo-sdk';
 
 export function useSDKInit(): { permissions: PermissionsResult | null } {
   const { sdk } = useVeepooSDK();

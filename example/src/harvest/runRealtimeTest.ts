@@ -2,7 +2,7 @@
 // terminal payload (or time out), stop it, and reduce the run to a HarvestPoint.
 // This is the per-test primitive the sweep loops over. Kept app-side per ADR 0011.
 
-import { RealtimeTest } from '@gaozh1024/expo-veepoo-sdk';
+import { RealtimeTest } from 'expo-veepoo-sdk';
 import type { HarvestSdk } from './sdk';
 import type { HarvestPoint, HarvestOutcome } from './types';
 import { isTerminalPayload, outcomeFromPayload, type SweepModality } from './modalities';

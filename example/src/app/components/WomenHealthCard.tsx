@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
-import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
-import type { WomenHealthSettings } from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "expo-veepoo-sdk";
+import type { WomenHealthSettings } from "expo-veepoo-sdk";
 
 const styles = StyleSheet.create({
   card: {

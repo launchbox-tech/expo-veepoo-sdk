@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
-import type { VeepooDevice } from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK } from 'expo-veepoo-sdk';
+import type { VeepooDevice } from 'expo-veepoo-sdk';
 import { useSDKEvent } from './useSDKEvent';
 import type { AppState } from './useAppState';
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useVeepooSDK } from '@gaozh1024/expo-veepoo-sdk';
-import type { VeepooEvent, VeepooEventPayload } from '@gaozh1024/expo-veepoo-sdk';
+import { useVeepooSDK } from 'expo-veepoo-sdk';
+import type { VeepooEvent, VeepooEventPayload } from 'expo-veepoo-sdk';
 
 export function useSDKEvent<K extends VeepooEvent>(
   event: K,

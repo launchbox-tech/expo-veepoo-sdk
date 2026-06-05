@@ -1,4 +1,4 @@
-import type { VeepooDevice } from "@gaozh1024/expo-veepoo-sdk";
+import type { VeepooDevice } from "expo-veepoo-sdk";
 import { Pressable, SafeAreaView, StatusBar, StyleSheet, Text } from "react-native";
 import { BLUE, RED } from "../../components/theme";
 

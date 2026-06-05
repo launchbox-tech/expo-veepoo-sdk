@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { BLUE } from "../../components/theme";
-import { useVeepooSDK } from "@gaozh1024/expo-veepoo-sdk";
-import type { FunctionStatus, OperationStatus, SocialMsgData } from "@gaozh1024/expo-veepoo-sdk";
+import { useVeepooSDK } from "expo-veepoo-sdk";
+import type { FunctionStatus, OperationStatus, SocialMsgData } from "expo-veepoo-sdk";
 
 type Channel = keyof SocialMsgData;
 
