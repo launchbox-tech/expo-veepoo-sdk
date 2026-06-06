@@ -58,6 +58,13 @@ export interface CapabilityContext<TNative> {
      * write `?? ""` or pass `null`).
      */
     emitDeviceEvent: <K extends DeviceScopedEvent>(event: K, payload: Omit<VeepooEventPayload[K], "device_id">) => void;
+    /**
+     * Subscribe to a bus event. For stream reads (ADR 0015) — a capability
+     * collecting the data/completion events of its own vendor operation.
+     * Always pair with `off` on every exit path.
+     */
+    on: <K extends VeepooEvent>(event: K, listener: (payload: VeepooEventPayload[K]) => void) => void;
+    off: <K extends VeepooEvent>(event: K, listener: (payload: VeepooEventPayload[K]) => void) => void;
     connectedDeviceId: () => string | null;
     setConnectedDeviceId: (id: string | null) => void;
     isScanning: () => boolean;

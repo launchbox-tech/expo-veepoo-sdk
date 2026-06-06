@@ -15,6 +15,7 @@ const index_1 = require("../capabilities/device-functions/normalizers/index");
 const device_version_1 = require("../capabilities/device-version");
 const dfu_1 = require("../capabilities/dfu");
 const find_device_1 = require("../capabilities/find-device");
+const historical_query_1 = require("../capabilities/historical-query");
 const music_1 = require("../capabilities/music");
 const normalizers_3 = require("../capabilities/origin-data/normalizers");
 const registry_1 = require("../capabilities/realtime-tests/registry");
@@ -148,6 +149,20 @@ const EVENT_DEFINITIONS_CORE = {
         jsName: "exercise_session_data",
         nativeName: "exerciseSessionData",
         logScope: "device",
+        // Sport `type` VALUE arrives camelCase from the native tables —
+        // deepSnakeKeys only rewrites keys (ADR 0013).
+        normalize: (0, event_envelope_1.wrapInner)("session", historical_query_1.normalizeExerciseSessionInner),
+    }),
+    exercise_read_complete: defineEvent({
+        jsName: "exercise_read_complete",
+        nativeName: "exerciseReadComplete",
+        logScope: "read",
+        normalize: (0, event_envelope_1.passthrough)(),
+    }),
+    exercise_read_progress: defineEvent({
+        jsName: "exercise_read_progress",
+        nativeName: "exerciseReadProgress",
+        logScope: "read",
         normalize: (0, event_envelope_1.passthrough)(),
     }),
     stored_temperature_data: defineEvent({

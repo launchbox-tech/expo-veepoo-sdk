@@ -41,7 +41,11 @@ export interface CapabilityContextSpies {
 }
 
 export type FakeCapabilityContext<TNative = MockNative> =
-  CapabilityContext<TNative> & { spies: CapabilityContextSpies };
+  CapabilityContext<TNative> & {
+    spies: CapabilityContextSpies;
+    /** Deliver a payload to listeners registered via `ctx.on` (stream reads). */
+    fireEvent: <K extends VeepooEvent>(event: K, payload: VeepooEventPayload[K]) => void;
+  };
 
 export interface FakeCapabilityContextOptions<TNative = MockNative> {
   native?: TNative;
@@ -101,6 +105,20 @@ export function makeFakeCapabilityContext<TNative = MockNative>(
     isScanning = v;
   });
 
+  // Mini-bus for `ctx.on`/`ctx.off` (stream-read collectors, ADR 0015).
+  // Tests deliver payloads with `ctx.fireEvent(event, payload)`.
+  const busListeners = new Map<VeepooEvent, Set<(payload: unknown) => void>>();
+  const on = (event: VeepooEvent, listener: (payload: never) => void) => {
+    if (!busListeners.has(event)) busListeners.set(event, new Set());
+    busListeners.get(event)!.add(listener as (payload: unknown) => void);
+  };
+  const off = (event: VeepooEvent, listener: (payload: never) => void) => {
+    busListeners.get(event)?.delete(listener as (payload: unknown) => void);
+  };
+  const fireEvent = (event: VeepooEvent, payload: unknown) => {
+    busListeners.get(event)?.forEach((l) => l(payload));
+  };
+
   const invoke = jest.fn() as jest.Mock;
   const invokeImpl: CapabilityContext<TNative>['invoke'] = (opts) => {
     invoke(opts);
@@ -153,6 +171,9 @@ export function makeFakeCapabilityContext<TNative = MockNative>(
     emit: emit as CapabilityContext<TNative>['emit'],
     emitDeviceEvent:
       emitDeviceEvent as unknown as CapabilityContext<TNative>['emitDeviceEvent'],
+    on: on as CapabilityContext<TNative>['on'],
+    off: off as CapabilityContext<TNative>['off'],
+    fireEvent: fireEvent as FakeCapabilityContext<TNative>['fireEvent'],
     connectedDeviceId: () => connectedDeviceId,
     setConnectedDeviceId:
       setConnectedDeviceId as CapabilityContext<TNative>['setConnectedDeviceId'],

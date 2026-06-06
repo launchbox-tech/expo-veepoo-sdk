@@ -38,6 +38,7 @@ typedef NS_ENUM (NSInteger, VPDeviceConnectState) {
     VPDeviceConnectStateVerifyPasswordFailure,  //验证密码失败
     VPDeviceDiscoverNewUpdateFirm,              //Discover new firmware that can be upgraded 发现可以升级的新固件
     VPDeviceConnectStateTimeout,                //连接超时，如果是自扫描连接，可能是SDK内部没有扫到相同的设备
+    VPDeviceConfirmStateTimeout,                //用户没有在设备上确认是否连接超时
 };
 
 typedef NS_ENUM(NSInteger, DeviceConnectState) {
@@ -48,6 +49,7 @@ typedef NS_ENUM(NSInteger, DeviceConnectState) {
     BleVerifyPasswordSuccess = 4,       //验证密码成功
     BleVerifyPasswordFailure = 5,       //验证密码失败
     BleConnectTimeout = 6,              //连接超时，如果是自扫描连接，可能是SDK内部没有扫到相同的设备
+    BleConfirmTimeout = 7,              //用户没有在设备上确认是否连接超时
 };
 
 typedef NS_ENUM(NSInteger, PasswordSynchronTpye) {
@@ -165,6 +167,8 @@ typedef NS_ENUM(NSInteger, VPSettingBaseFunctionSwitchType) {//关于来电提�
     VPSettingTemperatureUnit = 25,              //体温单位设置 1表示摄氏度 2表示华氏度
     VPSettingECGNormallyOpen = 26,              //ECG 常开功能
     VPSettingAutomaticBloodGlucoseTest = 27,    //血糖自动检测开关
+    VPSettingMet = 28,                          //梅脱自动检测开关(梅脱跟随运动量，该标志位暂无作用)
+    VPSettingStress = 29,                       //压力自动检测开关
     VPSettingBloodGlucoseUnit = 30,             //血糖单位设置 1表示mmol/L 2表示mg/dl
     VPSettingAutomaticBloodCompTest = 31,       //血液成分自动检测开关
     VPSettingUricAcidUnit = 32,                 //尿酸单位设置 1表示μmol/L 2表示mg/dl
@@ -276,7 +280,20 @@ typedef NS_OPTIONS(NSUInteger, VPManualTestDataType) {
     VPManualTestDataNone = 0,
     VPManualTestDataBloodPressure = 1 << 0,
     VPManualTestDataHeartRate = 1 << 1,
+    VPManualTestDataBloodSugar  = 1 << 2,
+    VPManualTestDataBloodOxygen  = 1 << 4,
+    VPManualTestDataTemperature = 1 << 5,
+    VPManualTestDataBloodComponents = 1 << 8,
+    VPManualTestDataHealthGlance = 1 << 9,
     VPManualTestDataAll = 0xFFFFFFFF
+};
+
+typedef NS_ENUM(NSInteger,VPTestHRVState) {//测试HRV过程中的状态变化
+    VPTestHRVStateTesting = 0,       //开始检测HRV中
+    VPTestHRVStateAlreadyStarted = 1, //设备已经在测试HRV,正忙
+    VPTestHRVStateLowPower = 2,         //低电
+    VPTestHRVStateDeviceBusy = 3,  //设备正忙正在测试其他功能
+    VPTestHRVStateNotWear = 4,     //佩戴检测没有通过
 };
 
 #pragma mark - SDK 1.7后新添加
@@ -642,9 +659,108 @@ typedef NS_ENUM(NSUInteger, VPJH58MeasurementModeState) {
     VPJH58MeasurementModeStateModeTwo = 0x03,
 };
 
-// 测量模式类型
-typedef NS_ENUM(NSUInteger, VPZT163AlwaysOffScreenState) {
-    VPZT163AlwaysOffScreenStateNoSup = 0x00,
-    VPZT163AlwaysOffScreenStateOpen = 0x01,
-    VPZT163AlwaysOffScreenStateClose = 0x02
+// 常灭屏功能状态
+typedef NS_ENUM(NSUInteger, VPZT163AlwaysOffScreenFunc) {
+    VPZT163AlwaysOffScreenFuncNoSup = 0x00,
+    VPZT163AlwaysOffScreenFuncClose = 0x01,
+    VPZT163AlwaysOffScreenFuncOpen = 0x02
+};
+
+// 皮电测量状态
+typedef NS_ENUM(NSUInteger, VPDeviceGSRState) {
+    VPDeviceGSRStateNoFunction,    // 设备没有此功能
+    VPDeviceGSRStateDeviceBusy,    // 设备正忙不能开始测试
+    VPDeviceGSRStateOver,          // 测试正常结束，人为结束
+    VPDeviceGSRStateLowPower,      // 设备低电
+    VPDeviceGSRStateFailure,       // 测试失败
+    VPDeviceGSRStateNotWear,       // 设备佩戴检测未通过
+    VPDeviceGSRStateComplete,      // 测试已经完成
+};
+
+// 微体检测量状态(公版)
+typedef NS_ENUM(NSUInteger, VPDeviceHealthGlanceState) {
+    VPDeviceHealthGlanceStateNoFunction,    // 设备没有此功能
+    VPDeviceHealthGlanceStateDeviceBusy,    // 设备正忙不能开始测试
+    VPDeviceHealthGlanceStateOver,          // 测试正常结束，人为结束
+    VPDeviceHealthGlanceStateLowPower,      // 设备低电
+    VPDeviceHealthGlanceStateFailure,       // 测试失败
+    VPDeviceHealthGlanceStateNotWear,       // 设备佩戴检测未通过
+    VPDeviceHealthGlanceStateComplete,      // 测试已经完成
+    VPDeviceHealthGlanceStateNotLead,      // 导联脱落
+};
+
+// 微体检支持的功能(公版)
+typedef NS_OPTIONS(NSUInteger, VPHealthGlanceType) {
+    VPHealthGlanceTypeNone             = 0,        // 不支持
+    VPHealthGlanceTypeHeartValue       = 1 << 0,   // 心率
+    VPHealthGlanceTypeBloodOxy         = 1 << 1,   // 血氧
+    VPHealthGlanceTypePpgBp            = 1 << 2,   // 光电血压
+    VPHealthGlanceTypeCuffBp           = 1 << 3,   // 气泵血压
+    VPHealthGlanceTypeBloodGlucose     = 1 << 4,   // 血糖
+    VPHealthGlanceTypeBodyTemp         = 1 << 5,   // 体温
+    VPHealthGlanceTypeStress           = 1 << 6,   // 压力
+    VPHealthGlanceTypeEmotion          = 1 << 7,   // 情绪
+    VPHealthGlanceTypeFatigue          = 1 << 8,   // 疲劳度
+    VPHealthGlanceTypeHRV              = 1 << 9,  // HRV
+    VPHealthGlanceTypeGSR              = 1 << 10,  // 皮电
+    VPHealthGlanceTypeBloodComp        = 1 << 11,  // 血液成分
+    VPHealthGlanceTypeBodyComp         = 1 << 12,  // 身体成分
+    VPHealthGlanceTypeECGNormal        = 1 << 13,  // ECG-单诊断
+    VPHealthGlanceTypeECGMulDia        = 1 << 14,  // ECG-多诊断
+};
+
+// 当前AI事件类型
+typedef NS_ENUM(NSUInteger, VPCurrentAIFunctionType){
+    VPCurrentAIFunctionTypeEndInteraction,          // 非AI功能进行中
+    VPCurrentAIFunctionTypeDeviceAIChatUsing,       // 设备端正在使用AI问答功能
+    VPCurrentAIFunctionTypeDeviceAIDialUsing,       // 设备端正在使用AI表盘功能
+    VPCurrentAIFunctionTypeAppAIChatUsing,          // App端正在使用AI问答功能
+    VPCurrentAIFunctionTypeAppAIDialUsing,          // App端正在使用AI表盘功能
+};
+
+// 事件状态，成功、失败、没有网络（如语音识别、问答、文生图）
+typedef NS_ENUM(uint8_t, VPAIFunctionTaskStatusType){
+    VPAIFunctionTaskStatusTypeSuccess,                        // 成功
+    VPAIFunctionTaskStatusTypeFailure,                        // 失败
+    VPAIFunctionTaskStatusTypeNetworkError,                   // 网络错误
+    VPAIFunctionTaskStatusTypeSensitiveWords,                 // 敏感词
+    VPAIFunctionTaskStatusTypeSpeechRecognitionFailure,       // 语言识别失败
+};
+
+typedef NS_ENUM(uint8_t, VPAINetworkStatus){
+    VPAINetworkStatusNotReachable,              // 不可用
+    VPAINetworkStatusReachableViaWiFi,
+    VPAINetworkStatusReachableViaWWAN
+};
+
+// 运动模式控制操作符
+typedef NS_ENUM(NSUInteger, VPDeviceSportControlOpCode) {
+    VPDeviceSportControlOpCodeStart = 0x01,
+    VPDeviceSportControlOpCodePause = 0x02,
+    VPDeviceSportControlOpCodeContinue = 0x03,
+    VPDeviceSportControlOpCodeStop = 0x04,
+};
+
+// JE136P 定制
+typedef NS_OPTIONS(uint32_t, JE136PTCMOption) {
+    JE136PTCMOptionTimesstamp      = 1 << 0,  // 0x00: 时间戳
+    JE136PTCMOptionBloodStasis     = 1 << 1,  // 0x01：血瘀
+    JE136PTCMOptionDampHeat        = 1 << 2,  // 0x02：湿热
+    JE136PTCMOptionSpecialAllergy  = 1 << 3,  // 0x03：特禀
+    JE136PTCMOptionYangDeficiency  = 1 << 4,  // 0x04：阳虚
+    JE136PTCMOptionYinDeficiency   = 1 << 5,  // 0x05：阴虚
+    JE136PTCMOptionPhlegmDampness  = 1 << 6,  // 0x06：痰湿
+    JE136PTCMOptionBalanced        = 1 << 7,  // 0x07：平和
+    JE136PTCMOptionQiStagnation    = 1 << 8,  // 0x08：气郁
+    JE136PTCMOptionQiDeficiency    = 1 << 9,  // 0x09：气虚
+    JE136PTCMOptionLargeIntestine  = 1 << 10, // 0x0A：大肠
+    JE136PTCMOptionGallbladder     = 1 << 11, // 0x0B：胆
+    JE136PTCMOptionLiver           = 1 << 12, // 0x0C：肝
+    JE136PTCMOptionSpleen          = 1 << 13, // 0x0D：脾
+    JE136PTCMOptionLung            = 1 << 14, // 0x0E：肺
+    JE136PTCMOptionSmallIntestine  = 1 << 15, // 0x0F：小肠
+    JE136PTCMOptionSanjiaoBladder  = 1 << 16, // 0x10：三焦膀胱
+    JE136PTCMOptionKidney          = 1 << 17, // 0x11：肾
+    JE136PTCMOptionStomach         = 1 << 18, // 0x12：胃
+    JE136PTCMOptionHeart           = 1 << 19, // 0x13：心脏
 };

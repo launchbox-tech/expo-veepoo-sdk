@@ -8,14 +8,29 @@
 
 #import <Foundation/Foundation.h>
 
+
 NS_ASSUME_NONNULL_BEGIN
 
-@class VPManualBloodPressureModel;
+@class VPManualBloodPressureModel,VPManualBloodSugarModel,VPManualBloodOxygenModel,VPManualHeartRateModel,VPManualBodyTempModel,VPManualBloodCompModel, VPManualHealthGlanceModel;
+
+
 @interface VPManualTestDataModel : NSObject
 
 @property (nonatomic, copy) NSString *mac;
 
 @property (nonatomic, strong) NSArray<VPManualBloodPressureModel *> *bloodPressureArr;
+
+@property (nonatomic, strong) NSArray<VPManualBodyTempModel *> *bodyTempArr;
+
+@property (nonatomic, strong) NSArray<VPManualBloodCompModel *> *bloodCompArr;
+
+@property (nonatomic, strong) NSArray<VPManualHeartRateModel *> *heartRateArr;
+
+@property (nonatomic, strong) NSArray<VPManualBloodOxygenModel *> *bloodOxygenArr;
+
+@property (nonatomic, strong) NSArray<VPManualBloodSugarModel *> *bloodSugarArr;
+
+@property (nonatomic, strong) NSArray<VPManualHealthGlanceModel *> *healthGlanceArr;
 
 - (instancetype)initWithData:(NSData *)sourceData;
 

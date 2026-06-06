@@ -80,9 +80,33 @@ fun ModuleDefinitionBuilder.defineExercise(module: VeepooSDKModule) {
                 }
             },
             object : ISportModelOriginListener {
-                override fun onReadOriginProgress(progress: Float) {}
+                // Forwarded for the host progress bar + JS stall-watchdog
+                // re-arm (ADR-0015) — a slow transfer is not a dead one.
+                override fun onReadOriginProgress(progress: Float) {
+                    module.sendEvent(EXERCISE_READ_PROGRESS, mapOf(
+                        "deviceId" to (module.connectedDeviceId ?: ""),
+                        "progress" to mapOf(
+                            "phase" to "transfer",
+                            "readState" to "reading",
+                            "total" to 0,
+                            "current" to 0,
+                            "progress" to (progress * 100f).toInt()
+                        )
+                    ))
+                }
 
-                override fun onReadOriginProgressDetail(total: Int, date: String?, current: Int, sessionProgress: Int) {}
+                override fun onReadOriginProgressDetail(total: Int, date: String?, current: Int, sessionProgress: Int) {
+                    module.sendEvent(EXERCISE_READ_PROGRESS, mapOf(
+                        "deviceId" to (module.connectedDeviceId ?: ""),
+                        "progress" to mapOf(
+                            "phase" to "slots",
+                            "readState" to "reading",
+                            "total" to total,
+                            "current" to current,
+                            "progress" to sessionProgress
+                        )
+                    ))
+                }
 
                 override fun onHeadChangeListListener(head: SportModelOriginHeadData?) {
                     pendingHead = head
@@ -125,7 +149,10 @@ fun ModuleDefinitionBuilder.defineExercise(module: VeepooSDKModule) {
                 }
 
                 override fun onReadOriginComplete() {
-                    module.sendEvent(READ_ORIGIN_COMPLETE, mapOf(
+                    // Dedicated completion event (ADR-0015) — never reuse
+                    // READ_ORIGIN_COMPLETE; the vendor listener name is an
+                    // implementation detail, not our event surface.
+                    module.sendEvent(EXERCISE_READ_COMPLETE, mapOf(
                         "deviceId" to (module.connectedDeviceId ?: ""),
                         "success" to true
                     ))

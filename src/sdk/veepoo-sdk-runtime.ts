@@ -319,6 +319,8 @@ export class VeepooSDKRuntime {
           ...payload,
         });
       },
+      on: (event, listener) => this.on(event, listener),
+      off: (event, listener) => this.off(event, listener),
       connectedDeviceId: () => this.state.connectedDeviceId,
       setConnectedDeviceId: (id) => this.state.setConnectedDeviceId(id),
       isScanning: () => this.state.isScanning,

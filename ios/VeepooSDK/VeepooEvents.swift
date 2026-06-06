@@ -40,6 +40,8 @@ enum VeepooEvent {
   static let bloodAnalysisTestResult = "bloodAnalysisTestResult"
   static let gsrTestResult = "gsrTestResult"
   static let exerciseSessionData = "exerciseSessionData"
+  static let exerciseReadComplete = "exerciseReadComplete"
+  static let exerciseReadProgress = "exerciseReadProgress"
   static let accurateSleepData = "accurateSleepData"
   static let storedTemperatureData = "storedTemperatureData"
   static let storedBloodGlucoseData = "storedBloodGlucoseData"
@@ -92,6 +94,8 @@ let SPORT_MODE_DATA = VeepooEvent.sportModeData
 let BLOOD_ANALYSIS_TEST_RESULT = VeepooEvent.bloodAnalysisTestResult
 let GSR_TEST_RESULT = VeepooEvent.gsrTestResult
 let EXERCISE_SESSION_DATA = VeepooEvent.exerciseSessionData
+let EXERCISE_READ_COMPLETE = VeepooEvent.exerciseReadComplete
+let EXERCISE_READ_PROGRESS = VeepooEvent.exerciseReadProgress
 let ACCURATE_SLEEP_DATA = VeepooEvent.accurateSleepData
 let STORED_TEMPERATURE_DATA = VeepooEvent.storedTemperatureData
 let STORED_BLOOD_GLUCOSE_DATA = VeepooEvent.storedBloodGlucoseData

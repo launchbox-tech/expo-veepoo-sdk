@@ -34,6 +34,8 @@ export interface CapabilityContextSpies {
 }
 export type FakeCapabilityContext<TNative = MockNative> = CapabilityContext<TNative> & {
     spies: CapabilityContextSpies;
+    /** Deliver a payload to listeners registered via `ctx.on` (stream reads). */
+    fireEvent: <K extends VeepooEvent>(event: K, payload: VeepooEventPayload[K]) => void;
 };
 export interface FakeCapabilityContextOptions<TNative = MockNative> {
     native?: TNative;

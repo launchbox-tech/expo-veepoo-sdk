@@ -17,6 +17,7 @@ import { normalizeDeviceFunctions } from "@/capabilities/device-functions/normal
 import { normalizeDeviceVersion } from "@/capabilities/device-version";
 import { normalizeFirmwareDfuProgress } from "@/capabilities/dfu";
 import { normalizeFindDeviceStatePayload } from "@/capabilities/find-device";
+import { normalizeExerciseSessionInner } from "@/capabilities/historical-query";
 import { normalizeMusicRemoteCommand } from "@/capabilities/music";
 import {
   normalizeHalfHourData,
@@ -186,7 +187,21 @@ const EVENT_DEFINITIONS_CORE = {
     jsName: "exercise_session_data",
     nativeName: "exerciseSessionData",
     logScope: "device",
-    normalize: passthrough<"exercise_session_data">(),
+    // Sport `type` VALUE arrives camelCase from the native tables —
+    // deepSnakeKeys only rewrites keys (ADR 0013).
+    normalize: wrapInner("session", normalizeExerciseSessionInner),
+  }),
+  exercise_read_complete: defineEvent({
+    jsName: "exercise_read_complete",
+    nativeName: "exerciseReadComplete",
+    logScope: "read",
+    normalize: passthrough<"exercise_read_complete">(),
+  }),
+  exercise_read_progress: defineEvent({
+    jsName: "exercise_read_progress",
+    nativeName: "exerciseReadProgress",
+    logScope: "read",
+    normalize: passthrough<"exercise_read_progress">(),
   }),
   stored_temperature_data: defineEvent({
     jsName: "stored_temperature_data",

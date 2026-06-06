@@ -108,6 +108,7 @@ export type {
 export type {
   DailyHealthData,
   ExerciseMinuteData,
+  ExerciseReadProgress,
   ExerciseSession,
   StoredTemperatureData,
   StoredBloodGlucoseData,

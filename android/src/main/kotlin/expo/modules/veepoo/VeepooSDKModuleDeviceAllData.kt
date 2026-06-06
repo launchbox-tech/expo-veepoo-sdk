@@ -13,6 +13,13 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.ModuleDefinitionBuilder
 
 fun ModuleDefinitionBuilder.defineReadDeviceAllData(module: VeepooSDKModule) {
+  // iOS-only for now: Android's vendor protocol streams via listeners and has
+  // no equivalent local-DB table getters to dump (cross-platform rule:
+  // reject CAPABILITY_UNSUPPORTED when no vendor entry point exists).
+  AsyncFunction("readOriginRawDump") { _: Int, promise: Promise ->
+    promise.reject("CAPABILITY_UNSUPPORTED", "readOriginRawDump is iOS-only (no Android vendor DB getters)", null)
+  }
+
   AsyncFunction("readDeviceAllData") { promise: Promise ->
     if (!module.isInitialized || module.connectedDeviceId == null) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)

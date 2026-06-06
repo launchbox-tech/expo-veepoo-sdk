@@ -711,7 +711,8 @@ describe("device settings events", () => {
     expect(result).toMatchObject({
       device_id: "AA:BB",
       session: {
-        type: "outdoorRun",
+        // Sport type VALUE normalized to canonical snake_case SportMode.
+        type: "outdoor_run",
         begin_time: "2024-01-01 08:00:00",
         end_time: "2024-01-01 09:00:00",
         total_steps: 5000,

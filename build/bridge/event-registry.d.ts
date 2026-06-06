@@ -69,6 +69,8 @@ export declare const EVENT_DEFINITIONS: {
     blood_analysis_test_result: EventDef<"blood_analysis_test_result">;
     gsr_test_result: EventDef<"gsr_test_result">;
     exercise_session_data: EventDef<"exercise_session_data">;
+    exercise_read_complete: EventDef<"exercise_read_complete">;
+    exercise_read_progress: EventDef<"exercise_read_progress">;
     accurate_sleep_data: EventDef<"accurate_sleep_data">;
     stored_temperature_data: EventDef<"stored_temperature_data">;
     stored_blood_glucose_data: EventDef<"stored_blood_glucose_data">;

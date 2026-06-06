@@ -48,8 +48,13 @@
 #import "VPAutoMonitTestModel.h"
 #import "VPManualTestDataModel.h"
 #import "VPManualBloodPressureModel.h"
-
-#import "VPSyncPersonalInfo.h"
+#import "VPManualBodyTempModel.h"
+#import "VPManualBloodCompModel.h"
+#import "VPManualHeartRateModel.h"
+#import "VPManualBloodOxygenModel.h"
+#import "VPManualBloodSugarModel.h"
+#import "VPManualHealthGlanceModel.h"
+#import "VPSyncPersonalInfo.h" 
 
 //Delegate
 #import "VPECGMultiLeadBLEDelegate.h"
@@ -84,7 +89,10 @@
 
 #import "VPImageTransmissionModel.h"
 #import "VPFileHandleManager.h"
-
+#import "VPOpusHandle.h"
+#import "VPQH15SecurityProtectionInfo.h"
+#import "VPJE136PTCMModel.h"
+#import "VPQH15HealthDataModel.h"
 //! Project version number for VeepooBleSDK.
 FOUNDATION_EXPORT double VeepooBleSDKVersionNumber;
 

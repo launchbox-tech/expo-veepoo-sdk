@@ -58,6 +58,27 @@ A small number of events have **non-uniform envelopes** (e.g. `device_function` 
 
 _(Grill-with-docs #4 — Q1–Q6.)_
 
+## Stream reads
+
+**Stream read:** A vendor read operation whose result arrives as an **event
+stream** — one BLE command, N data events, then a completion signal — rather
+than a return value. Exercise history is the canonical case; the
+`stored_*_data` record family behind `startReadOriginData` has the same shape.
+
+**Completion event:** Every stream read family signals "done" with its **own**
+event (`exercise_read_complete` for exercise reads). A completion event is
+never shared between families — vendor callback naming does not leak into the
+event surface. (ADR 0015.)
+
+**Collector:** The supported API for a stream read is a **promise-returning
+capability method** (`readExerciseSessions()`) that owns subscription,
+completion, stall detection, and cleanup. Data reads return data; the raw
+command is not part of the JS surface. Collecting one stream is **bridge**
+concern; sequencing multiple modalities remains a **host-app** concern
+(ADR 0011 boundary).
+
+_(Grill-with-docs #6 — band workout sync.)_
+
 ## Harvest (example app)
 
 **Harvest:** A one-button operation in the **example app** that, within an active **Session**, gathers every data point the connected **Band** model supports. It probes **`readDeviceFunctions()`**, runs each *supported* controllable **realtime test** in sequence (the Band measures one at a time), passively captures **receive-only** test results that happen to arrive during the run, and reads all **historical** data and **device config**. A Harvest is a **demo / diagnostic** flow **owned by the example app**: the module exposes only the per-capability methods it composes — there is deliberately **no `runHarvest` in the SDK surface** (the order, timeouts, and per-model gating are host-app opinions, per "host app owns those flows").

@@ -25,7 +25,7 @@ export type { SleepDataItem, SleepData, SleepMinuteState, SleepMinutePoint, Accu
 export type { SportStepData } from '../capabilities/sport-steps';
 export type { DaySummaryData } from '../capabilities/day-summary';
 export type { OriginData, HalfHourData, Spo2OriginData, ReadState, ReadOriginProgress, } from '../capabilities/origin-data/types';
-export type { DailyHealthData, ExerciseMinuteData, ExerciseSession, StoredTemperatureData, StoredBloodGlucoseData, StoredHrvData, StoredEcgData, StoredBodyCompositionData, } from '../capabilities/historical-query';
+export type { DailyHealthData, ExerciseMinuteData, ExerciseReadProgress, ExerciseSession, StoredTemperatureData, StoredBloodGlucoseData, StoredHrvData, StoredEcgData, StoredBodyCompositionData, } from '../capabilities/historical-query';
 export type { AutoMeasureSetting } from '../capabilities/auto-measure';
 export type { Language } from '../capabilities/language';
 export type { SportMode, SportModeStatus } from '../capabilities/sport-mode/types';

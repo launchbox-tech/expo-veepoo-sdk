@@ -1,5 +1,5 @@
 {
-  "description": "Golden AsyncFunction surface — JS-side regression guard.",
+  "description": "Golden AsyncFunction surface \u2014 JS-side regression guard.",
   "names": [
     "addContact",
     "connect",
@@ -29,6 +29,7 @@
     "readHealthReminder",
     "readHeartRateAlarm",
     "readOriginData",
+    "readOriginRawDump",
     "readScreenLightDuration",
     "readScreenLightSettings",
     "readSedentaryReminder",

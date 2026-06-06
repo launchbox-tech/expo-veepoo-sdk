@@ -15,7 +15,7 @@ import type { SportMode } from '../capabilities/sport-mode/types';
 import type { AccurateSleepSession, SleepData } from '../capabilities/sleep-data/types';
 import type { SportStepData } from '../capabilities/sport-steps';
 import type { HalfHourData, OriginData, Spo2OriginData, ReadOriginProgress } from '../capabilities/origin-data/types';
-import type { ExerciseSession, StoredTemperatureData, StoredBloodGlucoseData, StoredHrvData, StoredEcgData, StoredBodyCompositionData } from '../capabilities/historical-query';
+import type { ExerciseReadProgress, ExerciseSession, StoredTemperatureData, StoredBloodGlucoseData, StoredHrvData, StoredEcgData, StoredBodyCompositionData } from '../capabilities/historical-query';
 import type { BloodGlucoseData, StressData, BloodAnalysisTestResult, BloodOxygenTestResult, GsrTestResult, PttTestResult, PttState, BloodPressureTestResult, BodyCompositionTestResult, BreathingTestResult, EcgTestResult, FatigueTestResult, HeartRateTestResult, HrvTestResult, TemperatureTestResult } from '../capabilities/realtime-tests/types';
 import type { VeepooError } from './errors';
 import type { BloodGlucoseUnit, SkinTone, TemperatureUnit } from './settings';
@@ -273,6 +273,19 @@ export type VeepooEventPayload = {
     exercise_session_data: {
         device_id: string;
         session: ExerciseSession;
+    };
+    /** Emitted once when the exercise-history read finishes (ADR 0015 — never
+     * signalled via `read_origin_complete`). `success: false` = vendor aborted
+     * (invalid state) — the collector rejects instead of resolving. */
+    exercise_read_complete: {
+        device_id: string;
+        success: boolean;
+    };
+    /** Streams during an exercise-history read — drives host progress bars and
+     * re-arms the collector's stall watchdog (a slow transfer is not a dead one). */
+    exercise_read_progress: {
+        device_id: string;
+        progress: ExerciseReadProgress;
     };
     /** Emitted per accurate sleep session (one per night). Gate: sleepType > 0 (iOS) / isSupportPreciseSleep (Android). */
     accurate_sleep_data: {

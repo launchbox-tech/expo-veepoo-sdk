@@ -29,6 +29,7 @@ import type {
   ReadOriginProgress,
 } from '@/capabilities/origin-data/types';
 import type {
+  ExerciseReadProgress,
   ExerciseSession,
   StoredTemperatureData,
   StoredBloodGlucoseData,
@@ -219,6 +220,13 @@ export type VeepooEventPayload = {
   gsr_test_result: { device_id: string; result: GsrTestResult };
   /** Emitted once per session as exercise history syncs from Band. */
   exercise_session_data: { device_id: string; session: ExerciseSession };
+  /** Emitted once when the exercise-history read finishes (ADR 0015 — never
+   * signalled via `read_origin_complete`). `success: false` = vendor aborted
+   * (invalid state) — the collector rejects instead of resolving. */
+  exercise_read_complete: { device_id: string; success: boolean };
+  /** Streams during an exercise-history read — drives host progress bars and
+   * re-arms the collector's stall watchdog (a slow transfer is not a dead one). */
+  exercise_read_progress: { device_id: string; progress: ExerciseReadProgress };
   /** Emitted per accurate sleep session (one per night). Gate: sleepType > 0 (iOS) / isSupportPreciseSleep (Android). */
   accurate_sleep_data: { device_id: string; date: string; data: AccurateSleepSession };
   /** Emitted per stored temperature record. Prerequisite: call startReadOriginData first. */

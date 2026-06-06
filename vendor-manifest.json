@@ -1,20 +1,50 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-05-02",
+  "updated": "2026-06-06",
   "description": "Authoritative list of vendored Veepoo/HBand binaries in this repo plus optional upstream Git pins for drift warnings (vendor:check). Does not replace release notes when bumping AARs/frameworks.",
   "android": {
     "libsRelativePath": "android/libs",
     "aarProjects": [
-      { "name": "abpartool", "aarFilePath": "android/libs/abpartool-release.aar" },
-      { "name": "bmpconvert", "aarFilePath": "android/libs/BmpConvert_V1.6.0_10604-release.aar" },
-      { "name": "jl-bt-ota", "aarFilePath": "android/libs/jl_bt_ota_V1.10.0_10931-release.aar" },
-      { "name": "jl-rcsp", "aarFilePath": "android/libs/jl_rcsp_V0.7.2_527-release.aar" },
-      { "name": "jl-watch", "aarFilePath": "android/libs/JL_Watch_V1.13.1_11214-release.aar" },
-      { "name": "libble", "aarFilePath": "android/libs/libble-0.5.aar" },
-      { "name": "libdfu", "aarFilePath": "android/libs/libdfu-1.5.aar" },
-      { "name": "libfastdfu", "aarFilePath": "android/libs/libfastdfu-0.5.aar" },
-      { "name": "vpbluetooth", "aarFilePath": "android/libs/vpbluetooth-1.18.aar" },
-      { "name": "vpprotocol", "aarFilePath": "android/libs/vpprotocol-2.3.37.15.aar" }
+      {
+        "name": "abpartool",
+        "aarFilePath": "android/libs/abpartool-release.aar"
+      },
+      {
+        "name": "bmpconvert",
+        "aarFilePath": "android/libs/BmpConvert_V1.6.0_10604-release.aar"
+      },
+      {
+        "name": "jl-bt-ota",
+        "aarFilePath": "android/libs/jl_bt_ota_V1.10.0_10931-release.aar"
+      },
+      {
+        "name": "jl-rcsp",
+        "aarFilePath": "android/libs/jl_rcsp_V0.7.2_527-release.aar"
+      },
+      {
+        "name": "jl-watch",
+        "aarFilePath": "android/libs/JL_Watch_V1.13.1_11214-release.aar"
+      },
+      {
+        "name": "libble",
+        "aarFilePath": "android/libs/libble-0.5.aar"
+      },
+      {
+        "name": "libdfu",
+        "aarFilePath": "android/libs/libdfu-1.5.aar"
+      },
+      {
+        "name": "libfastdfu",
+        "aarFilePath": "android/libs/libfastdfu-0.5.aar"
+      },
+      {
+        "name": "vpbluetooth",
+        "aarFilePath": "android/libs/vpbluetooth-1.18.aar"
+      },
+      {
+        "name": "vpprotocol",
+        "aarFilePath": "android/libs/vpprotocol-2.3.37.15.aar"
+      }
     ]
   },
   "ios": {
@@ -28,7 +58,13 @@
       "ABParTool",
       "ZipZap"
     ],
-    "dynamicEmbeddedFrameworks": ["ABParTool", "GRDFUSDK", "JLDialUnit", "ZipZap"]
+    "dynamicEmbeddedFrameworks": [
+      "ABParTool",
+      "GRDFUSDK",
+      "JLDialUnit",
+      "ZipZap"
+    ],
+    "veepooBleSdkVersion": "2.2.88.15"
   },
   "upstreamReference": {
     "androidBleSdk": {
@@ -41,7 +77,7 @@
       "gitUrl": "https://github.com/HBandSDK/iOS_Ble_SDK.git",
       "defaultBranch": "master",
       "wikiUrl": "https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document",
-      "lastReviewedHeadSha": "77c8a4b321d041574014e306a1283ab252d196ce"
+      "lastReviewedHeadSha": "cc8c0586037971fb1a43ff840fbd43dc10b69b35"
     }
   }
 }

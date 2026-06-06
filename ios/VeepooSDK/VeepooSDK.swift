@@ -219,6 +219,8 @@ public class VeepooSDKModule: Module {
       BLOOD_ANALYSIS_TEST_RESULT,
       GSR_TEST_RESULT,
       EXERCISE_SESSION_DATA,
+      EXERCISE_READ_COMPLETE,
+      EXERCISE_READ_PROGRESS,
       ACCURATE_SLEEP_DATA,
       STORED_TEMPERATURE_DATA,
       STORED_BLOOD_GLUCOSE_DATA,
@@ -256,6 +258,7 @@ public class VeepooSDKModule: Module {
     AsyncFunction("readSportStepData") { (date: String?, promise: Promise) in self.handleReadSportStepData(date: date, promise: promise) }
     AsyncFunction("readOriginData") { (dayOffset: Int, promise: Promise) in self.handleReadOriginData(dayOffset: dayOffset, promise: promise) }
     AsyncFunction("readDeviceAllData") { (promise: Promise) in self.handleReadDeviceAllData(promise: promise) }
+    AsyncFunction("readOriginRawDump") { (dayOffset: Int, promise: Promise) in self.handleReadOriginRawDump(dayOffset: dayOffset, promise: promise) }
     AsyncFunction("readDaySummaryData") { (dayOffset: Int, promise: Promise) in self.handleReadDaySummaryData(dayOffset: dayOffset, promise: promise) }
 
     // MARK: Auto measure

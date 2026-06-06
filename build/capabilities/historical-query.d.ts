@@ -15,7 +15,9 @@ export interface DailyHealthData {
 }
 export interface ExerciseMinuteData {
     heart_rate: number;
+    /** Kilometres (normalized at the native boundary — ADR 0016). */
     distance: number;
+    /** Kilocalories (normalized at the native boundary — ADR 0016). */
     calories: number;
     steps: number;
     sport_value: number;
@@ -72,14 +74,28 @@ export interface StoredBodyCompositionData {
     protein_amount: number;
     basal_metabolic_rate: number;
 }
+export interface ExerciseReadProgress {
+    /** `transfer` = band→SDK bulk transfer; `slots` = per-stored-session reads. */
+    phase: "transfer" | "slots";
+    read_state: "start" | "reading" | "complete" | "invalid";
+    /** Units for `current` — transfer times (iOS), sessions (slots). 0 = unknown. */
+    total: number;
+    current: number;
+    /** 0–100 within `current`. */
+    progress: number;
+}
 export interface ExerciseSession {
     /** Sport mode — null if ordinal is out of range or unknown. */
     type: SportMode | null;
+    /** Vendor slot CRC (sport-API reads) — slot↔session forensics. */
+    crc?: number;
     /** ISO-like timestamp string "YYYY-MM-DD HH:MM:SS" */
     begin_time: string;
     end_time: string;
     total_steps: number;
+    /** Kilometres (iOS DB stores metres; normalized natively — ADR 0016). */
     total_distance: number;
+    /** Kilocalories (iOS DB stores cal; normalized natively — ADR 0016). */
     total_calories: number;
     /** Total active time in seconds */
     total_time: number;
@@ -91,14 +107,65 @@ export interface ExerciseSession {
     pause_total_time: number;
     minute_data: ExerciseMinuteData[];
 }
+/**
+ * Native exercise payloads carry the sport name in the native tables'
+ * camelCase ("outdoorRun"); the JS surface is snake_case `SportMode`
+ * (ADR 0004/0013). `deepSnakeKeys` rewrites keys, never values — so the
+ * `type` VALUE is converted here, validated against the canonical ordinal
+ * list, and nulled when unknown (matching the declared `SportMode | null`).
+ */
+export declare function normalizeExerciseSessionInner(raw: unknown): unknown;
 export interface HistoricalQueryNativeMethods {
     readDeviceAllData(): Promise<boolean>;
     startReadOriginData(): Promise<void>;
+    startReadExerciseData(): Promise<void>;
+    readOriginRawDump(dayOffset: number): Promise<Record<string, unknown>>;
+    readAccurateSleepData(date: string | null): Promise<unknown>;
+    readStoredEcgData(date: string | null): Promise<unknown>;
+    readStoredHrvData(date: string | null): Promise<unknown>;
+    readStoredTemperatureData(date: string | null): Promise<unknown>;
+    readStoredBloodGlucoseData(date: string | null): Promise<unknown>;
+    readStoredBodyCompositionData(date: string | null): Promise<unknown>;
 }
 export declare class HistoricalQueryCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<HistoricalQueryNativeMethods>);
     readDeviceAllData(): Promise<boolean>;
     startReadOriginData(): Promise<void>;
+    /**
+     * Unfiltered per-day dump of the vendor SDK's local DB tables (iOS-only;
+     * Android rejects CAPABILITY_UNSUPPORTED). Raw vendor field names and
+     * units — the "get-everything" sink for host-side raw capture; promote
+     * modalities to typed storage after the real shapes are known.
+     */
+    readOriginRawDump(dayOffset: number): Promise<Record<string, unknown>>;
+    /** Precision-sleep sessions (gate: precise-sleep support). Raw vendor shape. */
+    readAccurateSleepData(date?: string): Promise<unknown>;
+    /** Stored offline ECG records. Raw vendor shape. */
+    readStoredEcgData(date?: string): Promise<unknown>;
+    /** Stored HRV records. Raw vendor shape. */
+    readStoredHrvData(date?: string): Promise<unknown>;
+    /** Stored temperature records. Raw vendor shape. */
+    readStoredTemperatureData(date?: string): Promise<unknown>;
+    /** Stored blood-glucose records. Raw vendor shape. */
+    readStoredBloodGlucoseData(date?: string): Promise<unknown>;
+    /** Stored body-composition records. Raw vendor shape. */
+    readStoredBodyCompositionData(date?: string): Promise<unknown>;
+    /**
+     * Stream-read collector (ADR 0015): fires the exercise-history read and
+     * resolves with every stored session once `exercise_read_complete` arrives.
+     * `exercise_read_progress` events re-arm the stall watchdog (slow ≠ dead)
+     * and stream to `onProgress` for host progress bars. Rejects
+     * `CAPABILITY_UNSUPPORTED` when the Band has no exercise history (distinct
+     * from a supported Band with zero stored workouts → `[]`),
+     * `OPERATION_FAILED` when the vendor aborts (`success: false`), and
+     * `TIMEOUT` after {@link EXERCISE_STALL_MS} of event silence.
+     */
+    readExerciseSessions(opts?: {
+        onProgress?: (progress: ExerciseReadProgress) => void;
+        /** Streams each session as it arrives — persist incrementally so a
+         * mid-read death keeps everything received so far. */
+        onSession?: (session: ExerciseSession) => void;
+    }): Promise<ExerciseSession[]>;
 }
 //# sourceMappingURL=historical-query.d.ts.map

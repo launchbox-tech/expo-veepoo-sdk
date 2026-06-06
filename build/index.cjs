@@ -544,6 +544,294 @@ var FindDeviceCapability = class {
 	}
 };
 //#endregion
+//#region src/capabilities/sport-mode/types.ts
+/** Ordinal→SportMode mapping (indices 1–127; index 0 = 'common' meaning no sport active). */
+const SPORT_MODE_ORDINALS = [
+	"common",
+	"outdoor_run",
+	"outdoor_walk",
+	"indoor_run",
+	"indoor_walk",
+	"hiking",
+	"stair_stepper",
+	"outdoor_cycle",
+	"stationary_bike",
+	"elliptical",
+	"rowing_machine",
+	"mountaineering",
+	"swimming",
+	"sit_ups",
+	"skiing",
+	"jump_rope",
+	"yoga",
+	"table_tennis",
+	"basketball",
+	"volleyball",
+	"football",
+	"badminton",
+	"tennis",
+	"climb_stairs",
+	"fitness",
+	"weightlifting",
+	"diving",
+	"boxing",
+	"gym_ball",
+	"squat_training",
+	"triathlon",
+	"dance",
+	"hiit",
+	"rock_climbing",
+	"sports",
+	"balls",
+	"fitness_game",
+	"free_time",
+	"aerobics",
+	"gymnastics",
+	"floor_exercise",
+	"horizontal_bar",
+	"parallel_bars",
+	"trampoline",
+	"track_and_field",
+	"marathon",
+	"push_ups",
+	"dumbbell",
+	"rugby",
+	"handball",
+	"baseball_softball",
+	"baseball",
+	"hockey",
+	"golf",
+	"bowling",
+	"billiards",
+	"rowing",
+	"sailboat",
+	"skating",
+	"curling",
+	"ice_puck",
+	"sled",
+	"strong_walk",
+	"treadmill",
+	"trail_running",
+	"race_walking",
+	"mountain_biking",
+	"bmx",
+	"orienteering",
+	"fishing",
+	"hunting",
+	"skateboard",
+	"roller_skating",
+	"parkour",
+	"atv",
+	"motocross",
+	"climbing_machine",
+	"spinning_bike",
+	"indoor_fitness",
+	"mixed_aerobic",
+	"cross_training",
+	"bodybuilding_exercise",
+	"group_gymnastics",
+	"kickboxing",
+	"strength_training",
+	"stepping_training",
+	"core_training",
+	"flexibility_training",
+	"free_training",
+	"pilates",
+	"battle_rope",
+	"square_dance",
+	"ballroom_dancing",
+	"belly_dance",
+	"ballet",
+	"hip_hop",
+	"zumba",
+	"latin_dance",
+	"jazz",
+	"hip_hop_dance",
+	"pole_dancing",
+	"break_dance",
+	"national_dance",
+	"modern_dance",
+	"disco",
+	"tap_dance",
+	"wrestling",
+	"martial_arts",
+	"tai_chi",
+	"muay_thai",
+	"judo",
+	"taekwondo",
+	"karate",
+	"free_sparring",
+	"swordsmanship",
+	"jujitsu",
+	"fencing",
+	"beach_soccer",
+	"beach_volleyball",
+	"softball",
+	"squash",
+	"croquet",
+	"cricket",
+	"polo",
+	"wallball",
+	"takraw_ball",
+	"dodgeball",
+	"water_polo"
+];
+//#endregion
+//#region src/capabilities/shared/collect-stream.ts
+/**
+* Stream-read collector (ADR 0015): one vendor command, N data events, a
+* dedicated completion event. Subscribes BEFORE firing the command (events
+* may start before the command promise settles), collects every data event,
+* resolves on completion, and guards with a stall watchdog — a command the
+* Band silently drops never completes, so `stallMs` of event silence rejects
+* with `TIMEOUT` instead of hanging the caller forever. Progress events
+* (when the read has them) re-arm the watchdog — a slow transfer streaming
+* progress is alive, not stalled. All listeners are removed on every exit
+* path.
+*/
+function collectStream(ctx, opts) {
+	const { start, dataEvent, pick, onItem, completeEvent, isFailure, progress, stallMs } = opts;
+	return new Promise((resolve, reject) => {
+		const items = [];
+		let stall = null;
+		let settled = false;
+		const settle = (outcome) => {
+			if (settled) return;
+			settled = true;
+			if (stall) clearTimeout(stall);
+			ctx.off(dataEvent, onData);
+			ctx.off(completeEvent, onComplete);
+			if (progress) ctx.off(progress.event, onProgress);
+			outcome();
+		};
+		const armStall = () => {
+			if (settled) return;
+			if (stall) clearTimeout(stall);
+			stall = setTimeout(() => settle(() => reject({
+				code: "TIMEOUT",
+				message: `${dataEvent} stream stalled (${stallMs}ms of silence)`
+			})), stallMs);
+		};
+		const onData = (payload) => {
+			armStall();
+			const item = pick(payload);
+			items.push(item);
+			onItem?.(item);
+		};
+		const onProgress = (payload) => {
+			armStall();
+			progress?.onProgress?.(payload);
+		};
+		const onComplete = (payload) => {
+			const failure = isFailure?.(payload) ?? null;
+			settle(() => failure === null ? resolve(items) : reject({
+				code: "OPERATION_FAILED",
+				message: failure
+			}));
+		};
+		ctx.on(dataEvent, onData);
+		ctx.on(completeEvent, onComplete);
+		if (progress) ctx.on(progress.event, onProgress);
+		armStall();
+		start().catch((err) => settle(() => reject(err)));
+	});
+}
+//#endregion
+//#region src/capabilities/historical-query.ts
+const SPORT_MODE_SET = new Set(SPORT_MODE_ORDINALS);
+/**
+* Native exercise payloads carry the sport name in the native tables'
+* camelCase ("outdoorRun"); the JS surface is snake_case `SportMode`
+* (ADR 0004/0013). `deepSnakeKeys` rewrites keys, never values — so the
+* `type` VALUE is converted here, validated against the canonical ordinal
+* list, and nulled when unknown (matching the declared `SportMode | null`).
+*/
+function normalizeExerciseSessionInner(raw) {
+	if (!isRecord(raw)) return raw;
+	const type = typeof raw.type === "string" ? raw.type.replace(/([A-Z])/g, "_$1").toLowerCase() : null;
+	return {
+		...raw,
+		type: type !== null && SPORT_MODE_SET.has(type) ? type : null
+	};
+}
+var HistoricalQueryCapability = class {
+	constructor(ctx) {
+		this.ctx = ctx;
+	}
+	readDeviceAllData() {
+		return this.ctx.invoke({ invoke: () => this.ctx.native.readDeviceAllData() });
+	}
+	startReadOriginData() {
+		this.ctx.log("info", "read", "read.origin.start", "Starting origin data read", {});
+		return this.ctx.invoke({ invoke: () => this.ctx.native.startReadOriginData() });
+	}
+	/**
+	* Unfiltered per-day dump of the vendor SDK's local DB tables (iOS-only;
+	* Android rejects CAPABILITY_UNSUPPORTED). Raw vendor field names and
+	* units — the "get-everything" sink for host-side raw capture; promote
+	* modalities to typed storage after the real shapes are known.
+	*/
+	readOriginRawDump(dayOffset) {
+		return this.ctx.invoke({ invoke: () => this.ctx.native.readOriginRawDump(dayOffset) });
+	}
+	/** Precision-sleep sessions (gate: precise-sleep support). Raw vendor shape. */
+	readAccurateSleepData(date) {
+		return this.ctx.invoke({ invoke: () => this.ctx.native.readAccurateSleepData(date ?? null) });
+	}
+	/** Stored offline ECG records. Raw vendor shape. */
+	readStoredEcgData(date) {
+		return this.ctx.invoke({ invoke: () => this.ctx.native.readStoredEcgData(date ?? null) });
+	}
+	/** Stored HRV records. Raw vendor shape. */
+	readStoredHrvData(date) {
+		return this.ctx.invoke({ invoke: () => this.ctx.native.readStoredHrvData(date ?? null) });
+	}
+	/** Stored temperature records. Raw vendor shape. */
+	readStoredTemperatureData(date) {
+		return this.ctx.invoke({ invoke: () => this.ctx.native.readStoredTemperatureData(date ?? null) });
+	}
+	/** Stored blood-glucose records. Raw vendor shape. */
+	readStoredBloodGlucoseData(date) {
+		return this.ctx.invoke({ invoke: () => this.ctx.native.readStoredBloodGlucoseData(date ?? null) });
+	}
+	/** Stored body-composition records. Raw vendor shape. */
+	readStoredBodyCompositionData(date) {
+		return this.ctx.invoke({ invoke: () => this.ctx.native.readStoredBodyCompositionData(date ?? null) });
+	}
+	/**
+	* Stream-read collector (ADR 0015): fires the exercise-history read and
+	* resolves with every stored session once `exercise_read_complete` arrives.
+	* `exercise_read_progress` events re-arm the stall watchdog (slow ≠ dead)
+	* and stream to `onProgress` for host progress bars. Rejects
+	* `CAPABILITY_UNSUPPORTED` when the Band has no exercise history (distinct
+	* from a supported Band with zero stored workouts → `[]`),
+	* `OPERATION_FAILED` when the vendor aborts (`success: false`), and
+	* `TIMEOUT` after {@link EXERCISE_STALL_MS} of event silence.
+	*/
+	readExerciseSessions(opts) {
+		this.ctx.log("info", "read", "read.exercise.start", "Starting exercise history read", {});
+		return collectStream(this.ctx, {
+			start: () => this.ctx.invoke({ invoke: () => this.ctx.native.startReadExerciseData() }),
+			dataEvent: "exercise_session_data",
+			pick: (payload) => payload.session,
+			onItem: opts?.onSession,
+			completeEvent: "exercise_read_complete",
+			isFailure: (payload) => payload.success ? null : "exercise read aborted by the Band (invalid state)",
+			progress: {
+				event: "exercise_read_progress",
+				onProgress: (payload) => {
+					opts?.onProgress?.(payload.progress);
+				}
+			},
+			stallMs: EXERCISE_STALL_MS
+		});
+	}
+};
+/** Max silence between exercise-stream events before the read is declared
+* dead. The vendor app budgets 60s for its whole `readSportModelOrigin` step;
+* per-event silence of 30s is far past any live transfer's inter-packet gap. */
+const EXERCISE_STALL_MS = 3e4;
+//#endregion
 //#region src/capabilities/music.ts
 /** Normalizes a music remote command string from native. */
 function normalizeMusicRemoteCommand(value) {
@@ -1460,6 +1748,18 @@ const EVENT_DEFINITIONS_CORE = {
 		jsName: "exercise_session_data",
 		nativeName: "exerciseSessionData",
 		logScope: "device",
+		normalize: wrapInner("session", normalizeExerciseSessionInner)
+	}),
+	exercise_read_complete: defineEvent({
+		jsName: "exercise_read_complete",
+		nativeName: "exerciseReadComplete",
+		logScope: "read",
+		normalize: passthrough()
+	}),
+	exercise_read_progress: defineEvent({
+		jsName: "exercise_read_progress",
+		nativeName: "exerciseReadProgress",
+		logScope: "read",
 		normalize: passthrough()
 	}),
 	stored_temperature_data: defineEvent({
@@ -2260,6 +2560,8 @@ var VeepooSDKRuntime = class {
 					...payload
 				});
 			},
+			on: (event, listener) => this.on(event, listener),
+			off: (event, listener) => this.off(event, listener),
 			connectedDeviceId: () => this.state.connectedDeviceId,
 			setConnectedDeviceId: (id) => this.state.setConnectedDeviceId(id),
 			isScanning: () => this.state.isScanning,
@@ -2800,20 +3102,6 @@ var GpsTimezoneCapability = class {
 	}
 };
 //#endregion
-//#region src/capabilities/historical-query.ts
-var HistoricalQueryCapability = class {
-	constructor(ctx) {
-		this.ctx = ctx;
-	}
-	readDeviceAllData() {
-		return this.ctx.invoke({ invoke: () => this.ctx.native.readDeviceAllData() });
-	}
-	startReadOriginData() {
-		this.ctx.log("info", "read", "read.origin.start", "Starting origin data read", {});
-		return this.ctx.invoke({ invoke: () => this.ctx.native.startReadOriginData() });
-	}
-};
-//#endregion
 //#region src/capabilities/language.ts
 var LanguageCapability = class {
 	constructor(ctx) {
@@ -3146,139 +3434,6 @@ var SleepDataCapability = class {
 		});
 	}
 };
-//#endregion
-//#region src/capabilities/sport-mode/types.ts
-/** Ordinal→SportMode mapping (indices 1–127; index 0 = 'common' meaning no sport active). */
-const SPORT_MODE_ORDINALS = [
-	"common",
-	"outdoor_run",
-	"outdoor_walk",
-	"indoor_run",
-	"indoor_walk",
-	"hiking",
-	"stair_stepper",
-	"outdoor_cycle",
-	"stationary_bike",
-	"elliptical",
-	"rowing_machine",
-	"mountaineering",
-	"swimming",
-	"sit_ups",
-	"skiing",
-	"jump_rope",
-	"yoga",
-	"table_tennis",
-	"basketball",
-	"volleyball",
-	"football",
-	"badminton",
-	"tennis",
-	"climb_stairs",
-	"fitness",
-	"weightlifting",
-	"diving",
-	"boxing",
-	"gym_ball",
-	"squat_training",
-	"triathlon",
-	"dance",
-	"hiit",
-	"rock_climbing",
-	"sports",
-	"balls",
-	"fitness_game",
-	"free_time",
-	"aerobics",
-	"gymnastics",
-	"floor_exercise",
-	"horizontal_bar",
-	"parallel_bars",
-	"trampoline",
-	"track_and_field",
-	"marathon",
-	"push_ups",
-	"dumbbell",
-	"rugby",
-	"handball",
-	"baseball_softball",
-	"baseball",
-	"hockey",
-	"golf",
-	"bowling",
-	"billiards",
-	"rowing",
-	"sailboat",
-	"skating",
-	"curling",
-	"ice_puck",
-	"sled",
-	"strong_walk",
-	"treadmill",
-	"trail_running",
-	"race_walking",
-	"mountain_biking",
-	"bmx",
-	"orienteering",
-	"fishing",
-	"hunting",
-	"skateboard",
-	"roller_skating",
-	"parkour",
-	"atv",
-	"motocross",
-	"climbing_machine",
-	"spinning_bike",
-	"indoor_fitness",
-	"mixed_aerobic",
-	"cross_training",
-	"bodybuilding_exercise",
-	"group_gymnastics",
-	"kickboxing",
-	"strength_training",
-	"stepping_training",
-	"core_training",
-	"flexibility_training",
-	"free_training",
-	"pilates",
-	"battle_rope",
-	"square_dance",
-	"ballroom_dancing",
-	"belly_dance",
-	"ballet",
-	"hip_hop",
-	"zumba",
-	"latin_dance",
-	"jazz",
-	"hip_hop_dance",
-	"pole_dancing",
-	"break_dance",
-	"national_dance",
-	"modern_dance",
-	"disco",
-	"tap_dance",
-	"wrestling",
-	"martial_arts",
-	"tai_chi",
-	"muay_thai",
-	"judo",
-	"taekwondo",
-	"karate",
-	"free_sparring",
-	"swordsmanship",
-	"jujitsu",
-	"fencing",
-	"beach_soccer",
-	"beach_volleyball",
-	"softball",
-	"squash",
-	"croquet",
-	"cricket",
-	"polo",
-	"wallball",
-	"takraw_ball",
-	"dodgeball",
-	"water_polo"
-];
 //#endregion
 //#region src/capabilities/sport-mode/normalizers.ts
 function normalizeSportModeStatus(value) {
