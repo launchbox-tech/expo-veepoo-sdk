@@ -6,10 +6,7 @@ import { defineConfig } from 'tsdown';
 const here = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  entry: [
-    'src/index.ts',
-    'src/bridge-contract/run-contract-checks.ts',
-  ],
+  entry: ['src/index.ts'],
   format: 'cjs',
   outDir: 'build',
   dts: false,

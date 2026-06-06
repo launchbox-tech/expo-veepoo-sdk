@@ -17,6 +17,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
+    "prepare": "npm run build",
     "prepublishOnly": "expo-module prepublishOnly",
     "build": "tsdown --config-loader unrun && tsc --declaration --emitDeclarationOnly && tsc --project tsconfig.tools.json && tsc-alias --project tsconfig.tools.json",
     "build:plugin": "tsc --project tsconfig.tools.json && tsc-alias --project tsconfig.tools.json",
@@ -47,7 +48,7 @@
   "packageManager": "bun@1.3.13",
   "type": "commonjs",
   "expo": {
-    "plugin": "./build/plugin/index.cjs"
+    "plugin": "./build/plugin/index.js"
   },
   "peerDependencies": {
     "expo": "*",

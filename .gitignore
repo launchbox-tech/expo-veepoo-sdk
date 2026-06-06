@@ -67,8 +67,6 @@ typings/
 .next
 
 # Expo Module
-build/*
-!build/plugin/
 dist/
 
 # Android
