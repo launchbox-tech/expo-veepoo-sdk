@@ -34,6 +34,7 @@ export type {
   BloodGlucoseData,
   SleepDataItem,
   SleepData,
+  AccurateSleepSession,
   DailyHealthData,
   ExerciseMinuteData,
   ExerciseReadProgress,
