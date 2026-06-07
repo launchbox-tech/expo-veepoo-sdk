@@ -4108,36 +4108,40 @@ var VeepooSDKStateStore = class {
 const VeepooSDKContext = (0, react.createContext)(null);
 //#endregion
 //#region src/react/veepoo-sdk-provider.tsx
+function applyLoggingConfig(sdk, config) {
+	if (config.logEnabled !== void 0) sdk.setLogEnabled(config.logEnabled);
+	if (config.logger !== void 0) sdk.setLogger(config.logger);
+}
 function VeepooSDKProvider({ children, logEnabled, logger }) {
-	const sdkRef = (0, react.useRef)(null);
-	const storeRef = (0, react.useRef)(null);
-	if (sdkRef.current === null) sdkRef.current = new VeepooSDK();
-	if (storeRef.current === null) storeRef.current = new VeepooSDKStateStore(sdkRef.current);
+	const [sdk] = (0, react.useState)(() => new VeepooSDK());
+	const [store] = (0, react.useState)(() => new VeepooSDKStateStore(sdk));
 	const [error, setError] = (0, react.useState)(null);
-	const loggingRef = (0, react.useRef)({});
+	(0, react.useLayoutEffect)(() => {
+		applyLoggingConfig(sdk, {
+			logEnabled,
+			logger
+		});
+	}, [
+		sdk,
+		logEnabled,
+		logger
+	]);
 	(0, react.useEffect)(() => {
-		const sdk = sdkRef.current;
-		const store = storeRef.current;
 		sdk.init().catch((e) => setError(e));
 		return () => {
 			store.destroy();
 			sdk.destroy();
 		};
-	}, []);
-	const sdk = sdkRef.current;
-	if (logEnabled !== void 0 && loggingRef.current.logEnabled !== logEnabled) {
-		sdk.setLogEnabled(logEnabled);
-		loggingRef.current.logEnabled = logEnabled;
-	}
-	if (logger !== void 0 && loggingRef.current.logger !== logger) {
-		sdk.setLogger(logger);
-		loggingRef.current.logger = logger;
-	}
+	}, [sdk, store]);
 	const value = (0, react.useMemo)(() => ({
-		sdk: sdkRef.current,
-		store: storeRef.current,
+		sdk,
+		store,
 		error
-	}), [error]);
+	}), [
+		sdk,
+		store,
+		error
+	]);
 	return /* @__PURE__ */ (0, react_jsx_runtime.jsx)(VeepooSDKContext.Provider, {
 		value,
 		children
