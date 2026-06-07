@@ -36,6 +36,10 @@ const styles = StyleSheet.create({
   buttonText: { fontSize: 13, fontWeight: "600", color: BLUE },
 });
 
+function currentDeviceTime(): Date {
+  return new Date();
+}
+
 export default function SystemConfigCard() {
   const { sdk } = useVeepooSDK();
   const [btInfo, setBtInfo] = useState("—");
@@ -95,7 +99,7 @@ export default function SystemConfigCard() {
         </Pressable>
         <Pressable style={styles.button} onPress={() => {
           setSysInfo("syncing time…");
-          void sdk.deviceTime.setDeviceTime(new Date())
+          void sdk.deviceTime.setDeviceTime(currentDeviceTime())
             .then(ok => setSysInfo(`setDeviceTime: ${ok}`))
             .catch((e: unknown) => setSysInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

@@ -64,13 +64,23 @@ export function useHarvest(): {
         setProgress(null);
       }
       setWearWarning(false);
+      const finishRun = () => {
+        setRunning(false);
+        abortRef.current = null;
+        setContact(null);
+        contactResolver.current = null;
+      };
+      const onProgress = (p: HarvestProgress) => {
+        setProgress(only ? { ...p, points: mergePoints(base, p.points) } : p);
+      };
+      let res: HarvestResult;
       try {
-        const res = await runHarvest(sdk, {
+        res = await runHarvest(sdk, {
           historyDays,
           deviceId,
           only,
           signal: controller.signal,
-          onProgress: p => setProgress(only ? { ...p, points: mergePoints(base, p.points) } : p),
+          onProgress,
           onWearWarning: () => setWearWarning(true),
           requestContact: (key, label) =>
             new Promise<boolean>(resolve => {
@@ -78,25 +88,24 @@ export function useHarvest(): {
               setContact({ key, label });
             }),
         });
-        if (only) {
-          const merged = mergePoints(base, res.points);
-          const startedAt = priorStartedAt ?? res.startedAt;
-          setResult({
-            ...res,
-            startedAt,
-            durationMs: res.endedAt - startedAt,
-            points: merged,
-            summary: summarizePoints(merged),
-          });
-        } else {
-          setResult(res);
-        }
-      } finally {
-        setRunning(false);
-        abortRef.current = null;
-        setContact(null);
-        contactResolver.current = null;
+      } catch (error) {
+        finishRun();
+        throw error;
       }
+      if (only) {
+        const merged = mergePoints(base, res.points);
+        const startedAt = priorStartedAt ?? res.startedAt;
+        setResult({
+          ...res,
+          startedAt,
+          durationMs: res.endedAt - startedAt,
+          points: merged,
+          summary: summarizePoints(merged),
+        });
+      } else {
+        setResult(res);
+      }
+      finishRun();
     },
     [sdk, isReady, running, historyDays, deviceId, result],
   );

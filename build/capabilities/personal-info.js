@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersonalInfoCapability = void 0;
-exports.validatePersonalInfo = validatePersonalInfo;
 const deep_keys_1 = require("../shared/deep-keys");
 const assertions_1 = require("../shared/assertions");
 // ── Validators ──────────────────────────────────────────────────────────────

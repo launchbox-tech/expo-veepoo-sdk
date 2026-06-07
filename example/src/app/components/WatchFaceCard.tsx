@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import { useVeepooSDK } from "expo-veepoo-sdk";
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
 export default function WatchFaceCard() {
   const { sdk } = useVeepooSDK();
   const [watchFaceInfo, setWatchFaceInfo] = useState("—");
-  const [lastStyle, setLastStyle] = useState<WatchFaceStyle | null>(null);
+  const lastStyleRef = useRef<WatchFaceStyle | null>(null);
 
   return (
     <View style={styles.card}>
@@ -60,7 +60,7 @@ export default function WatchFaceCard() {
           onPress={() => {
             void sdk
               .watchFace.readWatchFaceStyle()
-              .then(s => { setLastStyle(s); setWatchFaceInfo(JSON.stringify(s)); })
+              .then(s => { lastStyleRef.current = s; setWatchFaceInfo(JSON.stringify(s)); })
               .catch(() =>
                 setWatchFaceInfo("(unsupported or error — gate with screenStyleFunction)")
               );
@@ -76,6 +76,7 @@ export default function WatchFaceCard() {
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
+            const lastStyle = lastStyleRef.current;
             if (!lastStyle) { setWatchFaceInfo("read first"); return; }
             void sdk
               .watchFace.setWatchFaceStyle({ screen_index: lastStyle.screen_index, dial_type: lastStyle.dial_type })

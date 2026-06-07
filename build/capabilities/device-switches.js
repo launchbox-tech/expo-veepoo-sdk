@@ -1,8 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeviceSwitchesCapability = void 0;
-exports.normalizeDeviceSwitches = normalizeDeviceSwitches;
-exports.validateDeviceSwitchType = validateDeviceSwitchType;
 const primitives_1 = require("../shared/primitives");
 // ── Normalizers ─────────────────────────────────────────────────────────────
 const SWITCH_KEYS = [
@@ -11,6 +9,7 @@ const SWITCH_KEYS = [
     "sos_remind", "auto_answer", "exercise_detection", "accurate_sleep",
     "ecg_normally_open", "met", "stress", "music_control",
 ];
+const SWITCH_KEY_SET = new Set(SWITCH_KEYS);
 /** Camel-case variant → snake_case switch key mapping. */
 const CAMEL_TO_SWITCH = {
     autoHr: "auto_hr",
@@ -42,7 +41,7 @@ function normalizeDeviceSwitches(value) {
     const result = Object.fromEntries(SWITCH_KEYS.map((k) => [k, false]));
     for (const [rawKey, rawVal] of Object.entries(record)) {
         const snakeKey = (CAMEL_TO_SWITCH[rawKey] ?? rawKey);
-        if (SWITCH_KEYS.includes(snakeKey)) {
+        if (SWITCH_KEY_SET.has(snakeKey)) {
             result[snakeKey] = (0, primitives_1.toBoolean)(rawVal, false);
         }
     }

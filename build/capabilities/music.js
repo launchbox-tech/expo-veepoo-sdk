@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MusicCapability = void 0;
 exports.normalizeMusicRemoteCommand = normalizeMusicRemoteCommand;
-exports.validateMusicData = validateMusicData;
 const deep_keys_1 = require("../shared/deep-keys");
 // ── Normalizers ─────────────────────────────────────────────────────────────
 /** Normalizes a music remote command string from native. */

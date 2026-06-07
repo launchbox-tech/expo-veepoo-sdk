@@ -17,7 +17,6 @@ export interface GPSAndTimezoneData {
 export interface GpsTimezoneNativeMethods {
     setDeviceGPSAndTimezone(data: GPSAndTimezoneData): Promise<void>;
 }
-export declare function validateGPSAndTimezoneData(data: GPSAndTimezoneData): void;
 export declare class GpsTimezoneCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<GpsTimezoneNativeMethods>);

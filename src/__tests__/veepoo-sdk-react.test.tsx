@@ -5,7 +5,7 @@ jest.mock("react-native", () => ({
   Platform: { OS: "ios" },
 }));
 
-import React, { act } from "react";
+import React, { act, useLayoutEffect } from "react";
 import { create } from "react-test-renderer";
 import { VeepooSDKProvider } from "@/react/veepoo-sdk-provider";
 import { useVeepooSDK } from "@/react/useVeepooSDK";
@@ -21,9 +21,12 @@ function renderInProvider<T>(
   useHook: () => T,
   providerProps: Omit<React.ComponentProps<typeof VeepooSDKProvider>, "children"> = {},
 ): HookResult<T> {
-  const result: HookResult<T> = { current: undefined as T };
+  const resultRef = { current: undefined as T | undefined };
   function Inner() {
-    result.current = useHook();
+    const value = useHook();
+    useLayoutEffect(() => {
+      resultRef.current = value;
+    }, [value]);
     return null;
   }
   act(() => {
@@ -31,7 +34,8 @@ function renderInProvider<T>(
       React.createElement(VeepooSDKProvider, providerProps, React.createElement(Inner)),
     );
   });
-  return result;
+  act(() => {});
+  return { current: resultRef.current as T };
 }
 
 // ── VeepooSDKProvider ─────────────────────────────────────────────────────────
@@ -106,13 +110,17 @@ describe("useSDKState", () => {
     native.init = jest.fn().mockResolvedValue(undefined);
     void new VeepooSDK(native);
 
-    // Inject the SDK via a test-only Provider subclass
-    const renderCount = { n: 0 };
-    let capturedIsConnected = false;
+    const snapshotRef = {
+      renderCount: 0,
+      capturedIsConnected: false,
+    };
 
     function Inner() {
-      capturedIsConnected = useSDKState((s) => s.isConnected);
-      renderCount.n++;
+      const isConnected = useSDKState((s) => s.isConnected);
+      useLayoutEffect(() => {
+        snapshotRef.capturedIsConnected = isConnected;
+        snapshotRef.renderCount += 1;
+      }, [isConnected]);
       return null;
     }
 
@@ -121,12 +129,13 @@ describe("useSDKState", () => {
         React.createElement(VeepooSDKProvider, {}, React.createElement(Inner)),
       );
     });
+    act(() => {});
 
-    const initialRenders = renderCount.n;
-    expect(capturedIsConnected).toBe(false);
+    const initialRenders = snapshotRef.renderCount;
+    expect(snapshotRef.capturedIsConnected).toBe(false);
 
     // Simulate connection event — this requires the provider's internal SDK to receive it
     // We can verify the hook responds to state changes by checking it doesn't re-render spuriously
-    expect(renderCount.n).toBe(initialRenders);
+    expect(snapshotRef.renderCount).toBe(initialRenders);
   });
 });

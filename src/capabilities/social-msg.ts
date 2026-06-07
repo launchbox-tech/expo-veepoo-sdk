@@ -64,7 +64,7 @@ const VALID_FUNCTION_STATUSES = new Set<FunctionStatus>([
   "unknown",
 ]);
 
-export function validateSocialMsgData(data: Partial<SocialMsgData>): void {
+function validateSocialMsgData(data: Partial<SocialMsgData>): void {
   const keys = Object.keys(data);
   if (keys.length === 0) {
     throw { code: "INVALID_ARGUMENT", message: "data must contain at least one channel" } satisfies VeepooError;

@@ -9,7 +9,10 @@ export function useSDKEvent<K extends VeepooEvent>(
 ): void {
   const { sdk } = useVeepooSDK();
   const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+
+  useEffect(() => {
+    handlerRef.current = handler;
+  }, [handler]);
 
   useEffect(() => {
     if (!active) return;

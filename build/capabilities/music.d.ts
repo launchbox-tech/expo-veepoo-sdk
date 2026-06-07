@@ -18,7 +18,6 @@ export interface MusicNativeMethods {
 }
 /** Normalizes a music remote command string from native. */
 export declare function normalizeMusicRemoteCommand(value: unknown): MusicRemoteCommand;
-export declare function validateMusicData(data: MusicData): void;
 export declare class MusicCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<MusicNativeMethods>);

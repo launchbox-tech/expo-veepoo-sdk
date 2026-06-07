@@ -1,4 +1,5 @@
-import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, Text } from "react-native";
+import { ActivityIndicator, StatusBar, StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { BLUE } from "../../components/theme";
 
 const styles = StyleSheet.create({

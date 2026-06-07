@@ -11,9 +11,6 @@ export interface CalibrationNativeMethods {
     calibrateBloodGlucose(value: number): Promise<OperationStatus>;
     setBloodGlucoseRiskLevel(low: number, high: number, unit: string): Promise<OperationStatus>;
 }
-export declare function validateBloodPressureCalibration(systolic: number, diastolic: number): void;
-export declare function validateBloodGlucoseCalibration(value: number): void;
-export declare function validateBloodGlucoseRiskLevel(config: BloodGlucoseRiskConfig): void;
 export declare class CalibrationCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<CalibrationNativeMethods>);

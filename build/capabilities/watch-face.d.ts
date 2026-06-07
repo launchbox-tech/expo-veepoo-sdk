@@ -21,12 +21,6 @@ export interface WatchFaceNativeMethods {
     setWatchFaceStyle(settings: WatchFaceStyleSettings): Promise<void>;
 }
 export declare function normalizeWatchFaceStyle(value: unknown): WatchFaceStyle;
-/** Optional filter for read; native may still return a unified snapshot (Android). */
-export declare function validateReadWatchFaceStyleOptions(options?: {
-    dial_type?: WatchFaceDialType;
-}): void;
-/** Vendor slot index; cap loosely — some Bands expose large enumerations. */
-export declare function validateWatchFaceStyleSettings(s: WatchFaceStyleSettings): void;
 export declare class WatchFaceCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<WatchFaceNativeMethods>);

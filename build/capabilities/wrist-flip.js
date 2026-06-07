@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WristFlipCapability = void 0;
 exports.normalizeWristFlipWakeSettings = normalizeWristFlipWakeSettings;
-exports.validateWristFlipWakeSettings = validateWristFlipWakeSettings;
 const deep_keys_1 = require("../shared/deep-keys");
 const assertions_1 = require("../shared/assertions");
 const primitives_1 = require("../shared/primitives");

@@ -44,10 +44,11 @@ function normalizeOriginItem(value: Record<string, unknown>): OriginData {
 
 export function normalizeOriginDataList(value: unknown): OriginData[] {
   if (!Array.isArray(value)) return [];
-  return value
-    .filter(isRecord)
-    .map((item) => normalizeOriginItem(item))
-    .sort((a, b) => a.time.localeCompare(b.time));
+  const normalized: OriginData[] = [];
+  for (const item of value) {
+    if (isRecord(item)) normalized.push(normalizeOriginItem(item));
+  }
+  return normalized.sort((a, b) => a.time.localeCompare(b.time));
 }
 
 export function normalizeHalfHourData(value: unknown): HalfHourData {

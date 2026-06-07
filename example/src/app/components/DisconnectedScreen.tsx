@@ -1,5 +1,6 @@
 import type { VeepooDevice } from "expo-veepoo-sdk";
-import { Pressable, SafeAreaView, StatusBar, StyleSheet, Text } from "react-native";
+import { Pressable, StatusBar, StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { BLUE, RED } from "../../components/theme";
 
 const styles = StyleSheet.create({

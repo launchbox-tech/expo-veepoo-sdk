@@ -16,8 +16,6 @@ export interface AutoMeasureNativeMethods {
     readAutoMeasureSetting(): Promise<unknown>;
     modifyAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): Promise<unknown>;
 }
-export declare function normalizeAutoMeasureSettings(value: unknown): AutoMeasureSetting[];
-export declare function validateAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): void;
 export declare class AutoMeasureCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<AutoMeasureNativeMethods>);

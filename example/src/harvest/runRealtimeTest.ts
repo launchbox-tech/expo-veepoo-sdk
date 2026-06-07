@@ -139,15 +139,18 @@ export async function runRealtimeTest(
   let outcome = reduce(result);
   rtLog(`initial outcome for ${m.key}: ${outcome}`);
 
-  for (let i = 0; i < busyRetries && outcome === 'busy'; i++) {
+  const retryIfBusy = async (retryIndex: number): Promise<void> => {
+    if (retryIndex >= busyRetries || outcome !== 'busy') return;
     totalAttempts++;
-    rtLog(`device_busy for ${m.key} — waiting ${busyBackoffMs}ms then retry ${i + 1}/${busyRetries}`);
+    rtLog(`device_busy for ${m.key} — waiting ${busyBackoffMs}ms then retry ${retryIndex + 1}/${busyRetries}`);
     await delay(busyBackoffMs);
-    result = await attempt(sdk, m, timeoutMs, opts.onUpdate, i + 1);
+    result = await attempt(sdk, m, timeoutMs, opts.onUpdate, retryIndex + 1);
     allEvents.push(...result.allPayloads);
     outcome = reduce(result);
-    rtLog(`retry ${i + 1} outcome for ${m.key}: ${outcome}`);
-  }
+    rtLog(`retry ${retryIndex + 1} outcome for ${m.key}: ${outcome}`);
+    await retryIfBusy(retryIndex + 1);
+  };
+  await retryIfBusy(0);
 
   const measured = outcome === 'measured';
   const point: HarvestPoint = {

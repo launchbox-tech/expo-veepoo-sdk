@@ -24,10 +24,11 @@ export function extractNativeRejectCodes(repoRoot: string): Set<string> {
   walkFiles(join(repoRoot, "ios/VeepooSDK"), ".swift", files);
 
   const codes = new Set<string>();
+  const re = new RegExp(REJECT_FIRST_ARG.source, "g");
   for (const file of files) {
     const src = readFileSync(file, "utf8");
     let m: RegExpExecArray | null;
-    const re = new RegExp(REJECT_FIRST_ARG.source, "g");
+    re.lastIndex = 0;
     while ((m = re.exec(src)) !== null) {
       const code = m[1];
       if (code) codes.add(code);

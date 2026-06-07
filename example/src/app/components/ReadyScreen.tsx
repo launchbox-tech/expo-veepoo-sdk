@@ -3,46 +3,40 @@ import type {
   DeviceVersion,
   VeepooDevice,
 } from "expo-veepoo-sdk";
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-} from "react-native";
-import {
-  ReadyHeader,
-  DeviceInfoCard,
-  HarvestCard,
-  CapabilityExplorer,
-  FindBandCard,
-  WatchFaceCard,
-  ScreenLightCard,
-  SedentaryCard,
-  WristFlipCard,
-  WomenHealthCard,
-  CameraMusicCard,
-  GpsAgpsCard,
-  BandBluetoothCard,
-  FirmwareDfuCard,
-  AlarmsCard,
-  ContactsCard,
-  AutoMeasureCard,
-  SystemConfigCard,
-  WeatherCard,
-  SocialMsgCard,
-  HistoricalQueryCard,
-  PersonalInfoSync,
-  HealthTestsSection,
-  VitalsLabSection,
-  EventLogCard,
-  HistoricalDataSection,
-  DisconnectButton,
-  SportModeCard,
-  DeviceSwitchesCard,
-  CalibrationCard,
-  WorldClockCard,
-  SessionUtilitiesCard,
-} from "../../components";
+import { ScrollView, StatusBar, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AlarmsCard from "./AlarmsCard";
+import AutoMeasureCard from "./AutoMeasureCard";
+import BandBluetoothCard from "./BandBluetoothCard";
+import CalibrationCard from "./CalibrationCard";
+import CameraMusicCard from "./CameraMusicCard";
+import CapabilityExplorer from "./CapabilityExplorer";
+import ContactsCard from "./ContactsCard";
+import DeviceInfoCard from "./DeviceInfoCard";
+import DeviceSwitchesCard from "./DeviceSwitchesCard";
+import DisconnectButton from "./DisconnectButton";
+import EventLogCard from "./EventLogCard";
+import FindBandCard from "./FindBandCard";
+import FirmwareDfuCard from "./FirmwareDfuCard";
+import GpsAgpsCard from "./GpsAgpsCard";
+import HarvestCard from "./HarvestCard";
+import HealthTestsSection from "./HealthTestsSection";
+import HistoricalDataSection from "./HistoricalDataSection";
+import HistoricalQueryCard from "./HistoricalQueryCard";
+import PersonalInfoSync from "./PersonalInfoSync";
+import ReadyHeader from "./ReadyHeader";
+import ScreenLightCard from "./ScreenLightCard";
+import SedentaryCard from "./SedentaryCard";
+import SessionUtilitiesCard from "./SessionUtilitiesCard";
+import SocialMsgCard from "./SocialMsgCard";
+import SportModeCard from "./SportModeCard";
+import SystemConfigCard from "./SystemConfigCard";
+import VitalsLabSection from "./VitalsLabSection";
+import WatchFaceCard from "./WatchFaceCard";
+import WeatherCard from "./WeatherCard";
+import WomenHealthCard from "./WomenHealthCard";
+import WorldClockCard from "./WorldClockCard";
+import WristFlipCard from "./WristFlipCard";
 import { useHealthTests } from "../../hooks/useHealthTests";
 import { useDataSync } from "../../hooks/useDataSync";
 import { usePassiveEvents } from "../../hooks/usePassiveEvents";

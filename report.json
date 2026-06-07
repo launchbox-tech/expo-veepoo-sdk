@@ -1,0 +1,1701 @@
+{
+  "generatedAt": "2026-06-07T12:09:34.248Z",
+  "totals": {
+    "filesScanned": 252,
+    "filesWithResults": 55,
+    "compiledFiles": 55,
+    "failedFiles": 0,
+    "successCount": 59,
+    "failedCount": 0
+  },
+  "files": [
+    {
+      "path": "src/react/useSDKState.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 6,
+              "column": 7,
+              "index": 206
+            },
+            "end": {
+              "line": 18,
+              "column": 1,
+              "index": 625
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/react/useSDKState.ts"
+          },
+          "fnName": "useSDKState",
+          "memoSlots": 3,
+          "memoBlocks": 1,
+          "memoValues": 1,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/react/useSDKState.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "src/react/useVeepooSDK.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 5,
+              "column": 7,
+              "index": 147
+            },
+            "end": {
+              "line": 15,
+              "column": 1,
+              "index": 552
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/react/useVeepooSDK.ts"
+          },
+          "fnName": "useVeepooSDK",
+          "memoSlots": 4,
+          "memoBlocks": 1,
+          "memoValues": 1,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/react/useVeepooSDK.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "src/react/veepoo-sdk-provider.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 25,
+              "column": 7,
+              "index": 699
+            },
+            "end": {
+              "line": 47,
+              "column": 1,
+              "index": 1529
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/react/veepoo-sdk-provider.tsx"
+          },
+          "fnName": "VeepooSDKProvider",
+          "memoSlots": 18,
+          "memoBlocks": 5,
+          "memoValues": 7,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/react/veepoo-sdk-provider.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "src/__tests__/veepoo-sdk-react.test.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 25,
+              "column": 2,
+              "index": 874
+            },
+            "end": {
+              "line": 31,
+              "column": 3,
+              "index": 1020
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/__tests__/veepoo-sdk-react.test.tsx"
+          },
+          "fnName": "Inner",
+          "memoSlots": 3,
+          "memoBlocks": 1,
+          "memoValues": 2,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/__tests__/veepoo-sdk-react.test.tsx"
+        },
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 76,
+              "column": 4,
+              "index": 2227
+            },
+            "end": {
+              "line": 79,
+              "column": 5,
+              "index": 2294
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/__tests__/veepoo-sdk-react.test.tsx"
+          },
+          "fnName": "Outside",
+          "memoSlots": 0,
+          "memoBlocks": 0,
+          "memoValues": 0,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/__tests__/veepoo-sdk-react.test.tsx"
+        },
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 97,
+              "column": 4,
+              "index": 2804
+            },
+            "end": {
+              "line": 100,
+              "column": 5,
+              "index": 2890
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/__tests__/veepoo-sdk-react.test.tsx"
+          },
+          "fnName": "Outside",
+          "memoSlots": 0,
+          "memoBlocks": 0,
+          "memoValues": 0,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/__tests__/veepoo-sdk-react.test.tsx"
+        },
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 118,
+              "column": 4,
+              "index": 3315
+            },
+            "end": {
+              "line": 125,
+              "column": 5,
+              "index": 3567
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/__tests__/veepoo-sdk-react.test.tsx"
+          },
+          "fnName": "Inner",
+          "memoSlots": 3,
+          "memoBlocks": 1,
+          "memoValues": 2,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/src/__tests__/veepoo-sdk-react.test.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/useAppState.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 18,
+              "column": 7,
+              "index": 528
+            },
+            "end": {
+              "line": 57,
+              "column": 1,
+              "index": 1696
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useAppState.ts"
+          },
+          "fnName": "useAppState",
+          "memoSlots": 7,
+          "memoBlocks": 3,
+          "memoValues": 4,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useAppState.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/useBandScan.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 7,
+              "column": 7,
+              "index": 235
+            },
+            "end": {
+              "line": 41,
+              "column": 1,
+              "index": 1035
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useBandScan.ts"
+          },
+          "fnName": "useBandScan",
+          "memoSlots": 10,
+          "memoBlocks": 5,
+          "memoValues": 5,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useBandScan.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/useBandSession.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 16,
+              "column": 7,
+              "index": 413
+            },
+            "end": {
+              "line": 131,
+              "column": 1,
+              "index": 3536
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useBandSession.ts"
+          },
+          "fnName": "useBandSession",
+          "memoSlots": 25,
+          "memoBlocks": 8,
+          "memoValues": 8,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useBandSession.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/useDataSync.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 6,
+              "column": 7,
+              "index": 233
+            },
+            "end": {
+              "line": 34,
+              "column": 1,
+              "index": 1447
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useDataSync.ts"
+          },
+          "fnName": "useDataSync",
+          "memoSlots": 12,
+          "memoBlocks": 6,
+          "memoValues": 6,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useDataSync.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/useHarvest.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 17,
+              "column": 7,
+              "index": 606
+            },
+            "end": {
+              "line": 150,
+              "column": 1,
+              "index": 4655
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useHarvest.ts"
+          },
+          "fnName": "useHarvest",
+          "memoSlots": 31,
+          "memoBlocks": 8,
+          "memoValues": 8,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useHarvest.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/useHealthTests.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 63,
+              "column": 7,
+              "index": 1533
+            },
+            "end": {
+              "line": 501,
+              "column": 1,
+              "index": 14311
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useHealthTests.ts"
+          },
+          "fnName": "useHealthTests",
+          "memoSlots": 98,
+          "memoBlocks": 39,
+          "memoValues": 39,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useHealthTests.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/usePassiveEvents.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 17,
+              "column": 7,
+              "index": 458
+            },
+            "end": {
+              "line": 51,
+              "column": 1,
+              "index": 2727
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/usePassiveEvents.ts"
+          },
+          "fnName": "usePassiveEvents",
+          "memoSlots": 52,
+          "memoBlocks": 26,
+          "memoValues": 26,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/usePassiveEvents.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/useSDKEvent.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 5,
+              "column": 7,
+              "index": 171
+            },
+            "end": {
+              "line": 25,
+              "column": 1,
+              "index": 695
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useSDKEvent.ts"
+          },
+          "fnName": "useSDKEvent",
+          "memoSlots": 8,
+          "memoBlocks": 2,
+          "memoValues": 4,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useSDKEvent.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/hooks/useSDKInit.ts",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 5,
+              "column": 7,
+              "index": 172
+            },
+            "end": {
+              "line": 20,
+              "column": 1,
+              "index": 696
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useSDKInit.ts"
+          },
+          "fnName": "useSDKInit",
+          "memoSlots": 6,
+          "memoBlocks": 2,
+          "memoValues": 3,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/hooks/useSDKInit.ts"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/components/DeviceRow.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 5,
+              "column": 7,
+              "index": 159
+            },
+            "end": {
+              "line": 32,
+              "column": 1,
+              "index": 947
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/components/DeviceRow.tsx"
+          },
+          "fnName": "DeviceRow",
+          "memoSlots": 15,
+          "memoBlocks": 6,
+          "memoValues": 6,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/components/DeviceRow.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/components/HealthTestCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 5,
+              "column": 7,
+              "index": 151
+            },
+            "end": {
+              "line": 78,
+              "column": 1,
+              "index": 2167
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/components/HealthTestCard.tsx"
+          },
+          "fnName": "HealthTestCard",
+          "memoSlots": 25,
+          "memoBlocks": 7,
+          "memoValues": 7,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/components/HealthTestCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/components/InfoRow.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 3,
+              "column": 7,
+              "index": 63
+            },
+            "end": {
+              "line": 10,
+              "column": 1,
+              "index": 301
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/components/InfoRow.tsx"
+          },
+          "fnName": "InfoRow",
+          "memoSlots": 7,
+          "memoBlocks": 3,
+          "memoValues": 3,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/components/InfoRow.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/_layout.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 5,
+              "column": 15,
+              "index": 173
+            },
+            "end": {
+              "line": 13,
+              "column": 1,
+              "index": 371
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/_layout.tsx"
+          },
+          "fnName": "RootLayout",
+          "memoSlots": 1,
+          "memoBlocks": 1,
+          "memoValues": 1,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/_layout.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/index.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 12,
+              "column": 15,
+              "index": 578
+            },
+            "end": {
+              "line": 63,
+              "column": 1,
+              "index": 1834
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/index.tsx"
+          },
+          "fnName": "Index",
+          "memoSlots": 20,
+          "memoBlocks": 5,
+          "memoValues": 5,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/index.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/AlarmsCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 39,
+              "column": 15,
+              "index": 974
+            },
+            "end": {
+              "line": 127,
+              "column": 1,
+              "index": 5083
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/AlarmsCard.tsx"
+          },
+          "fnName": "AlarmsCard",
+          "memoSlots": 62,
+          "memoBlocks": 32,
+          "memoValues": 32,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/AlarmsCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/AutoMeasureCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 37,
+              "column": 15,
+              "index": 883
+            },
+            "end": {
+              "line": 65,
+              "column": 1,
+              "index": 2056
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/AutoMeasureCard.tsx"
+          },
+          "fnName": "AutoMeasureCard",
+          "memoSlots": 19,
+          "memoBlocks": 10,
+          "memoValues": 10,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/AutoMeasureCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/BandBluetoothCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1000
+            },
+            "end": {
+              "line": 94,
+              "column": 1,
+              "index": 2720
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/BandBluetoothCard.tsx"
+          },
+          "fnName": "BandBluetoothCard",
+          "memoSlots": 25,
+          "memoBlocks": 13,
+          "memoValues": 13,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/BandBluetoothCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/CalibrationCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 38,
+              "column": 15,
+              "index": 919
+            },
+            "end": {
+              "line": 78,
+              "column": 1,
+              "index": 2808
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/CalibrationCard.tsx"
+          },
+          "fnName": "CalibrationCard",
+          "memoSlots": 28,
+          "memoBlocks": 14,
+          "memoValues": 14,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/CalibrationCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/CameraMusicCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1075
+            },
+            "end": {
+              "line": 134,
+              "column": 1,
+              "index": 4127
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/CameraMusicCard.tsx"
+          },
+          "fnName": "CameraMusicCard",
+          "memoSlots": 38,
+          "memoBlocks": 18,
+          "memoValues": 18,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/CameraMusicCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/CapabilityExplorer.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 11,
+              "column": 15,
+              "index": 416
+            },
+            "end": {
+              "line": 30,
+              "column": 1,
+              "index": 1161
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/CapabilityExplorer.tsx"
+          },
+          "fnName": "CapabilityExplorer",
+          "memoSlots": 15,
+          "memoBlocks": 7,
+          "memoValues": 7,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/CapabilityExplorer.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/ConnectingScreen.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 18,
+              "column": 15,
+              "index": 523
+            },
+            "end": {
+              "line": 32,
+              "column": 1,
+              "index": 936
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ConnectingScreen.tsx"
+          },
+          "fnName": "ConnectingScreen",
+          "memoSlots": 4,
+          "memoBlocks": 2,
+          "memoValues": 3,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ConnectingScreen.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/ContactsCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 39,
+              "column": 15,
+              "index": 974
+            },
+            "end": {
+              "line": 111,
+              "column": 1,
+              "index": 4240
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ContactsCard.tsx"
+          },
+          "fnName": "ContactsCard",
+          "memoSlots": 50,
+          "memoBlocks": 26,
+          "memoValues": 26,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ContactsCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/DeviceInfoCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 25,
+              "column": 15,
+              "index": 584
+            },
+            "end": {
+              "line": 57,
+              "column": 1,
+              "index": 1382
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/DeviceInfoCard.tsx"
+          },
+          "fnName": "DeviceInfoCard",
+          "memoSlots": 8,
+          "memoBlocks": 4,
+          "memoValues": 4,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/DeviceInfoCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/DeviceSwitchesCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 47,
+              "column": 15,
+              "index": 1189
+            },
+            "end": {
+              "line": 90,
+              "column": 1,
+              "index": 3115
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/DeviceSwitchesCard.tsx"
+          },
+          "fnName": "DeviceSwitchesCard",
+          "memoSlots": 26,
+          "memoBlocks": 14,
+          "memoValues": 14,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/DeviceSwitchesCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/DisconnectButton.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 20,
+              "column": 15,
+              "index": 474
+            },
+            "end": {
+              "line": 35,
+              "column": 1,
+              "index": 853
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/DisconnectButton.tsx"
+          },
+          "fnName": "DisconnectButton",
+          "memoSlots": 3,
+          "memoBlocks": 2,
+          "memoValues": 2,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/DisconnectButton.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/DisconnectedScreen.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 31,
+              "column": 15,
+              "index": 915
+            },
+            "end": {
+              "line": 67,
+              "column": 1,
+              "index": 1983
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/DisconnectedScreen.tsx"
+          },
+          "fnName": "DisconnectedScreen",
+          "memoSlots": 14,
+          "memoBlocks": 6,
+          "memoValues": 6,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/DisconnectedScreen.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/EventLogCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 38,
+              "column": 15,
+              "index": 916
+            },
+            "end": {
+              "line": 77,
+              "column": 1,
+              "index": 1946
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/EventLogCard.tsx"
+          },
+          "fnName": "EventLogCard",
+          "memoSlots": 11,
+          "memoBlocks": 6,
+          "memoValues": 6,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/EventLogCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/FindBandCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1074
+            },
+            "end": {
+              "line": 87,
+              "column": 1,
+              "index": 2399
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/FindBandCard.tsx"
+          },
+          "fnName": "FindBandCard",
+          "memoSlots": 20,
+          "memoBlocks": 11,
+          "memoValues": 11,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/FindBandCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/FirmwareDfuCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 40,
+              "column": 15,
+              "index": 1013
+            },
+            "end": {
+              "line": 73,
+              "column": 1,
+              "index": 2313
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/FirmwareDfuCard.tsx"
+          },
+          "fnName": "FirmwareDfuCard",
+          "memoSlots": 10,
+          "memoBlocks": 6,
+          "memoValues": 6,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/FirmwareDfuCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/GpsAgpsCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1014
+            },
+            "end": {
+              "line": 73,
+              "column": 1,
+              "index": 1971
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/GpsAgpsCard.tsx"
+          },
+          "fnName": "GpsAgpsCard",
+          "memoSlots": 11,
+          "memoBlocks": 6,
+          "memoValues": 6,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/GpsAgpsCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/HarvestCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 21,
+              "column": 0,
+              "index": 610
+            },
+            "end": {
+              "line": 34,
+              "column": 1,
+              "index": 1074
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HarvestCard.tsx"
+          },
+          "fnName": "PointRow",
+          "memoSlots": 16,
+          "memoBlocks": 6,
+          "memoValues": 6,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HarvestCard.tsx"
+        },
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 36,
+              "column": 15,
+              "index": 1091
+            },
+            "end": {
+              "line": 202,
+              "column": 1,
+              "index": 6738
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HarvestCard.tsx"
+          },
+          "fnName": "HarvestCard",
+          "memoSlots": 70,
+          "memoBlocks": 21,
+          "memoValues": 22,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HarvestCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/HealthTestsSection.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 20,
+              "column": 15,
+              "index": 508
+            },
+            "end": {
+              "line": 84,
+              "column": 1,
+              "index": 2366
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HealthTestsSection.tsx"
+          },
+          "fnName": "HealthTestsSection",
+          "memoSlots": 29,
+          "memoBlocks": 5,
+          "memoValues": 5,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HealthTestsSection.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/HistoricalDataSection.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 64,
+              "column": 15,
+              "index": 1706
+            },
+            "end": {
+              "line": 149,
+              "column": 1,
+              "index": 4578
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HistoricalDataSection.tsx"
+          },
+          "fnName": "HistoricalDataSection",
+          "memoSlots": 28,
+          "memoBlocks": 9,
+          "memoValues": 10,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HistoricalDataSection.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/HistoricalQueryCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 38,
+              "column": 15,
+              "index": 919
+            },
+            "end": {
+              "line": 92,
+              "column": 1,
+              "index": 3339
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HistoricalQueryCard.tsx"
+          },
+          "fnName": "HistoricalQueryCard",
+          "memoSlots": 39,
+          "memoBlocks": 20,
+          "memoValues": 20,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/HistoricalQueryCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/InitializingScreen.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 17,
+              "column": 15,
+              "index": 470
+            },
+            "end": {
+              "line": 25,
+              "column": 1,
+              "index": 766
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/InitializingScreen.tsx"
+          },
+          "fnName": "InitializingScreen",
+          "memoSlots": 1,
+          "memoBlocks": 1,
+          "memoValues": 1,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/InitializingScreen.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/PersonalInfoSync.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 25,
+              "column": 15,
+              "index": 636
+            },
+            "end": {
+              "line": 41,
+              "column": 1,
+              "index": 1126
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/PersonalInfoSync.tsx"
+          },
+          "fnName": "PersonalInfoSync",
+          "memoSlots": 3,
+          "memoBlocks": 2,
+          "memoValues": 2,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/PersonalInfoSync.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/ReadyHeader.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 15,
+              "column": 15,
+              "index": 389
+            },
+            "end": {
+              "line": 28,
+              "column": 1,
+              "index": 683
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ReadyHeader.tsx"
+          },
+          "fnName": "ReadyHeader",
+          "memoSlots": 3,
+          "memoBlocks": 2,
+          "memoValues": 2,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ReadyHeader.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/ReadyScreen.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 49,
+              "column": 15,
+              "index": 2089
+            },
+            "end": {
+              "line": 197,
+              "column": 1,
+              "index": 6129
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ReadyScreen.tsx"
+          },
+          "fnName": "ReadyScreen",
+          "memoSlots": 92,
+          "memoBlocks": 14,
+          "memoValues": 34,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ReadyScreen.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/ScanScreen.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 54,
+              "column": 15,
+              "index": 1545
+            },
+            "end": {
+              "line": 169,
+              "column": 1,
+              "index": 5091
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ScanScreen.tsx"
+          },
+          "fnName": "ScanScreen",
+          "memoSlots": 22,
+          "memoBlocks": 8,
+          "memoValues": 8,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ScanScreen.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/ScreenLightCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1087
+            },
+            "end": {
+              "line": 133,
+              "column": 1,
+              "index": 4547
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ScreenLightCard.tsx"
+          },
+          "fnName": "ScreenLightCard",
+          "memoSlots": 36,
+          "memoBlocks": 18,
+          "memoValues": 18,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/ScreenLightCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/SedentaryCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1093
+            },
+            "end": {
+              "line": 92,
+              "column": 1,
+              "index": 2868
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SedentaryCard.tsx"
+          },
+          "fnName": "SedentaryCard",
+          "memoSlots": 19,
+          "memoBlocks": 10,
+          "memoValues": 10,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SedentaryCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/SessionUtilitiesCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 38,
+              "column": 15,
+              "index": 919
+            },
+            "end": {
+              "line": 86,
+              "column": 1,
+              "index": 3172
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SessionUtilitiesCard.tsx"
+          },
+          "fnName": "SessionUtilitiesCard",
+          "memoSlots": 36,
+          "memoBlocks": 18,
+          "memoValues": 18,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SessionUtilitiesCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/SocialMsgCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 61,
+              "column": 15,
+              "index": 1876
+            },
+            "end": {
+              "line": 162,
+              "column": 1,
+              "index": 5375
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SocialMsgCard.tsx"
+          },
+          "fnName": "SocialMsgCard",
+          "memoSlots": 58,
+          "memoBlocks": 18,
+          "memoValues": 24,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SocialMsgCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/SportModeCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 39,
+              "column": 15,
+              "index": 974
+            },
+            "end": {
+              "line": 79,
+              "column": 1,
+              "index": 2625
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SportModeCard.tsx"
+          },
+          "fnName": "SportModeCard",
+          "memoSlots": 26,
+          "memoBlocks": 14,
+          "memoValues": 14,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SportModeCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/SystemConfigCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1035
+            },
+            "end": {
+              "line": 111,
+              "column": 1,
+              "index": 4088
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SystemConfigCard.tsx"
+          },
+          "fnName": "SystemConfigCard",
+          "memoSlots": 50,
+          "memoBlocks": 25,
+          "memoValues": 25,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/SystemConfigCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/VitalsLabSection.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 35,
+              "column": 15,
+              "index": 894
+            },
+            "end": {
+              "line": 205,
+              "column": 1,
+              "index": 6823
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/VitalsLabSection.tsx"
+          },
+          "fnName": "VitalsLabSection",
+          "memoSlots": 78,
+          "memoBlocks": 13,
+          "memoValues": 13,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/VitalsLabSection.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/WatchFaceCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 42,
+              "column": 15,
+              "index": 1036
+            },
+            "end": {
+              "line": 93,
+              "column": 1,
+              "index": 2911
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WatchFaceCard.tsx"
+          },
+          "fnName": "WatchFaceCard",
+          "memoSlots": 20,
+          "memoBlocks": 11,
+          "memoValues": 11,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WatchFaceCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/WeatherCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 48,
+              "column": 15,
+              "index": 1275
+            },
+            "end": {
+              "line": 86,
+              "column": 1,
+              "index": 2873
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WeatherCard.tsx"
+          },
+          "fnName": "WeatherCard",
+          "memoSlots": 25,
+          "memoBlocks": 13,
+          "memoValues": 13,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WeatherCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/WomenHealthCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1087
+            },
+            "end": {
+              "line": 92,
+              "column": 1,
+              "index": 2867
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WomenHealthCard.tsx"
+          },
+          "fnName": "WomenHealthCard",
+          "memoSlots": 19,
+          "memoBlocks": 10,
+          "memoValues": 10,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WomenHealthCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/WorldClockCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 38,
+              "column": 15,
+              "index": 919
+            },
+            "end": {
+              "line": 69,
+              "column": 1,
+              "index": 2219
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WorldClockCard.tsx"
+          },
+          "fnName": "WorldClockCard",
+          "memoSlots": 19,
+          "memoBlocks": 10,
+          "memoValues": 10,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WorldClockCard.tsx"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "path": "example/src/app/components/WristFlipCard.tsx",
+      "success": [
+        {
+          "kind": "CompileSuccess",
+          "fnLoc": {
+            "start": {
+              "line": 43,
+              "column": 15,
+              "index": 1089
+            },
+            "end": {
+              "line": 92,
+              "column": 1,
+              "index": 2849
+            },
+            "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WristFlipCard.tsx"
+          },
+          "fnName": "WristFlipCard",
+          "memoSlots": 19,
+          "memoBlocks": 10,
+          "memoValues": 10,
+          "prunedMemoBlocks": 0,
+          "prunedMemoValues": 0,
+          "filename": "/Users/saileshbro/Projects/expo-veepoo-sdk/example/src/app/components/WristFlipCard.tsx"
+        }
+      ],
+      "failed": []
+    }
+  ],
+  "errors": []
+}

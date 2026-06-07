@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GpsTimezoneCapability = void 0;
-exports.validateGPSAndTimezoneData = validateGPSAndTimezoneData;
 const deep_keys_1 = require("../shared/deep-keys");
 // ── Validators ──────────────────────────────────────────────────────────────
 function validateGPSAndTimezoneData(data) {

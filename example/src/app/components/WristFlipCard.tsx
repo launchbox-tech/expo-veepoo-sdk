@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import { useVeepooSDK } from "expo-veepoo-sdk";
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 export default function WristFlipCard() {
   const { sdk } = useVeepooSDK();
   const [wristFlipInfo, setWristFlipInfo] = useState("—");
-  const [lastSettings, setLastSettings] = useState<WristFlipWakeSettings | null>(null);
+  const lastSettingsRef = useRef<WristFlipWakeSettings | null>(null);
 
   return (
     <View style={styles.card}>
@@ -61,7 +61,7 @@ export default function WristFlipCard() {
           onPress={() => {
             void sdk
               .wristFlip.readWristFlipWakeSettings()
-              .then(s => { setLastSettings(s); setWristFlipInfo(JSON.stringify(s)); })
+              .then(s => { lastSettingsRef.current = s; setWristFlipInfo(JSON.stringify(s)); })
               .catch(() => setWristFlipInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
@@ -75,6 +75,7 @@ export default function WristFlipCard() {
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
+            const lastSettings = lastSettingsRef.current;
             if (!lastSettings) { setWristFlipInfo("read first"); return; }
             void sdk
               .wristFlip.setWristFlipWakeSettings(lastSettings)

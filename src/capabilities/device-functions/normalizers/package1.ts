@@ -4,9 +4,9 @@ import { isRecord, normalizeFunctionStatus } from "@/shared/primitives";
 export function normalizePackage1(record: Record<string, unknown>): DeviceFunctions["package1"] {
   if (isRecord(record.package1)) {
     return Object.fromEntries(
-      Object.entries(record.package1)
-        .filter(([key]) => key !== 'type')
-        .map(([key, item]) => [key, normalizeFunctionStatus(item)])
+      Object.entries(record.package1).flatMap(([key, item]) =>
+        key === 'type' ? [] : [[key, normalizeFunctionStatus(item)]]
+      )
     ) as unknown as DeviceFunctions["package1"];
   }
 

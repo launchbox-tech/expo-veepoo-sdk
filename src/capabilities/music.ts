@@ -39,7 +39,7 @@ export function normalizeMusicRemoteCommand(value: unknown): MusicRemoteCommand 
 
 // ── Validators ──────────────────────────────────────────────────────────────
 
-export function validateMusicData(data: MusicData): void {
+function validateMusicData(data: MusicData): void {
   if (typeof data.name !== "string" || data.name.trim().length === 0) {
     throw { code: "INVALID_ARGUMENT", message: "name is required" } satisfies VeepooError;
   }

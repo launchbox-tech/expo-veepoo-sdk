@@ -42,10 +42,12 @@ function normalizeOriginItem(value) {
 function normalizeOriginDataList(value) {
     if (!Array.isArray(value))
         return [];
-    return value
-        .filter(primitives_1.isRecord)
-        .map((item) => normalizeOriginItem(item))
-        .sort((a, b) => a.time.localeCompare(b.time));
+    const normalized = [];
+    for (const item of value) {
+        if ((0, primitives_1.isRecord)(item))
+            normalized.push(normalizeOriginItem(item));
+    }
+    return normalized.sort((a, b) => a.time.localeCompare(b.time));
 }
 function normalizeHalfHourData(value) {
     const record = (0, primitives_1.isRecord)(value) ? value : {};

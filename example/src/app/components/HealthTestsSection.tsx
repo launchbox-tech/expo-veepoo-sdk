@@ -4,7 +4,7 @@ import type {
   BloodOxygenTestResult,
 } from "expo-veepoo-sdk";
 import { StyleSheet, Text, View } from "react-native";
-import { HealthTestCard } from "../../components";
+import { HealthTestCard } from "../../components/HealthTestCard";
 
 const styles = StyleSheet.create({
   sectionHeader: { paddingHorizontal: 24, paddingBottom: 8, paddingTop: 4 },

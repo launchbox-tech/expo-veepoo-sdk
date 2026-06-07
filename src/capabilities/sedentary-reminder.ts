@@ -40,7 +40,7 @@ export function normalizeSedentaryReminderSettings(value: unknown): SedentaryRem
 // ── Validators ──────────────────────────────────────────────────────────────
 
 /** Vendor long-sit gate is 30–240 minutes (iOS `longSeatGateValue`). */
-export function validateSedentaryReminderSettings(s: SedentaryReminderSettings): void {
+function validateSedentaryReminderSettings(s: SedentaryReminderSettings): void {
   requireValidHour(s.start_hour, "startHour");
   requireValidMinute(s.start_minute, "startMinute");
   requireValidHour(s.end_hour, "endHour");

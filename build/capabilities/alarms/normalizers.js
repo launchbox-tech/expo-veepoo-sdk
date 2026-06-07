@@ -12,34 +12,38 @@ function repeatStringToWeekdays(repeatStr) {
     }
     return days.sort((a, b) => a - b);
 }
+function normalizeAlarmItem(item) {
+    const repeatRaw = typeof item.repeat === 'string' ? item.repeat : '0000000';
+    const repeat = Array.isArray(item.repeat)
+        ? item.repeat
+        : repeatStringToWeekdays(repeatRaw);
+    const alarm = {
+        id: (0, primitives_1.toInt)(item.id, 0),
+        enabled: (0, primitives_1.toBoolean)(item.enabled, false),
+        hour: (0, primitives_1.toInt)(item.hour, 0),
+        minute: (0, primitives_1.toInt)(item.minute, 0),
+        repeat,
+    };
+    if (item.scene !== undefined && item.scene !== null) {
+        alarm.scene = (0, primitives_1.toInt)(item.scene);
+    }
+    if (typeof item.text === 'string' && item.text.length > 0) {
+        alarm.text = item.text;
+    }
+    if (item.type === 'normal' || item.type === 'text') {
+        alarm.type = item.type;
+    }
+    return alarm;
+}
 function normalizeAlarmList(value) {
     if (!Array.isArray(value))
         return [];
-    return value
-        .filter((item) => (0, primitives_1.isRecord)(item))
-        .map((item) => {
-        const repeatRaw = typeof item.repeat === 'string' ? item.repeat : '0000000';
-        const repeat = Array.isArray(item.repeat)
-            ? item.repeat
-            : repeatStringToWeekdays(repeatRaw);
-        const alarm = {
-            id: (0, primitives_1.toInt)(item.id, 0),
-            enabled: (0, primitives_1.toBoolean)(item.enabled, false),
-            hour: (0, primitives_1.toInt)(item.hour, 0),
-            minute: (0, primitives_1.toInt)(item.minute, 0),
-            repeat,
-        };
-        if (item.scene !== undefined && item.scene !== null) {
-            alarm.scene = (0, primitives_1.toInt)(item.scene);
-        }
-        if (typeof item.text === 'string' && item.text.length > 0) {
-            alarm.text = item.text;
-        }
-        if (item.type === 'normal' || item.type === 'text') {
-            alarm.type = item.type;
-        }
-        return alarm;
-    });
+    const alarms = [];
+    for (const item of value) {
+        if ((0, primitives_1.isRecord)(item))
+            alarms.push(normalizeAlarmItem(item));
+    }
+    return alarms;
 }
 function normalizeHeartRateAlarm(value) {
     const record = (0, primitives_1.isRecord)(value) ? value : {};

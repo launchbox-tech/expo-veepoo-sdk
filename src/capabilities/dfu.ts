@@ -64,7 +64,7 @@ export function normalizeFirmwareDfuProgress(value: unknown): VeepooEventPayload
 
 // ── Validators ──────────────────────────────────────────────────────────────
 
-export function validateFirmwareDfuFilePath(filePath: string): void {
+function validateFirmwareDfuFilePath(filePath: string): void {
   if (typeof filePath !== "string" || filePath.trim().length === 0) {
     throw { code: "INVALID_ARGUMENT", message: "filePath is required" } satisfies VeepooError;
   }

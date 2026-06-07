@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SocialMsgCapability = void 0;
 exports.normalizeSocialMsgData = normalizeSocialMsgData;
-exports.validateSocialMsgData = validateSocialMsgData;
 const deep_keys_1 = require("../shared/deep-keys");
 const primitives_1 = require("../shared/primitives");
 // ── Normalizers ─────────────────────────────────────────────────────────────

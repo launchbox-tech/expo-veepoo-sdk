@@ -8,7 +8,6 @@ exports.normalizeHrvTestResult = normalizeHrvTestResult;
 exports.normalizeEcgTestResult = normalizeEcgTestResult;
 exports.normalizeFatigueTestResult = normalizeFatigueTestResult;
 exports.normalizeBreathingTestResult = normalizeBreathingTestResult;
-exports.normalizeBodyCompositionMetrics = normalizeBodyCompositionMetrics;
 exports.normalizeBodyCompositionTestResult = normalizeBodyCompositionTestResult;
 exports.normalizeStressData = normalizeStressData;
 exports.normalizeBloodGlucoseData = normalizeBloodGlucoseData;

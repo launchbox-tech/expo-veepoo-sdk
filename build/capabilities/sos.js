@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SosCapability = void 0;
 exports.normalizeSosCallTimesSettings = normalizeSosCallTimesSettings;
-exports.validateSosCallTimes = validateSosCallTimes;
 const primitives_1 = require("../shared/primitives");
 // ── Normalizers ─────────────────────────────────────────────────────────────
 function normalizeSosCallTimesSettings(value) {

@@ -20,7 +20,6 @@ export interface SocialMsgNativeMethods {
     writeSocialMsgData(data: Partial<SocialMsgData>): Promise<OperationStatus>;
 }
 export declare function normalizeSocialMsgData(value: unknown): SocialMsgData;
-export declare function validateSocialMsgData(data: Partial<SocialMsgData>): void;
 export declare class SocialMsgCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<SocialMsgNativeMethods>);

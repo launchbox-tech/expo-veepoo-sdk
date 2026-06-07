@@ -4,9 +4,7 @@ exports.normalizePackage1 = normalizePackage1;
 const primitives_1 = require("../../../shared/primitives");
 function normalizePackage1(record) {
     if ((0, primitives_1.isRecord)(record.package1)) {
-        return Object.fromEntries(Object.entries(record.package1)
-            .filter(([key]) => key !== 'type')
-            .map(([key, item]) => [key, (0, primitives_1.normalizeFunctionStatus)(item)]));
+        return Object.fromEntries(Object.entries(record.package1).flatMap(([key, item]) => key === 'type' ? [] : [[key, (0, primitives_1.normalizeFunctionStatus)(item)]]));
     }
     return {
         blood_pressure: (0, primitives_1.normalizeFunctionStatus)(record.Bp ?? record.bp),

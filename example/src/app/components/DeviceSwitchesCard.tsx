@@ -36,15 +36,20 @@ const styles = StyleSheet.create({
   buttonText: { fontSize: 13, fontWeight: "600", color: BLUE },
 });
 
+function formatOnSwitches(switches: Record<string, boolean>): string {
+  const on: string[] = [];
+  for (const [key, value] of Object.entries(switches)) {
+    if (value) on.push(key);
+  }
+  return on.join(", ");
+}
+
 export default function DeviceSwitchesCard() {
   const { sdk } = useVeepooSDK();
   const [switchesInfo, setSwitchesInfo] = useState("—");
 
   useSDKEvent("device_switches_data", ({ switches }) => {
-    const on = Object.entries(switches)
-      .filter(([, v]) => v)
-      .map(([k]) => k)
-      .join(", ");
+    const on = formatOnSwitches(switches);
     setSwitchesInfo(`[event] on: ${on || "none"}`);
   }, true);
 
@@ -57,8 +62,7 @@ export default function DeviceSwitchesCard() {
           setSwitchesInfo("reading…");
           void sdk.deviceSwitches.readDeviceSwitches()
             .then(s => {
-              const on = Object.entries(s).filter(([, v]) => v).map(([k]) => k).join(", ");
-              setSwitchesInfo(`on: ${on || "none"}`);
+              setSwitchesInfo(`on: ${formatOnSwitches(s) || "none"}`);
             })
             .catch((e: unknown) => setSwitchesInfo((e as Error)?.message ?? "error"));
         }} accessibilityRole="button">

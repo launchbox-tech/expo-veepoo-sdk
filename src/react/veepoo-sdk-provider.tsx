@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { VeepooSDK } from "@/veepoo-sdk";
 import { VeepooSDKStateStore } from "./sdk-state-store";
 import { VeepooSDKContext } from "./veepoo-sdk-context";
@@ -10,36 +10,38 @@ type VeepooSDKProviderProps = {
   logger?: LogListener;
 };
 
+function applyLoggingConfig(
+  sdk: VeepooSDK,
+  config: { logEnabled?: boolean; logger?: LogListener },
+): void {
+  if (config.logEnabled !== undefined) {
+    sdk.setLogEnabled(config.logEnabled);
+  }
+  if (config.logger !== undefined) {
+    sdk.setLogger(config.logger);
+  }
+}
+
 export function VeepooSDKProvider({ children, logEnabled, logger }: VeepooSDKProviderProps) {
-  const sdkRef = useRef<VeepooSDK | null>(null);
-  const storeRef = useRef<VeepooSDKStateStore | null>(null);
-
-  if (sdkRef.current === null) {
-    sdkRef.current = new VeepooSDK();
-  }
-  if (storeRef.current === null) {
-    storeRef.current = new VeepooSDKStateStore(sdkRef.current);
-  }
-
+  const [sdk] = useState(() => new VeepooSDK());
+  const [store] = useState(() => new VeepooSDKStateStore(sdk));
   const [error, setError] = useState<VeepooError | null>(null);
 
-  useEffect(() => {
-    const sdk = sdkRef.current!;
-    if (logEnabled !== undefined) sdk.setLogEnabled(logEnabled);
-    if (logger !== undefined) sdk.setLogger(logger);
+  // Layout effect runs before the init effect on mount, so logging is configured first (PRD #166).
+  useLayoutEffect(() => {
+    applyLoggingConfig(sdk, { logEnabled, logger });
+  }, [sdk, logEnabled, logger]);
 
-    sdk.init().catch((e: unknown) => setError(e as VeepooError));
+  useEffect(() => {
+    void sdk.init().catch((e: unknown) => setError(e as VeepooError));
 
     return () => {
-      storeRef.current?.destroy();
+      store.destroy();
       sdk.destroy();
     };
-  }, []);
+  }, [sdk, store]);
 
-  const value = useMemo(
-    () => ({ sdk: sdkRef.current!, store: storeRef.current!, error }),
-    [error],
-  );
+  const value = useMemo(() => ({ sdk, store, error }), [sdk, store, error]);
 
   return <VeepooSDKContext.Provider value={value}>{children}</VeepooSDKContext.Provider>;
 }

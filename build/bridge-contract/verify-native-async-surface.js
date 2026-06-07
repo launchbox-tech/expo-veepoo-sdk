@@ -101,10 +101,12 @@ function diffSurface(platform, occurrences, expectedNames) {
     const actual = new Set(seen.keys());
     const missing = [...expected].filter(n => !actual.has(n)).sort();
     const extra = [...actual].filter(n => !expected.has(n)).sort();
-    const duplicates = [...seen.entries()]
-        .filter(([, files]) => files.length > 1)
-        .map(([name, files]) => ({ name, files: [...files].sort() }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+    const duplicates = [];
+    for (const [name, files] of seen.entries()) {
+        if (files.length > 1)
+            duplicates.push({ name, files: [...files].sort() });
+    }
+    duplicates.sort((a, b) => a.name.localeCompare(b.name));
     return { platform, missing, extra, duplicates };
 }
 /** The iOS simulator stub file is intentionally a narrower surface — exclude it. */

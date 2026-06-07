@@ -4,7 +4,7 @@
 import type { HarvestOutcome, HarvestPoint, HarvestResult } from './types';
 
 /** Outcomes worth re-running. Genuine API gaps still re-fail fast, so retrying them is cheap. */
-export const RETRYABLE_OUTCOMES: ReadonlySet<HarvestOutcome> = new Set<HarvestOutcome>([
+const RETRYABLE_OUTCOMES: ReadonlySet<HarvestOutcome> = new Set<HarvestOutcome>([
   'error',
   'timeout',
   'busy',
@@ -32,5 +32,10 @@ export function summarizePoints(points: HarvestPoint[]): HarvestResult['summary'
   };
 }
 
-export const failedKeys = (points: HarvestPoint[]): string[] =>
-  points.filter(p => RETRYABLE_OUTCOMES.has(p.outcome)).map(p => p.key);
+export const failedKeys = (points: HarvestPoint[]): string[] => {
+  const keys: string[] = [];
+  for (const p of points) {
+    if (RETRYABLE_OUTCOMES.has(p.outcome)) keys.push(p.key);
+  }
+  return keys;
+};

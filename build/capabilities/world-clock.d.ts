@@ -9,8 +9,6 @@ export interface WorldClockNativeMethods {
     readWorldClock(): Promise<unknown>;
     setWorldClock(clocks: WorldClockEntry[]): Promise<OperationStatus>;
 }
-export declare function normalizeWorldClockList(value: unknown): WorldClockEntry[];
-export declare function validateWorldClockList(clocks: WorldClockEntry[]): void;
 export declare class WorldClockCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<WorldClockNativeMethods>);

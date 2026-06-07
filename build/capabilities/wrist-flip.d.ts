@@ -18,7 +18,6 @@ export interface WristFlipNativeMethods {
     setWristFlipWakeSettings(settings: WristFlipWakeSettings): Promise<void>;
 }
 export declare function normalizeWristFlipWakeSettings(value: unknown): WristFlipWakeSettings;
-export declare function validateWristFlipWakeSettings(s: WristFlipWakeSettings): void;
 export declare class WristFlipCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<WristFlipNativeMethods>);

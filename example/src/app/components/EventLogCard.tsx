@@ -65,8 +65,8 @@ export default function EventLogCard({
             here (mutex: one realtime test at a time).
           </Text>
         ) : (
-          labLog.map((line, i) => (
-            <Text key={`log-${i}`} style={styles.line} selectable>
+          labLog.map(line => (
+            <Text key={line} style={styles.line} selectable>
               {line}
             </Text>
           ))

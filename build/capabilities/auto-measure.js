@@ -1,16 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AutoMeasureCapability = void 0;
-exports.normalizeAutoMeasureSettings = normalizeAutoMeasureSettings;
-exports.validateAutoMeasureSetting = validateAutoMeasureSetting;
 const deep_keys_1 = require("../shared/deep-keys");
 const assertions_1 = require("../shared/assertions");
 const primitives_1 = require("../shared/primitives");
 // ── Normalizers ─────────────────────────────────────────────────────────────
-function normalizeAutoMeasureSettings(value) {
-    if (!Array.isArray(value))
-        return [];
-    return value.filter(primitives_1.isRecord).map((item) => ({
+function normalizeAutoMeasureSetting(item) {
+    return {
         protocol_type: (0, primitives_1.toInt)(item.protocolType ?? item.protocol_type),
         fun_type: (0, primitives_1.toInt)(item.funType ?? item.fun_type),
         is_switch_open: (0, primitives_1.toBoolean)(item.isSwitchOpen ?? item.is_switch_open),
@@ -22,7 +18,17 @@ function normalizeAutoMeasureSettings(value) {
         measure_interval: (0, primitives_1.toInt)(item.measureInterval ?? item.measure_interval),
         current_start_minute: (0, primitives_1.toInt)(item.currentStartMinute ?? item.current_start_minute),
         current_end_minute: (0, primitives_1.toInt)(item.currentEndMinute ?? item.current_end_minute),
-    }));
+    };
+}
+function normalizeAutoMeasureSettings(value) {
+    if (!Array.isArray(value))
+        return [];
+    const settings = [];
+    for (const item of value) {
+        if ((0, primitives_1.isRecord)(item))
+            settings.push(normalizeAutoMeasureSetting(item));
+    }
+    return settings;
 }
 // ── Validators ──────────────────────────────────────────────────────────────
 function validateAutoMeasureSetting(setting) {

@@ -10,7 +10,6 @@ export interface SosNativeMethods {
     setSosCallTimes(times: number): Promise<void>;
 }
 export declare function normalizeSosCallTimesSettings(value: unknown): SosCallTimesSettings;
-export declare function validateSosCallTimes(times: number): void;
 export declare class SosCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<SosNativeMethods>);

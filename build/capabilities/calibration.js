@@ -1,9 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CalibrationCapability = void 0;
-exports.validateBloodPressureCalibration = validateBloodPressureCalibration;
-exports.validateBloodGlucoseCalibration = validateBloodGlucoseCalibration;
-exports.validateBloodGlucoseRiskLevel = validateBloodGlucoseRiskLevel;
 const assertions_1 = require("../shared/assertions");
 // ── Validators ──────────────────────────────────────────────────────────────
 function validateBloodPressureCalibration(systolic, diastolic) {

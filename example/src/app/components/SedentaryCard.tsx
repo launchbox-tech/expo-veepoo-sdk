@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import { useVeepooSDK } from "expo-veepoo-sdk";
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 export default function SedentaryCard() {
   const { sdk } = useVeepooSDK();
   const [sedentaryInfo, setSedentaryInfo] = useState("—");
-  const [lastSettings, setLastSettings] = useState<SedentaryReminderSettings | null>(null);
+  const lastSettingsRef = useRef<SedentaryReminderSettings | null>(null);
 
   return (
     <View style={styles.card}>
@@ -61,7 +61,7 @@ export default function SedentaryCard() {
           onPress={() => {
             void sdk
               .sedentaryReminder.readSedentaryReminder()
-              .then(s => { setLastSettings(s); setSedentaryInfo(JSON.stringify(s)); })
+              .then(s => { lastSettingsRef.current = s; setSedentaryInfo(JSON.stringify(s)); })
               .catch(() => setSedentaryInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
@@ -75,6 +75,7 @@ export default function SedentaryCard() {
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
+            const lastSettings = lastSettingsRef.current;
             if (!lastSettings) { setSedentaryInfo("read first"); return; }
             void sdk
               .sedentaryReminder.setSedentaryReminder(lastSettings)

@@ -4,11 +4,11 @@ import { isRecord, toInt, normalizeFunctionStatus } from "@/shared/primitives";
 export function normalizePackage3(record: Record<string, unknown>): DeviceFunctions["package3"] {
   if (isRecord(record.package3)) {
     return Object.fromEntries(
-      Object.entries(record.package3)
-        .filter(([key]) => key !== 'type')
-        .map(([key, item]) =>
-          typeof item === 'number' ? [key, item] : [key, normalizeFunctionStatus(item)]
-        )
+      Object.entries(record.package3).flatMap(([key, item]) =>
+        key === 'type'
+          ? []
+          : [[key, typeof item === 'number' ? item : normalizeFunctionStatus(item)]]
+      )
     ) as unknown as DeviceFunctions["package3"];
   }
 

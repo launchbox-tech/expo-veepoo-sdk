@@ -1,10 +1,8 @@
-import {
-  ConnectingScreen,
-  DisconnectedScreen,
-  InitializingScreen,
-  ReadyScreen,
-  ScanScreen,
-} from "../components";
+import ConnectingScreen from "./components/ConnectingScreen";
+import DisconnectedScreen from "./components/DisconnectedScreen";
+import InitializingScreen from "./components/InitializingScreen";
+import ReadyScreen from "./components/ReadyScreen";
+import ScanScreen from "./components/ScanScreen";
 import { useAppState } from "../hooks/useAppState";
 import { useSDKInit } from "../hooks/useSDKInit";
 import { useBandScan } from "../hooks/useBandScan";

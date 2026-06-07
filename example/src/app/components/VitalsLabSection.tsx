@@ -10,7 +10,7 @@ import type {
 } from "expo-veepoo-sdk";
 import { StyleSheet, Switch, Text, View } from "react-native";
 import { BLUE } from "../../components/theme";
-import { HealthTestCard } from "../../components";
+import { HealthTestCard } from "../../components/HealthTestCard";
 
 const styles = StyleSheet.create({
   sectionHeader: { paddingHorizontal: 24, paddingBottom: 8, paddingTop: 4 },

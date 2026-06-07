@@ -167,23 +167,26 @@ function repeatStringToWeekdays(repeatStr) {
 	for (let i = 0; i < 7; i++) if (repeatStr[i] === "1") days.push(7 - i);
 	return days.sort((a, b) => a - b);
 }
+function normalizeAlarmItem(item) {
+	const repeatRaw = typeof item.repeat === "string" ? item.repeat : "0000000";
+	const repeat = Array.isArray(item.repeat) ? item.repeat : repeatStringToWeekdays(repeatRaw);
+	const alarm = {
+		id: toInt(item.id, 0),
+		enabled: toBoolean(item.enabled, false),
+		hour: toInt(item.hour, 0),
+		minute: toInt(item.minute, 0),
+		repeat
+	};
+	if (item.scene !== void 0 && item.scene !== null) alarm.scene = toInt(item.scene);
+	if (typeof item.text === "string" && item.text.length > 0) alarm.text = item.text;
+	if (item.type === "normal" || item.type === "text") alarm.type = item.type;
+	return alarm;
+}
 function normalizeAlarmList(value) {
 	if (!Array.isArray(value)) return [];
-	return value.filter((item) => isRecord(item)).map((item) => {
-		const repeatRaw = typeof item.repeat === "string" ? item.repeat : "0000000";
-		const repeat = Array.isArray(item.repeat) ? item.repeat : repeatStringToWeekdays(repeatRaw);
-		const alarm = {
-			id: toInt(item.id, 0),
-			enabled: toBoolean(item.enabled, false),
-			hour: toInt(item.hour, 0),
-			minute: toInt(item.minute, 0),
-			repeat
-		};
-		if (item.scene !== void 0 && item.scene !== null) alarm.scene = toInt(item.scene);
-		if (typeof item.text === "string" && item.text.length > 0) alarm.text = item.text;
-		if (item.type === "normal" || item.type === "text") alarm.type = item.type;
-		return alarm;
-	});
+	const alarms = [];
+	for (const item of value) if (isRecord(item)) alarms.push(normalizeAlarmItem(item));
+	return alarms;
 }
 function normalizeHeartRateAlarm(value) {
 	const record = isRecord(value) ? value : {};
@@ -325,7 +328,7 @@ function normalizeContactList(value) {
 //#endregion
 //#region src/capabilities/device-functions/normalizers/package1.ts
 function normalizePackage1(record) {
-	if (isRecord(record.package1)) return Object.fromEntries(Object.entries(record.package1).filter(([key]) => key !== "type").map(([key, item]) => [key, normalizeFunctionStatus(item)]));
+	if (isRecord(record.package1)) return Object.fromEntries(Object.entries(record.package1).flatMap(([key, item]) => key === "type" ? [] : [[key, normalizeFunctionStatus(item)]]));
 	return {
 		blood_pressure: normalizeFunctionStatus(record.Bp ?? record.bp),
 		drinking: normalizeFunctionStatus(record.Drink ?? record.drink),
@@ -351,7 +354,7 @@ function normalizePackage1(record) {
 //#endregion
 //#region src/capabilities/device-functions/normalizers/package2.ts
 function normalizePackage2(record) {
-	if (isRecord(record.package2)) return Object.fromEntries(Object.entries(record.package2).filter(([key]) => key !== "type").map(([key, item]) => typeof item === "number" ? [key, item] : [key, normalizeFunctionStatus(item)]));
+	if (isRecord(record.package2)) return Object.fromEntries(Object.entries(record.package2).flatMap(([key, item]) => key === "type" ? [] : [[key, typeof item === "number" ? item : normalizeFunctionStatus(item)]]));
 	return {
 		count_down: normalizeFunctionStatus(record.CountDown ?? record.countDown),
 		sport_model_function: normalizeFunctionStatus(record.SportModel ?? record.sportModel),
@@ -379,7 +382,7 @@ function normalizePackage2(record) {
 //#endregion
 //#region src/capabilities/device-functions/normalizers/package3.ts
 function normalizePackage3(record) {
-	if (isRecord(record.package3)) return Object.fromEntries(Object.entries(record.package3).filter(([key]) => key !== "type").map(([key, item]) => typeof item === "number" ? [key, item] : [key, normalizeFunctionStatus(item)]));
+	if (isRecord(record.package3)) return Object.fromEntries(Object.entries(record.package3).flatMap(([key, item]) => key === "type" ? [] : [[key, typeof item === "number" ? item : normalizeFunctionStatus(item)]]));
 	return {
 		big_data_tran_type: toInt(record.bitDataTranType ?? record.bigDataTranType),
 		watch_ui_server_count: toInt(record.watchUiServerCount),
@@ -899,7 +902,9 @@ function normalizeOriginItem(value) {
 }
 function normalizeOriginDataList(value) {
 	if (!Array.isArray(value)) return [];
-	return value.filter(isRecord).map((item) => normalizeOriginItem(item)).sort((a, b) => a.time.localeCompare(b.time));
+	const normalized = [];
+	for (const item of value) if (isRecord(item)) normalized.push(normalizeOriginItem(item));
+	return normalized.sort((a, b) => a.time.localeCompare(b.time));
 }
 function normalizeHalfHourData(value) {
 	const record = isRecord(value) ? value : {};
@@ -2678,9 +2683,8 @@ var AlarmsCapability = class {
 };
 //#endregion
 //#region src/capabilities/auto-measure.ts
-function normalizeAutoMeasureSettings(value) {
-	if (!Array.isArray(value)) return [];
-	return value.filter(isRecord).map((item) => ({
+function normalizeAutoMeasureSetting(item) {
+	return {
 		protocol_type: toInt(item.protocolType ?? item.protocol_type),
 		fun_type: toInt(item.funType ?? item.fun_type),
 		is_switch_open: toBoolean(item.isSwitchOpen ?? item.is_switch_open),
@@ -2692,7 +2696,13 @@ function normalizeAutoMeasureSettings(value) {
 		measure_interval: toInt(item.measureInterval ?? item.measure_interval),
 		current_start_minute: toInt(item.currentStartMinute ?? item.current_start_minute),
 		current_end_minute: toInt(item.currentEndMinute ?? item.current_end_minute)
-	}));
+	};
+}
+function normalizeAutoMeasureSettings(value) {
+	if (!Array.isArray(value)) return [];
+	const settings = [];
+	for (const item of value) if (isRecord(item)) settings.push(normalizeAutoMeasureSetting(item));
+	return settings;
 }
 function validateAutoMeasureSetting(setting) {
 	if (setting.measure_interval !== void 0) requireInRange(setting.measure_interval, "measureInterval", 1, 120);
@@ -2891,26 +2901,53 @@ var ContactsCapability = class {
 };
 //#endregion
 //#region src/capabilities/day-summary.ts
+function normalizeSportList(value) {
+	if (!Array.isArray(value)) return [];
+	const items = [];
+	for (const item of value) {
+		if (!isRecord(item)) continue;
+		items.push({
+			time: toStringValue(item.time),
+			step: toInt(item.step),
+			cal: toNumber(item.cal) ?? 0,
+			dis: toNumber(item.dis) ?? 0
+		});
+	}
+	return items;
+}
+function normalizeRateList(value) {
+	if (!Array.isArray(value)) return [];
+	const items = [];
+	for (const item of value) {
+		if (!isRecord(item)) continue;
+		items.push({
+			time: toStringValue(item.time),
+			rate: toInt(item.rate)
+		});
+	}
+	return items;
+}
+function normalizeBpList(value) {
+	if (!Array.isArray(value)) return [];
+	const items = [];
+	for (const item of value) {
+		if (!isRecord(item)) continue;
+		items.push({
+			time: toStringValue(item.time),
+			high: toInt(item.high),
+			low: toInt(item.low)
+		});
+	}
+	return items;
+}
 function normalizeDaySummaryData(value) {
 	const record = isRecord(value) ? value : {};
 	return {
 		date: toStringValue(record.date),
 		all_step: toInt(record.allStep ?? record.all_step),
-		sport_list: Array.isArray(record.sportList ?? record.sport_list) ? (record.sportList ?? record.sport_list).filter(isRecord).map((item) => ({
-			time: toStringValue(item.time),
-			step: toInt(item.step),
-			cal: toNumber(item.cal) ?? 0,
-			dis: toNumber(item.dis) ?? 0
-		})) : [],
-		rate_list: Array.isArray(record.rateList ?? record.rate_list) ? (record.rateList ?? record.rate_list).filter(isRecord).map((item) => ({
-			time: toStringValue(item.time),
-			rate: toInt(item.rate)
-		})) : [],
-		bp_list: Array.isArray(record.bpList ?? record.bp_list) ? (record.bpList ?? record.bp_list).filter(isRecord).map((item) => ({
-			time: toStringValue(item.time),
-			high: toInt(item.high),
-			low: toInt(item.low)
-		})) : []
+		sport_list: normalizeSportList(record.sportList ?? record.sport_list),
+		rate_list: normalizeRateList(record.rateList ?? record.rate_list),
+		bp_list: normalizeBpList(record.bpList ?? record.bp_list)
 	};
 }
 var DaySummaryCapability = class {
@@ -2967,6 +3004,7 @@ const SWITCH_KEYS = [
 	"stress",
 	"music_control"
 ];
+const SWITCH_KEY_SET = new Set(SWITCH_KEYS);
 /** Camel-case variant → snake_case switch key mapping. */
 const CAMEL_TO_SWITCH = {
 	autoHr: "auto_hr",
@@ -2997,7 +3035,7 @@ function normalizeDeviceSwitches(value) {
 	const result = Object.fromEntries(SWITCH_KEYS.map((k) => [k, false]));
 	for (const [rawKey, rawVal] of Object.entries(record)) {
 		const snakeKey = CAMEL_TO_SWITCH[rawKey] ?? rawKey;
-		if (SWITCH_KEYS.includes(snakeKey)) result[snakeKey] = toBoolean(rawVal, false);
+		if (SWITCH_KEY_SET.has(snakeKey)) result[snakeKey] = toBoolean(rawVal, false);
 	}
 	return result;
 }
@@ -3805,17 +3843,20 @@ var WomenHealthCapability = class {
 };
 //#endregion
 //#region src/capabilities/world-clock.ts
+function normalizeWorldClockEntry(item) {
+	const entry = {
+		timezone_offset_minutes: toInt(item.timezone_offset_minutes ?? item.timezoneOffsetMinutes, 0),
+		city_name: typeof item.city_name === "string" ? item.city_name : typeof item.cityName === "string" ? item.cityName : ""
+	};
+	const dstRaw = item.dst_offset ?? item.dstOffset;
+	if (dstRaw !== void 0 && dstRaw !== null) entry.dst_offset = toInt(dstRaw);
+	return entry;
+}
 function normalizeWorldClockList(value) {
 	if (!Array.isArray(value)) return [];
-	return value.filter((item) => isRecord(item)).map((item) => {
-		const entry = {
-			timezone_offset_minutes: toInt(item.timezone_offset_minutes ?? item.timezoneOffsetMinutes, 0),
-			city_name: typeof item.city_name === "string" ? item.city_name : typeof item.cityName === "string" ? item.cityName : ""
-		};
-		const dstRaw = item.dst_offset ?? item.dstOffset;
-		if (dstRaw !== void 0 && dstRaw !== null) entry.dst_offset = toInt(dstRaw);
-		return entry;
-	});
+	const entries = [];
+	for (const item of value) if (isRecord(item)) entries.push(normalizeWorldClockEntry(item));
+	return entries;
 }
 function validateWorldClockList(clocks) {
 	if (clocks.length > 4) throw {
@@ -4073,16 +4114,25 @@ function VeepooSDKProvider({ children, logEnabled, logger }) {
 	if (sdkRef.current === null) sdkRef.current = new VeepooSDK();
 	if (storeRef.current === null) storeRef.current = new VeepooSDKStateStore(sdkRef.current);
 	const [error, setError] = (0, react.useState)(null);
+	const loggingRef = (0, react.useRef)({});
 	(0, react.useEffect)(() => {
 		const sdk = sdkRef.current;
-		if (logEnabled !== void 0) sdk.setLogEnabled(logEnabled);
-		if (logger !== void 0) sdk.setLogger(logger);
+		const store = storeRef.current;
 		sdk.init().catch((e) => setError(e));
 		return () => {
-			storeRef.current?.destroy();
+			store.destroy();
 			sdk.destroy();
 		};
 	}, []);
+	const sdk = sdkRef.current;
+	if (logEnabled !== void 0 && loggingRef.current.logEnabled !== logEnabled) {
+		sdk.setLogEnabled(logEnabled);
+		loggingRef.current.logEnabled = logEnabled;
+	}
+	if (logger !== void 0 && loggingRef.current.logger !== logger) {
+		sdk.setLogger(logger);
+		loggingRef.current.logger = logger;
+	}
 	const value = (0, react.useMemo)(() => ({
 		sdk: sdkRef.current,
 		store: storeRef.current,

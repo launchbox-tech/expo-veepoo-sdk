@@ -11,7 +11,6 @@ export interface PersonalInfo {
 export interface PersonalInfoNativeMethods {
     syncPersonalInfo(info: PersonalInfo): Promise<boolean>;
 }
-export declare function validatePersonalInfo(info: PersonalInfo): void;
 export declare class PersonalInfoCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<PersonalInfoNativeMethods>);

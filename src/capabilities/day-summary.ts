@@ -31,38 +31,56 @@ export interface DaySummaryNativeMethods {
 
 // ── Normalizers ─────────────────────────────────────────────────────────────
 
+function normalizeSportList(value: unknown): DaySummaryData['sport_list'] {
+  if (!Array.isArray(value)) return [];
+  const items: DaySummaryData['sport_list'] = [];
+  for (const item of value) {
+    if (!isRecord(item)) continue;
+    items.push({
+      time: toStringValue(item.time),
+      step: toInt(item.step),
+      cal: toNumber(item.cal) ?? 0,
+      dis: toNumber(item.dis) ?? 0,
+    });
+  }
+  return items;
+}
+
+function normalizeRateList(value: unknown): DaySummaryData['rate_list'] {
+  if (!Array.isArray(value)) return [];
+  const items: DaySummaryData['rate_list'] = [];
+  for (const item of value) {
+    if (!isRecord(item)) continue;
+    items.push({
+      time: toStringValue(item.time),
+      rate: toInt(item.rate),
+    });
+  }
+  return items;
+}
+
+function normalizeBpList(value: unknown): DaySummaryData['bp_list'] {
+  if (!Array.isArray(value)) return [];
+  const items: DaySummaryData['bp_list'] = [];
+  for (const item of value) {
+    if (!isRecord(item)) continue;
+    items.push({
+      time: toStringValue(item.time),
+      high: toInt(item.high),
+      low: toInt(item.low),
+    });
+  }
+  return items;
+}
+
 export function normalizeDaySummaryData(value: unknown): DaySummaryData {
   const record = isRecord(value) ? value : {};
   return {
     date: toStringValue(record.date),
     all_step: toInt(record.allStep ?? record.all_step),
-    sport_list: Array.isArray(record.sportList ?? record.sport_list)
-      ? ((record.sportList ?? record.sport_list) as unknown[])
-          .filter(isRecord)
-          .map((item) => ({
-            time: toStringValue(item.time),
-            step: toInt(item.step),
-            cal: toNumber(item.cal) ?? 0,
-            dis: toNumber(item.dis) ?? 0,
-          }))
-      : [],
-    rate_list: Array.isArray(record.rateList ?? record.rate_list)
-      ? ((record.rateList ?? record.rate_list) as unknown[])
-          .filter(isRecord)
-          .map((item) => ({
-            time: toStringValue(item.time),
-            rate: toInt(item.rate),
-          }))
-      : [],
-    bp_list: Array.isArray(record.bpList ?? record.bp_list)
-      ? ((record.bpList ?? record.bp_list) as unknown[])
-          .filter(isRecord)
-          .map((item) => ({
-            time: toStringValue(item.time),
-            high: toInt(item.high),
-            low: toInt(item.low),
-          }))
-      : [],
+    sport_list: normalizeSportList(record.sportList ?? record.sport_list),
+    rate_list: normalizeRateList(record.rateList ?? record.rate_list),
+    bp_list: normalizeBpList(record.bpList ?? record.bp_list),
   };
 }
 

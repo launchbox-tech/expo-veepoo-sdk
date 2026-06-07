@@ -6,8 +6,6 @@ export interface DeviceSwitchesNativeMethods {
     readDeviceSwitches(): Promise<unknown>;
     setDeviceSwitch(type: string, enabled: boolean): Promise<OperationStatus>;
 }
-export declare function normalizeDeviceSwitches(value: unknown): DeviceSwitches;
-export declare function validateDeviceSwitchType(type: unknown): asserts type is DeviceSwitchType;
 export declare class DeviceSwitchesCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<DeviceSwitchesNativeMethods>);

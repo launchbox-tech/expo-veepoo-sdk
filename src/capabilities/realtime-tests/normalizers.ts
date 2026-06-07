@@ -111,7 +111,7 @@ export function normalizeBreathingTestResult(value: unknown): BreathingTestResul
   };
 }
 
-export function normalizeBodyCompositionMetrics(value: unknown): BodyCompositionMetrics | undefined {
+function normalizeBodyCompositionMetrics(value: unknown): BodyCompositionMetrics | undefined {
   if (!isRecord(value)) return undefined;
   const r = value;
   const mt = r.measurementTime;

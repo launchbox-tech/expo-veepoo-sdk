@@ -52,7 +52,7 @@ export function normalizeWristFlipWakeSettings(value: unknown): WristFlipWakeSet
 
 // ── Validators ──────────────────────────────────────────────────────────────
 
-export function validateWristFlipWakeSettings(s: WristFlipWakeSettings): void {
+function validateWristFlipWakeSettings(s: WristFlipWakeSettings): void {
   requireValidHour(s.start_hour, "startHour");
   requireValidMinute(s.start_minute, "startMinute");
   requireValidHour(s.end_hour, "endHour");

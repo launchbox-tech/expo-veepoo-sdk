@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import { useVeepooSDK } from "expo-veepoo-sdk";
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 export default function WomenHealthCard() {
   const { sdk } = useVeepooSDK();
   const [womenHealthInfo, setWomenHealthInfo] = useState("—");
-  const [lastSettings, setLastSettings] = useState<WomenHealthSettings | null>(null);
+  const lastSettingsRef = useRef<WomenHealthSettings | null>(null);
 
   return (
     <View style={styles.card}>
@@ -61,7 +61,7 @@ export default function WomenHealthCard() {
           onPress={() => {
             void sdk
               .womenHealth.readWomenHealthSettings()
-              .then(s => { setLastSettings(s); setWomenHealthInfo(JSON.stringify(s)); })
+              .then(s => { lastSettingsRef.current = s; setWomenHealthInfo(JSON.stringify(s)); })
               .catch(() => setWomenHealthInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
@@ -75,6 +75,7 @@ export default function WomenHealthCard() {
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
+            const lastSettings = lastSettingsRef.current;
             if (!lastSettings) { setWomenHealthInfo("read first"); return; }
             void sdk
               .womenHealth.setWomenHealthSettings(lastSettings)

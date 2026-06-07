@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DfuCapability = void 0;
 exports.normalizeFirmwareDfuProgress = normalizeFirmwareDfuProgress;
-exports.validateFirmwareDfuFilePath = validateFirmwareDfuFilePath;
 const primitives_1 = require("../shared/primitives");
 // ── Normalizers ─────────────────────────────────────────────────────────────
 const FIRMWARE_DFU_STATES = [

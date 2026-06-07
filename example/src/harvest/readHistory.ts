@@ -52,21 +52,28 @@ async function readPerDay(
 
   hLog(`readPerDay START: ${key} (${label}) for ${days} day(s)`);
 
-  for (let offset = 0; offset < days; offset++) {
-    const date = dateForOffset(offset);
-    try {
-      const data = await read(offset, date);
-      const hasData = hasRows(data);
-      if (hasData) anyData = true;
-      hLog(`  ${key} ${date} → ${hasData ? 'has data' : 'empty'}`);
-      if (hasData) hLogJson(`  ${key} ${date} data`, data);
-      value.push({ date, data });
-    } catch (e) {
-      anyErr = true;
-      const errStr = formatErr(e);
-      hLog(`  ${key} ${date} → ERROR: ${errStr}`);
-      value.push({ date, error: errStr });
-    }
+  const dayResults = await Promise.all(
+    Array.from({ length: days }, (_, offset) => {
+      const date = dateForOffset(offset);
+      return read(offset, date)
+        .then(data => {
+          const hasData = hasRows(data);
+          hLog(`  ${key} ${date} → ${hasData ? 'has data' : 'empty'}`);
+          if (hasData) hLogJson(`  ${key} ${date} data`, data);
+          return { date, data, hasData, error: undefined as string | undefined };
+        })
+        .catch((e: unknown) => {
+          const errStr = formatErr(e);
+          hLog(`  ${key} ${date} → ERROR: ${errStr}`);
+          return { date, data: undefined, hasData: false, error: errStr };
+        });
+    }),
+  );
+
+  for (const result of dayResults) {
+    if (result.hasData) anyData = true;
+    if (result.error) anyErr = true;
+    value.push(result.error ? { date: result.date, error: result.error } : { date: result.date, data: result.data });
   }
 
   const outcome: HarvestOutcome = anyData ? 'measured' : anyErr ? 'error' : 'skipped';

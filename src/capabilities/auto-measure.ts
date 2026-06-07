@@ -28,9 +28,8 @@ export interface AutoMeasureNativeMethods {
 
 // ── Normalizers ─────────────────────────────────────────────────────────────
 
-export function normalizeAutoMeasureSettings(value: unknown): AutoMeasureSetting[] {
-  if (!Array.isArray(value)) return [];
-  return value.filter(isRecord).map((item) => ({
+function normalizeAutoMeasureSetting(item: Record<string, unknown>): AutoMeasureSetting {
+  return {
     protocol_type: toInt(item.protocolType ?? item.protocol_type),
     fun_type: toInt(item.funType ?? item.fun_type),
     is_switch_open: toBoolean(item.isSwitchOpen ?? item.is_switch_open),
@@ -42,12 +41,21 @@ export function normalizeAutoMeasureSettings(value: unknown): AutoMeasureSetting
     measure_interval: toInt(item.measureInterval ?? item.measure_interval),
     current_start_minute: toInt(item.currentStartMinute ?? item.current_start_minute),
     current_end_minute: toInt(item.currentEndMinute ?? item.current_end_minute),
-  }));
+  };
+}
+
+function normalizeAutoMeasureSettings(value: unknown): AutoMeasureSetting[] {
+  if (!Array.isArray(value)) return [];
+  const settings: AutoMeasureSetting[] = [];
+  for (const item of value) {
+    if (isRecord(item)) settings.push(normalizeAutoMeasureSetting(item));
+  }
+  return settings;
 }
 
 // ── Validators ──────────────────────────────────────────────────────────────
 
-export function validateAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): void {
+function validateAutoMeasureSetting(setting: Partial<AutoMeasureSetting>): void {
   if (setting.measure_interval !== undefined) {
     requireInRange(setting.measure_interval, "measureInterval", 1, 120);
   }

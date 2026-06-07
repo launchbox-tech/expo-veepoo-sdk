@@ -4,7 +4,6 @@ export interface DfuNativeMethods {
     startLocalFirmwareDfu(filePath: string): Promise<void>;
 }
 export declare function normalizeFirmwareDfuProgress(value: unknown): VeepooEventPayload["firmware_dfu_progress"];
-export declare function validateFirmwareDfuFilePath(filePath: string): void;
 export declare class DfuCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<DfuNativeMethods>);

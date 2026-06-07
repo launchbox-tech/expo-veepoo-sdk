@@ -28,6 +28,8 @@ const SWITCH_KEYS: DeviceSwitchType[] = [
   "ecg_normally_open", "met", "stress", "music_control",
 ];
 
+const SWITCH_KEY_SET = new Set<DeviceSwitchType>(SWITCH_KEYS);
+
 /** Camel-case variant → snake_case switch key mapping. */
 const CAMEL_TO_SWITCH: Record<string, DeviceSwitchType> = {
   autoHr: "auto_hr",
@@ -54,7 +56,7 @@ const CAMEL_TO_SWITCH: Record<string, DeviceSwitchType> = {
   musicControl: "music_control",
 };
 
-export function normalizeDeviceSwitches(value: unknown): DeviceSwitches {
+function normalizeDeviceSwitches(value: unknown): DeviceSwitches {
   const record = isRecord(value) ? value : {};
 
   // Start with all false
@@ -62,7 +64,7 @@ export function normalizeDeviceSwitches(value: unknown): DeviceSwitches {
 
   for (const [rawKey, rawVal] of Object.entries(record)) {
     const snakeKey = (CAMEL_TO_SWITCH[rawKey] ?? rawKey) as DeviceSwitchType;
-    if (SWITCH_KEYS.includes(snakeKey)) {
+    if (SWITCH_KEY_SET.has(snakeKey)) {
       result[snakeKey] = toBoolean(rawVal, false);
     }
   }
@@ -79,7 +81,7 @@ const DEVICE_SWITCH_TYPES = new Set<string>([
   "ecg_normally_open", "met", "stress", "music_control",
 ]);
 
-export function validateDeviceSwitchType(type: unknown): asserts type is DeviceSwitchType {
+function validateDeviceSwitchType(type: unknown): asserts type is DeviceSwitchType {
   if (typeof type !== "string" || !DEVICE_SWITCH_TYPES.has(type)) {
     throw { code: "INVALID_ARGUMENT", message: `Invalid device switch type: ${String(type)}` } satisfies VeepooError;
   }

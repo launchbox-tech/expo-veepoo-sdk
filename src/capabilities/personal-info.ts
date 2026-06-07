@@ -24,7 +24,7 @@ export interface PersonalInfoNativeMethods {
 
 // ── Validators ──────────────────────────────────────────────────────────────
 
-export function validatePersonalInfo(info: PersonalInfo): void {
+function validatePersonalInfo(info: PersonalInfo): void {
   if (info.sex !== 0 && info.sex !== 1) {
     throw { code: "INVALID_ARGUMENT", message: "sex must be 0 or 1" } satisfies VeepooError;
   }

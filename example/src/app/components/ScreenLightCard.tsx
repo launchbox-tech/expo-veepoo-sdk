@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { BLUE } from "../../components/theme";
 import { useVeepooSDK } from "expo-veepoo-sdk";
@@ -44,8 +44,8 @@ export default function ScreenLightCard() {
   const { sdk } = useVeepooSDK();
   const [screenLightInfo, setScreenLightInfo] = useState("—");
   const [screenDurationInfo, setScreenDurationInfo] = useState("—");
-  const [lastSettings, setLastSettings] = useState<ScreenLightSettings | null>(null);
-  const [lastDuration, setLastDuration] = useState<number | null>(null);
+  const lastSettingsRef = useRef<ScreenLightSettings | null>(null);
+  const lastDurationRef = useRef<number | null>(null);
 
   return (
     <View style={styles.card}>
@@ -66,7 +66,7 @@ export default function ScreenLightCard() {
           onPress={() => {
             void sdk
               .screenLight.readScreenLightSettings()
-              .then(s => { setLastSettings(s); setScreenLightInfo(JSON.stringify(s)); })
+              .then(s => { lastSettingsRef.current = s; setScreenLightInfo(JSON.stringify(s)); })
               .catch(() => setScreenLightInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
@@ -80,6 +80,7 @@ export default function ScreenLightCard() {
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
+            const lastSettings = lastSettingsRef.current;
             if (!lastSettings) { setScreenLightInfo("read first"); return; }
             void sdk
               .screenLight.setScreenLightSettings(lastSettings)
@@ -101,7 +102,7 @@ export default function ScreenLightCard() {
           onPress={() => {
             void sdk
               .screenLight.readScreenLightDuration()
-              .then(d => { setLastDuration(d.current_seconds); setScreenDurationInfo(JSON.stringify(d)); })
+              .then(d => { lastDurationRef.current = d.current_seconds; setScreenDurationInfo(JSON.stringify(d)); })
               .catch(() => setScreenDurationInfo("(unsupported or error)"));
           }}
           accessibilityRole="button"
@@ -115,6 +116,7 @@ export default function ScreenLightCard() {
             pressed && styles.buttonPressed,
           ]}
           onPress={() => {
+            const lastDuration = lastDurationRef.current;
             if (lastDuration == null) { setScreenDurationInfo("read first"); return; }
             void sdk
               .screenLight.setScreenLightDuration(lastDuration)

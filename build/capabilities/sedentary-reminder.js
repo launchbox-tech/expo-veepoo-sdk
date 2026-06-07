@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SedentaryReminderCapability = void 0;
 exports.normalizeSedentaryReminderSettings = normalizeSedentaryReminderSettings;
-exports.validateSedentaryReminderSettings = validateSedentaryReminderSettings;
 const deep_keys_1 = require("../shared/deep-keys");
 const assertions_1 = require("../shared/assertions");
 const primitives_1 = require("../shared/primitives");

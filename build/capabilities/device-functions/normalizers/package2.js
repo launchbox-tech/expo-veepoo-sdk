@@ -4,9 +4,9 @@ exports.normalizePackage2 = normalizePackage2;
 const primitives_1 = require("../../../shared/primitives");
 function normalizePackage2(record) {
     if ((0, primitives_1.isRecord)(record.package2)) {
-        return Object.fromEntries(Object.entries(record.package2)
-            .filter(([key]) => key !== 'type')
-            .map(([key, item]) => typeof item === 'number' ? [key, item] : [key, (0, primitives_1.normalizeFunctionStatus)(item)]));
+        return Object.fromEntries(Object.entries(record.package2).flatMap(([key, item]) => key === 'type'
+            ? []
+            : [[key, typeof item === 'number' ? item : (0, primitives_1.normalizeFunctionStatus)(item)]]));
     }
     return {
         count_down: (0, primitives_1.normalizeFunctionStatus)(record.CountDown ?? record.countDown),

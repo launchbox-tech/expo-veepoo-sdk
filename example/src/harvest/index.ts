@@ -6,7 +6,7 @@ export { runHarvest, type RunHarvestOptions } from './runHarvest';
 export { SWEEP_MODALITIES, RECEIVE_ONLY, type SweepModality } from './modalities';
 export { runRealtimeTest, type RunRealtimeOptions } from './runRealtimeTest';
 export { readHistory, readConfig } from './readHistory';
-export { mergePoints, summarizePoints, failedKeys, RETRYABLE_OUTCOMES } from './merge';
+export { mergePoints, summarizePoints, failedKeys } from './merge';
 
 import { Platform } from 'react-native';
 import type { HarvestPoint, HarvestResult } from './types';
@@ -87,12 +87,22 @@ export function harvestToJson(result: HarvestResult): string {
       byCategory,
     },
     ...(enrichedTimings ? { phaseTimings: enrichedTimings } : {}),
-    points: result.points.map(enrichPoint),
-    pointsByCategory: {
-      realtime: result.points.filter(p => p.category === 'realtime').map(enrichPoint),
-      historical: result.points.filter(p => p.category === 'historical').map(enrichPoint),
-      config: result.points.filter(p => p.category === 'config').map(enrichPoint),
-    },
+    ...(() => {
+      const points: ReturnType<typeof enrichPoint>[] = [];
+      const pointsByCategory = {
+        realtime: [] as ReturnType<typeof enrichPoint>[],
+        historical: [] as ReturnType<typeof enrichPoint>[],
+        config: [] as ReturnType<typeof enrichPoint>[],
+      };
+      for (const p of result.points) {
+        const enriched = enrichPoint(p);
+        points.push(enriched);
+        if (p.category === 'realtime') pointsByCategory.realtime.push(enriched);
+        else if (p.category === 'historical') pointsByCategory.historical.push(enriched);
+        else if (p.category === 'config') pointsByCategory.config.push(enriched);
+      }
+      return { points, pointsByCategory };
+    })(),
   };
 
   return JSON.stringify(export_, null, 2);

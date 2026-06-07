@@ -1,7 +1,7 @@
 import type { BatteryInfo, DeviceVersion } from "expo-veepoo-sdk";
 import { View, Text, StyleSheet } from "react-native";
 import { GREEN } from "../../components/theme";
-import { InfoRow } from "../../components";
+import { InfoRow } from "../../components/InfoRow";
 
 const styles = StyleSheet.create({
   card: {

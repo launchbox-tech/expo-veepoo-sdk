@@ -22,10 +22,11 @@ function extractNativeRejectCodes(repoRoot) {
     walkFiles((0, path_1.join)(repoRoot, "android/src/main/kotlin/expo/modules/veepoo"), ".kt", files);
     walkFiles((0, path_1.join)(repoRoot, "ios/VeepooSDK"), ".swift", files);
     const codes = new Set();
+    const re = new RegExp(REJECT_FIRST_ARG.source, "g");
     for (const file of files) {
         const src = (0, fs_1.readFileSync)(file, "utf8");
         let m;
-        const re = new RegExp(REJECT_FIRST_ARG.source, "g");
+        re.lastIndex = 0;
         while ((m = re.exec(src)) !== null) {
             const code = m[1];
             if (code)

@@ -1,17 +1,18 @@
 import type { VeepooDevice, PermissionsResult } from "expo-veepoo-sdk";
+import { useCallback } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Linking,
   Pressable,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { BLUE, RED } from "../../components/theme";
-import { DeviceRow } from "../../components";
+import { DeviceRow } from "../../components/DeviceRow";
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
@@ -66,6 +67,12 @@ export default function ScanScreen({
   connect: (device: VeepooDevice) => Promise<void>;
 }) {
   const permissionsGranted = permissions?.granted ?? false;
+  const renderDevice = useCallback(
+    ({ item }: { item: VeepooDevice }) => (
+      <DeviceRow device={item} onConnect={() => connect(item)} />
+    ),
+    [connect],
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -154,9 +161,7 @@ export default function ScanScreen({
               Scanning for nearby HBand devices…
             </Text>
           }
-          renderItem={({ item }) => (
-            <DeviceRow device={item} onConnect={() => connect(item)} />
-          )}
+          renderItem={renderDevice}
         />
       )}
     </SafeAreaView>

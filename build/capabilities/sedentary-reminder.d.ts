@@ -14,8 +14,6 @@ export interface SedentaryReminderNativeMethods {
     setSedentaryReminder(settings: SedentaryReminderSettings): Promise<void>;
 }
 export declare function normalizeSedentaryReminderSettings(value: unknown): SedentaryReminderSettings;
-/** Vendor long-sit gate is 30–240 minutes (iOS `longSeatGateValue`). */
-export declare function validateSedentaryReminderSettings(s: SedentaryReminderSettings): void;
 export declare class SedentaryReminderCapability {
     private readonly ctx;
     constructor(ctx: CapabilityContext<SedentaryReminderNativeMethods>);

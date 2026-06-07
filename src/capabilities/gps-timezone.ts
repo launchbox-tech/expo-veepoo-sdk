@@ -28,7 +28,7 @@ export interface GpsTimezoneNativeMethods {
 
 // ── Validators ──────────────────────────────────────────────────────────────
 
-export function validateGPSAndTimezoneData(data: GPSAndTimezoneData): void {
+function validateGPSAndTimezoneData(data: GPSAndTimezoneData): void {
   if (typeof data.latitude !== "number" || !Number.isFinite(data.latitude) || data.latitude < -90 || data.latitude > 90) {
     throw { code: "INVALID_ARGUMENT", message: "latitude must be a number between -90 and 90" } satisfies VeepooError;
   }

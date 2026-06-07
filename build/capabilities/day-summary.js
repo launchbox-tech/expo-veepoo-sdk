@@ -4,38 +4,59 @@ exports.DaySummaryCapability = void 0;
 exports.normalizeDaySummaryData = normalizeDaySummaryData;
 const primitives_1 = require("../shared/primitives");
 // ── Normalizers ─────────────────────────────────────────────────────────────
+function normalizeSportList(value) {
+    if (!Array.isArray(value))
+        return [];
+    const items = [];
+    for (const item of value) {
+        if (!(0, primitives_1.isRecord)(item))
+            continue;
+        items.push({
+            time: (0, primitives_1.toStringValue)(item.time),
+            step: (0, primitives_1.toInt)(item.step),
+            cal: (0, primitives_1.toNumber)(item.cal) ?? 0,
+            dis: (0, primitives_1.toNumber)(item.dis) ?? 0,
+        });
+    }
+    return items;
+}
+function normalizeRateList(value) {
+    if (!Array.isArray(value))
+        return [];
+    const items = [];
+    for (const item of value) {
+        if (!(0, primitives_1.isRecord)(item))
+            continue;
+        items.push({
+            time: (0, primitives_1.toStringValue)(item.time),
+            rate: (0, primitives_1.toInt)(item.rate),
+        });
+    }
+    return items;
+}
+function normalizeBpList(value) {
+    if (!Array.isArray(value))
+        return [];
+    const items = [];
+    for (const item of value) {
+        if (!(0, primitives_1.isRecord)(item))
+            continue;
+        items.push({
+            time: (0, primitives_1.toStringValue)(item.time),
+            high: (0, primitives_1.toInt)(item.high),
+            low: (0, primitives_1.toInt)(item.low),
+        });
+    }
+    return items;
+}
 function normalizeDaySummaryData(value) {
     const record = (0, primitives_1.isRecord)(value) ? value : {};
     return {
         date: (0, primitives_1.toStringValue)(record.date),
         all_step: (0, primitives_1.toInt)(record.allStep ?? record.all_step),
-        sport_list: Array.isArray(record.sportList ?? record.sport_list)
-            ? (record.sportList ?? record.sport_list)
-                .filter(primitives_1.isRecord)
-                .map((item) => ({
-                time: (0, primitives_1.toStringValue)(item.time),
-                step: (0, primitives_1.toInt)(item.step),
-                cal: (0, primitives_1.toNumber)(item.cal) ?? 0,
-                dis: (0, primitives_1.toNumber)(item.dis) ?? 0,
-            }))
-            : [],
-        rate_list: Array.isArray(record.rateList ?? record.rate_list)
-            ? (record.rateList ?? record.rate_list)
-                .filter(primitives_1.isRecord)
-                .map((item) => ({
-                time: (0, primitives_1.toStringValue)(item.time),
-                rate: (0, primitives_1.toInt)(item.rate),
-            }))
-            : [],
-        bp_list: Array.isArray(record.bpList ?? record.bp_list)
-            ? (record.bpList ?? record.bp_list)
-                .filter(primitives_1.isRecord)
-                .map((item) => ({
-                time: (0, primitives_1.toStringValue)(item.time),
-                high: (0, primitives_1.toInt)(item.high),
-                low: (0, primitives_1.toInt)(item.low),
-            }))
-            : [],
+        sport_list: normalizeSportList(record.sportList ?? record.sport_list),
+        rate_list: normalizeRateList(record.rateList ?? record.rate_list),
+        bp_list: normalizeBpList(record.bpList ?? record.bp_list),
     };
 }
 // ── Capability ──────────────────────────────────────────────────────────────

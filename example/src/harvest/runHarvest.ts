@@ -76,7 +76,9 @@ export async function runHarvest(sdk: HarvestSdk, opts: RunHarvestOptions): Prom
 
   // Receive-only tests can't be triggered — listen for the whole run and keep the last payload each.
   const received = new Map<string, Record<string, unknown>>();
-  const roSubs = RECEIVE_ONLY.filter(ro => want(ro.key)).map(ro => {
+  const roSubs: Array<{ ro: (typeof RECEIVE_ONLY)[number]; handler: (evt: unknown) => void }> = [];
+  for (const ro of RECEIVE_ONLY) {
+    if (!want(ro.key)) continue;
     const handler = (evt: unknown) => {
       const payload = ((evt as Record<string, unknown>)?.[ro.field] ?? {}) as Record<string, unknown>;
       log(`[receive-only] ${ro.key} event arrived (${ro.event})`);
@@ -84,8 +86,8 @@ export async function runHarvest(sdk: HarvestSdk, opts: RunHarvestOptions): Prom
       received.set(ro.key, payload);
     };
     sdk.on(ro.event, handler);
-    return { ro, handler };
-  });
+    roSubs.push({ ro, handler });
+  }
   log(`listening for ${roSubs.length} receive-only test(s): ${roSubs.map(s => s.ro.key).join(', ')}`);
 
   const skip = (key: string, label: string, detail?: string): HarvestPoint => ({
@@ -103,21 +105,25 @@ export async function runHarvest(sdk: HarvestSdk, opts: RunHarvestOptions): Prom
     log(`${SWEEP_MODALITIES.filter(m => want(m.key)).length} tests to run`);
     emit(null);
 
-    for (const m of SWEEP_MODALITIES) {
-      if (aborted()) { log(`abort signal — stopping realtime sweep before ${m.key}`); break; }
-      if (!want(m.key)) { log(`[skip] ${m.key} — not in retry set`); continue; }
+    const runRealtimeSweep = async (index: number): Promise<void> => {
+      if (aborted() || index >= SWEEP_MODALITIES.length) return;
+      const m = SWEEP_MODALITIES[index];
+      if (!want(m.key)) {
+        log(`[skip] ${m.key} — not in retry set`);
+        return runRealtimeSweep(index + 1);
+      }
 
       if (m.requiresContact) {
         log(`[contact-required] ${m.key} (${m.label}) — requesting user contact`);
         const proceed = opts.requestContact ? await opts.requestContact(m.key, m.label) : true;
         log(`[contact-required] ${m.key} user responded: ${proceed ? 'PROCEED' : 'SKIP'}`);
-        if (aborted()) { log(`abort signal after contact prompt for ${m.key}`); break; }
+        if (aborted()) { log(`abort signal after contact prompt for ${m.key}`); return; }
         if (!proceed) {
           const pt = skip(m.key, m.label, 'skipped by user');
           points.push(pt);
           log(`[point] ${m.key} → skipped by user`);
           emit(null);
-          continue;
+          return runRealtimeSweep(index + 1);
         }
       }
 
@@ -134,7 +140,9 @@ export async function runHarvest(sdk: HarvestSdk, opts: RunHarvestOptions): Prom
         opts.onWearWarning?.();
       }
       emit(null);
-    }
+      return runRealtimeSweep(index + 1);
+    };
+    await runRealtimeSweep(0);
 
     if (!aborted()) {
       startPhase('historical');

@@ -4,9 +4,9 @@ exports.normalizePackage3 = normalizePackage3;
 const primitives_1 = require("../../../shared/primitives");
 function normalizePackage3(record) {
     if ((0, primitives_1.isRecord)(record.package3)) {
-        return Object.fromEntries(Object.entries(record.package3)
-            .filter(([key]) => key !== 'type')
-            .map(([key, item]) => typeof item === 'number' ? [key, item] : [key, (0, primitives_1.normalizeFunctionStatus)(item)]));
+        return Object.fromEntries(Object.entries(record.package3).flatMap(([key, item]) => key === 'type'
+            ? []
+            : [[key, typeof item === 'number' ? item : (0, primitives_1.normalizeFunctionStatus)(item)]]));
     }
     return {
         big_data_tran_type: (0, primitives_1.toInt)(record.bitDataTranType ?? record.bigDataTranType),
