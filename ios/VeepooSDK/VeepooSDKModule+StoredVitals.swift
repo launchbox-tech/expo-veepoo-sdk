@@ -105,6 +105,17 @@ extension VeepooSDKModule {
 
   // MARK: - ECG
 
+  // ECG IS LIVE-ONLY ON THIS BAND — there is no offline-stored ECG to sync.
+  // Device-verified 2026-06-07: the vendor SDK's own ECGTest_table stays empty
+  // and every offline read tier is non-responsive on this firmware
+  // (readDeviceOffStoreECGIDArray + readOneDeviceOffStoreECGData → nothing; the
+  // CRC channel veepooSDK_readDeviceOffStoreECGCrcResult: → callback never
+  // fires). The waveform exists only DURING a veepooSDKTestECGStart test,
+  // captured by the connected app — so G Band's prior-day ECG is G Band's own
+  // saved copy, not band-resident data. ECG capture is therefore a future
+  // live-measurement flow (finger on the electrode, app foreground) — see
+  // docs/adr/0031. This getter stays as a cheap, hang-free no-op that would
+  // surface rows if a future offline-capable firmware ever persisted them.
   func handleReadStoredEcgData(date: String?, promise: Promise) {
     #if targetEnvironment(simulator)
     promise.resolve(nil)
@@ -121,7 +132,6 @@ extension VeepooSDKModule {
     for model in records {
       let ts = "\(model.date ?? queryDate) \(model.testTime ?? "00:00:00")"
       let filterRaw = model.filterSignals as? [NSNumber] ?? []
-      let filterSignals = filterRaw.map { $0.intValue }
       let data: [String: Any] = [
         "timestamp": ts,
         "duration": Int(Double(model.duration ?? "0") ?? 0),
@@ -129,7 +139,7 @@ extension VeepooSDKModule {
         "aveHrv": Int(Double(model.aveHrv ?? "0") ?? 0),
         "aveResRate": Int(Double(model.aveResRate ?? "0") ?? 0),
         "aveQT": Int(Double(model.aveQT ?? "0") ?? 0),
-        "filterSignals": filterSignals,
+        "filterSignals": filterRaw.map { $0.intValue },
       ]
       sendEvent(STORED_ECG_DATA, ["deviceId": connectedDeviceId ?? "", "data": data])
     }

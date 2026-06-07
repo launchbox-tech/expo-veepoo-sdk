@@ -1,4 +1,5 @@
 import ExpoModulesCore
+import ObjectiveC
 import VeepooBleSDK
 
 // Unfiltered per-day dump of the vendor SDK's local database (ADR-0016
@@ -29,6 +30,25 @@ extension VeepooSDKModule {
     case is NSNull:
       return NSNull()
     default:
+      // Vendor model objects (e.g. VPDailyBloodAnalysisModel — the cholesterol
+      // panel) reach here: reflect their ObjC @properties into a dict instead
+      // of an opaque `description` string, so the panel is captured as real
+      // JSON (HDL/LDL/cholesterol/…), not a stringified blob.
+      let obj = value as AnyObject
+      if let cls = object_getClass(obj), let nsObj = obj as? NSObject {
+        var count: UInt32 = 0
+        if let props = class_copyPropertyList(cls, &count), count > 0 {
+          defer { free(props) }
+          var out: [String: Any] = [:]
+          for i in 0..<Int(count) {
+            let name = String(cString: property_getName(props[i]))
+            if let v = nsObj.value(forKey: name) {
+              out[name] = rawJsonSafe(v)
+            }
+          }
+          if !out.isEmpty { return out }
+        }
+      }
       return String(describing: value)
     }
   }
