@@ -9,6 +9,7 @@ exports.normalizeEcgTestResult = normalizeEcgTestResult;
 exports.normalizeFatigueTestResult = normalizeFatigueTestResult;
 exports.normalizeBreathingTestResult = normalizeBreathingTestResult;
 exports.normalizeBodyCompositionTestResult = normalizeBodyCompositionTestResult;
+exports.normalizeHealthGlanceResult = normalizeHealthGlanceResult;
 exports.normalizeStressData = normalizeStressData;
 exports.normalizeBloodGlucoseData = normalizeBloodGlucoseData;
 exports.normalizeGsrTestResult = normalizeGsrTestResult;
@@ -151,6 +152,29 @@ function normalizeBodyCompositionTestResult(value) {
         raw_state: typeof raw === 'string' || typeof raw === 'number' ? raw : undefined,
         is_end: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
         composition: normalizeBodyCompositionMetrics(record.composition),
+    };
+}
+function normalizeHealthGlanceResult(value) {
+    const r = (0, primitives_1.isRecord)(value) ? value : {};
+    const raw = r.rawState;
+    const pos = (v) => {
+        const n = (0, primitives_1.toNumber)(v);
+        return typeof n === 'number' && n > 0 ? n : undefined;
+    };
+    return {
+        state: (0, primitives_1.normalizeTestState)(r.state),
+        progress: (0, primitives_1.toInt)(r.progress),
+        raw_state: typeof raw === 'string' || typeof raw === 'number' ? raw : undefined,
+        is_end: typeof r.isEnd === 'boolean' ? r.isEnd : undefined,
+        heart_rate: pos(r.heartRate),
+        blood_oxygen: pos(r.bloodOxygen),
+        stress: pos(r.stress),
+        hrv: pos(r.hrv),
+        body_temperature: pos(r.bodyTemperature),
+        systolic: pos(r.systolic),
+        diastolic: pos(r.diastolic),
+        blood_sugar: pos(r.bloodSugar),
+        fatigue_level: pos(r.fatigueLevel),
     };
 }
 function normalizeStressData(value) {

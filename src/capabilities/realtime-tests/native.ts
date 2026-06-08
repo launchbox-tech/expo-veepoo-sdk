@@ -21,4 +21,6 @@ export interface RealtimeTestsNativeMethods {
   stopBreathingTest(): Promise<void>;
   startBodyCompositionTest(): Promise<void>;
   stopBodyCompositionTest(): Promise<void>;
+  startHealthGlanceTest(): Promise<void>;
+  stopHealthGlanceTest(): Promise<void>;
 }

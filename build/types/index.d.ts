@@ -19,7 +19,7 @@ export type { MusicData, MusicRemoteCommand } from '../capabilities/music';
 export type { GPSAndTimezoneData } from '../capabilities/gps-timezone';
 export type { DeviceBTState, DeviceBTStatus } from '../capabilities/bt-status';
 export type { DeviceSwitchType, DeviceSwitches } from '../capabilities/device-switches';
-export type { TestState, HeartRateData, BloodPressureData, BloodOxygenData, TemperatureData, StressData, BloodGlucoseData, HeartRateTestResult, BloodPressureTestResult, BloodOxygenTestResult, TemperatureTestResult, BloodGlucoseTestResult, HrvTestResult, EcgTestOptions, EcgTestResult, FatigueTestResult, BreathingTestResult, BodyCompositionMetrics, BodyCompositionTestResult, BloodAnalysisValues, BloodAnalysisTestResult, GsrTestResult, PttState, PttTestResult, RealtimeTestModality, } from '../capabilities/realtime-tests/types';
+export type { TestState, HeartRateData, BloodPressureData, BloodOxygenData, TemperatureData, StressData, BloodGlucoseData, HeartRateTestResult, BloodPressureTestResult, BloodOxygenTestResult, TemperatureTestResult, BloodGlucoseTestResult, HrvTestResult, EcgTestOptions, EcgTestResult, FatigueTestResult, BreathingTestResult, BodyCompositionMetrics, BodyCompositionTestResult, HealthGlanceResult, BloodAnalysisValues, BloodAnalysisTestResult, GsrTestResult, PttState, PttTestResult, RealtimeTestModality, } from '../capabilities/realtime-tests/types';
 export { RealtimeTest } from '../capabilities/realtime-tests/types';
 export type { SleepDataItem, SleepData, SleepMinuteState, SleepMinutePoint, AccurateSleepSession, } from '../capabilities/sleep-data/types';
 export type { SportStepData } from '../capabilities/sport-steps';

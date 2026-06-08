@@ -203,7 +203,7 @@ public class VeepooSDKModule: Module {
       ORIGIN_SPO2_DATA, SOCIAL_MSG_DATA,
       SLEEP_DATA, SPORT_STEP_DATA, ALARM_DATA,
       HRV_TEST_RESULT, ECG_TEST_RESULT, FATIGUE_TEST_RESULT, BREATHING_TEST_RESULT,
-      BODY_COMPOSITION_TEST_RESULT,
+      BODY_COMPOSITION_TEST_RESULT, HEALTH_GLANCE_TEST_RESULT,
       FIND_DEVICE_STATE,
       FIRMWARE_DFU_PROGRESS,
       CONTACTS_DATA,
@@ -373,6 +373,8 @@ public class VeepooSDKModule: Module {
     AsyncFunction("stopBreathingTest") { (promise: Promise) in self.handleStopBreathingTest(promise: promise) }
     AsyncFunction("startBodyCompositionTest") { (promise: Promise) in self.handleStartBodyCompositionTest(promise: promise) }
     AsyncFunction("stopBodyCompositionTest") { (promise: Promise) in self.handleStopBodyCompositionTest(promise: promise) }
+    AsyncFunction("startHealthGlanceTest") { (promise: Promise) in self.handleStartHealthGlanceTest(promise: promise) }
+    AsyncFunction("stopHealthGlanceTest") { (promise: Promise) in self.handleStopHealthGlanceTest(promise: promise) }
 
     // MARK: Lifecycle
     OnStartObserving {

@@ -31,6 +31,19 @@ extension VeepooSDKModule {
         progressWrapper.value += 4
         if progressWrapper.value >= 100 {
           timer.invalidate()
+          // The synthetic 25s window elapsed — emit a terminal so the app
+          // completes with the last value even if the band's `.over` callback
+          // is slow or never arrives (device-verified: stuck at ~96% otherwise).
+          self.sendEvent(BLOOD_OXYGEN_TEST_RESULT, [
+            "deviceId": self.connectedDeviceId ?? "",
+            "result": [
+              "state": "over",
+              "value": spo2ValueWrapper.value,
+              "rate": rateValueWrapper.value,
+              "progress": 100,
+              "isEnd": true
+            ]
+          ])
           return
         }
 

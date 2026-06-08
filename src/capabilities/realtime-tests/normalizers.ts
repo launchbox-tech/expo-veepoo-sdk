@@ -10,6 +10,7 @@ import type {
   EcgTestResult,
   FatigueTestResult,
   GsrTestResult,
+  HealthGlanceResult,
   HeartRateTestResult,
   HrvTestResult,
   PttTestResult,
@@ -162,6 +163,30 @@ export function normalizeBodyCompositionTestResult(value: unknown): BodyComposit
     raw_state: typeof raw === 'string' || typeof raw === 'number' ? raw : undefined,
     is_end: typeof record.isEnd === 'boolean' ? record.isEnd : undefined,
     composition: normalizeBodyCompositionMetrics(record.composition),
+  };
+}
+
+export function normalizeHealthGlanceResult(value: unknown): HealthGlanceResult {
+  const r = isRecord(value) ? value : {};
+  const raw = r.rawState;
+  const pos = (v: unknown): number | undefined => {
+    const n = toNumber(v);
+    return typeof n === 'number' && n > 0 ? n : undefined;
+  };
+  return {
+    state: normalizeTestState(r.state),
+    progress: toInt(r.progress),
+    raw_state: typeof raw === 'string' || typeof raw === 'number' ? raw : undefined,
+    is_end: typeof r.isEnd === 'boolean' ? r.isEnd : undefined,
+    heart_rate: pos(r.heartRate),
+    blood_oxygen: pos(r.bloodOxygen),
+    stress: pos(r.stress),
+    hrv: pos(r.hrv),
+    body_temperature: pos(r.bodyTemperature),
+    systolic: pos(r.systolic),
+    diastolic: pos(r.diastolic),
+    blood_sugar: pos(r.bloodSugar),
+    fatigue_level: pos(r.fatigueLevel),
   };
 }
 

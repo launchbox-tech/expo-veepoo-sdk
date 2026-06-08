@@ -66,6 +66,8 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "stopBreathingTest",
   "startBodyCompositionTest",
   "stopBodyCompositionTest",
+  "startHealthGlanceTest",
+  "stopHealthGlanceTest",
   "setDeviceTime",
   "readAlarms",
   "setAlarm",

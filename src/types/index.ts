@@ -81,6 +81,7 @@ export type {
   BreathingTestResult,
   BodyCompositionMetrics,
   BodyCompositionTestResult,
+  HealthGlanceResult,
   BloodAnalysisValues,
   BloodAnalysisTestResult,
   GsrTestResult,

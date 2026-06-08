@@ -47,6 +47,7 @@ export declare const EVENT_DEFINITIONS: {
     fatigue_test_result: EventDef<"fatigue_test_result">;
     breathing_test_result: EventDef<"breathing_test_result">;
     body_composition_test_result: EventDef<"body_composition_test_result">;
+    health_glance_test_result: EventDef<"health_glance_test_result">;
     battery_data: EventDef<"battery_data">;
     connection_status_changed: EventDef<"connection_status_changed">;
     origin_spo2_data: EventDef<"origin_spo2_data">;

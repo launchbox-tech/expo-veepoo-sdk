@@ -40,6 +40,7 @@ describe('REALTIME_TEST_DEFINITIONS registry', () => {
         'ecg',
         'fatigue',
         'gsr',
+        'health_glance',
         'heart_rate',
         'hrv',
         'ptt',

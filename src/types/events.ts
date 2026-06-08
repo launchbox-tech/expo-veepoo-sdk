@@ -50,6 +50,7 @@ import type {
   BreathingTestResult,
   EcgTestResult,
   FatigueTestResult,
+  HealthGlanceResult,
   HeartRateTestResult,
   HrvTestResult,
   TemperatureTestResult,
@@ -181,6 +182,7 @@ export type VeepooEventPayload = {
   fatigue_test_result: { device_id: string; result: FatigueTestResult };
   breathing_test_result: { device_id: string; result: BreathingTestResult };
   body_composition_test_result: { device_id: string; result: BodyCompositionTestResult };
+  health_glance_test_result: { device_id: string; result: HealthGlanceResult };
   battery_data: { device_id: string; data: BatteryInfo };
   connection_status_changed: { device_id: string; status: ConnectionStatus };
   origin_spo2_data: { device_id: string; data: Spo2OriginData };

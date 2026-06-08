@@ -11,6 +11,7 @@ import {
   normalizeEcgTestResult,
   normalizeFatigueTestResult,
   normalizeGsrTestResult,
+  normalizeHealthGlanceResult,
   normalizeHeartRateTestResult,
   normalizeHrvTestResult,
   normalizePttTestResult,
@@ -170,6 +171,16 @@ export const REALTIME_TEST_DEFINITIONS = {
     control: {
       start: (n) => n.startBodyCompositionTest(),
       stop: (n) => n.stopBodyCompositionTest(),
+    },
+  },
+  health_glance: {
+    event: "health_glance_test_result",
+    eventField: "result",
+    logScope: "test",
+    normalize: normalizeHealthGlanceResult,
+    control: {
+      start: (n) => n.startHealthGlanceTest(),
+      stop: (n) => n.stopHealthGlanceTest(),
     },
   },
   blood_analysis: {

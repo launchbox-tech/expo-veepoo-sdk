@@ -110,6 +110,7 @@ let ECG_TEST_RESULT = "ecgTestResult"
 let FATIGUE_TEST_RESULT = "fatigueTestResult"
 let BREATHING_TEST_RESULT = "breathingTestResult"
 let BODY_COMPOSITION_TEST_RESULT = "bodyCompositionTestResult"
+let HEALTH_GLANCE_TEST_RESULT = "healthGlanceTestResult"
 let CONTACTS_DATA = "contactsData"
 let SOS_CALL_TIMES_DATA = "sosCallTimesData"
 let ERROR = VeepooEvent.error

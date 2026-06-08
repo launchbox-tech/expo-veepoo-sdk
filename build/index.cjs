@@ -1097,6 +1097,29 @@ function normalizeBodyCompositionTestResult(value) {
 		composition: normalizeBodyCompositionMetrics(record.composition)
 	};
 }
+function normalizeHealthGlanceResult(value) {
+	const r = isRecord(value) ? value : {};
+	const raw = r.rawState;
+	const pos = (v) => {
+		const n = toNumber(v);
+		return typeof n === "number" && n > 0 ? n : void 0;
+	};
+	return {
+		state: normalizeTestState(r.state),
+		progress: toInt(r.progress),
+		raw_state: typeof raw === "string" || typeof raw === "number" ? raw : void 0,
+		is_end: typeof r.isEnd === "boolean" ? r.isEnd : void 0,
+		heart_rate: pos(r.heartRate),
+		blood_oxygen: pos(r.bloodOxygen),
+		stress: pos(r.stress),
+		hrv: pos(r.hrv),
+		body_temperature: pos(r.bodyTemperature),
+		systolic: pos(r.systolic),
+		diastolic: pos(r.diastolic),
+		blood_sugar: pos(r.bloodSugar),
+		fatigue_level: pos(r.fatigueLevel)
+	};
+}
 function normalizeStressData(value) {
 	const record = isRecord(value) ? value : {};
 	return {
@@ -1284,6 +1307,16 @@ const REALTIME_TEST_DEFINITIONS = {
 		control: {
 			start: (n) => n.startBodyCompositionTest(),
 			stop: (n) => n.stopBodyCompositionTest()
+		}
+	},
+	health_glance: {
+		event: "health_glance_test_result",
+		eventField: "result",
+		logScope: "test",
+		normalize: normalizeHealthGlanceResult,
+		control: {
+			start: (n) => n.startHealthGlanceTest(),
+			stop: (n) => n.stopHealthGlanceTest()
 		}
 	},
 	blood_analysis: {

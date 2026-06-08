@@ -129,6 +129,16 @@ exports.REALTIME_TEST_DEFINITIONS = {
             stop: (n) => n.stopBodyCompositionTest(),
         },
     },
+    health_glance: {
+        event: "health_glance_test_result",
+        eventField: "result",
+        logScope: "test",
+        normalize: normalizers_1.normalizeHealthGlanceResult,
+        control: {
+            start: (n) => n.startHealthGlanceTest(),
+            stop: (n) => n.stopHealthGlanceTest(),
+        },
+    },
     blood_analysis: {
         event: "blood_analysis_test_result",
         eventField: "result",

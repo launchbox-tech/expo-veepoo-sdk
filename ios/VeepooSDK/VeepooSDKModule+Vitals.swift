@@ -45,8 +45,18 @@ extension VeepooSDKModule {
         if let anyHrv = model.aveHrv, let hv = Int(anyHrv) {
           payload["hrv"] = hv
         }
-        if includeWaveform, let fs = model.filterSignals as? [NSNumber] {
-          payload["waveform"] = fs.map { $0.intValue }
+        if includeWaveform {
+          // The vendor exposes two live sample streams: `filterSignals`
+          // (draw-ready, preferred) and `originalSignals` (raw ADC). This
+          // firmware populates only `originalSignals` during a live test, so
+          // take whichever has data — otherwise the waveform is silently dropped
+          // (device-verified 2026-06-08: f=0, o grows to ~19.5k over 39s).
+          let filter = (model.filterSignals as? [NSNumber])?.map { $0.intValue } ?? []
+          let original = (model.originalSignals as? [NSNumber])?.map { $0.intValue } ?? []
+          let wave = filter.isEmpty ? original : filter
+          if !wave.isEmpty {
+            payload["waveform"] = wave
+          }
         }
       }
 
@@ -235,6 +245,99 @@ extension VeepooSDKModule {
     self.finishMeasurement(type: "bodyComposition", reason: "manual_stop")
     promise.resolve(nil)
     #endif
+  }
+
+  // MARK: - Health Glance (one-tap combined test)
+
+  // The standalone stress test returns 0 because stress is HRV-derived; Health
+  // Glance gathers HRV during the measurement and reports stress + every other
+  // vital together (this is what G Band's "Quick Measurement" uses).
+  func handleStartHealthGlanceTest(promise: Promise) {
+    #if targetEnvironment(simulator)
+    promise.resolve(nil)
+    #else
+    guard self.ensureMeasurementCanStart(type: "healthGlance", promise: promise) else {
+      return
+    }
+    guard let peripheralManage = self.peripheralManage else {
+      promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")
+      return
+    }
+    if (self.bleManager?.peripheralModel?.healthGlanceType ?? 0) == 0 {
+      self.finishMeasurement(type: "healthGlance", reason: "capability_unsupported")
+      promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support health glance")
+      return
+    }
+    peripheralManage.veepooSDK_healthGlanceTestStart(
+      true,
+      andProgress: { [weak self] progress in
+        guard let self = self else { return }
+        self.sendEvent(HEALTH_GLANCE_TEST_RESULT, [
+          "deviceId": self.connectedDeviceId ?? "",
+          "result": ["state": "testing", "progress": progress, "rawState": "progress", "isEnd": false]
+        ])
+      },
+      andResult: { [weak self] state, model in
+        guard let self = self else { return }
+        let rawVal = state.rawValue
+        let isEnd = self.healthGlanceStateIsTerminal(state)
+        var payload: [String: Any] = [
+          "state": self.healthGlanceStateLabel(state),
+          "rawState": rawVal,
+          "isEnd": isEnd
+        ]
+        if let m = model {
+          payload["heartRate"] = m.heartRate
+          payload["bloodOxygen"] = m.bloodOxygen
+          payload["stress"] = m.stress
+          payload["hrv"] = m.hrv
+          payload["bodyTemperature"] = m.bodyTemperature
+          payload["systolic"] = m.systolicBloodPressure
+          payload["diastolic"] = m.diastolicBloodPressure
+          payload["bloodSugar"] = m.bloodSugar
+          payload["fatigueLevel"] = m.fatigueLevel
+        }
+        self.sendEvent(HEALTH_GLANCE_TEST_RESULT, [
+          "deviceId": self.connectedDeviceId ?? "",
+          "result": payload
+        ])
+        if isEnd {
+          peripheralManage.veepooSDK_healthGlanceTestStart(false, andProgress: { _ in }, andResult: { _, _ in })
+          self.finishMeasurement(type: "healthGlance", reason: "terminal_\(rawVal)")
+        }
+      }
+    )
+    promise.resolve(nil)
+    #endif
+  }
+
+  func handleStopHealthGlanceTest(promise: Promise) {
+    #if targetEnvironment(simulator)
+    promise.resolve(nil)
+    #else
+    self.peripheralManage?.veepooSDK_healthGlanceTestStart(false, andProgress: { _ in }, andResult: { _, _ in })
+    self.finishMeasurement(type: "healthGlance", reason: "manual_stop")
+    promise.resolve(nil)
+    #endif
+  }
+
+  private func healthGlanceStateLabel(_ state: VPDeviceHealthGlanceState) -> String {
+    switch state {
+    case .over, .complete: return "over"
+    case .notWear, .notLead: return "notWear"
+    case .deviceBusy, .lowPower: return "deviceBusy"
+    case .failure, .noFunction: return "error"
+    @unknown default: return "testing"
+    }
+  }
+
+  private func healthGlanceStateIsTerminal(_ state: VPDeviceHealthGlanceState) -> Bool {
+    switch state {
+    case .over, .complete, .notWear, .notLead, .deviceBusy, .lowPower, .failure, .noFunction:
+      return true
+    @unknown default:
+      return false
+    }
   }
 
   // MARK: - Mapping helpers

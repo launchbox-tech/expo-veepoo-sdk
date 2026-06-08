@@ -16,7 +16,7 @@ import type { AccurateSleepSession, SleepData } from '../capabilities/sleep-data
 import type { SportStepData } from '../capabilities/sport-steps';
 import type { HalfHourData, OriginData, Spo2OriginData, ReadOriginProgress } from '../capabilities/origin-data/types';
 import type { ExerciseReadProgress, ExerciseSession, StoredTemperatureData, StoredBloodGlucoseData, StoredHrvData, StoredEcgData, StoredBodyCompositionData } from '../capabilities/historical-query';
-import type { BloodGlucoseData, StressData, BloodAnalysisTestResult, BloodOxygenTestResult, GsrTestResult, PttTestResult, PttState, BloodPressureTestResult, BodyCompositionTestResult, BreathingTestResult, EcgTestResult, FatigueTestResult, HeartRateTestResult, HrvTestResult, TemperatureTestResult } from '../capabilities/realtime-tests/types';
+import type { BloodGlucoseData, StressData, BloodAnalysisTestResult, BloodOxygenTestResult, GsrTestResult, PttTestResult, PttState, BloodPressureTestResult, BodyCompositionTestResult, BreathingTestResult, EcgTestResult, FatigueTestResult, HealthGlanceResult, HeartRateTestResult, HrvTestResult, TemperatureTestResult } from '../capabilities/realtime-tests/types';
 import type { VeepooError } from './errors';
 import type { BloodGlucoseUnit, SkinTone, TemperatureUnit } from './settings';
 /** Generic key/value bag used by the `custom_settings_data` payload. */
@@ -178,6 +178,10 @@ export type VeepooEventPayload = {
     body_composition_test_result: {
         device_id: string;
         result: BodyCompositionTestResult;
+    };
+    health_glance_test_result: {
+        device_id: string;
+        result: HealthGlanceResult;
     };
     battery_data: {
         device_id: string;

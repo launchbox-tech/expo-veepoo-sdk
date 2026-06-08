@@ -50,6 +50,24 @@ export interface BloodGlucoseData {
   error?: string;
 }
 
+/** Health Glance (微体检) — one-tap combined test; the band gathers HRV and
+ *  derives stress/etc. Fields are 0 until the result callback fires at the end. */
+export interface HealthGlanceResult {
+  state: TestState | string;
+  progress?: number;
+  raw_state?: string | number;
+  is_end?: boolean;
+  heart_rate?: number;
+  blood_oxygen?: number;
+  stress?: number;
+  hrv?: number;
+  body_temperature?: number;
+  systolic?: number;
+  diastolic?: number;
+  blood_sugar?: number;
+  fatigue_level?: number;
+}
+
 export interface HeartRateTestResult {
   state: TestState;
   value?: number;

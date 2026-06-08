@@ -1,6 +1,6 @@
 import type { LogScope, VeepooEvent, EcgTestOptions } from "../../types/index";
 import type { RealtimeTestsNativeMethods } from "./native";
-import { normalizeBloodAnalysisTestResult, normalizeBloodGlucoseData, normalizeBloodOxygenTestResult, normalizeBloodPressureTestResult, normalizeBodyCompositionTestResult, normalizeBreathingTestResult, normalizeEcgTestResult, normalizeFatigueTestResult, normalizeGsrTestResult, normalizeHeartRateTestResult, normalizeHrvTestResult, normalizePttTestResult, normalizeStressData, normalizeTemperatureTestResult } from "./normalizers";
+import { normalizeBloodAnalysisTestResult, normalizeBloodGlucoseData, normalizeBloodOxygenTestResult, normalizeBloodPressureTestResult, normalizeBodyCompositionTestResult, normalizeBreathingTestResult, normalizeEcgTestResult, normalizeFatigueTestResult, normalizeGsrTestResult, normalizeHealthGlanceResult, normalizeHeartRateTestResult, normalizeHrvTestResult, normalizePttTestResult, normalizeStressData, normalizeTemperatureTestResult } from "./normalizers";
 export interface RealtimeTestControl<TOptions = void> {
     /** Start the test on the Band. `options` is per-test; most are parameterless. */
     start: (native: RealtimeTestsNativeMethods, options?: TOptions) => Promise<unknown>;
@@ -140,6 +140,16 @@ export declare const REALTIME_TEST_DEFINITIONS: {
         readonly eventField: "result";
         readonly logScope: "test";
         readonly normalize: typeof normalizeBodyCompositionTestResult;
+        readonly control: {
+            readonly start: (n: RealtimeTestsNativeMethods) => Promise<void>;
+            readonly stop: (n: RealtimeTestsNativeMethods) => Promise<void>;
+        };
+    };
+    readonly health_glance: {
+        readonly event: "health_glance_test_result";
+        readonly eventField: "result";
+        readonly logScope: "test";
+        readonly normalize: typeof normalizeHealthGlanceResult;
         readonly control: {
             readonly start: (n: RealtimeTestsNativeMethods) => Promise<void>;
             readonly stop: (n: RealtimeTestsNativeMethods) => Promise<void>;
