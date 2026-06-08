@@ -46,6 +46,7 @@ fun ModuleDefinitionBuilder.defineEvents() {
     EXERCISE_SESSION_DATA,
     EXERCISE_READ_COMPLETE,
     EXERCISE_READ_PROGRESS,
+    HEALTH_GLANCE_TEST_RESULT,
     ERROR
   )
 }
