@@ -212,6 +212,14 @@
         "via": "veepooSDKAddPTTStateListener: block (pttState integer)"
       }
     },
+    "healthGlanceTestResult": {
+      "android": {
+        "via": "VPOperateManager.startMiniCheckup / IMiniCheckupOptListener (onMiniCheckupTestProgress, onMiniCheckupSuccess, onMiniCheckupDetailTestSuccess, onMiniCheckupTestFailed)"
+      },
+      "ios": {
+        "via": "veepooSDK_healthGlanceTestStart:andProgress:andResult: block (VPDeviceHealthGlanceState, VPHealthGlanceTestModel)"
+      }
+    },
     "readOriginProgress": {
       "android": {
         "via": "IOriginProgressListener.onReadOriginProgress / onReadOriginProgressDetail"
