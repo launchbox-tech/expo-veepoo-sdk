@@ -79,6 +79,10 @@ public class VeepooSDKModule: Module {
   var permissionPromise: Promise?
   var permissionCentralManager: CBCentralManager?
   var permissionDelegate: PermissionDelegate?
+  // [SCAN-FIX] retained delegate for the always-on centralManager + a one-shot
+  // guard so the power-on scan re-arm fires at most once per scan session.
+  var stateDelegate: CentralStateDelegate?
+  var scanRearmedOnPowerOn = false
   var pendingScanStart = false
   var discoveredDevices: [String: VPPeripheralModel] = [:]
   var pendingConnectDeviceId: String?

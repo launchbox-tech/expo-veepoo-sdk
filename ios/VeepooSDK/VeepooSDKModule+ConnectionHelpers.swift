@@ -36,9 +36,52 @@ extension VeepooSDKModule {
   func ensureCentralManager() {
     #if !targetEnvironment(simulator)
     if centralManager != nil { return }
-    centralManager = CBCentralManager(delegate: nil, queue: nil, options: [
+    // [SCAN-FIX] Attach a delegate so the central completes initialization and
+    // delivers centralManagerDidUpdateState — a nil delegate leaves `.state`
+    // stuck at `.unknown`, which made emitBluetoothStatus() lie about power-on
+    // for ~10s on a cold scan.
+    if stateDelegate == nil { stateDelegate = CentralStateDelegate(module: self) }
+    centralManager = CBCentralManager(delegate: stateDelegate, queue: nil, options: [
       CBCentralManagerOptionShowPowerAlertKey: true
     ])
+    #endif
+  }
+
+  // [SCAN-FIX] Delivered by CentralStateDelegate when the radio state changes.
+  // Publishes the truthful state to JS and re-arms a scan that was issued before
+  // power-on (the dropped-scan recovery the 10s auto-stop used to handle).
+  func handleCentralStateUpdate(_ central: CBCentralManager) {
+    #if !targetEnvironment(simulator)
+    print("[VeepooSDK] [SCAN-FIX] centralManagerDidUpdateState: \(central.state.rawValue)")
+    self.emitBluetoothStatus()
+    self.ensureScanning(source: "delegate")
+    #endif
+  }
+
+  // [SCAN-FIX] Single authority for actually starting the vendor scan. Idempotent
+  // per scan session via `scanRearmedOnPowerOn`, so it can be called from
+  // handleStartScan AND the power-on callbacks (delegate / vendor block) in any
+  // order without racing or double-issuing — whichever runs first while the radio
+  // is poweredOn wins; the rest no-op. Defers cleanly while still powering on.
+  func ensureScanning(source: String) {
+    #if !targetEnvironment(simulator)
+    guard self.isScanning,
+          !self.scanRearmedOnPowerOn,
+          self.centralManager?.state == .poweredOn,
+          let mgr = self.bleManager else { return }
+    self.scanRearmedOnPowerOn = true
+    print("[VeepooSDK] [SCAN-FIX] ensureScanning: clean stop+start (source: \(source))")
+    // The first vendor scan after a cold BLE init is unreliable as a bare start
+    // (logs: a start right after power-on found nothing for 24s; only a retry's
+    // stop+start worked). Stop to reset vendor state, then start after a beat.
+    mgr.veepooSDKStopScanDevice()
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+      guard let self = self, self.isScanning, let mgr = self.bleManager else { return }
+      mgr.veepooSDKStartScanDeviceAndReceiveScanningDevice { [weak self] peripheralModel in
+        guard let self = self, let model = peripheralModel else { return }
+        self.handleDiscoveredDevice(model)
+      }
+    }
     #endif
   }
 
@@ -265,7 +308,10 @@ extension VeepooSDKModule {
 
     manager.vpBleCentralManageChangeBlock = { [weak self] _ in
       DispatchQueue.main.async {
-        self?.emitBluetoothStatus()
+        guard let self = self else { return }
+        self.emitBluetoothStatus()
+        // [SCAN-FIX] Backstop to the delegate path — same idempotent authority.
+        self.ensureScanning(source: "vendorBlock")
       }
     }
 
@@ -601,6 +647,7 @@ extension VeepooSDKModule {
     #endif
     isScanning = false
     pendingScanStart = false
+    scanRearmedOnPowerOn = false
     connectedDeviceId = nil
     isInitialized = false
     pendingConnectDeviceId = nil
