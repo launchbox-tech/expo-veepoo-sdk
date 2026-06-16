@@ -189,7 +189,17 @@ extension VeepooSDKModule {
         self.cacheDeviceFunctions()
         self.connectionState = .ready
         self.activeConnectDeviceId = nil
-        self.sendEvent(DEVICE_READY, ["deviceId": self.connectedDeviceId ?? "", "isOadModel": false])
+        // Surface the real, stable hardware MAC. `deviceAddress` settles to it
+        // after password verification (vendor header: "may change after password
+        // verification") and the SDK's own historical-data reads already use it
+        // as their `tableID`, so it's proven correct. Pairing keys device
+        // identity on THIS instead of the scan-time value, which flips to the iOS
+        // CBPeripheral UUID on re-pair.
+        self.sendEvent(DEVICE_READY, [
+          "deviceId": self.connectedDeviceId ?? "",
+          "mac": manager.peripheralModel?.deviceAddress ?? "",
+          "isOadModel": false,
+        ])
       }
       promiseBox.resolve(resultData)
     }

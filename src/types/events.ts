@@ -152,7 +152,10 @@ export type VeepooEventPayload = {
     status: ConnectionStatus;
     code?: number;
   };
-  device_ready: { device_id: string; is_oad_model?: boolean };
+  // `mac` is the real, stable hardware MAC read post-verification — use it as the
+  // canonical device identity (the scan `device_id` flips to the iOS UUID on
+  // re-pair). May be "" if the SDK couldn't resolve it.
+  device_ready: { device_id: string; is_oad_model?: boolean; mac?: string };
   bluetooth_state_changed: BluetoothStatus;
   device_function: {
     device_id: string;

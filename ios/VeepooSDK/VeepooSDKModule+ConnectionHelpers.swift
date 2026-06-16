@@ -566,7 +566,17 @@ extension VeepooSDKModule {
         self.connectionState = .ready
         self.activeConnectDeviceId = nil
         self.authenticationRetryCount = 0
-        self.sendEvent(DEVICE_READY, ["deviceId": deviceId, "isOadModel": false])
+        // Surface the real, stable hardware MAC (see Connect.swift handleVerifyPassword).
+        // `deviceAddress` settles to it post-verification and the SDK's historical
+        // reads already use it as their tableID, so it's proven correct — pairing
+        // keys device identity on this instead of the scan id (which flips to the
+        // iOS CBPeripheral UUID on re-pair). This is the auto-verify-on-connect
+        // path the app actually hits.
+        self.sendEvent(DEVICE_READY, [
+          "deviceId": deviceId,
+          "mac": manager.peripheralModel?.deviceAddress ?? "",
+          "isOadModel": false,
+        ])
       } else {
         print("[VeepooSDK] verifyPasswordInternal - 密码验证失败, result: \(result.rawValue)")
         
