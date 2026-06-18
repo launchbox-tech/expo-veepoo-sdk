@@ -1021,13 +1021,33 @@ function normalizeHrvTestResult(value) {
 }
 function normalizeEcgTestResult(value) {
 	const record = isRecord(value) ? value : {};
+	const int = (v) => {
+		const n = toNumber(v);
+		return n === void 0 ? void 0 : Math.trunc(n);
+	};
+	const mv = (v) => {
+		const n = toNumber(v);
+		return n === void 0 ? void 0 : n / 100;
+	};
+	const rhythm = Array.isArray(record.rhythmDiagnosis) ? record.rhythmDiagnosis.filter((s) => typeof s === "string" && s.length > 0) : void 0;
 	return {
 		state: normalizeTestState(record.rawState ?? record.state),
 		progress: toInt(record.progress),
 		heart_rate: toInt(record.heartRate ?? record.hr),
 		hrv: toInt(record.hrv),
 		raw_state: typeof record.rawState === "string" ? record.rawState : void 0,
-		waveform: normalizeWaveform(record.waveform)
+		waveform: normalizeWaveform(record.waveform),
+		qt_ms: int(record.qtMs),
+		sdnn_ms: int(record.sdnnMs),
+		rmssd_ms: int(record.rmssdMs),
+		qrs_duration_ms: int(record.qrsDurationMs),
+		qrs_amplitude_mv: mv(record.qrsAmpX100),
+		st_amplitude_mv: mv(record.stAmpX100),
+		mental_stress_index: int(record.mentalStressIndex),
+		fatigue_index: int(record.fatigueIndex),
+		min_hr: int(record.minHr),
+		max_hr: int(record.maxHr),
+		rhythm_diagnosis: rhythm && rhythm.length > 0 ? rhythm : void 0
 	};
 }
 function normalizeFatigueTestResult(value) {

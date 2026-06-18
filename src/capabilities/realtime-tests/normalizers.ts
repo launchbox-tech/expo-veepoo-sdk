@@ -82,6 +82,22 @@ export function normalizeHrvTestResult(value: unknown): HrvTestResult {
 
 export function normalizeEcgTestResult(value: unknown): EcgTestResult {
   const record = isRecord(value) ? value : {};
+  // Diagnostic fields (ADR-0047 Tier B) arrive ONLY on the terminal event as raw
+  // vendor strings. `int`/`mv` return undefined when absent (unlike `toInt`,
+  // whose 0-fallback would stamp every non-terminal event), so the fields are
+  // simply omitted until the report is present. `mv` undoes the vendor ×100.
+  const int = (v: unknown): number | undefined => {
+    const n = toNumber(v);
+    return n === undefined ? undefined : Math.trunc(n);
+  };
+  const mv = (v: unknown): number | undefined => {
+    const n = toNumber(v);
+    return n === undefined ? undefined : n / 100;
+  };
+  const rhythm =
+    Array.isArray(record.rhythmDiagnosis) ?
+      record.rhythmDiagnosis.filter((s): s is string => typeof s === 'string' && s.length > 0)
+    : undefined;
   return {
     state: normalizeTestState(record.rawState ?? record.state),
     progress: toInt(record.progress),
@@ -89,6 +105,17 @@ export function normalizeEcgTestResult(value: unknown): EcgTestResult {
     hrv: toInt(record.hrv),
     raw_state: typeof record.rawState === 'string' ? record.rawState : undefined,
     waveform: normalizeWaveform(record.waveform),
+    qt_ms: int(record.qtMs),
+    sdnn_ms: int(record.sdnnMs),
+    rmssd_ms: int(record.rmssdMs),
+    qrs_duration_ms: int(record.qrsDurationMs),
+    qrs_amplitude_mv: mv(record.qrsAmpX100),
+    st_amplitude_mv: mv(record.stAmpX100),
+    mental_stress_index: int(record.mentalStressIndex),
+    fatigue_index: int(record.fatigueIndex),
+    min_hr: int(record.minHr),
+    max_hr: int(record.maxHr),
+    rhythm_diagnosis: rhythm && rhythm.length > 0 ? rhythm : undefined,
   };
 }
 

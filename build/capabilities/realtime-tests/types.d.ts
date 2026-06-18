@@ -107,6 +107,28 @@ export interface EcgTestResult {
     raw_state?: string;
     /** Present when `startEcgTest({ include_waveform: true })` and Band supports it */
     waveform?: number[];
+    /** Average QT interval, ms (Bazett QTc is derived app-side from this + HR). */
+    qt_ms?: number;
+    /** SDNN — standard deviation of NN intervals, ms. */
+    sdnn_ms?: number;
+    /** RMSSD — root-mean-square of successive NN differences, ms. */
+    rmssd_ms?: number;
+    /** QRS complex duration, ms. */
+    qrs_duration_ms?: number;
+    /** QRS amplitude, mV (vendor ×100 integer, scaled down). */
+    qrs_amplitude_mv?: number;
+    /** Mean ST-segment amplitude, mV (vendor ×100 integer, scaled down). */
+    st_amplitude_mv?: number;
+    /** Mental Stress Index, 1–99 (vendor `pressureIndex`). */
+    mental_stress_index?: number;
+    /** Fatigue Index, 1–99 (vendor `fatigueIndex`) — distinct from the `fatigue` spot test's 1–4 level. */
+    fatigue_index?: number;
+    /** Min HR over the recording, bpm (from the band's per-second HR array). */
+    min_hr?: number;
+    /** Max HR over the recording, bpm. */
+    max_hr?: number;
+    /** Vendor rhythm/disease diagnosis labels, when the band flags any (often empty for normal readings). */
+    rhythm_diagnosis?: string[];
 }
 /** Fatigue manual test — vendor fatigue level often 1–4. */
 export interface FatigueTestResult {

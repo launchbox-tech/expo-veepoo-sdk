@@ -60,6 +60,17 @@ extension VeepooSDKModule {
         }
       }
 
+      // [ADR-0047 Tier B] On the terminal callback, surface the vendor ECG
+      // diagnostic report (SDNN/RMSSD/QRS/ST/QT + mental-stress & fatigue
+      // indices + the per-second HR range). Raw vendor strings pass through to
+      // the TS normalizer, which parses and scales them. Absent on an aborted
+      // test (the report comes back nil) — then nothing is attached.
+      if self.ecgStateIsTerminal(state), let model = testModel,
+        let diag = self.ecgDiagnostics(model)
+      {
+        for (key, value) in diag { payload[key] = value }
+      }
+
       self.sendEvent(ECG_TEST_RESULT, [
         "deviceId": self.connectedDeviceId ?? "",
         "result": payload
@@ -465,5 +476,69 @@ extension VeepooSDKModule {
     if let v = bodyCompositionMetricDouble(m.proteinAmount) { o["proteinMassKg"] = v }
     if let v = bodyCompositionMetricDouble(m.basalMetabolicRate) { o["basalMetabolicRateKcal"] = v }
     return o
+  }
+
+  // MARK: - ECG diagnostics extraction (ADR-0047 Tier B)
+
+  // Surfaces the vendor ECG diagnostic report on the terminal callback. Raw
+  // vendor strings pass through to the TS normalizer, which parses to numbers
+  // and scales (qrsAmp / stMeanAmp are vendor ×100 integers → ÷100 → mV).
+  // Crash-safe: fields read via KVC (the report header is NS_ASSUME_NONNULL but
+  // the firmware returns nil on an aborted test), and the class methods are
+  // invoked by raw ObjC selector so the build never depends on guessing the
+  // Clang-imported Swift argument label. Returns nil when there is no report.
+  private func ecgDiagnostics(_ model: VPECGTestDataModel) -> [String: Any]? {
+    guard let report = self.ecgHandlePerform("resultReportWithModel:", model) as? NSObject
+    else { return nil }
+    var d: [String: Any] = [:]
+    // Plain-ms scalars (vendor strings; TS parses to int).
+    d["qtMs"] = self.ecgKvcString(model, "aveQT")
+    d["sdnnMs"] = self.ecgKvcString(report, "diseaseSdnn")
+    d["rmssdMs"] = self.ecgKvcString(report, "diseaseRmssd")
+    d["qrsDurationMs"] = self.ecgKvcString(report, "qrsTime")
+    // Vendor ×100 integers — TS divides by 100 → mV.
+    d["qrsAmpX100"] = self.ecgKvcString(report, "qrsAmp")
+    d["stAmpX100"] = self.ecgKvcString(report, "stMeanAmp")
+    // Diagnostic indices [1–99].
+    d["mentalStressIndex"] = self.ecgKvcString(report, "pressureIndex")
+    d["fatigueIndex"] = self.ecgKvcString(report, "fatigueIndex")
+    // Per-second HR range from the band's own array (a reduction, not new math).
+    if let range = self.ecgHrRange(model) {
+      d["minHr"] = range.min
+      d["maxHr"] = range.max
+    }
+    // Vendor rhythm labels — empty on this firmware for normal readings, but
+    // surface them when present so the app can prefer a real diagnosis over the
+    // HR-derived rate class.
+    if let arr = self.ecgHandlePerform("resultWithModel:", model) as? [NSObject] {
+      let names = arr.map { self.ecgKvcString($0, "diseaseName") }
+        .filter { !$0.isEmpty && $0 != "<nil>" && $0 != "<no-key>" }
+      if !names.isEmpty { d["rhythmDiagnosis"] = names }
+    }
+    return d
+  }
+
+  private func ecgHrRange(_ model: VPECGTestDataModel) -> (min: Int, max: Int)? {
+    guard let arr = model.value(forKey: "hearts") as? [Any] else { return nil }
+    let hrs = arr.compactMap { ($0 as? NSNumber)?.intValue ?? Int($0 as? String ?? "") }
+      .filter { $0 > 0 }
+    guard let lo = hrs.min(), let hi = hrs.max() else { return nil }
+    return (lo, hi)
+  }
+
+  private func ecgHandlePerform(_ selectorName: String, _ arg: Any) -> Any? {
+    let sel = NSSelectorFromString(selectorName)
+    let cls: AnyObject = VPECGTestResutHandle.self
+    guard cls.responds(to: sel) else { return nil }
+    return cls.perform(sel, with: arg)?.takeUnretainedValue()
+  }
+
+  private func ecgKvcString(_ obj: NSObject, _ key: String) -> String {
+    guard obj.responds(to: NSSelectorFromString(key)) else { return "<no-key>" }
+    let v = obj.value(forKey: key)
+    if v == nil { return "<nil>" }
+    if let s = v as? String { return s }
+    if let n = v as? NSNumber { return n.stringValue }
+    return String(describing: v!)
   }
 }
