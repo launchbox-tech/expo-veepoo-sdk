@@ -1,3 +1,4 @@
+import CoreBluetooth
 import ExpoModulesCore
 import VeepooBleSDK
 
@@ -28,6 +29,10 @@ extension VeepooSDKModule {
     // 只有在本地没有缓存模型时，才回退到 UUID 恢复外围设备。
     var peripheralModel: VPPeripheralModel? = nil
     var modelSource = "none"
+    // [#117 / ADR-0050 C] A held stale link to clear before the fresh connect
+    // (captured below if the retrieved peripheral is non-disconnected).
+    var staleHeldPeripheral: CBPeripheral? = nil
+    var staleHeldCentral: CBCentralManager? = nil
     peripheralModel = self.discoveredDevices[deviceId]
     if peripheralModel != nil {
       modelSource = "cache:deviceId"
@@ -48,6 +53,18 @@ extension VeepooSDKModule {
       let peripherals = vendorCentral.retrievePeripherals(withIdentifiers: [uuid])
       print("[VeepooSDK] connect - retrievePeripherals(vendor central), uuid: \(uuidStr), count: \(peripherals.count), state: \(peripherals.first?.state.rawValue ?? -1)")
       if let peripheral = peripherals.first {
+        // [#117 / ADR-0050 C] If the OS still reports this retrieved peripheral
+        // as non-disconnected, it's a STALE link held from the just-killed
+        // process — its GATT was never re-discovered in THIS process, so the
+        // vendor's connect short-circuits to "already connected" and the first
+        // command after verify is dropped (deaf link → 5s timeout → zombie
+        // recycle). The vendor app (HFit) clears the link before every connect;
+        // match it by cancelling here so the fresh connect re-discovers GATT.
+        // A genuinely fresh peripheral (.disconnected) skips this — no latency.
+        if peripheral.state != .disconnected {
+          staleHeldPeripheral = peripheral
+          staleHeldCentral = vendorCentral
+        }
         peripheralModel = VPPeripheralModel(peripher: peripheral)
         if let recoveredModel = peripheralModel {
           self.discoveredDevices[uuidStr] = recoveredModel
@@ -68,6 +85,8 @@ extension VeepooSDKModule {
     // failure/timeout, so trusting the model never regresses.
     let shouldUseScanFallbackDirectly = modelSource == "none"
     let capturedModel = peripheralModel
+    let capturedStalePeripheral = staleHeldPeripheral
+    let capturedStaleCentral = staleHeldCentral
 
     // Vendor SDK connect calls schedule Timers and invoke CoreBluetooth APIs
     // that require a thread with an active run loop. ExpoModulesCore dispatches
@@ -76,45 +95,62 @@ extension VeepooSDKModule {
     // vendor SDK, the same pattern as handleInit. Without this, Timer.scheduledTimer
     // inside performConnect crashes on the module queue thread.
     DispatchQueue.main.async {
-      if shouldUseScanFallbackDirectly {
-        print("[VeepooSDK] connect - 当前仅有 UUID 恢复模型或无模型，直接进入隐藏扫描兜底, deviceId: \(deviceId), modelSource: \(modelSource)")
-        self.startScanConnectFallback(
-          deviceId: deviceId,
-          password: password,
-          is24Hour: is24Hour,
-          promise: promise
-        )
-      } else if let model = capturedModel {
-        self.performConnect(
-          model: model,
-          deviceId: deviceId,
-          password: password,
-          is24Hour: is24Hour,
-          promise: promise,
-          fallbackToScan: { [weak self] in
-            // Do NOT capture `promise` here — this closure is strongly held by
-            // the vendor deviceConnectBlock, and a captured Promise destroyed
-            // after HMR crashes (see performConnect). performConnect already
-            // parked the promise in pendingConnectPromise; read it from there.
-            // After cleanup() nils it, this guard makes the fallback a no-op.
-            guard let self = self, let pendingPromise = self.pendingConnectPromise else { return }
-            print("[VeepooSDK] connect - performConnect 失败，进入扫描兜底, deviceId: \(deviceId)")
-            self.startScanConnectFallback(
-              deviceId: deviceId,
-              password: password,
-              is24Hour: is24Hour,
-              promise: pendingPromise
-            )
-          }
-        )
+      // The actual connect — one of three paths. Hoisted so a stale-held-link
+      // clear can gate it behind a brief disconnect settle (below).
+      let proceed: () -> Void = {
+        if shouldUseScanFallbackDirectly {
+          print("[VeepooSDK] connect - 当前仅有 UUID 恢复模型或无模型，直接进入隐藏扫描兜底, deviceId: \(deviceId), modelSource: \(modelSource)")
+          self.startScanConnectFallback(
+            deviceId: deviceId,
+            password: password,
+            is24Hour: is24Hour,
+            promise: promise
+          )
+        } else if let model = capturedModel {
+          self.performConnect(
+            model: model,
+            deviceId: deviceId,
+            password: password,
+            is24Hour: is24Hour,
+            promise: promise,
+            fallbackToScan: { [weak self] in
+              // Do NOT capture `promise` here — this closure is strongly held by
+              // the vendor deviceConnectBlock, and a captured Promise destroyed
+              // after HMR crashes (see performConnect). performConnect already
+              // parked the promise in pendingConnectPromise; read it from there.
+              // After cleanup() nils it, this guard makes the fallback a no-op.
+              guard let self = self, let pendingPromise = self.pendingConnectPromise else { return }
+              print("[VeepooSDK] connect - performConnect 失败，进入扫描兜底, deviceId: \(deviceId)")
+              self.startScanConnectFallback(
+                deviceId: deviceId,
+                password: password,
+                is24Hour: is24Hour,
+                promise: pendingPromise
+              )
+            }
+          )
+        } else {
+          print("[VeepooSDK] connect - 无可用模型，直接进入扫描兜底, deviceId: \(deviceId), uuid: \(uuidString ?? "nil")")
+          self.startScanConnectFallback(
+            deviceId: deviceId,
+            password: password,
+            is24Hour: is24Hour,
+            promise: promise
+          )
+        }
+      }
+
+      // [#117 / ADR-0050 C] Clear a stale held link before connecting so GATT
+      // re-discovers cleanly (vendor parity — HFit clears the link each open).
+      // cancelPeripheralConnection is async, so give the disconnect a brief
+      // moment to land, then connect fresh. ONLY a held link pays this ~0.35s;
+      // a fresh peripheral runs `proceed` immediately (no tax on healthy opens).
+      if let stale = capturedStalePeripheral, let central = capturedStaleCentral {
+        print("[VeepooSDK] connect - clearing stale held link (state \(stale.state.rawValue)) before fresh connect, deviceId: \(deviceId)")
+        central.cancelPeripheralConnection(stale)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { proceed() }
       } else {
-        print("[VeepooSDK] connect - 无可用模型，直接进入扫描兜底, deviceId: \(deviceId), uuid: \(uuidString ?? "nil")")
-        self.startScanConnectFallback(
-          deviceId: deviceId,
-          password: password,
-          is24Hour: is24Hour,
-          promise: promise
-        )
+        proceed()
       }
     }
     #endif
