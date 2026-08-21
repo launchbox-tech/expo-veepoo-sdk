@@ -1,7 +1,7 @@
 package expo.modules.veepoo
 
 import com.inuker.bluetooth.library.Code
-import com.inuker.bluetooth.library.connect.response.BleWriteResponse
+import com.veepoo.protocol.listener.base.IBleWriteResponse
 import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.data.ISportModelOriginListener
 import com.veepoo.protocol.model.datas.SportModelGPSWatchOriginHeadData
@@ -70,7 +70,7 @@ fun ModuleDefinitionBuilder.defineExercise(module: VeepooSDKModule) {
         var pendingHead: SportModelOriginHeadData? = null
 
         manager.readSportModelOrigin(
-            object : BleWriteResponse {
+            object : IBleWriteResponse {
                 override fun onResponse(code: Int) {
                     if (code == Code.REQUEST_SUCCESS) {
                         promise.resolve(null)

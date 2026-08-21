@@ -1,13 +1,14 @@
 package expo.modules.veepoo
 
 import com.veepoo.protocol.VPOperateManager
-import com.veepoo.protocol.listener.data.ISportModelDataListener
+import com.veepoo.protocol.listener.base.IBleWriteResponse
+import com.veepoo.protocol.listener.data.ISportModelStateListener
 import com.veepoo.protocol.model.datas.SportModelStateData
 import com.veepoo.protocol.model.enums.ESportType
 import com.veepoo.protocol.model.enums.ECheckWear
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.ModuleDefinitionBuilder
-import com.veepoo.protocol.sharepre.VpSpGetUtil
+import com.veepoo.protocol.shareprence.VpSpGetUtil
 
 private val SPORT_MODE_ORDINALS = arrayOf(
     "common",
@@ -53,26 +54,29 @@ fun ModuleDefinitionBuilder.defineSportMode(module: VeepooSDKModule) {
 
     AsyncFunction("readSportMode") { promise: Promise ->
         val ctx = module.context
-        val manager = VPOperateManager.getManagerInstance(ctx)
+        val manager = VPOperateManager.getInstance()
         if (!VpSpGetUtil.getVpSpVariInstance(ctx).isSupportSportModel) {
             promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support sport mode", null)
             return@AsyncFunction
         }
         manager.readSportModelState(
-            { _, _ -> },
-            object : ISportModelDataListener {
-                override fun onSportStopped(sportModeType: Int) {
-                    val modeName = ordinalToSportMode(sportModeType)
+            object : IBleWriteResponse {
+                override fun onResponse(code: Int) {}
+            },
+            object : ISportModelStateListener {
+                // ISportModelStateListener.onSportStopped takes NO argument in this
+                // SDK — the mode ordinal this was written to receive does not exist.
+                // "Stopped" means no mode is running, so say exactly that rather
+                // than guess which mode ended: normalizeSportModeStatus reads
+                // mode=null / isActive=false as "not in a workout".
+                override fun onSportStopped() {
                     module.sendEvent(SPORT_MODE_DATA, mapOf(
                         "deviceId" to (module.connectedDeviceId ?: ""),
-                        "mode" to modeName
+                        "mode" to null,
+                        "isActive" to false
                     ))
                 }
-                override fun onSportStateChange(data: SportModelStateData?) {
-                    if (data == null) {
-                        promise.reject("READ_FAILED", "readSportMode returned null", null)
-                        return
-                    }
+                override fun onSportModelStateChange(data: SportModelStateData) {
                     val isActive = data.deviceStauts?.name?.contains("OPEN") == true
                     val modeName = ordinalToSportMode(data.sportModeType)
                     promise.resolve(mapOf(
@@ -86,7 +90,7 @@ fun ModuleDefinitionBuilder.defineSportMode(module: VeepooSDKModule) {
 
     AsyncFunction("setSportMode") { mode: String, promise: Promise ->
         val ctx = module.context
-        val manager = VPOperateManager.getManagerInstance(ctx)
+        val manager = VPOperateManager.getInstance()
         if (!VpSpGetUtil.getVpSpVariInstance(ctx).isSupportSportModel) {
             promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support sport mode", null)
             return@AsyncFunction
@@ -97,20 +101,23 @@ fun ModuleDefinitionBuilder.defineSportMode(module: VeepooSDKModule) {
             return@AsyncFunction
         }
         manager.startMultSportModel(
-            { _, _ -> },
-            object : ISportModelDataListener {
-                override fun onSportStopped(sportModeType: Int) {
-                    val modeName = ordinalToSportMode(sportModeType)
+            object : IBleWriteResponse {
+                override fun onResponse(code: Int) {}
+            },
+            object : ISportModelStateListener {
+                // ISportModelStateListener.onSportStopped takes NO argument in this
+                // SDK — the mode ordinal this was written to receive does not exist.
+                // "Stopped" means no mode is running, so say exactly that rather
+                // than guess which mode ended: normalizeSportModeStatus reads
+                // mode=null / isActive=false as "not in a workout".
+                override fun onSportStopped() {
                     module.sendEvent(SPORT_MODE_DATA, mapOf(
                         "deviceId" to (module.connectedDeviceId ?: ""),
-                        "mode" to modeName
+                        "mode" to null,
+                        "isActive" to false
                     ))
                 }
-                override fun onSportStateChange(data: SportModelStateData?) {
-                    if (data == null) {
-                        promise.reject("SET_FAILED", "setSportMode returned null", null)
-                        return
-                    }
+                override fun onSportModelStateChange(data: SportModelStateData) {
                     val success = data.oprateStauts == ECheckWear.OPEN_SUCCESS
                     if (success) {
                         promise.resolve(null)
@@ -125,26 +132,29 @@ fun ModuleDefinitionBuilder.defineSportMode(module: VeepooSDKModule) {
 
     AsyncFunction("stopSportMode") { promise: Promise ->
         val ctx = module.context
-        val manager = VPOperateManager.getManagerInstance(ctx)
+        val manager = VPOperateManager.getInstance()
         if (!VpSpGetUtil.getVpSpVariInstance(ctx).isSupportSportModel) {
             promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support sport mode", null)
             return@AsyncFunction
         }
         manager.stopSportModel(
-            { _, _ -> },
-            object : ISportModelDataListener {
-                override fun onSportStopped(sportModeType: Int) {
-                    val modeName = ordinalToSportMode(sportModeType)
+            object : IBleWriteResponse {
+                override fun onResponse(code: Int) {}
+            },
+            object : ISportModelStateListener {
+                // ISportModelStateListener.onSportStopped takes NO argument in this
+                // SDK — the mode ordinal this was written to receive does not exist.
+                // "Stopped" means no mode is running, so say exactly that rather
+                // than guess which mode ended: normalizeSportModeStatus reads
+                // mode=null / isActive=false as "not in a workout".
+                override fun onSportStopped() {
                     module.sendEvent(SPORT_MODE_DATA, mapOf(
                         "deviceId" to (module.connectedDeviceId ?: ""),
-                        "mode" to modeName
+                        "mode" to null,
+                        "isActive" to false
                     ))
                 }
-                override fun onSportStateChange(data: SportModelStateData?) {
-                    if (data == null) {
-                        promise.reject("STOP_FAILED", "stopSportMode returned null", null)
-                        return
-                    }
+                override fun onSportModelStateChange(data: SportModelStateData) {
                     val success = data.oprateStauts == ECheckWear.CLOSE_SUCCESS
                     if (success) {
                         promise.resolve(null)

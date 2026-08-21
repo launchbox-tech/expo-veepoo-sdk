@@ -283,6 +283,11 @@ fun ModuleDefinitionBuilder.defineContacts(module: VeepooSDKModule) {
         }
         override fun onSOSCallTimesReadSuccess(times: Int, minTimes: Int, maxTimes: Int) {}
         override fun onSOSCallTimesReadFailed() {}
+      },
+      object : IBleWriteResponse {
+        override fun onResponse(code: Int) {
+          if (code != Code.REQUEST_SUCCESS) Log.e(TAG, "setSOSCallTimes: write code=$code")
+        }
       }
     )
   }

@@ -65,8 +65,8 @@ private fun buildWomenSettingFromMap(m: Map<String, Any?>): WomenSetting {
   val babySexRaw = (m["babySex"] as? String)?.lowercase()
   val babySex = when (babySexRaw) {
     "male", "man" -> ESex.MAN
-    "female", "woman" -> ESex.WOMAN
-    else -> ESex.WOMAN
+    "female", "woman" -> ESex.WOMEN
+    else -> ESex.WOMEN
   }
 
   return when (status) {

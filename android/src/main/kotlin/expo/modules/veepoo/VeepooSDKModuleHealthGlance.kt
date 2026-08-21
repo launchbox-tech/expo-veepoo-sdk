@@ -44,21 +44,21 @@ fun ModuleDefinitionBuilder.defineHealthGlance(module: VeepooSDKModule) {
                         "result" to mapOf("state" to "testing", "progress" to progress, "rawState" to "progress", "isEnd" to false)
                     ))
                 }
-                override fun onMiniCheckupSuccess(data: MiniCheckupResultData?) {
+                override fun onMiniCheckupSuccess(data: MiniCheckupResultData) {
                     module.endRealtimeTest("healthGlance")
                     module.sendEvent(HEALTH_GLANCE_TEST_RESULT, mapOf(
                         "deviceId" to (module.connectedDeviceId ?: ""),
                         "result" to buildResultMap(data, "over", true)
                     ))
                 }
-                override fun onMiniCheckupDetailTestSuccess(data: MiniCheckupDetailData?) {
+                override fun onMiniCheckupDetailTestSuccess(data: MiniCheckupDetailData) {
                     // Detail result — emit as a supplementary complete event
                     module.sendEvent(HEALTH_GLANCE_TEST_RESULT, mapOf(
                         "deviceId" to (module.connectedDeviceId ?: ""),
                         "result" to buildDetailMap(data)
                     ))
                 }
-                override fun onMiniCheckupTestFailed(err: EMiniCheckupTestErrorCode?) {
+                override fun onMiniCheckupTestFailed(err: EMiniCheckupTestErrorCode) {
                     module.endRealtimeTest("healthGlance")
                     val state = when (err) {
                         EMiniCheckupTestErrorCode.FUNCTION_NOT_SUPPORT -> "error"
@@ -97,9 +97,9 @@ fun ModuleDefinitionBuilder.defineHealthGlance(module: VeepooSDKModule) {
                 },
                 object : IMiniCheckupOptListener {
                     override fun onMiniCheckupTestProgress(progress: Int) {}
-                    override fun onMiniCheckupSuccess(data: MiniCheckupResultData?) {}
-                    override fun onMiniCheckupDetailTestSuccess(data: MiniCheckupDetailData?) {}
-                    override fun onMiniCheckupTestFailed(err: EMiniCheckupTestErrorCode?) {}
+                    override fun onMiniCheckupSuccess(data: MiniCheckupResultData) {}
+                    override fun onMiniCheckupDetailTestSuccess(data: MiniCheckupDetailData) {}
+                    override fun onMiniCheckupTestFailed(err: EMiniCheckupTestErrorCode) {}
                     override fun onMiniCheckupStopSuccess() {}
                 }
             )

@@ -152,7 +152,7 @@ fun ModuleDefinitionBuilder.defineCustomSettings(module: VeepooSDKModule) {
           customSetting.isOpenAutoHRV = d.autoHrv
           customSetting.isOpenAutoInCall = d.autoIncall
           customSetting.isOpenDisconnectRemind = d.disconnectRemind
-          customSetting.isOpenSOS = d.SOS
+          customSetting.isOpenSOS = d.getSOS()
           customSetting.isOpenPPG = d.ppg
           customSetting.isOpenMusicControl = d.musicControl
           customSetting.isOpenLongClickLockScreen = d.longClickLockScreen
@@ -160,7 +160,7 @@ fun ModuleDefinitionBuilder.defineCustomSettings(module: VeepooSDKModule) {
           customSetting.isOpenAutoTemperatureDetect = d.autoTemperatureDetect
           customSetting.ecgAlwaysOpen = d.ecgAlwaysOpen
           customSetting.isOpenBloodGlucoseDetect = d.bloodGlucoseDetection
-          customSetting.METDetect = d.METDetect
+          customSetting.setMETDetect(d.getMETDetect())
           customSetting.stressDetect = d.stressDetect
           customSetting.isOpenBloodComponentDetect = d.bloodComponentDetect
 

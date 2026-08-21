@@ -31,16 +31,16 @@ dependencies {
   implementation "com.google.code.gson:gson:2.10.1"
 
   // AAR 子项目引用 - 使用正确的项目名称格式
-  implementation project(':gaozh1024-expo-veepoo-sdk$abpartool')
-  implementation project(':gaozh1024-expo-veepoo-sdk$bmpconvert')
-  implementation project(':gaozh1024-expo-veepoo-sdk$jl-bt-ota')
-  implementation project(':gaozh1024-expo-veepoo-sdk$jl-rcsp')
-  implementation project(':gaozh1024-expo-veepoo-sdk$jl-watch')
-  implementation project(':gaozh1024-expo-veepoo-sdk$libble')
-  implementation project(':gaozh1024-expo-veepoo-sdk$libdfu')
-  implementation project(':gaozh1024-expo-veepoo-sdk$libfastdfu')
-  implementation project(':gaozh1024-expo-veepoo-sdk$vpbluetooth')
-  implementation project(':gaozh1024-expo-veepoo-sdk$vpprotocol')
+  implementation project(':expo-veepoo-sdk$abpartool')
+  implementation project(':expo-veepoo-sdk$bmpconvert')
+  implementation project(':expo-veepoo-sdk$jl-bt-ota')
+  implementation project(':expo-veepoo-sdk$jl-rcsp')
+  implementation project(':expo-veepoo-sdk$jl-watch')
+  implementation project(':expo-veepoo-sdk$libble')
+  implementation project(':expo-veepoo-sdk$libdfu')
+  implementation project(':expo-veepoo-sdk$libfastdfu')
+  implementation project(':expo-veepoo-sdk$vpbluetooth')
+  implementation project(':expo-veepoo-sdk$vpprotocol')
 
   // JAR files
   implementation fileTree(dir: "${project.projectDir}/libs", include: ['*.jar'])

@@ -6,11 +6,11 @@ import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
 import com.veepoo.protocol.listener.data.IWeatherStatusDataListener
 import com.veepoo.protocol.model.datas.TimeData
-import com.veepoo.protocol.model.datas.WeatherData
-import com.veepoo.protocol.model.datas.WeatherEvery3Hour
-import com.veepoo.protocol.model.datas.WeatherEveryDay
+import com.veepoo.protocol.model.datas.weather.WeatherData
+import com.veepoo.protocol.model.datas.weather.WeatherEvery3Hour
+import com.veepoo.protocol.model.datas.weather.WeatherEveryDay
 import com.veepoo.protocol.model.datas.WeatherStatusData
-import com.veepoo.protocol.model.datas.WeatherStatusSetting
+import com.veepoo.protocol.model.settings.WeatherStatusSetting
 import com.veepoo.protocol.model.enums.EWeatherOprateStatus
 import com.veepoo.protocol.model.enums.EWeatherType
 import com.veepoo.protocol.shareprence.VpSpGetUtil

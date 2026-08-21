@@ -43,11 +43,11 @@ fun ModuleDefinitionBuilder.defineGsr(module: VeepooSDKModule) {
             override fun onGsrDetectProgress(progress: Int) {
                 emitGsrResult(module, "testing", progress, null)
             }
-            override fun onGsrDetectSuccess(result: GsrDetectResult?) {
+            override fun onGsrDetectSuccess(result: GsrDetectResult) {
                 emitGsrResult(module, "over", 100, result)
                 module.endRealtimeTest("gsr")
             }
-            override fun onGsrDetectFailed(ack: GsrDetectAck?) {
+            override fun onGsrDetectFailed(ack: GsrDetectAck) {
                 val label = when (ack) {
                     GsrDetectAck.LOW_BATTERY -> "error"
                     GsrDetectAck.BUSY_MEASURING_PRESSURE, GsrDetectAck.BUSY_MEASURING_OTHER -> "deviceBusy"
@@ -96,7 +96,7 @@ fun ModuleDefinitionBuilder.defineGsr(module: VeepooSDKModule) {
 
     // PTT is iOS-only — no Android vendor API
     AsyncFunction("startPttTest") { promise: Promise ->
-        promise.reject("CAPABILITY_UNSUPPORTED", "PTT test is not supported on Android — iOS only")
+        promise.reject("CAPABILITY_UNSUPPORTED", "PTT test is not supported on Android — iOS only", null)
     }
 
     AsyncFunction("stopPttTest") { promise: Promise ->

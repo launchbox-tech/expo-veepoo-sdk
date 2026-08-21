@@ -118,6 +118,7 @@ fun ModuleDefinitionBuilder.defineBodyCompositionTest(module: VeepooSDKModule) {
         }
       }
     )
+  }
 }
 /**
  * Body composition helpers are defensive against vpprotocol refactors: no hard-coded enum constant
@@ -218,7 +219,7 @@ private fun probeIntMember(target: Any, vararg names: String): Int? {
 
 private fun probeTimeBean(bean: Any): Map<String, Int>? {
   val cls = bean.javaClass
-  val tb: Any? = try {
+  val tb: Any = try {
     try {
       cls.getMethod("getTimeBean").invoke(bean)
     } catch (_: Exception) {

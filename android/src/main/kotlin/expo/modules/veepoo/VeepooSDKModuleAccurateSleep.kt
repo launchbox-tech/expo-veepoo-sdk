@@ -9,7 +9,7 @@ import com.veepoo.protocol.listener.data.ISleepDataListener
 import com.veepoo.protocol.model.datas.SleepData
 import com.veepoo.protocol.model.datas.SleepPrecisionData
 import com.veepoo.protocol.model.datas.TimeData
-import com.veepoo.protocol.model.enums.Code
+import com.inuker.bluetooth.library.Code
 import com.veepoo.protocol.shareprence.VpSpGetUtil
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.ModuleDefinitionBuilder

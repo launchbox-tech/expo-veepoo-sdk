@@ -11,6 +11,7 @@ import com.veepoo.protocol.model.datas.AutoMeasureData
 import com.veepoo.protocol.model.enums.EAutoMeasureType
 import com.veepoo.protocol.model.enums.ELanguage
 import com.veepoo.protocol.shareprence.VpSpGetUtil
+import com.veepoo.protocol.model.enums.EFunctionStatus
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.ModuleDefinitionBuilder
 
@@ -261,7 +262,20 @@ fun ModuleDefinitionBuilder.defineWriteData(module: VeepooSDKModule) {
 
     // Build merged data: start from last-read cache so unmentioned channels are preserved.
     // If FunctionSocailMsgData fields are Java byte, change statusToNative return type to Byte.
-    fun statusToNative(s: String): Int = when (s) { "open" -> 1; "close" -> 2; else -> 0 }
+    // The vendor's Android setter takes EFunctionStatus; iOS deals in the raw
+    // ANCS wire byte instead (1 = open, 2 = close — see statusFromByte in
+    // VeepooSDKModule+ReadHelpers.swift). Map by MEANING, not by number: the
+    // ordinals do NOT line up (SUPPORT_OPEN is ordinal 2, not 1), so passing the
+    // wire byte through would silently write "support" where the caller asked
+    // for "open". The string set matches FunctionStatus in
+    // src/capabilities/social-msg.ts.
+    fun statusToNative(s: String): EFunctionStatus = when (s) {
+      "unsupported" -> EFunctionStatus.UNSUPPORT
+      "support" -> EFunctionStatus.SUPPORT
+      "open" -> EFunctionStatus.SUPPORT_OPEN
+      "close" -> EFunctionStatus.SUPPORT_CLOSE
+      else -> EFunctionStatus.UNKONW
+    }
 
     val socialData = FunctionSocailMsgData()
     val cached = module.cachedSocialMsgData

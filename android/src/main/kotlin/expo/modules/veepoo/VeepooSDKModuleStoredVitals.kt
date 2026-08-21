@@ -65,7 +65,7 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
     manager.readTemptureDataBySetting(
       object : IBleWriteResponse {
         override fun onResponse(code: Int) {
-          if (code != com.veepoo.protocol.model.enums.Code.REQUEST_SUCCESS) {
+          if (code != Code.REQUEST_SUCCESS) {
             uiHandler.removeCallbacks(timeout)
             if (resolved.compareAndSet(false, true)) promise.resolve(null)
           }
@@ -74,7 +74,7 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
       object : ITemptureDataListener {
         override fun onTemptureDataListDataChange(list: List<TemptureData>?) {
           list?.forEach { item ->
-            val ts = formatUnixTs(item.mTime?.let { td ->
+            val ts = formatUnixTs(item.getmTime()?.let { td ->
               String.format("%04d-%02d-%02d %02d:%02d", td.year, td.month, td.day, td.hour, td.minute)
             } ?: unixToTimestamp(0))
             module.sendEvent(STORED_TEMPERATURE_DATA, mapOf(
@@ -119,7 +119,7 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
     manager.readDeviceManualData(
       object : IBleWriteResponse {
         override fun onResponse(code: Int) {
-          if (code != com.veepoo.protocol.model.enums.Code.REQUEST_SUCCESS) {
+          if (code != Code.REQUEST_SUCCESS) {
             uiHandler.removeCallbacks(timeout)
             if (resolved.compareAndSet(false, true)) promise.resolve(null)
           }
@@ -174,7 +174,7 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
     manager.readHRVOrigin(
       object : IBleWriteResponse {
         override fun onResponse(code: Int) {
-          if (code != com.veepoo.protocol.model.enums.Code.REQUEST_SUCCESS) {
+          if (code != Code.REQUEST_SUCCESS) {
             uiHandler.removeCallbacks(timeout)
             if (resolved.compareAndSet(false, true)) promise.resolve(null)
           }
@@ -183,7 +183,7 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
       object : IHRVOriginDataListener {
         override fun onHRVOriginListener(data: HRVOriginData?) {
           val d = data ?: return
-          val ts = d.mTime?.let { td ->
+          val ts = d.getmTime()?.let { td ->
             String.format("%04d-%02d-%02d %02d:%02d", td.year, td.month, td.day, td.hour, td.minute)
           } ?: d.date ?: ""
           val rrList = d.rrValue?.toList() ?: emptyList()
@@ -240,7 +240,7 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
       EEcgDataType.ALL,
       object : IECGReadIdListener {
         override fun readIdFinish(ids: IntArray?) {
-          if (ids.isNullOrEmpty()) {
+          if (ids == null || ids.isEmpty()) {
             uiHandler.removeCallbacks(timeout)
             if (resolved.compareAndSet(false, true)) promise.resolve(null)
             return
@@ -313,8 +313,8 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
         }
       },
       object : IBodyComponentReadIdListener {
-        override fun readIdFinish(ids: ArrayList<Int>?) {
-          if (ids.isNullOrEmpty()) {
+        override fun readIdFinish(ids: ArrayList<Int>) {
+          if (ids.isEmpty()) {
             uiHandler.removeCallbacks(timeout)
             if (resolved.compareAndSet(false, true)) promise.resolve(null)
             return
@@ -339,10 +339,10 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
                     "deviceId" to (module.connectedDeviceId ?: ""),
                     "data" to mapOf(
                       "timestamp" to ts,
-                      "bmi" to item.bmi.toDouble(),
+                      "bmi" to item.BMI.toDouble(),
                       "bodyFatPercentage" to item.bodyFatRate.toDouble(),
                       "fatMass" to item.fatRate.toDouble(),
-                      "leanBodyMass" to item.fFM.toDouble(),
+                      "leanBodyMass" to item.FFM.toDouble(),
                       "muscleRate" to item.muscleRate.toDouble(),
                       "muscleMass" to item.muscleMass.toDouble(),
                       "subcutaneousFat" to item.subcutaneousFat.toDouble(),

@@ -48,14 +48,14 @@ fun ModuleDefinitionBuilder.defineBloodAnalysis(module: VeepooSDKModule) {
             return@AsyncFunction
         }
         val listener = object : IBloodComponentDetectListener {
-            override fun onDetecting(progress: Int, component: BloodComponent?) {
+            override fun onDetecting(progress: Int, component: BloodComponent) {
                 emitBloodAnalysisResult(module, "testing", progress, component)
             }
-            override fun onDetectComplete(component: BloodComponent?) {
+            override fun onDetectComplete(component: BloodComponent) {
                 emitBloodAnalysisResult(module, "over", 100, component)
                 module.endRealtimeTest("bloodAnalysis")
             }
-            override fun onDetectFailed(state: EBloodComponentDetectState?) {
+            override fun onDetectFailed(state: EBloodComponentDetectState) {
                 val label = when (state) {
                     EBloodComponentDetectState.LOW_POWER -> "error"
                     EBloodComponentDetectState.BUSY -> "deviceBusy"

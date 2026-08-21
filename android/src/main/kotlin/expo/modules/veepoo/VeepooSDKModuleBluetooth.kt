@@ -8,10 +8,14 @@ import com.veepoo.protocol.model.datas.BTInfo
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.ModuleDefinitionBuilder
 
-private fun btStateToString(status: Int): String = when (status) {
-  0 -> "disconnected"
-  1 -> "connected"
-  2 -> "pairing"
+// BTInfo.status is an enum (DISCONNECTED / CONNECTED / BROADCASTING), not the
+// Int this was written against. Mapped by constant, matching the iOS switch on
+// VPBTConnectState (.disConnect / .connected / .advertising -> "pairing", see
+// VeepooSDKModule+Bluetooth.swift) so both platforms emit the same DeviceBTState
+// union declared in src/capabilities/bt-status.ts.
+private fun btStateToString(status: BTInfo.BTStatus?): String = when (status) {
+  BTInfo.BTStatus.CONNECTED -> "connected"
+  BTInfo.BTStatus.BROADCASTING -> "pairing"
   else -> "disconnected"
 }
 
@@ -38,13 +42,13 @@ fun ModuleDefinitionBuilder.defineBluetooth(module: VeepooSDKModule) {
       override fun onDeviceBTFunctionNotSupport() {
         promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support classic Bluetooth", null)
       }
-      override fun onDeviceBTInfoSettingSuccess(info: BTInfo?) {
+      override fun onDeviceBTInfoSettingSuccess(info: BTInfo) {
         // Not expected during read
       }
       override fun onDeviceBTInfoSettingFailed() {
         // Not expected during read
       }
-      override fun onDeviceBTInfoReadSuccess(info: BTInfo?) {
+      override fun onDeviceBTInfoReadSuccess(info: BTInfo) {
         if (info != null) {
           promise.resolve(mapOf(
             "isBTOpen" to info.isBTOpen,
@@ -60,7 +64,7 @@ fun ModuleDefinitionBuilder.defineBluetooth(module: VeepooSDKModule) {
       override fun onDeviceBTInfoReadFailed() {
         promise.reject("OPERATION_FAILED", "Read BT info failed", null)
       }
-      override fun onDeviceBTInfoReport(info: BTInfo?) {
+      override fun onDeviceBTInfoReport(info: BTInfo) {
         if (info != null) {
           emitBTStateChanged(module, info)
         }
@@ -77,9 +81,9 @@ fun ModuleDefinitionBuilder.defineBluetooth(module: VeepooSDKModule) {
       override fun onDeviceBTFunctionNotSupport() {
         promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support classic Bluetooth", null)
       }
-      override fun onDeviceBTInfoSettingSuccess(info: BTInfo?) {}
+      override fun onDeviceBTInfoSettingSuccess(info: BTInfo) {}
       override fun onDeviceBTInfoSettingFailed() {}
-      override fun onDeviceBTInfoReadSuccess(info: BTInfo?) {
+      override fun onDeviceBTInfoReadSuccess(info: BTInfo) {
         if (info != null) {
           promise.resolve(mapOf(
             "isBTOpen" to info.isBTOpen,
@@ -95,7 +99,7 @@ fun ModuleDefinitionBuilder.defineBluetooth(module: VeepooSDKModule) {
       override fun onDeviceBTInfoReadFailed() {
         promise.reject("OPERATION_FAILED", "Read BT info failed", null)
       }
-      override fun onDeviceBTInfoReport(info: BTInfo?) {
+      override fun onDeviceBTInfoReport(info: BTInfo) {
         if (info != null) {
           emitBTStateChanged(module, info)
         }
@@ -115,7 +119,7 @@ fun ModuleDefinitionBuilder.defineBluetooth(module: VeepooSDKModule) {
       override fun onDeviceBTFunctionNotSupport() {
         promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support classic Bluetooth", null)
       }
-      override fun onDeviceBTInfoSettingSuccess(info: BTInfo?) {
+      override fun onDeviceBTInfoSettingSuccess(info: BTInfo) {
         if (info != null) {
           emitBTStateChanged(module, info)
         }
@@ -124,9 +128,9 @@ fun ModuleDefinitionBuilder.defineBluetooth(module: VeepooSDKModule) {
       override fun onDeviceBTInfoSettingFailed() {
         promise.reject("OPERATION_FAILED", "Set BT switch failed", null)
       }
-      override fun onDeviceBTInfoReadSuccess(info: BTInfo?) {}
+      override fun onDeviceBTInfoReadSuccess(info: BTInfo) {}
       override fun onDeviceBTInfoReadFailed() {}
-      override fun onDeviceBTInfoReport(info: BTInfo?) {
+      override fun onDeviceBTInfoReport(info: BTInfo) {
         if (info != null) {
           emitBTStateChanged(module, info)
         }

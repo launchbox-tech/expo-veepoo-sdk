@@ -35,7 +35,6 @@ import com.veepoo.protocol.model.datas.DeviceFunctionPackage4
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage5
 import com.veepoo.protocol.model.enums.DeviceManualDataType
 import com.inuker.bluetooth.library.Code
-import com.veepoo.protocol.model.enums.DeviceManualDataType
 import com.veepoo.protocol.model.settings.CustomSettingData
 import expo.modules.kotlin.Promise
 

@@ -65,7 +65,7 @@ fun ModuleDefinitionBuilder.defineMedia(module: VeepooSDKModule) {
         }
       },
       object : ICameraDataListener {
-        override fun onCameraDataChange(status: ECameraStatus) {
+        override fun OnCameraDataChange(status: ECameraStatus) {
           when (status) {
             ECameraStatus.OPEN_FALI -> {
               if (!promiseDone) {
@@ -75,7 +75,7 @@ fun ModuleDefinitionBuilder.defineMedia(module: VeepooSDKModule) {
             }
             ECameraStatus.TAKEPHOTO_CAN -> emitCameraShutter(module, "canTake")
             ECameraStatus.TAKEPHOTO_CAN_NOT -> emitCameraShutter(module, "cannotTake")
-            ECameraStatus.EXIT_SUCCESS -> { /* handled by exitCameraMode */ }
+            ECameraStatus.CLOSE_SUCCESS -> { /* handled by exitCameraMode */ }
             else -> {}
           }
         }
@@ -102,7 +102,7 @@ fun ModuleDefinitionBuilder.defineMedia(module: VeepooSDKModule) {
     }
 
     var promiseDone = false
-    manager.exitCamera(
+    manager.stopCamera(
       object : IBleWriteResponse {
         override fun onResponse(code: Int) {
           if (code == Code.REQUEST_SUCCESS) {
@@ -117,12 +117,12 @@ fun ModuleDefinitionBuilder.defineMedia(module: VeepooSDKModule) {
         }
       },
       object : ICameraDataListener {
-        override fun onCameraDataChange(status: ECameraStatus) {
+        override fun OnCameraDataChange(status: ECameraStatus) {
           when (status) {
-            ECameraStatus.EXIT_SUCCESS -> {
+            ECameraStatus.CLOSE_SUCCESS -> {
               if (!promiseDone) { promiseDone = true; promise.resolve(null) }
             }
-            ECameraStatus.EXIT_FALI -> {
+            ECameraStatus.CLOSE_FAIL -> {
               if (!promiseDone) {
                 promiseDone = true
                 promise.reject("OPERATION_FAILED", "Band failed to exit camera mode", null)
@@ -166,13 +166,20 @@ fun ModuleDefinitionBuilder.defineMedia(module: VeepooSDKModule) {
       return@AsyncFunction
     }
 
-    val musicData = MusicData().apply {
+    // MusicData has no no-arg constructor in this SDK; the only one is
+    // (singerName, musicName, musicAlbum, musicVoiceLevel, palyStatus) — order
+    // read off the constructor bytecode, since the field order in the class does
+    // NOT match it. `palyStatus` is an Int flag standing in for the JS
+    // `isPlaying` boolean (1 = playing, 0 = paused); the vendor ships no constant
+    // for it, so this is the conventional encoding and is unverified on hardware.
+    val musicData = MusicData(
+      data["artist"] as? String ?: "",
+      data["name"] as? String ?: "",
+      data["album"] as? String ?: "",
+      (data["volume"] as? Number)?.toInt() ?: 50,
+      if (data["isPlaying"] as? Boolean == true) 1 else 0
+    ).apply {
       musicAppId = data["appId"] as? String ?: ""
-      musicAlbum = data["album"] as? String ?: ""
-      musicName = data["name"] as? String ?: ""
-      musicArtist = data["artist"] as? String ?: ""
-      isPlayMusic = data["isPlaying"] as? Boolean ?: false
-      musicVoiceLevel = (data["volume"] as? Number)?.toInt() ?: 50
     }
 
     var promiseDone = false
@@ -195,6 +202,25 @@ fun ModuleDefinitionBuilder.defineMedia(module: VeepooSDKModule) {
         override fun nextMusic() = emitMusicCommand(module, "next")
         override fun previousMusic() = emitMusicCommand(module, "previous")
         override fun pauseAndPlayMusic() = emitMusicCommand(module, "pausePlay")
+        // Required by IMusicControlListener, but MusicRemoteCommand in
+        // src/capabilities/music.ts is only next | previous | pause_play. There
+        // is no honest mapping for these four: normalizeMusicRemoteCommand falls
+        // back to "pause_play" for anything it does not recognise, so emitting
+        // them would surface a volume change to JS as a play/pause toggle. Log
+        // and drop rather than report a command the band did not send. Widening
+        // the TS union is a separate, cross-platform API change.
+        override fun pauseMusic() {
+          Log.d(TAG, "pushMusicData: band sent pauseMusic — no MusicRemoteCommand for it, dropped")
+        }
+        override fun playMusic() {
+          Log.d(TAG, "pushMusicData: band sent playMusic — no MusicRemoteCommand for it, dropped")
+        }
+        override fun voiceUp() {
+          Log.d(TAG, "pushMusicData: band sent voiceUp — no MusicRemoteCommand for it, dropped")
+        }
+        override fun voiceDown() {
+          Log.d(TAG, "pushMusicData: band sent voiceDown — no MusicRemoteCommand for it, dropped")
+        }
         override fun oprateMusicSuccess() {}
         override fun oprateMusicFail() {
           Log.e(TAG, "pushMusicData: IMusicControlListener.oprateMusicFail")

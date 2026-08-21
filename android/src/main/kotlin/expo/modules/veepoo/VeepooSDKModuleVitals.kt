@@ -6,6 +6,7 @@ import com.veepoo.protocol.listener.base.IBleWriteResponse
 import com.veepoo.protocol.listener.data.IBreathDataListener
 import com.veepoo.protocol.listener.data.IECGDetectListener
 import com.veepoo.protocol.model.datas.BreathData
+import com.veepoo.protocol.model.datas.EcgDiagnosis
 import com.veepoo.protocol.model.datas.EcgDetectInfo
 import com.veepoo.protocol.model.datas.EcgDetectResult
 import com.veepoo.protocol.model.datas.EcgDetectState
@@ -104,8 +105,16 @@ fun ModuleDefinitionBuilder.defineVitals(module: VeepooSDKModule) {
         finishAndroidEcg(module, manager, includeWaveform, this)
       }
 
-      override fun onEcgADCChange(data: IntArray?) {
-        if (!module.ecgWantWaveform || data == null) return
+      // The vendor hands back TWO live sample streams here, mirroring the iOS
+      // `filterSignals` (draw-ready) / `originalSignals` (raw ADC) pair — see
+      // VeepooSDKModule+Vitals.swift, where this firmware was measured to
+      // populate only one of them (device-verified 2026-06-08). Which slot is
+      // which is undocumented on Android and cannot be settled without a band
+      // on the bench, so take whichever carries samples, exactly as iOS does.
+      override fun onEcgADCChange(filtered: IntArray?, original: IntArray?) {
+        if (!module.ecgWantWaveform) return
+        val wave = if (filtered != null && filtered.isNotEmpty()) filtered else original
+        if (wave == null || wave.isEmpty()) return
         module.sendEvent(
           ECG_TEST_RESULT,
           mapOf(
@@ -113,10 +122,18 @@ fun ModuleDefinitionBuilder.defineVitals(module: VeepooSDKModule) {
             "result" to mapOf(
               "state" to "testing",
               "rawState" to "waveform",
-              "waveform" to data.toList()
+              "waveform" to wave.toList()
             )
           )
         )
+      }
+
+      // Required by IECGDetectListener. iOS surfaces the vendor diagnostic
+      // report on the TERMINAL callback instead (ADR-0047 Tier B,
+      // `ecgDiagnostics`), so there is nothing to emit here; implemented as a
+      // no-op rather than inventing an Android-only event shape that no JS
+      // caller reads.
+      override fun onEcgDetectDiagnosisChange(diagnosis: EcgDiagnosis?) {
       }
     }
 

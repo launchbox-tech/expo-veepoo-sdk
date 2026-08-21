@@ -64,6 +64,11 @@ fun ModuleDefinitionBuilder.defineHealthReminders(module: VeepooSDKModule) {
     manager.readHealthRemind(
       remindType,
       object : IHealthRemindListener {
+        // Required by IHealthRemindListener: fires when the band finishes
+        // streaming reminder records. Each call site settles its promise from
+        // the per-record callbacks below, so there is nothing to do here.
+        override fun onHealthRemindReadingComplete() {
+        }
         override fun functionNotSupport() {
           if (done) return
           done = true
@@ -128,6 +133,11 @@ fun ModuleDefinitionBuilder.defineHealthReminders(module: VeepooSDKModule) {
     manager.settingHealthRemind(
       healthRemind,
       object : IHealthRemindListener {
+        // Required by IHealthRemindListener: fires when the band finishes
+        // streaming reminder records. Each call site settles its promise from
+        // the per-record callbacks below, so there is nothing to do here.
+        override fun onHealthRemindReadingComplete() {
+        }
         override fun functionNotSupport() {
           if (done) return
           done = true
