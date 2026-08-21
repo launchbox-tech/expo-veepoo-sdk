@@ -666,7 +666,9 @@ extension VeepooSDKModule {
     pendingConnectPromise = nil
     permissionPromise = nil
     clearAllPromiseBoxes()
+    #if !targetEnvironment(simulator)
     discoveredDevices.removeAll()
+    #endif
     connectionState = .idle
     emitBluetoothStatus()
   }

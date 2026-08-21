@@ -478,6 +478,9 @@ extension VeepooSDKModule {
     return o
   }
 
+  #if !targetEnvironment(simulator)
+  // Vendor-typed helpers — no simulator slice carries these classes, so they
+  // are compiled out. Every call site is inside a matching guard.
   // MARK: - ECG diagnostics extraction (ADR-0047 Tier B)
 
   // Surfaces the vendor ECG diagnostic report on the terminal callback. Raw
@@ -541,4 +544,5 @@ extension VeepooSDKModule {
     if let n = v as? NSNumber { return n.stringValue }
     return String(describing: v!)
   }
+  #endif
 }

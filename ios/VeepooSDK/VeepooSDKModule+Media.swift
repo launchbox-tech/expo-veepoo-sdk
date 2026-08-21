@@ -5,11 +5,15 @@ extension VeepooSDKModule {
 
   // MARK: - Helpers
 
+  // Reads a vendor-typed property, so it is compiled out on the simulator —
+  // every call site is inside a matching guard.
+  #if !targetEnvironment(simulator)
   private func cameraSupported() -> Bool {
     // VeepooBleSDK exposes no camera-capability flag on VPPeripheralModel;
     // gate only on a connected model and let the device respond.
     return peripheralManage?.peripheralModel != nil
   }
+  #endif
 
   // MARK: - enterCameraMode
 

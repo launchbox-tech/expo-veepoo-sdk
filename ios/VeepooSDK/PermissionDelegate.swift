@@ -1,13 +1,10 @@
 import CoreBluetooth
 
-#if !targetEnvironment(simulator)
 // MARK: - 权限回调委托
 //
-// Only built for device targets — the simulator-only `VeepooSDKModule`
-// stub in `VeepooSDKSimulator.swift` doesn't expose
-// `handlePermissionStateUpdate`, and the podspec already excludes the
-// real module file (and every `VeepooSDKModule+*.swift` extension) from
-// `iphonesimulator*` builds via `EXCLUDED_SOURCE_FILE_NAMES`.
+// Pure CoreBluetooth — no vendor SDK — so these compile on the simulator too.
+// They are only ever *constructed* inside `#if !targetEnvironment(simulator)`
+// branches, so the simulator has nothing to instantiate.
 final class PermissionDelegate: NSObject, CBCentralManagerDelegate {
   private weak var module: VeepooSDKModule?
   init(module: VeepooSDKModule) { self.module = module }
@@ -32,4 +29,3 @@ final class CentralStateDelegate: NSObject, CBCentralManagerDelegate {
     module?.handleCentralStateUpdate(central)
   }
 }
-#endif

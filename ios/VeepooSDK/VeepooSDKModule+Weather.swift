@@ -5,6 +5,9 @@ extension VeepooSDKModule {
 
   // MARK: - Helpers
 
+  #if !targetEnvironment(simulator)
+  // Vendor-typed helpers — no simulator slice carries these classes, so they
+  // are compiled out. Every call site is inside a matching guard.
   private func weatherHandle() -> VPWeatherHandle? {
     return VPWeatherHandle.share()
   }
@@ -17,6 +20,7 @@ extension VeepooSDKModule {
       "crc": model.crc,
     ]
   }
+  #endif
 
   // MARK: - Read
 
@@ -152,6 +156,10 @@ extension VeepooSDKModule {
 
   // MARK: - Model builder
 
+  #if !targetEnvironment(simulator)
+  // Vendor-typed helpers — no simulator slice carries these classes, so they
+  // are compiled out. Every call site is inside a matching guard.
+
   private func buildWeatherServerModel(from data: [String: Any]) -> VPWeatherServerModel? {
     let model = VPWeatherServerModel()
 
@@ -199,4 +207,5 @@ extension VeepooSDKModule {
 
     return model
   }
+  #endif
 }

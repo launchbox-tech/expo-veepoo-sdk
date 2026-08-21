@@ -76,6 +76,9 @@ extension VeepooSDKModule {
 
   // ── Session shapes → bridge dicts (JS contract: km + kcal, ADR-0016) ──────
 
+  #if !targetEnvironment(simulator)
+  // Vendor-typed helpers — no simulator slice carries these classes, so they
+  // are compiled out. Every call site is inside a matching guard.
   /// New-API typed session (`VPDeviceSportModel`, framework ≥2.2.88).
   /// Header-documented units: totalDis = m, totalCal = kcal, times = s.
   private func parseSportModel(_ m: VPDeviceSportModel) -> [String: Any] {
@@ -139,6 +142,7 @@ extension VeepooSDKModule {
       "minuteData": minuteData,
     ]
   }
+  #endif
 
   /// Legacy SDK-DB session dict (fallback path) — keys per the
   /// `VPDeviceRunning*Key` constants in `VPDataBaseOperation.h`. Legacy DB
@@ -213,6 +217,9 @@ extension VeepooSDKModule {
     #endif
   }
 
+  #if !targetEnvironment(simulator)
+  // Vendor-typed helpers — no simulator slice carries these classes, so they
+  // are compiled out. Every call site is inside a matching guard.
   // ── Phase 1: typed sport API (≥2.2.88) ─────────────────────────────────────
 
   private func readSportViaCrcApi(peripheralManage: VPPeripheralManage, tableID: String) {
@@ -469,4 +476,5 @@ extension VeepooSDKModule {
       "tableId": tableID
     ])
   }
+  #endif
 }

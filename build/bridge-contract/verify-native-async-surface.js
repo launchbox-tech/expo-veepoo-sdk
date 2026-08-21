@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ANDROID_SOURCE_ROOT = exports.IOS_SOURCE_ROOT = exports.IOS_EXCLUDED_BASENAMES = void 0;
+exports.ANDROID_SOURCE_ROOT = exports.IOS_SOURCE_ROOT = void 0;
 exports.extractAsyncFunctions = extractAsyncFunctions;
 exports.collectAsyncFunctionOccurrences = collectAsyncFunctionOccurrences;
 exports.diffSurface = diffSurface;
@@ -109,10 +109,6 @@ function diffSurface(platform, occurrences, expectedNames) {
     duplicates.sort((a, b) => a.name.localeCompare(b.name));
     return { platform, missing, extra, duplicates };
 }
-/** The iOS simulator stub file is intentionally a narrower surface — exclude it. */
-exports.IOS_EXCLUDED_BASENAMES = new Set([
-    "VeepooSDKSimulator.swift",
-]);
 exports.IOS_SOURCE_ROOT = "ios/VeepooSDK";
 exports.ANDROID_SOURCE_ROOT = "android/src/main/kotlin/expo/modules/veepoo";
 //# sourceMappingURL=verify-native-async-surface.js.map

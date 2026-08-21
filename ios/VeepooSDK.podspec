@@ -13,44 +13,40 @@ Pod::Spec.new do |s|
   s.dependency 'MJExtension'
   s.swift_versions = '5.4'
 
-  frameworks_dir = File.expand_path('VeepooSDK/Frameworks', __dir__)
-  # VeepooBleSDK is vendored under ios/VeepooSDK/Frameworks. Pod target and user target
-  # have different available vars, so keep separate search-path strings.
-  veepoo_fw_search = '$(inherited) "$(PODS_TARGET_SRCROOT)/VeepooSDK/Frameworks"'
-  veepoo_fw_search_user = %($(inherited) "#{frameworks_dir}")
-  linked_frameworks = %w[
-    VeepooBleSDK
-    JL_BLEKit
-    JLDialUnit
-    GRDFUSDK
-    ABParTool
-    ZipZap
+  # Each vendored framework is an .xcframework with two slices: our real,
+  # unchanged device binary, and an empty stub for the simulator (built by
+  # scripts/build-xcframeworks.sh — the vendor publishes no simulator slice at
+  # any version). The stub carries the real Headers/ and module.modulemap, so
+  # `import VeepooBleSDK` resolves on the simulator and our Swift compiles
+  # there instead of being excluded from the build.
+  #
+  # NOTE on what this does and does not buy: Swift parses but does not
+  # type-check an inactive `#if` branch, so simulator builds now catch syntax
+  # errors everywhere and type errors only OUTSIDE the
+  # `#if !targetEnvironment(simulator)` guards. Vendor signature drift is still
+  # device-only. Verify with `-sdk iphoneos`.
+  #
+  # CocoaPods owns the slice selection: it copies the matching slice into
+  # PODS_XCFRAMEWORKS_BUILD_DIR at build time and generates the search paths.
+  # Do not hand-write slice directory names here — they vary per binary
+  # (ios-arm64 vs ios-arm64_armv7) and change on a vendor bump.
+  s.vendored_frameworks = %w[
+    VeepooSDK/Frameworks/VeepooBleSDK.xcframework
+    VeepooSDK/Frameworks/JL_BLEKit.xcframework
+    VeepooSDK/Frameworks/JLDialUnit.xcframework
+    VeepooSDK/Frameworks/GRDFUSDK.xcframework
+    VeepooSDK/Frameworks/ABParTool.xcframework
+    VeepooSDK/Frameworks/ZipZap.xcframework
   ]
-  linker_flags = linked_frameworks.map { |name| %(-framework "#{name}") }.join(' ')
 
-  # This spec only *links* the vendored frameworks (device-only). The four
-  # dynamic frameworks (ABParTool, GRDFUSDK, JLDialUnit, ZipZap) must also be
-  # *embedded* into the app's Frameworks/ folder or the app crashes at launch
-  # ("Library not loaded: @rpath/JLDialUnit.framework/JLDialUnit"). A pod
-  # script_phase cannot do that: this pod is a static library, so its build
-  # phases have no FRAMEWORKS_FOLDER_PATH and never reach the app bundle.
-  # Embedding therefore happens in the *app* target via the config plugin
-  # (src/plugin/index.ts -> withVeepooFrameworkEmbed).
+  # Declaring them here also makes CocoaPods embed the four dynamic frameworks
+  # (ABParTool, GRDFUSDK, JLDialUnit, ZipZap) into the app's Frameworks/ folder
+  # via `[CP] Embed Pods Frameworks` — without that the app crashes at launch
+  # with "Library not loaded: @rpath/JLDialUnit.framework/JLDialUnit". That used
+  # to need a bespoke run-script phase in the app target
+  # (src/plugin/index.ts -> withVeepooFrameworkEmbed), which is why the plugin no
+  # longer has one.
 
-  s.preserve_paths = 'VeepooSDK/Frameworks/**/*'
-  s.pod_target_xcconfig = {
-    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => veepoo_fw_search,
-    'OTHER_LDFLAGS[sdk=iphoneos*]' => %($(inherited) #{linker_flags}),
-    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => veepoo_fw_search,
-    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)',
-    'EXCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]' => 'VeepooSDK.swift VeepooSDKModule+*.swift'
-  }
-  s.user_target_xcconfig = {
-    'FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]' => veepoo_fw_search_user,
-    'OTHER_LDFLAGS[sdk=iphoneos*]' => %($(inherited) #{linker_flags}),
-    'FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]' => veepoo_fw_search_user,
-    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => '$(inherited)'
-  }
   s.frameworks = 'CoreBluetooth', 'CoreLocation', 'CoreMotion', 'CoreAudio', 'AVFoundation'
 
   s.subspec 'VeepooSDK' do |ss|

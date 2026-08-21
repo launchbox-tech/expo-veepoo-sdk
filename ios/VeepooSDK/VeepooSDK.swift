@@ -84,7 +84,11 @@ public class VeepooSDKModule: Module {
   var stateDelegate: CentralStateDelegate?
   var scanRearmedOnPowerOn = false
   var pendingScanStart = false
+  // Vendor-typed — the simulator slice is a stub that carries no such class, so
+  // this is compiled out there. Every read and write is inside a matching guard.
+  #if !targetEnvironment(simulator)
   var discoveredDevices: [String: VPPeripheralModel] = [:]
+  #endif
   var pendingConnectDeviceId: String?
   var pendingConnectPassword: String?
   var pendingConnectIs24Hour: Bool = false

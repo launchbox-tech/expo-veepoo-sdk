@@ -2,41 +2,9 @@ import {
   ConfigPlugin,
   withInfoPlist,
   withAndroidManifest,
-  withXcodeProject,
   AndroidConfig,
-  XcodeProject,
 } from 'expo/config-plugins';
 
-// The four VeepooBleSDK dependencies that ship as dynamic frameworks (DYLIBs).
-// They are device-only (arm64/armv7, no simulator slice) and must be copied into
-// the app's Frameworks/ folder or the app crashes at launch with
-// "Library not loaded: @rpath/JLDialUnit.framework/JLDialUnit".
-const DYNAMIC_FRAMEWORKS = ['ABParTool', 'GRDFUSDK', 'JLDialUnit', 'ZipZap'];
-const EMBED_PHASE_NAME = 'Embed VeepooSDK Dynamic Frameworks';
-
-// Run-script body added to the *app* target. The VeepooSDK pod is a static
-// library, so its own build phases have no FRAMEWORKS_FOLDER_PATH and cannot
-// reach the app bundle — embedding must happen here, in the app target.
-// `cp -RL` dereferences symlinks (bun `file:` deps symlink the framework
-// binaries) so codesign receives regular files.
-const EMBED_SCRIPT = [
-  'set -eu',
-  'case "${PLATFORM_NAME:-}" in iphonesimulator*) echo "VeepooSDK: skip embed on simulator"; exit 0 ;; esac',
-  'SRC="${SRCROOT}/../node_modules/expo-veepoo-sdk/ios/VeepooSDK/Frameworks"',
-  '[ -d "${SRC}" ] || SRC="${SRCROOT}/../node_modules/@gaozh1024/expo-veepoo-sdk/ios/VeepooSDK/Frameworks"',
-  'DST="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"',
-  'mkdir -p "${DST}"',
-  `for fw in ${DYNAMIC_FRAMEWORKS.join(' ')}; do`,
-  '  if [ ! -d "${SRC}/${fw}.framework" ]; then echo "warning: VeepooSDK missing ${fw}.framework at ${SRC}"; continue; fi',
-  '  rm -rf "${DST}/${fw}.framework"',
-  '  cp -RL "${SRC}/${fw}.framework" "${DST}/${fw}.framework"',
-  '  rm -rf "${DST}/${fw}.framework/Headers" "${DST}/${fw}.framework/Modules" "${DST}/${fw}.framework/_CodeSignature"',
-  '  if [ -n "${EXPANDED_CODE_SIGN_IDENTITY:-}" ]; then',
-  '    /usr/bin/codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" "${DST}/${fw}.framework"',
-  '  fi',
-  '  echo "VeepooSDK: embedded ${fw}.framework"',
-  'done',
-].join('\n');
 
 type VeepooSDKPluginProps = {
   bluetoothAlwaysPermission?: string;
@@ -67,57 +35,9 @@ const withVeepooSDK: ConfigPlugin<VeepooSDKPluginProps | void> = (
   };
 
   config = withIOSBluetoothPermissions(config, options);
-  config = withVeepooFrameworkEmbed(config);
   config = withAndroidBluetoothPermissions(config);
 
   return config;
-};
-
-// Adds an app-target run-script phase that embeds the device-only dynamic
-// frameworks into the .app bundle. Idempotent — safe across repeated prebuilds.
-const withVeepooFrameworkEmbed: ConfigPlugin = (config) => {
-  return withXcodeProject(config, (config) => {
-    const project = config.modResults as XcodeProject;
-
-    const nativeTargets = project.pbxNativeTargetSection();
-    let appTargetUuid: string | undefined;
-    for (const uuid of Object.keys(nativeTargets)) {
-      const target = nativeTargets[uuid];
-      if (!target || typeof target !== 'object' || !target.productType) continue;
-      if (
-        String(target.productType).replace(/"/g, '') ===
-        'com.apple.product-type.application'
-      ) {
-        appTargetUuid = uuid;
-        break;
-      }
-    }
-    if (!appTargetUuid) return config;
-
-    // Skip if the phase already exists (re-runs of prebuild).
-    const shellPhases =
-      project.hash.project.objects.PBXShellScriptBuildPhase || {};
-    for (const key of Object.keys(shellPhases)) {
-      const phase = shellPhases[key];
-      if (
-        phase &&
-        typeof phase === 'object' &&
-        String(phase.name || '').replace(/"/g, '') === EMBED_PHASE_NAME
-      ) {
-        return config;
-      }
-    }
-
-    project.addBuildPhase(
-      [],
-      'PBXShellScriptBuildPhase',
-      EMBED_PHASE_NAME,
-      appTargetUuid,
-      { shellPath: '/bin/sh', shellScript: EMBED_SCRIPT }
-    );
-
-    return config;
-  });
 };
 
 const withIOSBluetoothPermissions: ConfigPlugin<VeepooSDKPluginProps> = (

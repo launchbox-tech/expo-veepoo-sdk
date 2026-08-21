@@ -6,7 +6,6 @@ import {
   collectAsyncFunctionOccurrences,
   diffSurface,
   extractAsyncFunctions,
-  IOS_EXCLUDED_BASENAMES,
   IOS_SOURCE_ROOT,
 } from "../bridge-contract/verify-native-async-surface";
 
@@ -26,7 +25,6 @@ const GOLDEN = [...golden.names].sort();
 const iosOccurrences = collectAsyncFunctionOccurrences(
   join(REPO_ROOT, IOS_SOURCE_ROOT),
   [".swift"],
-  IOS_EXCLUDED_BASENAMES,
 );
 const androidOccurrences = collectAsyncFunctionOccurrences(
   join(REPO_ROOT, ANDROID_SOURCE_ROOT),

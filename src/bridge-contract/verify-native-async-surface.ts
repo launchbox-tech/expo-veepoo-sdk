@@ -130,11 +130,6 @@ export function diffSurface(
   return { platform, missing, extra, duplicates };
 }
 
-/** The iOS simulator stub file is intentionally a narrower surface — exclude it. */
-export const IOS_EXCLUDED_BASENAMES: ReadonlySet<string> = new Set([
-  "VeepooSDKSimulator.swift",
-]);
-
 export const IOS_SOURCE_ROOT = "ios/VeepooSDK";
 export const ANDROID_SOURCE_ROOT =
   "android/src/main/kotlin/expo/modules/veepoo";

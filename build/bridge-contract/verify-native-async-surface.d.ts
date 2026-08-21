@@ -46,8 +46,6 @@ export interface SurfaceMismatch {
  *   the test to flag.
  */
 export declare function diffSurface(platform: "ios" | "android", occurrences: readonly AsyncFunctionOccurrence[], expectedNames: readonly string[]): SurfaceMismatch;
-/** The iOS simulator stub file is intentionally a narrower surface — exclude it. */
-export declare const IOS_EXCLUDED_BASENAMES: ReadonlySet<string>;
 export declare const IOS_SOURCE_ROOT = "ios/VeepooSDK";
 export declare const ANDROID_SOURCE_ROOT = "android/src/main/kotlin/expo/modules/veepoo";
 //# sourceMappingURL=verify-native-async-surface.d.ts.map

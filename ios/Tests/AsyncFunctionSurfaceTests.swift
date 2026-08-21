@@ -10,8 +10,6 @@ import XCTest
 /// project; the podspec exposes this directory via the `test_spec 'Tests'`
 /// block so `pod install --include-tests` is enough.
 final class AsyncFunctionSurfaceTests: XCTestCase {
-  private static let excludedBasenames: Set<String> = ["VeepooSDKSimulator.swift"]
-
   /// Walk up from the test bundle's location to find the repo root (the dir
   /// holding `package.json`). Works equally from a CocoaPods Test host and
   /// from `xcodebuild test`.
@@ -35,7 +33,6 @@ final class AsyncFunctionSurfaceTests: XCTestCase {
     let regex = try NSRegularExpression(pattern: #"\bAsyncFunction\s*\(\s*"([^"]+)""#)
     for case let url as URL in enumerator {
       guard url.pathExtension == "swift" else { continue }
-      if Self.excludedBasenames.contains(url.lastPathComponent) { continue }
       let source = try String(contentsOf: url, encoding: .utf8)
       let range = NSRange(source.startIndex..<source.endIndex, in: source)
       regex.enumerateMatches(in: source, range: range) { match, _, _ in

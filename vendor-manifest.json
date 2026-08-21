@@ -50,6 +50,8 @@
   "ios": {
     "podspecModuleVersion": "1.2.11",
     "frameworksRelativePath": "ios/VeepooSDK/Frameworks",
+    "frameworkPackaging": "xcframework",
+    "frameworkPackagingNote": "Each linked framework is vendored as <name>.xcframework with a real device slice and an empty simulator stub (int veepoo_stub(void)) carrying the real Headers/ and module.modulemap. Regenerate with scripts/build-xcframeworks.sh. The vendor publishes no simulator slice at any version.",
     "linkedFrameworks": [
       "VeepooBleSDK",
       "JL_BLEKit",
