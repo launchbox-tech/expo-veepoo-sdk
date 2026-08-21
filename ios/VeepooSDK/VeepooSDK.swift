@@ -95,6 +95,19 @@ public class VeepooSDKModule: Module {
   var ecgIncludeWaveform: Bool = false
   var isFirmwareDfuActive: Bool = false
 
+  // [DAILY-READ CRITICAL SECTION] The vendor data interface is single-op
+  // (official doc: "does not support concurrent operations… in the process of
+  // reading daily data") and the daily-read callback has NO vendor timeout — if
+  // the link goes deaf after `.start` the block never fires again (the observed
+  // "stuck at 0%"). So the daily read is treated as an exclusive critical
+  // section: while `dailyReadInFlight` is set a second read COALESCES onto the
+  // live one (rides it to completion) and realtime measurements are refused, and
+  // `dailyReadWatchdog` recovers a deaf link deterministically. All three are
+  // mutated only on the main thread (see ReadHelpers).
+  var dailyReadInFlight = false
+  var dailyReadWatchdog: Timer?
+  var dailyReadWaiters: [PromiseBox] = []
+
   var connectionState: ConnectionState = .idle {
     didSet {
       print("[VeepooSDK] 状态变化: \(oldValue.rawValue) -> \(connectionState.rawValue)")

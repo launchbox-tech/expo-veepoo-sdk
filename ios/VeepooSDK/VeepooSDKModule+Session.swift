@@ -22,6 +22,16 @@ extension VeepooSDKModule {
       manager.peripheralManage = self.peripheralManage
       manager.isLogEnable = true
       manager.manufacturerIDFilter = false
+      // [SINGLE-OWNER RECONNECT — official doc: multiple connections to one
+      // peripheral trigger "an infinite loop of reading data and cause
+      // exceptions"] The SDK's own auto-reconnect loop is a SECOND connection
+      // owner racing our JS reconnect (band-session: backoff + tight-loop guard +
+      // native adopt). Two owners re-issuing connect (→ read) into one band is the
+      // documented concurrency hazard — and the experiment that enabled it was
+      // never verified to help (it competed with our retrieve-first handleConnect).
+      // JS owns ALL reconnection; the SDK loop stays off.
+      manager.automaticConnection = false
+      manager.isAutoConnectBT = false
       self.setupVeepooCallbacks()
       self.isInitialized = true
       self.ensureCentralManager()

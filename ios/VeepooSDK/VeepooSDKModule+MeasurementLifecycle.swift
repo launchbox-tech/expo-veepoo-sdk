@@ -50,6 +50,17 @@ extension VeepooSDKModule {
       return false
     }
 
+    // [DAILY-READ EXCLUSIVITY — official doc: "in the process of reading daily
+    // data, it does not support operating the switch state of the device"] A
+    // realtime test issued mid-read is the documented concurrency violation —
+    // refuse it (fail-fast device-busy) so the read isn't deafened. The app layer
+    // already sequences its own ops after the read; this bounces stray callers.
+    if self.dailyReadInFlight {
+      print("[Measurement] 拒绝启动\(type)测量 - 正在读取每日数据 (daily read in flight)")
+      promise.reject("BAND_BUSY_READING", "Device is busy reading daily data; retry after the read completes")
+      return false
+    }
+
     if self.activeMeasurementType != nil {
       let busy = self.activeMeasurementType ?? ""
       print("[Measurement] 拒绝启动\(type)测量 - 已有测量进行中: \(busy)")

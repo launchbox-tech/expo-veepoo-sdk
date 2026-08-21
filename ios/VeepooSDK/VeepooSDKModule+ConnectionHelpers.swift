@@ -320,12 +320,18 @@ extension VeepooSDKModule {
 
       let deviceId = self.connectedDeviceId ?? self.activeConnectDeviceId ?? ""
       let status: String
+      // VPDeviceConnectState (VPPublicDefine.h): 0 DisConnect, 1 Connecting,
+      // 2 Connect, 3 VerifyPasswordSuccess, 4 VerifyPasswordFailure, 5 Timeout,
+      // 6 ConfirmTimeout. The old `default → "error"` stamped state 3
+      // (VERIFY SUCCESS) as an error on EVERY successful connect — a red herring
+      // that looked like the failure cause and masked the real signal. Map each
+      // explicitly: 3 = link fully up (not an error); only 4/5/6 are real errors.
       switch state.rawValue {
       case 0:
         status = "disconnected"
       case 1:
         status = "connecting"
-      case 2:
+      case 2, 3:
         status = "connected"
       default:
         status = "error"

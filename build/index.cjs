@@ -4165,9 +4165,19 @@ function applyLoggingConfig(sdk, config) {
 	if (config.logEnabled !== void 0) sdk.setLogEnabled(config.logEnabled);
 	if (config.logger !== void 0) sdk.setLogger(config.logger);
 }
+const g = globalThis;
+function getVeepooSingleton() {
+	if (!g.__rayuVeepooSdk) {
+		const sdk = new VeepooSDK();
+		g.__rayuVeepooSdk = {
+			sdk,
+			store: new VeepooSDKStateStore(sdk)
+		};
+	}
+	return g.__rayuVeepooSdk;
+}
 function VeepooSDKProvider({ children, logEnabled, logger }) {
-	const [sdk] = (0, react.useState)(() => new VeepooSDK());
-	const [store] = (0, react.useState)(() => new VeepooSDKStateStore(sdk));
+	const [{ sdk, store }] = (0, react.useState)(getVeepooSingleton);
 	const [error, setError] = (0, react.useState)(null);
 	(0, react.useLayoutEffect)(() => {
 		applyLoggingConfig(sdk, {
@@ -4181,10 +4191,6 @@ function VeepooSDKProvider({ children, logEnabled, logger }) {
 	]);
 	(0, react.useEffect)(() => {
 		sdk.init().catch((e) => setError(e));
-		return () => {
-			store.destroy();
-			sdk.destroy();
-		};
 	}, [sdk, store]);
 	const value = (0, react.useMemo)(() => ({
 		sdk,

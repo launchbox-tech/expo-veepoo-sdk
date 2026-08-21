@@ -19,6 +19,23 @@ extension VeepooSDKModule {
       promise.reject("SDK_NOT_INITIALIZED", "BLE manager is nil")
       return
     }
+    // [ADOPT — official doc: no concurrent connect/read; multi-connect triggers
+    // "an infinite loop of reading data"] This Expo native module is a process
+    // singleton; its verified connection SURVIVES a JS reload/remount. If we're
+    // already ready to THIS device, re-emit device_ready and resolve instead of
+    // re-running connect — a second connect collides with an in-flight daily read
+    // on the shared link (the band goes deaf → 0% stall → recycle). The fresh JS
+    // layer re-subscribed to events before connecting, so it receives this.
+    if self.connectionState == .ready, self.connectedDeviceId == deviceId {
+      print("[VeepooSDK] connect - ADOPT existing ready link, deviceId: \(deviceId)")
+      self.sendEvent(DEVICE_READY, [
+        "deviceId": deviceId,
+        "mac": self.bleManager?.peripheralModel?.deviceAddress ?? "",
+        "isOadModel": false,
+      ])
+      promise.resolve(nil)
+      return
+    }
     let password = options?["password"] as? String ?? "0000"
     let is24Hour = options?["is24Hour"] as? Bool ?? false
     let uuidString = options?["uuid"] as? String
@@ -72,6 +89,25 @@ extension VeepooSDKModule {
           modelSource = "retrieved:uuid"
         }
       }
+    }
+
+    // [GHOST-LINK] A cached/retrieved peripheral whose CBPeripheral is NOT
+    // .disconnected is a HELD link: iOS still reports it connected, but its GATT
+    // was never re-discovered in this session. The vendor reattaches in ~20ms,
+    // reports connect-success + verify-success (VPDeviceConnectState 2 then 3),
+    // then the link is DEAF — the daily read gets a start frame and no data
+    // (→ 12s watchdog → recycle → reattach the SAME ghost → loop). The retrieve
+    // path already clears this; cache hits (the common reconnect) skipped it
+    // (0 clears observed in device logs). Capture it here too so the clear below
+    // runs for EVERY held link, forcing a clean GATT re-discovery (ADR-0050,
+    // generalized to the cache path). A genuinely .disconnected peripheral is
+    // untouched — no tax on a healthy first connect.
+    if staleHeldPeripheral == nil,
+       let held = peripheralModel?.peripheral,
+       held.state != .disconnected,
+       let central = self.bleManager?.centralManager {
+      staleHeldPeripheral = held
+      staleHeldCentral = central
     }
 
     print("[VeepooSDK] connect - 模型解析结果, deviceId: \(deviceId), modelSource: \(modelSource), uuid: \(uuidString ?? "nil"), foundModel: \(peripheralModel != nil)")
@@ -163,8 +199,31 @@ extension VeepooSDKModule {
     self.sendEvent(DEVICE_CONNECT_STATUS, ["deviceId": deviceId, "status": "disconnected"])
     promise.resolve(nil)
     #else
+    // End any in-flight daily-read critical section so the flag/watchdog don't
+    // outlive the link — otherwise a reconnect's read would COALESCE onto a dead
+    // read (it self-heals via the watchdog ≤12s, but clearing here is immediate).
+    // Hop to main: the critical-section state + Timer are main-thread-owned.
+    DispatchQueue.main.async {
+      if self.dailyReadInFlight {
+        self.finishDailyRead(success: false, code: "DEVICE_DISCONNECTED", message: "Disconnected during daily read")
+      }
+    }
+    // [FORCE-QUIT GHOST] Capture the held peripheral BEFORE the vendor disconnect
+    // (which may clear peripheralModel). `veepooSDKDisconnectDevice` is a SOFT
+    // (vendor-level) disconnect — it leaves the CoreBluetooth link UP, so the next
+    // connect reattaches in ~15ms to the same dead-GATT peripheral a killed process
+    // left held → the daily read is deaf → recycle → reattach → loop forever
+    // (observed 2026-06-22: force-quit→reopen never recovers, link_up always
+    // ~15-28ms). Hard-cancel at the CB level so iOS actually drops the link and the
+    // band releases its side; the next connect is then a REAL fresh connection.
+    let heldCentral = self.bleManager?.centralManager
+    let heldPeripheral = self.bleManager?.peripheralModel?.peripheral
     self.connectionState = .disconnecting
     self.bleManager?.veepooSDKDisconnectDevice()
+    if let central = heldCentral, let peripheral = heldPeripheral {
+      print("[VeepooSDK] disconnect - hard cancelPeripheralConnection (CB state \(peripheral.state.rawValue)) to drop the held link")
+      central.cancelPeripheralConnection(peripheral)
+    }
     self.connectedDeviceId = nil
     self.activeConnectDeviceId = nil
     self.activeMeasurementType = nil

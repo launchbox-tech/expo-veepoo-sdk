@@ -1,6 +1,12 @@
 import ExpoModulesCore
 import VeepooBleSDK
 
+// Native daily-read watchdog windows (seconds). The vendor read callback carries
+// no timeout of its own; these bound the critical section so a deaf link can't
+// wedge the sync at 0%. Tunable on-device.
+private let DAILY_READ_INITIAL_STALL: TimeInterval = 12  // .start → first .reading
+private let DAILY_READ_STEADY_STALL: TimeInterval = 10   // between .reading frames
+
 /// 读取数据辅助方法
 extension VeepooSDKModule {
   func mergeBloodGlucoseData(into item: inout [String: Any], from bgData: [String: Any]) {
@@ -252,31 +258,44 @@ extension VeepooSDKModule {
       promise.reject("DEVICE_NOT_CONNECTED", "No device connected")
       return
     }
-    
-    self.sendEvent(READ_ORIGIN_PROGRESS, [
-      "deviceId": self.connectedDeviceId ?? "",
-      "progress": [
-        "readState": "start" as NSString,
-        "totalDays": 1,
-        "currentDay": 1,
-        "progress": 0
-      ]
-    ])
 
+    let box = self.makePromiseBox(promise)
     // 厂商的读取状态机依赖 RunLoop（内部有超时 Timer）——从 Expo 模块队列
     // （无运行 RunLoop）调用时回调永远不会触发（同步卡在 0%）。
-    // 与心率测试的 Timer 同样的约束：必须从主线程进入。
-    // The vendor read state machine is runloop-driven (internal timeout
-    // timer) — invoked from the Expo module queue (no running runloop) its
-    // state-change block never fires. Same constraint as the heart-rate
-    // test timer; always enter from main.
-    let promiseBox = self.makePromiseBox(promise)
+    // The vendor read state machine is runloop-driven (internal timeout timer)
+    // — invoked from the Expo module queue (no running runloop) its state-change
+    // block never fires. Always enter from main. Main-only mutation also keeps
+    // the daily-read critical-section state (flag / waiters / watchdog) race-free.
     DispatchQueue.main.async {
+      // [DAILY-READ EXCLUSIVITY] A read is already streaming — COALESCE onto it
+      // instead of issuing a second vendor read (a concurrent read is exactly
+      // what the docs forbid → deaf link). The in-flight read's progress events
+      // already reach this (possibly reloaded) JS; this box settles with it.
+      if self.dailyReadInFlight {
+        self.dailyReadWaiters.append(box)
+        return
+      }
+      self.dailyReadInFlight = true
+      self.dailyReadWaiters = [box]
+
+      self.sendEvent(READ_ORIGIN_PROGRESS, [
+        "deviceId": self.connectedDeviceId ?? "",
+        "progress": [
+          "readState": "start" as NSString,
+          "totalDays": 1,
+          "currentDay": 1,
+          "progress": 0
+        ]
+      ])
+      self.armDailyReadWatchdog(initial: true)
+
       manager.peripheralManage.veepooSdkStartReadDeviceAllData { [weak self] readState, totalDay, currentReadDayNumber, readCurrentDayProgress in
         guard let self = self else { return }
 
         switch readState {
         case .reading:
+          // Real progress — reset the stall watchdog to the steady window.
+          self.armDailyReadWatchdog(initial: false)
           let progressInDay = min(max(Double(readCurrentDayProgress), 0.0), 100.0)
           let completedDays = max(Double(currentReadDayNumber) - 1.0, 0.0)
           let overallProgress = totalDay > 0
@@ -315,7 +334,7 @@ extension VeepooSDKModule {
             "success": true
           ])
 
-          promiseBox.resolve(true)
+          self.finishDailyRead(success: true)
 
         case .invalid:
           self.sendEvent(READ_ORIGIN_PROGRESS, [
@@ -328,7 +347,7 @@ extension VeepooSDKModule {
             ]
           ])
 
-          promiseBox.reject("READ_FAILED", "Read device data failed")
+          self.finishDailyRead(success: false, code: "READ_FAILED", message: "Read device data failed")
 
         default:
           break
@@ -336,6 +355,74 @@ extension VeepooSDKModule {
       }
     }
     #endif
+  }
+
+  // MARK: Daily-read watchdog (critical section)
+
+  /// (Re)arm the no-progress watchdog. `initial` covers the .start → first
+  /// .reading window (the band may be briefly busy); thereafter the tighter
+  /// between-frame window applies. A healthy read streams `.reading` within
+  /// ~1-2s; a deaf link streams nothing, so a fire means the link is dead —
+  /// recovered far faster than the old 30s JS-only timeout. Main-thread only
+  /// (Timer needs the run loop; matches the vendor callback thread).
+  func armDailyReadWatchdog(initial: Bool) {
+    #if !targetEnvironment(simulator)
+    self.dailyReadWatchdog?.invalidate()
+    let timeout = initial ? DAILY_READ_INITIAL_STALL : DAILY_READ_STEADY_STALL
+    self.dailyReadWatchdog = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
+      guard let self = self, self.dailyReadInFlight else { return }
+      let id = self.connectedDeviceId ?? self.activeConnectDeviceId ?? ""
+      self.sendEvent(READ_ORIGIN_PROGRESS, [
+        "deviceId": id,
+        "progress": [
+          "readState": "invalid" as NSString,
+          "totalDays": 1,
+          "currentDay": 1,
+          "progress": 0.0
+        ]
+      ])
+      self.finishDailyRead(
+        success: false,
+        code: "READ_DEAF_LINK",
+        message: "band stopped responding during daily read"
+      )
+      // Official doc: on a timed-out read, disconnect yourself so a clean
+      // reconnect (adopting a live link, or re-verifying a fresh one) retries.
+      // Mirrors handleDisconnect's teardown order. HARD-cancel the CB link too —
+      // the vendor soft disconnect leaves it up, so the reconnect would reattach
+      // in ~15ms to the same deaf ghost (force-quit loop).
+      let heldCentral = self.bleManager?.centralManager
+      let heldPeripheral = self.bleManager?.peripheralModel?.peripheral
+      self.connectionState = .disconnecting
+      self.bleManager?.veepooSDKDisconnectDevice()
+      if let central = heldCentral, let peripheral = heldPeripheral {
+        central.cancelPeripheralConnection(peripheral)
+      }
+      self.connectedDeviceId = nil
+      self.activeConnectDeviceId = nil
+      self.activeMeasurementType = nil
+      self.sendEvent(DEVICE_DISCONNECTED, ["deviceId": id])
+      self.emitConnectionStatus(deviceId: id, status: "disconnected")
+      self.connectionState = .disconnected
+    }
+    #endif
+  }
+
+  /// End the critical section: stop the watchdog, clear the flag, and settle
+  /// every coalesced waiter together. Main-thread only.
+  func finishDailyRead(success: Bool, code: String = "", message: String = "") {
+    self.dailyReadWatchdog?.invalidate()
+    self.dailyReadWatchdog = nil
+    self.dailyReadInFlight = false
+    let waiters = self.dailyReadWaiters
+    self.dailyReadWaiters = []
+    for box in waiters {
+      if success {
+        box.resolve(true)
+      } else {
+        box.reject(code, message)
+      }
+    }
   }
 
   func cacheDeviceFunctions() {
