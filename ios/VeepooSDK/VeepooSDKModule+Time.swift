@@ -4,7 +4,7 @@ import VeepooBleSDK
 extension VeepooSDKModule {
   func handleSetDeviceTime(_ time: [String: Any]?, promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(true)
+    rejectUnavailableOnSimulator(promise, "setDeviceTime")
     #else
     guard let peripheralManage = self.peripheralManage else {
       promise.reject("DEVICE_NOT_CONNECTED", "No device connected")

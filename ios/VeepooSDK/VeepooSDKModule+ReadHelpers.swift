@@ -246,7 +246,9 @@ extension VeepooSDKModule {
   }
   
   func handleReadDeviceAllData(promise: Promise) {
-    #if !targetEnvironment(simulator)
+    #if targetEnvironment(simulator)
+    rejectUnavailableOnSimulator(promise, "readDeviceAllData")
+    #else
     guard let manager = self.bleManager,
           let _ = manager.peripheralModel?.deviceAddress else {
       promise.reject("DEVICE_NOT_CONNECTED", "No device connected")

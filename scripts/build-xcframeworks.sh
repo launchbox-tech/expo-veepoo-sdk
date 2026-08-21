@@ -29,7 +29,6 @@ set -eu
 ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 FRAMEWORK_DIR="$ROOT_DIR/ios/VeepooSDK/Frameworks"
 TMP_DIR="${TMPDIR:-/private/tmp}/veepoo-xcframeworks"
-# Match s.platforms in ios/VeepooSDK.podspec.
 MIN_IOS="16.4"
 SIM_ARCHS="arm64 x86_64"
 
@@ -37,6 +36,15 @@ rm -rf "$TMP_DIR"
 mkdir -p "$TMP_DIR"
 
 SIM_SDK_PATH="$(xcrun --sdk iphonesimulator --show-sdk-path)"
+
+# MIN_IOS must track `s.platforms` in the podspec — a stub built for a newer
+# deployment target than the pod allows is a link error nobody would connect
+# back to this script. Assert rather than comment.
+PODSPEC_IOS="$(sed -n 's/.*:ios *=> *.\([0-9.]*\).*/\1/p' "$ROOT_DIR/ios/VeepooSDK.podspec" | head -1)"
+if [ "$PODSPEC_IOS" != "$MIN_IOS" ]; then
+  echo "error: MIN_IOS=$MIN_IOS but ios/VeepooSDK.podspec says :ios => '$PODSPEC_IOS'" >&2
+  exit 1
+fi
 
 # Echoes the path of the device .framework for $1, preferring the plain
 # framework and falling back to the non-simulator slice of an existing
@@ -62,20 +70,38 @@ device_framework_path() {
 
 # `ios-arm64_armv7`-style slice identifier, from the archs actually in $1.
 # Alphabetical, which is the order xcodebuild itself emits.
-slice_identifier() {
+# Echoes the archs in $1, one per line, sorted. Fails loudly on an empty result:
+# POSIX sh has no `pipefail`, so a pipeline reports only its LAST stage's status
+# and a failed `lipo` would otherwise sail through as an empty arch list — an
+# `ios-` slice id and an empty <array> that `plutil -lint` happily accepts,
+# after which the plain .framework is deleted.
+archs_of() {
   binary="$1"
+  archs="$(lipo -archs "$binary")" || {
+    echo "error: lipo could not read $binary" >&2
+    exit 1
+  }
+  archs="$(echo "$archs" | tr ' ' '\n' | sort | grep -v '^$')"
+  if [ -z "$archs" ]; then
+    echo "error: no architectures found in $binary" >&2
+    exit 1
+  fi
+  echo "$archs"
+}
+
+slice_identifier() {
   suffix="$2"
-  archs="$(lipo -archs "$binary" | tr ' ' '\n' | sort | tr '\n' '_' | sed 's/_$//')"
-  echo "ios-$archs$suffix"
+  joined="$(archs_of "$1" | tr '\n' '_' | sed 's/_$//')"
+  echo "ios-$joined$suffix"
 }
 
 # <string> rows for the SupportedArchitectures array of $1.
 arch_entries() {
-  lipo -archs "$1" | tr ' ' '\n' | sort | sed 's|.*|\
+  archs_of "$1" | sed 's|.*|\
 				<string>&</string>|' | tr -d '\n'
 }
 
-make_stub_framework() {
+repackage_as_xcframework() {
   name="$1"
   kind="$2"
 
@@ -98,7 +124,12 @@ make_stub_framework() {
     cp -R "$device_framework/Modules" "$stub_framework/Modules"
   fi
   cp "$device_framework/Info.plist" "$stub_framework/Info.plist"
+  # The plist is the device framework's, so it still describes a device binary.
+  # Correct the three keys that would otherwise contradict the slice.
   /usr/libexec/PlistBuddy -c "Set :CFBundleExecutable $name" "$stub_framework/Info.plist" >/dev/null
+  /usr/libexec/PlistBuddy -c "Set :CFBundleSupportedPlatforms:0 iPhoneSimulator" "$stub_framework/Info.plist" >/dev/null 2>&1 || true
+  /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion $MIN_IOS" "$stub_framework/Info.plist" >/dev/null 2>&1 || true
+  /usr/libexec/PlistBuddy -c "Delete :UIRequiredDeviceCapabilities" "$stub_framework/Info.plist" >/dev/null 2>&1 || true
 
   # A vendor-generated `<name>-Swift.h` guards its declarations with
   # `#elif defined(__arm64__) && __arm64__` and `#error unsupported Swift
@@ -219,11 +250,11 @@ PLIST
   echo "wrote $name.xcframework ($device_id + $sim_id)"
 }
 
-make_stub_framework VeepooBleSDK static
-make_stub_framework JL_BLEKit static
-make_stub_framework JLDialUnit dynamic
-make_stub_framework GRDFUSDK dynamic
-make_stub_framework ABParTool dynamic
-make_stub_framework ZipZap dynamic
+repackage_as_xcframework VeepooBleSDK static
+repackage_as_xcframework JL_BLEKit static
+repackage_as_xcframework JLDialUnit dynamic
+repackage_as_xcframework GRDFUSDK dynamic
+repackage_as_xcframework ABParTool dynamic
+repackage_as_xcframework ZipZap dynamic
 
 echo "xcframeworks written to $FRAMEWORK_DIR"

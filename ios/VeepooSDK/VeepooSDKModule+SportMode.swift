@@ -47,7 +47,7 @@ extension VeepooSDKModule {
 
   func handleReadSportMode(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(["mode": nil as Any?, "isActive": false])
+    rejectUnavailableOnSimulator(promise, "readSportMode")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

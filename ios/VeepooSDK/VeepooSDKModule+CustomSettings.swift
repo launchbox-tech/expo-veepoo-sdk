@@ -7,11 +7,7 @@ extension VeepooSDKModule {
 
   func handleReadCustomSettings(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "temperatureUnit": "celsius",
-      "bloodGlucoseUnit": "mmolL",
-      "skinTone": 1
-    ])
+    rejectUnavailableOnSimulator(promise, "readCustomSettings")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

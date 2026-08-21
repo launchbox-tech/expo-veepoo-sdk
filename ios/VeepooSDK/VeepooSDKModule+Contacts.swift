@@ -30,7 +30,7 @@ extension VeepooSDKModule {
 
   func handleReadContacts(crc: Int?, promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([[String: Any]]())
+    rejectUnavailableOnSimulator(promise, "readContacts")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")
@@ -209,7 +209,7 @@ extension VeepooSDKModule {
 
   func handleReadSosCallTimes(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(["times": 3, "minTimes": 1, "maxTimes": 9])
+    rejectUnavailableOnSimulator(promise, "readSosCallTimes")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

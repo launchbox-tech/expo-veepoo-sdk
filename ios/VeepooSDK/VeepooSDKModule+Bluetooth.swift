@@ -7,13 +7,7 @@ extension VeepooSDKModule {
 
   func handleReadDeviceBTStatus(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "isBTOpen": false,
-      "isAutoConnect": false,
-      "isAudioOpen": false,
-      "hasPairInfo": false,
-      "state": "disconnected"
-    ] as [String: Any])
+    rejectUnavailableOnSimulator(promise, "readDeviceBTStatus")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

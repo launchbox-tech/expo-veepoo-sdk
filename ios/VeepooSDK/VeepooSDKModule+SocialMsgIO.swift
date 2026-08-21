@@ -4,12 +4,7 @@ import VeepooBleSDK
 extension VeepooSDKModule {
   func handleReadSocialMsgData(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "phone": "support", "sms": "support", "wechat": "support", "qq": "support",
-      "facebook": "support", "twitter": "support", "instagram": "support",
-      "linkedin": "unsupported", "whatsapp": "unsupported", "line": "unsupported",
-      "skype": "unsupported", "email": "support", "other": "support"
-    ])
+    rejectUnavailableOnSimulator(promise, "readSocialMsgData")
     #else
     guard let manager = self.bleManager, let model = manager.peripheralModel else {
       promise.reject("DEVICE_NOT_CONNECTED", "No device connected")
@@ -24,7 +19,7 @@ extension VeepooSDKModule {
 
   func handleWriteSocialMsgData(data: [String: Any], promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve("success")
+    rejectUnavailableOnSimulator(promise, "writeSocialMsgData")
     #else
     guard let peripheralManage = self.peripheralManage else {
       promise.reject("DEVICE_NOT_CONNECTED", "No device connected")

@@ -32,17 +32,7 @@ extension VeepooSDKModule {
 
   func handleReadScreenLightSettings(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "nightStartHour": 22,
-      "nightStartMinute": 0,
-      "nightEndHour": 7,
-      "nightEndMinute": 0,
-      "nightLevel": 2,
-      "dayLevel": 4,
-      "autoAdjust": false,
-      "maxLevel": 5,
-      "lastManualDayLevel": 4
-    ])
+    rejectUnavailableOnSimulator(promise, "readScreenLightSettings")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")
@@ -99,12 +89,7 @@ extension VeepooSDKModule {
 
   func handleReadScreenLightDuration(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "currentSeconds": 10,
-      "minSeconds": 5,
-      "maxSeconds": 60,
-      "recommendSeconds": 10
-    ])
+    rejectUnavailableOnSimulator(promise, "readScreenLightDuration")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

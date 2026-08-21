@@ -101,12 +101,7 @@ extension VeepooSDKModule {
 
   func handleReadWomenHealthSettings(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "status": "none",
-      "menstrualLengthDays": 5,
-      "menstrualCycleDays": 28,
-      "babySex": "female",
-    ])
+    rejectUnavailableOnSimulator(promise, "readWomenHealthSettings")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

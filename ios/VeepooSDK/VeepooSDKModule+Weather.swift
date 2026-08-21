@@ -26,7 +26,7 @@ extension VeepooSDKModule {
 
   func handleReadWeatherSettings(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(["isOpen": false, "unit": "C", "crc": 0])
+    rejectUnavailableOnSimulator(promise, "readWeatherSettings")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

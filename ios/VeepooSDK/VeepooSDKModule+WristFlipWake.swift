@@ -35,15 +35,7 @@ extension VeepooSDKModule {
 
   func handleReadWristFlipWakeSettings(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "startHour": 22,
-      "startMinute": 0,
-      "endHour": 8,
-      "endMinute": 0,
-      "enabled": true,
-      "sensitivityLevel": 5,
-      "supportsCustomTimeWindow": true
-    ])
+    rejectUnavailableOnSimulator(promise, "readWristFlipWakeSettings")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

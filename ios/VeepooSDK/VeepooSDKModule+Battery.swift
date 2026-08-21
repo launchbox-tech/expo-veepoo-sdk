@@ -4,7 +4,7 @@ import VeepooBleSDK
 extension VeepooSDKModule {
   func handleReadBattery(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(["level": 88, "percent": 88, "powerModel": 0, "state": 1, "bat": 0, "isPercent": true, "isLowBattery": false])
+    rejectUnavailableOnSimulator(promise, "readBattery")
     #else
     guard let peripheralManage = self.peripheralManage else {
       promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")

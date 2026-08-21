@@ -32,11 +32,7 @@ extension VeepooSDKModule {
 
   func handleReadWatchFaceStyle(_ options: [String: Any]?, promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "dialType": "default",
-      "screenIndex": 0,
-      "operationSuccess": true
-    ])
+    rejectUnavailableOnSimulator(promise, "readWatchFaceStyle")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

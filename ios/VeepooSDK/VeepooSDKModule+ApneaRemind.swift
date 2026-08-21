@@ -14,7 +14,7 @@ extension VeepooSDKModule {
 
   func handleReadApneaRemindSettings(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(["enabled": false, "threshold": 90])
+    rejectUnavailableOnSimulator(promise, "readApneaRemindSettings")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

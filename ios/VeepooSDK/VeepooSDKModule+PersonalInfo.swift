@@ -4,7 +4,7 @@ import VeepooBleSDK
 extension VeepooSDKModule {
   func handleSyncPersonalInfo(info: [String: Any], promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(true)
+    rejectUnavailableOnSimulator(promise, "syncPersonalInfo")
     #else
     guard let peripheralManage = self.peripheralManage else {
       promise.reject("SDK_NOT_INITIALIZED", "Peripheral manager is nil")

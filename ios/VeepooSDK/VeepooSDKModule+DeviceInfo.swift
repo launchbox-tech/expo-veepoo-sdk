@@ -4,7 +4,7 @@ import VeepooBleSDK
 extension VeepooSDKModule {
   func handleReadDeviceFunctions(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(["package1": ["type": "DeviceFunctionPackage1", "bloodPressure": "unsupported", "heartRateDetect": "support"]])
+    rejectUnavailableOnSimulator(promise, "readDeviceFunctions")
     #else
     if self.cachedDeviceFunctions.isEmpty { self.cacheDeviceFunctions() }
     promise.resolve(self.cachedDeviceFunctions)
@@ -13,14 +13,7 @@ extension VeepooSDKModule {
 
   func handleReadDeviceVersion(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "hardwareVersion": "1.0.0-SIMULATOR",
-      "firmwareVersion": "2.0.0-SIMULATOR",
-      "softwareVersion": "3.0.0-SIMULATOR",
-      "deviceNumber": "SIM001",
-      "newVersion": "",
-      "description": "Simulator Mode"
-    ])
+    rejectUnavailableOnSimulator(promise, "readDeviceVersion")
     #else
     guard let manager = self.bleManager, let model = manager.peripheralModel else {
       promise.reject("DEVICE_NOT_CONNECTED", "No device connected or model unavailable")

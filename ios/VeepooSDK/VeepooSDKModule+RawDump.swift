@@ -55,7 +55,7 @@ extension VeepooSDKModule {
 
   func handleReadOriginRawDump(dayOffset: Int, promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([:] as [String: Any])
+    rejectUnavailableOnSimulator(promise, "readOriginRawDump")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

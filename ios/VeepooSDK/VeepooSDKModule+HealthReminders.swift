@@ -47,15 +47,7 @@ extension VeepooSDKModule {
 
   func handleReadHealthReminder(type typeStr: String, promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "type": typeStr,
-      "startHour": 8,
-      "startMinute": 0,
-      "endHour": 20,
-      "endMinute": 0,
-      "interval": 60,
-      "enabled": true
-    ])
+    rejectUnavailableOnSimulator(promise, "readHealthReminder")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")

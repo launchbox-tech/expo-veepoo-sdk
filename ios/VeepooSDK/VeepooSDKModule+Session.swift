@@ -33,7 +33,7 @@ extension VeepooSDKModule {
   // MARK: Permissions
   func handleIsBluetoothEnabled(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(true)
+    rejectUnavailableOnSimulator(promise, "isBluetoothEnabled")
     #else
     self.ensureCentralManager()
     guard let central = self.centralManager else {
@@ -46,7 +46,7 @@ extension VeepooSDKModule {
 
   func handleRequestPermissions(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve(self.makePermissionsResult(status: "granted", granted: true, canAskAgain: false))
+    rejectUnavailableOnSimulator(promise, "requestPermissions")
     #else
     let authorization = CBManager.authorization
     switch authorization {

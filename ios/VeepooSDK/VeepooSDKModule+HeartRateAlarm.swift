@@ -4,11 +4,7 @@ import VeepooBleSDK
 extension VeepooSDKModule {
   func handleReadHeartRateAlarm(promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve([
-      "enabled": false,
-      "highThreshold": 120,
-      "lowThreshold": 60
-    ])
+    rejectUnavailableOnSimulator(promise, "readHeartRateAlarm")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")
@@ -44,7 +40,7 @@ extension VeepooSDKModule {
 
   func handleSetHeartRateAlarm(_ alarm: [String: Any], promise: Promise) {
     #if targetEnvironment(simulator)
-    promise.resolve("success")
+    rejectUnavailableOnSimulator(promise, "setHeartRateAlarm")
     #else
     guard self.isInitialized else {
       promise.reject("SDK_NOT_INITIALIZED", "SDK not initialized")
