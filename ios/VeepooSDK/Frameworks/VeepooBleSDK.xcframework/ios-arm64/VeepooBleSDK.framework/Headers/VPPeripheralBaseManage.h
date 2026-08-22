@@ -62,6 +62,7 @@
 
 #import "VPQH15HealthDataModel.h"
 #import "VPQH15StepDataModel.h"
+#import "VPReminderEventModel.h"
 @class JL_Assist,VPMultiBloodGlucoseModel,VPBodyCompositionValueModel,VPBloodAnalysisResultModel,VPManualTestDataModel;
 
 @class JL_Assist,VPMultiBloodGlucoseModel,VPBodyCompositionValueModel,VPBloodAnalysisResultModel,VPManualTestDataModel;
@@ -106,6 +107,12 @@
 //Send firmware upgrade command, used internally by SDK
 //发送固件升级命令，SDK内部使用
 - (void)veepooSDKSendUpdateFirmCommand;
+
+//发送固件升级命令,部分设备支持响应
+- (void)veepooSDKSendUpdateFirmCommand:(void(^)(void))block;
+
+//发送退出升级模式命令
+- (void)veepooSDKSendExitUpdateFirmCommand;
 
 /**
  GSensor, specific development use
@@ -266,9 +273,9 @@
  
  @param deviceBatteryInfoBlock The callback return battery Info
  读取电量的回调函数
-  - isPercent 表示电量是否为百分比；mean device battery info is  [0, 100]] or [0, 4]
-  - percenTypeIsLowBat 表示isPercent为真的情况下，设备是否为低电状态；mean if isPercent is true，device whether is low attery
-  - battery 电池电量，如果为百分比电量，则范围为[0, 100] 否则表示电池的格数，[0, 4]
+ - isPercent 表示电量是否为百分比；mean device battery info is  [0, 100]] or [0, 4]
+ - percenTypeIsLowBat 表示isPercent为真的情况下，设备是否为低电状态；mean if isPercent is true，device whether is low attery
+ - battery 电池电量，如果为百分比电量，则范围为[0, 100] 否则表示电池的格数，[0, 4]
  */
 - (void)veepooSDKReadDeviceBatteryInfo:(void(^)(BOOL isPercent, BOOL percenTypeIsLowBat, NSUInteger battery))deviceBatteryInfoBlock;
 
@@ -278,10 +285,10 @@
  
  @param deviceBatteryInfoBlock The callback return battery Info
  读取电量的回调函数
-  - isPercent 表示电量是否为百分比；mean device battery info is  [0, 100]] or [0, 4]
-  - chargeState 充电状态
-  - percenTypeIsLowBat 表示isPercent为真的情况下，设备是否为低电状态；mean if isPercent is true，device whether is low attery
-  - battery 电池电量，如果为百分比电量，则范围为[0, 100] 否则表示电池的格数，[0, 4]
+ - isPercent 表示电量是否为百分比；mean device battery info is  [0, 100]] or [0, 4]
+ - chargeState 充电状态
+ - percenTypeIsLowBat 表示isPercent为真的情况下，设备是否为低电状态；mean if isPercent is true，device whether is low attery
+ - battery 电池电量，如果为百分比电量，则范围为[0, 100] 否则表示电池的格数，[0, 4]
  */
 - (void)veepooSDKReadDeviceBatteryAndChargeInfo:(void(^)(BOOL isPercent, VPDeviceChargeState chargeState, BOOL percenTypeIsLowBat, NSUInteger battery))deviceBatteryInfoBlock;
 
@@ -551,7 +558,7 @@
  血糖类型(bloodGlucoseType)为5情况下，level风险等级才有效
  
  @param start Start and End
- @param isPersonalModel 是否为私人模式 
+ @param isPersonalModel 是否为私人模式
  @param testResult Callback of test results
  */
 - (void)veepooSDKTestBloodGlucoseStart:(BOOL)start
@@ -649,7 +656,7 @@
 /**
  Screen style setting, first get the range of screen style settings according to screenTypes in VPPeripheralModel. If it is 3, you can set 1-3. If it is 0, it does not have this function.
  屏幕风格设置，先根据VPPeripheralModel中的screenTypes获取屏幕风格设置的区间，如果为3代表可以设置1-3，如果为0代表没有此功能
-
+ 
  @param screenStyle Set the style, the interval is [1 screenTypes], when the reading is 0 设置的样式，区间为【1 screenTypes】，读取的时候传0
  @param settingMode 1 stands for setting, 2 stands for reading 1代表设置，2代表读取
  @param settingScreenStyleResultBlock
@@ -663,7 +670,7 @@
 /**
  Screen style setting, first get the range of screen style settings according to screenTypes in VPPeripheralModel. If it is 3, you can set 1-3. If it is 0, it does not have this function.
  屏幕风格设置，先根据VPPeripheralModel中的screenTypes获取屏幕风格设置的区间，如果为3代表可以设置1-3，如果为0代表没有此功能
-
+ 
  @param screenStyle Set the style, the interval is [1 screenTypes], when the reading is 0 设置的样式，区间为【1 screenTypes】，读取的时候传0
  @param settingMode 1 stands for setting, 2 stands for reading 1代表设置，2代表读取
  @param dialType 表盘类型
@@ -707,7 +714,7 @@
    The normal use of this interface is to ensure that the current state is being operated each time the setting is turned on or off.
  设置和读取运动模式
  此接口正常的使用方式是，每次设置开启或者关闭的时候要确保当前的状态在做操作
-
+ 
  @param settingType
  0 is to turn off the sport mode, 1 is to turn on the sport mode, 2 is to read the current device sport mode
  0是关闭运动模式，1是开启运动模式，2是读取当前设备运动模式
@@ -718,7 +725,7 @@
  Set and read the results, The runningType is 0 for not in the sport mode, 1 for the sport mode, 2 for the other busy state, and 3 for the active mode to notify the App when the sport mode ends the connection state. This parameter is only used for reference when reading or setting fails, or in motion. When ending the active report
       settingSuccess Set or read successfully. If it fails, you can refer to the runningType type to see the reason. If the sport mode is already on, turn it back on, it will fail, or the device is doing other operations.
   设置和读取结果， runningType为0代表不在运动模式下，1代表运动模式中，2代表其他忙碌状态,3代表运动模式结束连接状态下主动告知App,此参数只有在读取或者设置失败的时候做参考，或者在运动结束主动上报的时候用
-    settingSuccess 设置或读取是否成功，如果失败，可以参考runningType类型来看一下原因，如运动模式已经开启，再次开启，就会失败，或者设备在做其他操作
+ settingSuccess 设置或读取是否成功，如果失败，可以参考runningType类型来看一下原因，如运动模式已经开启，再次开启，就会失败，或者设备在做其他操作
  */
 - (void)veepooSDKSettingDeviceRunning:(int)settingType runMode:(VPDeviceRuningMode)runningMode result:(void(^)(int runningType, BOOL settingSuccess))runningResultBlock;
 
@@ -726,7 +733,7 @@
 /**
  Set or read low power
  设置或读取低功耗
-
+ 
  @param settingMode
  Set the type, first read first, if you do not read the direct setting on or off may fail
  设置类型, 第一次要先读取, 如果不读直接设置开或关可能会失败
@@ -741,6 +748,8 @@
 //Reset the device, device will reload, data will not clear. this operation will disconnect.
 //复位，设备会重新冷启动一遍，数据不会丢失。会与App断开连接
 - (void)veepooSDKResetDeviceData;
+// 关机
+- (void)veepooSDKPowerOffDevice;
 
 /// 读取已连接设备的RSSI值  ⚠️设备未连接时无效
 /// @param block 回调函数
@@ -788,7 +797,7 @@
 /**
  Read the count data for a certain day
  读取某一天的计步数据
-
+ 
  @param dayNumber 代表哪一天0代表今天，1代表昨天，2代表前天，不能大于VPPeripheralModel中属性saveDays的值
  @param readStepBlock 读取计步的回调，是一个字典，包含计步、距离和卡路里
  */
@@ -796,7 +805,7 @@
 
 /**
  读取某一天的睡眠数据,因数据量比较少，所以没有进度
-
+ 
  @param dayNumber 同上 但是睡眠今天应该显示昨天的数据，所以读取睡眠的dayNumber区间应该是【1 saveDays】
  @param readSleepBlock 返回一天的睡眠数据，一天可能有多段睡眠所以是数组，目前结构和数据库中类VPDataBaseOperation的结构一致，可以去参考下
  */
@@ -804,7 +813,7 @@
 
 /**
  读取基本数据，一天的详细的计步、心率、血压数据，如每5分钟一次数据
-
+ 
  @param dayNumber 代表哪一天0代表今天，1代表昨天，2代表前天，不能大于
  @param maxPackage 一天的数据比较多，每次读取可以从选择的包数读取，如从上一次读取结束的最大包数 + 1 读取，如逻辑简单也可以每次从1开始读取，处理起来简单，增加了手环传输数据量
  @param readBasicDataBlock 返回一天的基本数据，一天多个5分钟或者10分钟所以是数组，目前结构和数据库中类VPDataBaseOperation的结构一致，可以去参考下,因数据比较多所以返回一个一共有多少包，当前读取到多少包了,当前包大于等于总包数，数据读取完成
@@ -813,7 +822,7 @@
 
 /**
  读取一天的血氧数据 此接口无效
-
+ 
  @param dayNumber 代表哪一天0代表今天，1代表昨天，2代表前天，不能大于saveDays
  @param maxPackage 一天的数据比较多，每次读取可以从选择的包数读取，如从上一次读取结束的最大包数 + 1 读取，如逻辑简单也可以每次从1开始读取，处理起来简单，增加了手环传输数据量
  @param readOxygenDataBlock 返回一天的血氧数据，目前结构和数据库中类VPDataBaseOperation的结构一致，可以去参考下,因数据比较多所以返回一个一共有多少包，当前读取到多少包了,当前包大于等于总包数，数据读取完成
@@ -826,7 +835,7 @@
 /**
  获取手环运动数据的CRC
  读取运动模式数据的时候为了重复读取数据，先获取手环运动数据的CRC，获取的array长度是多少就代表手环最多能够存储几组运动数据，如数据内为@[@(128),@(0),@(153698)],数组内的数据为NSNumber类型，数组长度为3，手环上最多存储3组数据，读取第几组就用数组的下标读取，如0 1 2 ，数据为0的位置如@(0)，这块里没有数据，要直接跳过，每次获取完crc数据后要和本地的运动模式数据对比，如果返回的crc在本地存在就不用读取直接跳过，第一组和第二组不用读取，那直接用数据的最后下标2去读取就可以了,比如第一组和第三组都要读取，那就调用两次获取运动数据的接口，要读取完一组后在去读取，（切记不要一组没有读取完毕，就直接读取下一组）
-
+ 
  @param readDeviceRunningCrcBlock 获取CRC数据后的回调
  */
 - (void)veepooSDK_readDeviceRunningCrcResult:(void(^)(NSArray *crcValues))readDeviceRunningCrcBlock;
@@ -1016,7 +1025,7 @@
  */
 - (void)veepooSDK_setPulseAction:(BOOL)open type:(int)type minute:(int)minute level:(int)level;
 
-/** 
+/**
  磁疗功能的响应回调
  - Parameter result: 响应回调
  - state: 操作类型
@@ -1071,7 +1080,7 @@
 ///   - image: 传输的图片
 ///   - sendResult: 结果回调
 ///   - progress: 传输进度回调
--(void)veepooSDKSendStartTransmissionImage:(UIImage*)image andResult:(void(^_Nonnull)(NSError * _Nullable error))sendResult andProgress:(void(^_Nonnull)(double progress))progress;
+-(void)veepooSDKSendStartTransmissionImage:(UIImage*_Nullable)image andResult:(void(^_Nonnull)(NSError * _Nullable error))sendResult andProgress:(void(^_Nonnull)(double progress))progress;
 
 
 //查询设备支持可传输图片的信息
@@ -1092,7 +1101,7 @@
 /// - Parameters:
 ///   - state: 测试模式 VPJH58MeasurementModeStateOff:全关 VPJH58MeasurementModeStateModeOne:模式1开 VPJH58MeasurementModeStateModeTwo:模式2开
 ///   - sendResult: 结果回调
--(void)veepooSDK_JH58SetMeasurementMode:(VPJH58MeasurementModeState)state andResult:(void(^)(NSError *error,VPJH58MeasurementModeState state))sendResult;
+-(void)veepooSDK_JH58SetMeasurementMode:(VPJH58MeasurementModeState)state andResult:(void(^_Nullable)(NSError * _Nullable error,VPJH58MeasurementModeState state))sendResult;
 
 //监听设备测试模式开关变化状态上报 - 设备修改主动上报,APP修改不触发
 /// - Parameters:
@@ -1105,14 +1114,14 @@
 ///   - timestamp:获取这个时间戳以后的数据,为0就是所有数据
 ///   - progressBlock:进度回调 group:第几组 DT:一组内第几包 DTS:一组内总包数
 ///   - sendResult:结果回调
--(void)veepooSDK_JH58GetPPGAndAccelerationRawDataWithMeasurementMode:(VPJH58MeasurementModeState)state andTimestamp:(NSTimeInterval)timestamp andProgress:(void(^)(NSInteger group,NSInteger DT ,NSInteger DTS))progressBlock andResult:(void(^)(NSError *error,NSMutableArray<VPJH58PPGAccelerationModel*> *array))sendResult;
+-(void)veepooSDK_JH58GetPPGAndAccelerationRawDataWithMeasurementMode:(VPJH58MeasurementModeState)state andTimestamp:(NSTimeInterval)timestamp andProgress:(void(^_Nullable)(NSInteger group,NSInteger DT ,NSInteger DTS))progressBlock andResult:(void(^_Nullable)(NSError * _Nullable error,NSMutableArray<VPJH58PPGAccelerationModel*> * _Nullable array))sendResult;
 
 
 //向设备请求实时传输
 /// - Parameters:
 ///   - open :YES 请求开启 NO:请求关闭
 ///   - sendResult:结果回调
--(void)veepooSDK_JH58ReqRealTimeTransmission:(BOOL)open andResult:(void(^)(BOOL success))sendResult;
+-(void)veepooSDK_JH58ReqRealTimeTransmission:(BOOL)open andResult:(void(^_Nullable)(BOOL success))sendResult;
 
 
 //响应设备实时传输请求
@@ -1125,19 +1134,29 @@
 //监听设备请求实时传输
 /// - Parameters:
 ///   - sendResult:结果回调 YES:请求开启 NO:请求关闭
--(void)veepooSDK_JH58MonitorDeviceReqRealTimeTransmission:(void(^)(BOOL open))sendResult;
+-(void)veepooSDK_JH58MonitorDeviceReqRealTimeTransmission:(void(^_Nullable)(BOOL open))sendResult;
 
 
 //监听设备实时传输PPG数据
 /// - Parameters:
 ///   - sendResult:结果回调
--(void)veepooSDK_JH58MonitorRealTimeTransmissionPPGData:(void(^)(NSMutableArray *array))sendResult;
+-(void)veepooSDK_JH58MonitorRealTimeTransmissionPPGData:(void(^_Nullable)(NSMutableArray * _Nullable array))sendResult;
 
 
 //监听设备实时传输加速度数据
 /// - Parameters:
 ///   - sendResult:结果回调
--(void)veepooSDK_JH58MonitorRealTimeTransmissionAccelerationData:(void(^)(NSMutableArray <VPAccelerationModel*> *array))sendResult;
+-(void)veepooSDK_JH58MonitorRealTimeTransmissionAccelerationData:(void(^_Nullable)(NSMutableArray <VPAccelerationModel*> * _Nullable array))sendResult;
+
+// 主动开启测量
+/// - Parameters:
+///   - sendResult:结果回调
+- (void)veepooSDK_JH58ActiveTestPPGAndAcceleration:(VPJH58ActiveMeasurementState)state andResult:(void(^_Nullable)(VPJH58ActiveMeasurementResultState state))sendResult;
+
+// 开启测量后数据上报
+/// - Parameters:
+///   - sendResult:结果回调
+- (void)veepooSDK_JH58ActiveTestPPGAndAccelerationReport:(void(^_Nullable)( NSMutableArray<VPJH58PPGAccelerationModel*> * _Nullable array))sendResult;
 
 #pragma mark 微体检(定制项目)
 
@@ -1149,14 +1168,14 @@
 ///   - successResult :结束成功回调
 ///   - heartRateBlock: 测量中心率数据回调
 ///   - ppgBlock: 测量中PPG数据回调
--(void)veepooSDKMicroTestOpenState:(BOOL)open andProgress:(void(^)(int progress))progressResult andFail:(void(^)(NSError *error))failResult andSuccess:(void(^)(BOOL endState,VPMicroTestModel *miniCheckModel))successResult andHeartRate:(void(^)(int heartRateStatus))heartRateBlock andPPG:(void(^)(NSMutableArray *ppgArray))ppgBlock;
+-(void)veepooSDKMicroTestOpenState:(BOOL)open andProgress:(void(^_Nullable)(int progress))progressResult andFail:(void(^_Nullable)(NSError * _Nullable error))failResult andSuccess:(void(^_Nullable)(BOOL endState,VPMicroTestModel * _Nullable miniCheckModel))successResult andHeartRate:(void(^_Nullable)(int heartRateStatus))heartRateBlock andPPG:(void(^_Nullable)(NSMutableArray * _Nullable ppgArray))ppgBlock;
 
 
 //获取微体检手动测量数据
 /// - Parameters:
 ///   - timestamp:秒级时间戳，只返回时间戳之后的数据
 ///   - sendBlock :结果回调
--(void)veepooSDKMicroTestManualMeasurement:(NSTimeInterval)timestamp andPPG:(void(^)(NSMutableArray<VPManualMeasurementMicroTestModel*> *microTestArray))sendBlock;
+-(void)veepooSDKMicroTestManualMeasurement:(NSTimeInterval)timestamp andPPG:(void(^_Nullable)(NSMutableArray<VPManualMeasurementMicroTestModel*> * _Nullable microTestArray))sendBlock;
 
 
 //合镁ZT163定制项目
@@ -1164,12 +1183,12 @@
 /// - Parameters:
 ///   - open:YES:开启常灭屏,NO:关闭常灭屏
 ///   - sendResult :结果回调
-- (void)veepooSDK_ZT163SetDeviceAlwaysOffScreen:(BOOL)open andResult:(void(^)(BOOL success))sendResult;
+- (void)veepooSDK_ZT163SetDeviceAlwaysOffScreen:(BOOL)open andResult:(void(^_Nullable)(BOOL success))sendResult;
 
 // 获取设备常灭屏功能状态
 /// - Parameters:
 ///   - sendResult :结果回调
-- (void)veepooSDK_ZT163GetDeviceAlwaysOffScreenState:(void(^)(VPZT163AlwaysOffScreenFunc state))sendResult;
+- (void)veepooSDK_ZT163GetDeviceAlwaysOffScreenState:(void(^_Nullable)(VPZT163AlwaysOffScreenFunc state))sendResult;
 
 #pragma mark - 压力功能
 
@@ -1178,20 +1197,20 @@
 ///   - start: 开启/关闭
 ///   - result: 回调函数
 - (void)veepooSDK_stressTestStart:(BOOL)start
-                           result:(void (^)(VPDeviceStressTestState state, NSInteger progress, NSInteger stress))result;
+                           result:(void (^_Nullable)(VPDeviceStressTestState state, NSInteger progress, NSInteger stress))result;
 
 #pragma mark - 健康辅助功能控制
 
 /// 读取健康辅助功能支持的列表类型
 /// - Parameter result: 健康辅助功能列表回调
-- (void)veepooSDK_readFuncAssessment:(void (^)(NSArray<VPHealthFunctionModel *> *))result;
+- (void)veepooSDK_readFuncAssessment:(void (^_Nullable)(NSArray<VPHealthFunctionModel *> *_Nullable))result;
 
 /// 设置健康辅助功能，开启或关闭
 /// - Parameters:
 ///   - type: 对应类型，从peripheralModel获取VPFuncAssessmentType
 ///   - open: 开启或关闭
 ///   - result: 结果，成功或失败
-- (void)veepooSDK_setFuncAssessmentWithType:(VPFuncAssessmentType)type open:(BOOL)open result:(void(^)(BOOL))result;
+- (void)veepooSDK_setFuncAssessmentWithType:(VPFuncAssessmentType)type open:(BOOL)open result:(void(^_Nullable)(BOOL))result;
 
 #pragma mark - 皮电功能
 
@@ -1200,8 +1219,8 @@
 ///   - progress :进度回调
 ///   - testResult :结束成功回调
 - (void)veepooSDKTestGSRStart:(BOOL)start
-                     progress:(void(^)(NSProgress *progress))progress
-                   testResult:(void(^)(VPDeviceGSRState state, VPGSRResultModel *model))testResult;
+                     progress:(void(^_Nullable)(NSProgress * _Nullable progress))progress
+                   testResult:(void(^_Nullable)(VPDeviceGSRState state, VPGSRResultModel * _Nullable model))testResult;
 
 #pragma mark 微体检(公版)
 
@@ -1210,41 +1229,41 @@
 ///   - open:YES 开启 NO 关闭
 ///   - progressResult :进度回调
 ///   - result :结束成功回调
--(void)veepooSDK_healthGlanceTestStart:(BOOL)start andProgress:(void(^)(NSInteger progress))progressResult andResult:(void(^)(VPDeviceHealthGlanceState state,VPHealthGlanceTestModel *healthGlanceModel))result;
+-(void)veepooSDK_healthGlanceTestStart:(BOOL)start andProgress:(void(^_Nullable)(NSInteger progress))progressResult andResult:(void(^_Nullable)(VPDeviceHealthGlanceState state,VPHealthGlanceTestModel * _Nullable healthGlanceModel))result;
 
 #pragma mark - AI功能
 
 //监听设备AI功能使用情况
-- (void)veepooSDK_aiFuncOpusDataSubscribe:(void (^)(VPCurrentAIFunctionType, NSData *opusData))result;
+- (void)veepooSDK_aiFuncOpusDataSubscribe:(void (^_Nullable)(VPCurrentAIFunctionType, NSData * _Nullable opusData))result;
 
 // 发送语音转成文字的结果给设备
 /// - Parameters:
 ///  - resultStr: 结果文字
-- (void)veepooSDK_aiFuncSendSpeechConvertWithTextResult:(NSString *)resultStr;
+- (void)veepooSDK_aiFuncSendSpeechConvertWithTextResult:(NSString *_Nullable)resultStr;
 
 // 发送AI回答的结果给设备
 /// - Parameters:
 ///  - resultStr: 结果文字
-- (void)veepooSDK_aiFuncSendChatAnswerWithTextResult:(NSString *)resultStr;
+- (void)veepooSDK_aiFuncSendChatAnswerWithTextResult:(NSString *_Nullable)resultStr;
 
 // 监听设备触发AI再次回答
 /// - Parameters:
 ///  - askBlock: 结果文字
-- (void)veepooSDK_aiFuncReceiveAnswerAgainSubscribe:(void (^)(NSString *))askBlock;
+- (void)veepooSDK_aiFuncReceiveAnswerAgainSubscribe:(void (^_Nullable)(NSString *_Nullable))askBlock;
 
 /// AI表盘 监听收到了设备获取图片
 /// - Parameters:
 ///  - result: lastAsk:结果文字,style:图片风格
-- (void)veepooSDK_aiFuncCanGetImageActionSubscribe:(void (^)(NSString *lastAsk, NSInteger style))result;
+- (void)veepooSDK_aiFuncCanGetImageActionSubscribe:(void (^_Nullable)(NSString * _Nullable lastAsk, NSInteger style))result;
 
 /// 发送AI表盘预览图
 /// /// - Parameters:
 ///  - imageData: 图片转成NSData
-- (void)veepooSDK_aiFuncSendImageData:(NSData *)imageData;
+- (void)veepooSDK_aiFuncSendImageData:(NSData *_Nullable)imageData;
 
 /// 监听设备触发发送AI表盘
 ///  - result: start:是否开始,success:是否成功 image:发送的图片
-- (void)veepooSDK_aiFuncImageTransformResultSubscribe:(void (^)(BOOL start, BOOL success, UIImage *image))result;
+- (void)veepooSDK_aiFuncImageTransformResultSubscribe:(void (^_Nullable)(BOOL start, BOOL success, UIImage * _Nullable image))result;
 
 /// APP端AI流程异常主动下发中断，如网络异常，敏感词等
 /// - Parameter type: 异常类型
@@ -1262,64 +1281,64 @@
 
 #pragma mark - 4G功能
 /// 读取 4G 设备配置信息
-- (void)veepooSDK_read4GDeviceConfigInfoSubscribe:(void (^)(BOOL isReadAckInfo, VP4GFunctionConfigurationInfoModel *deviceConfigInfo))result;
+- (void)veepooSDK_read4GDeviceConfigInfoSubscribe:(void (^_Nullable)(BOOL isReadAckInfo, VP4GFunctionConfigurationInfoModel * _Nullable deviceConfigInfo))result;
 /// 发送 4G 设备信息核准成功
 - (void)veepooSDK_sendVerifyInfoSucc;
 /// 绑定设备
 /// - Parameter account: App 账号
 /// - Parameter password: App 随机生成的密码
 /// - Parameter callback: 绑定结果
-- (void)veepooSDK_bind4GDeviceAccount:(NSString *)account password:(NSString *)password callback:(void (^)(BOOL isSucc))result;
+- (void)veepooSDK_bind4GDeviceAccount:(NSString *_Nullable)account password:(NSString *_Nullable)password callback:(void (^_Nullable)(BOOL isSucc))result;
 
 /// 绑定设备，发送 App 账号是否在设备端生效
 /// - Parameter state: 生效状态 （0 无效、1 有效）
 /// - Parameter callback: 修改结果
-- (void)veepooSDK_modifyAccountValidState:(NSInteger)state callback:(void (^)(BOOL isSucc))result;
+- (void)veepooSDK_modifyAccountValidState:(NSInteger)state callback:(void (^_Nullable)(BOOL isSucc))result;
 
 /// 修改移动网络开关启用状态
 /// - Parameter state: 开启状态
 /// - Parameter callback: 修改结果
-- (void)veepooSDK_modify4GSwitchEnableState:(NSInteger)state callback:(void (^)(BOOL isSucc))result;
+- (void)veepooSDK_modify4GSwitchEnableState:(NSInteger)state callback:(void (^_Nullable)(BOOL isSucc))result;
 
 /// 修改移动数据同步开关启用状态
 /// - Parameter state: 开启状态
 /// - Parameter callback: 修改结果
-- (void)veepooSDK_modify4GSyncSwitchEnableState:(NSInteger)state callback:(void (^)(BOOL isSucc))result;
+- (void)veepooSDK_modify4GSyncSwitchEnableState:(NSInteger)state callback:(void (^_Nullable)(BOOL isSucc))result;
 
 /// 修改设备数据上报间隔时间
 /// - Parameter time: 时间间隔
 /// - Parameter callback: 修改结果
-- (void)veepooSDK_modifySyncTimeInterval:(NSInteger)time callback:(void (^)(BOOL isSucc))result;
+- (void)veepooSDK_modifySyncTimeInterval:(NSInteger)time callback:(void (^_Nullable)(BOOL isSucc))result;
 
 /// 修改设备MQTT配置
 /// - Parameter host: IP
 /// - Parameter port: 端口
 /// - Parameter callback: 修改结果
-- (void)veepooSDK_modifyMQTTConfig:(NSString *)host port:(NSInteger)port callback:(void (^)(BOOL isSucc))result;
+- (void)veepooSDK_modifyMQTTConfig:(NSString *_Nullable)host port:(NSInteger)port callback:(void (^_Nullable)(BOOL isSucc))result;
 
 #pragma mark - 运动控制
 
 /// 读取设备存储的运动模式数据CRC列表
 /// - Parameter result: CRC数组回调，NSNumber 的类型是 uint16
-- (void)readDeviceSportCRCArr:(void(^)(bool success, NSArray<NSNumber *> * _Nullable))result;
+- (void)readDeviceSportCRCArr:(void(^_Nullable)(bool success, NSArray<NSNumber *> * _Nullable))result;
 
 /// 读取给定CRC列表的运动模式详情数据
 /// - Parameters:
 ///   - crcArr: CRC列表，由读取接口获取，并在应用层过滤已经读取的CRC
 ///   - result: 读取结果回调
-- (void)readDeviceSportWithCRC:(NSArray<NSNumber *> *)crcArr result:(void(^)(NSArray<VPDeviceSportModel *> * _Nullable, NSArray<VPDeviceSportWithGPSModel *> * _Nullable))result;
+- (void)readDeviceSportWithCRC:(NSArray<NSNumber *> *_Nullable)crcArr result:(void(^_Nullable)(NSArray<VPDeviceSportModel *> * _Nullable, NSArray<VPDeviceSportWithGPSModel *> * _Nullable))result;
 
 /// 读取当前设备的运动状态
 - (void)veepooSDK_readDeviceSportState;
 
 /// 订阅当前设备运动状态的变更接口
 /// - Parameter result: callback
-- (void)veepooSDK_deviceSportRunninStateSubscribe:(void (^)(VPSportControlRunState))result;
+- (void)veepooSDK_deviceSportRunninStateSubscribe:(void (^_Nullable)(VPSportControlRunState))result;
 
 
 /// 订阅当前设备运动信息的变更接口
 /// - Parameter result: callback
-- (void)veepooSDK_deviceSportInfoSubscribe:(void (^)(VPDeviceSportControlModel *))result;
+- (void)veepooSDK_deviceSportInfoSubscribe:(void (^_Nullable)(VPDeviceSportControlModel *_Nullable))result;
 
 /// 运动模式控制接口
 /// - Parameters:
@@ -1335,35 +1354,35 @@
 ///     - isOpen: YES:开启 NO:关闭
 ///     - time: UTC时间戳
 ///     - result: callback
-- (void)veepooSDK_QH15SetProtectionOpen:(BOOL)isOpen callBack:(void(^)(VPQH15SetProtectionFuncAckState ackState))result;
+- (void)veepooSDK_QH15SetProtectionOpen:(BOOL)isOpen callBack:(void(^_Nullable)(VPQH15SetProtectionFuncAckState ackState))result;
 
 /// 设置GNSS实时位置数据
 /// - Parameters:
 ///     - model: 位置数据
 ///     - type: 请求/推送
-- (void)veepooSDK_QH15SetGNSSRealTimeData:(VPQH15GNSSLocationModel *)model type:(VPQH15SPType)type;
+- (void)veepooSDK_QH15SetGNSSRealTimeData:(VPQH15GNSSLocationModel *_Nullable)model type:(VPQH15SPType)type;
 
 /// 监听安全守护状态通知
 /// - Parameters:
 ///     - result: callback
-- (void)veepooSDK_QH15ProtectionResultSubscribe:(void(^)(BOOL isOpen, uint32_t time))result;
+- (void)veepooSDK_QH15ProtectionResultSubscribe:(void(^_Nullable)(BOOL isOpen, uint32_t time))result;
 
 /// 监听GNSS实时位置数据通知
 /// - Parameters:
 ///     - result: callback
-- (void)veepooSDK_QH15GNSSLocationResultSubscribe:(void(^)(VPQH15SPType funcType, VPQH15GNSSLocationModel *locationModel))result;
+- (void)veepooSDK_QH15GNSSLocationResultSubscribe:(void(^_Nullable)(VPQH15SPType funcType, VPQH15GNSSLocationModel * _Nullable locationModel))result;
 
 /// JE136P定制中医数据下发
 /// Parameters:
 ///     - model: 下发的数据模型
 ///     - result: callback
-- (void)veepooSDK_JE136PSendTCMCustomData:(VPJE136PTCMModel *)model callBack:(void(^)(uint32_t time))result;
+- (void)veepooSDK_JE136PSendTCMCustomData:(VPJE136PTCMModel *_Nullable)model callBack:(void(^_Nullable)(uint32_t time))result;
 
 /// HRV测量
 /// Parameters:
 ///     - state: YES:开始 NO:关闭
 ///     - result: callBack
-- (void)veepooSDK_HRVTest:(BOOL)state callBack:(void(^)(int con, VPTestHRVState ack, int hrvValue))result;
+- (void)veepooSDK_HRVTest:(BOOL)state callBack:(void(^_Nullable)(int con, VPTestHRVState ack, int hrvValue))result;
 /// 如果调用系统方法断开蓝牙有时没生效,可以先调用这个方法
 - (void)disconnectPhone;
 
@@ -1416,9 +1435,9 @@
 - (void)enterZKDfu;
 
 
-- (void)sendZKDFU:(NSData*)data;
+- (void)sendZKDFU:(NSData*_Nullable)data;
 
-- (void)zkReceiveData:(void(^_Nullable)(NSData *data))receive zkCanSendNextAction:(void(^_Nullable)())canSend zkDidEnable:(void(^_Nullable)())enable;
+- (void)zkReceiveData:(void(^_Nullable)(NSData * _Nullable data))receive zkCanSendNextAction:(void(^_Nullable)(void))canSend zkDidEnable:(void(^_Nullable)(void))enable;
 
 
 /// QH15定制健康数据下发
@@ -1442,6 +1461,65 @@
 ///   - callback : 结果回调
 - (void)veepooSDK_QH15SetComplianceEvent:(AchievementType)type callback:(void(^_Nullable)(BOOL success))result;
 
+
+#pragma mark 提醒事件
+
+/// 监听提醒事件主动上报
+/// - Parameters:
+///   - result : 结果回调
+- (void)veepooSDK_listenReminderEventReport:(void (^_Nullable)(NSArray<VPReminderEventModel *> * _Nullable array))result;
+
+
+/// 读取历史提醒事件
+/// - Parameters:
+///   - type: 事件类型
+///   - time: 时间戳 (设备上报大于等于该时间戳的事件)
+///   - result : 结果回调
+- (void)veepooSDK_readHistoricalDataReminderEvents:(VPReminderEventType)type andTime:(uint32_t)time callBack:(void (^_Nullable)(NSArray<VPReminderEventModel *> * _Nullable array))result;
+
+/// 主动触发消息提醒事件(仅用于测试)
+- (void)veepooSDK_triggerReminderEvent;
+
+/// 读取设备IMEI信息
+/// - Parameters:
+///   - result : 结果回调
+- (void)veepooSDK_readIMEIInfo:(void (^_Nullable)(NSString *_Nullable))result;
+
+
+/// 梅脱测量
+/// - Parameters:
+///   - result : 结果回调
+- (void)veepooSDK_metTest:(BOOL)state callBack:(void(^_Nullable)(int con, VPTestMetState ack, int progress,int hrvValue))result;
+
+
+
+/// 情绪测量
+/// - Parameters:
+///   - result : 结果回调
+- (void)veepooSDK_emotionTest:(BOOL)state callBack:(void(^_Nullable)(int con, VPTestEmotionState ack, int progress,NSInteger value))result;
+
+
+/// 疲劳度测量
+/// - Parameters:
+///   - result : 结果回调
+- (void)veepooSDK_fatigueLevelTest:(BOOL)state callBack:(void(^_Nullable)(int con, VPTestFatigueLevelState ack, int progress,int value))result;
+
+
+/// 读取健康灯状态
+/// - Parameters:
+///   - result : 结果回调
+- (void)veepooSDKReadHealthLightStatus:(void(^_Nullable)(VPHealthLightStatusType type))result;
+
+/// 设置健康灯状态
+/// - Parameters:
+///   - type : 状态
+///   - result : 结果回调
+- (void)veepooSDKSetHealthLightStatus:(VPHealthLightStatusType)type callBack:(void(^_Nullable)(BOOL result, VPHealthLightStatusType type))result;
+
+/// 监听健康灯状态变化
+/// - Parameters:
+///   - result : 结果回调
+- (void)veepooSDKListenHealthLightStatus:(void(^_Nullable)(VPHealthLightStatusType type))result;
 
 @end
 

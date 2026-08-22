@@ -281,10 +281,16 @@ typedef NS_OPTIONS(NSUInteger, VPManualTestDataType) {
     VPManualTestDataBloodPressure = 1 << 0,
     VPManualTestDataHeartRate = 1 << 1,
     VPManualTestDataBloodSugar  = 1 << 2,
+    VPManualTestDataStress  = 1 << 3,
     VPManualTestDataBloodOxygen  = 1 << 4,
     VPManualTestDataTemperature = 1 << 5,
+    VPManualTestDataMet = 1 << 6,
+    VPManualTestDataHRV = 1 << 7,
     VPManualTestDataBloodComponents = 1 << 8,
     VPManualTestDataHealthGlance = 1 << 9,
+    VPManualTestDataEmotion = 1 << 10,
+    VPManualTestDataFatigueLevel = 1 << 11,
+    VPManualTestDataGSR = 1 << 12,
     VPManualTestDataAll = 0xFFFFFFFF
 };
 
@@ -294,6 +300,30 @@ typedef NS_ENUM(NSInteger,VPTestHRVState) {//测试HRV过程中的状态变化
     VPTestHRVStateLowPower = 2,         //低电
     VPTestHRVStateDeviceBusy = 3,  //设备正忙正在测试其他功能
     VPTestHRVStateNotWear = 4,     //佩戴检测没有通过
+};
+
+typedef NS_ENUM(NSInteger,VPTestMetState) {//测试梅脱过程中的状态变化
+    VPTestMetStateTesting = 0,       //开始检测梅脱中
+    VPTestMetStateAlreadyStarted = 1, //设备已经在测试梅脱,正忙
+    VPTestMetStateLowPower = 2,         //低电
+    VPTestMetStateDeviceBusy = 3,  //设备正忙正在测试其他功能
+    VPTestMetStateNotWear = 4,     //佩戴检测没有通过
+};
+
+typedef NS_ENUM(NSInteger,VPTestEmotionState) {//测试情绪过程中的状态变化
+    VPTestEmotionStateTesting = 0,       //开始检测情绪中
+    VPTestEmotionStateAlreadyStarted = 1, //设备已经在测试情绪,正忙
+    VPTestEmotionStateLowPower = 2,         //低电
+    VPTestEmotionStateDeviceBusy = 3,  //设备正忙正在测试其他功能
+    VPTestEmotionStateNotWear = 4,     //佩戴检测没有通过
+};
+
+typedef NS_ENUM(NSInteger,VPTestFatigueLevelState) {//测试疲劳度过程中的状态变化
+    VPTestFatigueLevelStateTesting = 0,       //开始检测疲劳度中
+    VPTestFatigueLevelStateAlreadyStarted = 1, //设备已经在测试疲劳度,正忙
+    VPTestFatigueLevelStateLowPower = 2,         //低电
+    VPTestFatigueLevelStateDeviceBusy = 3,  //设备正忙正在测试其他功能
+    VPTestFatigueLevelStateNotWear = 4,     //佩戴检测没有通过
 };
 
 #pragma mark - SDK 1.7后新添加
@@ -657,6 +687,19 @@ typedef NS_ENUM(NSUInteger, VPJH58MeasurementModeState) {
     VPJH58MeasurementModeStateOff = 0x01,
     VPJH58MeasurementModeStateModeOne = 0x02,
     VPJH58MeasurementModeStateModeTwo = 0x03,
+    VPJH58MeasurementModeStateActiveTest = 0x04,
+};
+
+typedef NS_ENUM(NSUInteger, VPJH58ActiveMeasurementState) {
+    VPJH58ActiveMeasurementStateRealTime = 0x01,      // 开启测量，实时传输
+    VPJH58ActiveMeasurementStateResume = 0x02,        // 开启测量，断点传输（重连后补传断联前5分钟数据，再切实时）
+    VPJH58ActiveMeasurementStateOff = 0x03,           // 关闭测量
+};
+
+typedef NS_ENUM(NSUInteger, VPJH58ActiveMeasurementResultState) {
+    VPJH58ActiveMeasurementResultStateSuccess = 0x01,      // 成功
+    VPJH58ActiveMeasurementResultStateBusy = 0x02,        // 设备正在手动测量，App显示设备正忙
+    VPJH58ActiveMeasurementResultStateLowBattery = 0x03,           // 设备处于低电状态
 };
 
 // 常灭屏功能状态
@@ -763,4 +806,18 @@ typedef NS_OPTIONS(uint32_t, JE136PTCMOption) {
     JE136PTCMOptionKidney          = 1 << 17, // 0x11：肾
     JE136PTCMOptionStomach         = 1 << 18, // 0x12：胃
     JE136PTCMOptionHeart           = 1 << 19, // 0x13：心脏
+};
+
+
+typedef NS_OPTIONS(uint8_t, VPReminderEventType) {
+    VPReminderEventTypeAll = 1,
+    VPReminderEventTypeFall,
+    VPReminderEventTypeSedentary,
+};
+
+typedef NS_ENUM(NSUInteger, VPHealthLightStatusType) {
+    VPHealthLightStatusTypeOff = 0,
+    VPHealthLightStatusTypeSlowFlash,
+    VPHealthLightStatusTypeContinuousFlashing,
+    VPHealthLightStatusTypeStayOn
 };

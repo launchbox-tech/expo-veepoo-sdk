@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "description": "Authoritative map of upstream HBandSDK native callbacks to the TS NATIVE_EMITTED_EVENTS they produce. Maintained manually; update when vendor-manifest.json SHAs change. Contract test (verify-upstream-sdk-coverage.ts) validates this against NATIVE_EMITTED_EVENTS.",
   "androidSdkSha": "9fcada5278340881340021fce70c4b984e783d3c",
-  "iosSdkSha": "cc8c0586037971fb1a43ff840fbd43dc10b69b35",
+  "iosSdkSha": "a72fdefe6398c54517807f6bbf38518dc0982d2a",
   "events": {
     "deviceFound": {
       "android": {
@@ -717,6 +717,54 @@
       {
         "method": "veepooSDKReadDisconnectOxygenData",
         "reason": "Post-disconnect SpO2 batch read; originSpo2Data covers real-time"
+      },
+      {
+        "method": "veepooSDK_emotionTest",
+        "reason": "Manual emotion spot measurement, new in framework 2.2.101.15; the bump vendors the binary only — bridging is separate work (launchbox-tech/rayu.ai#432)"
+      },
+      {
+        "method": "veepooSDK_metTest",
+        "reason": "Manual MET spot measurement, new in framework 2.2.101.15; not bridged in this release (launchbox-tech/rayu.ai#432)"
+      },
+      {
+        "method": "veepooSDK_fatigueLevelTest",
+        "reason": "Manual fatigue-level spot measurement, new in framework 2.2.101.15; not bridged in this release (launchbox-tech/rayu.ai#432)"
+      },
+      {
+        "method": "veepooSDK_listenReminderEventReport",
+        "reason": "Fall + sedentary reminder event push, new in framework 2.2.101.15; no JS surface for reminder events yet"
+      },
+      {
+        "method": "veepooSDK_readHistoricalDataReminderEvents",
+        "reason": "Stored reminder-event read, new in framework 2.2.101.15; no JS surface for reminder events yet"
+      },
+      {
+        "method": "veepooSDK_triggerReminderEvent",
+        "reason": "Reminder-event trigger, new in framework 2.2.101.15; app→device write, no push event"
+      },
+      {
+        "method": "veepooSDKReadHealthLightStatus",
+        "reason": "Health-light indicator read, new in framework 2.2.101.15; a device setting, not a measurement"
+      },
+      {
+        "method": "veepooSDKSetHealthLightStatus",
+        "reason": "Health-light indicator write, new in framework 2.2.101.15; write result only, no push event"
+      },
+      {
+        "method": "veepooSDKListenHealthLightStatus",
+        "reason": "Health-light status subscribe, new in framework 2.2.101.15; no JS surface for the setting yet"
+      },
+      {
+        "method": "veepooSDK_readIMEIInfo",
+        "reason": "IMEI read, new in framework 2.2.101.15; device_ready already carries the stable hardware MAC"
+      },
+      {
+        "method": "veepooSDKPowerOffDevice",
+        "reason": "Device power-off command, new in framework 2.2.101.15; write-only, no push event"
+      },
+      {
+        "method": "veepooSDKSendExitUpdateFirmCommand",
+        "reason": "DFU-exit command, new in framework 2.2.101.15; write-only, firmwareDfuProgress covers OTA"
       }
     ]
   }

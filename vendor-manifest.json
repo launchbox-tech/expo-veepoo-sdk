@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-06-06",
+  "updated": "2026-08-22",
   "description": "Authoritative list of vendored Veepoo/HBand binaries in this repo plus optional upstream Git pins for drift warnings (vendor:check). Does not replace release notes when bumping AARs/frameworks.",
   "android": {
     "libsRelativePath": "android/libs",
@@ -48,7 +48,7 @@
     ]
   },
   "ios": {
-    "podspecModuleVersion": "1.3.2",
+    "podspecModuleVersion": "1.3.3",
     "frameworksRelativePath": "ios/VeepooSDK/Frameworks",
     "frameworkPackaging": "xcframework",
     "frameworkPackagingNote": "Each linked framework is vendored as <name>.xcframework with a real device slice and an empty simulator stub (int veepoo_stub(void)) carrying the real Headers/ and module.modulemap. Regenerate with scripts/build-xcframeworks.sh. The vendor publishes no simulator slice at any version.",
@@ -66,7 +66,7 @@
       "JLDialUnit",
       "ZipZap"
     ],
-    "veepooBleSdkVersion": "2.2.88.15"
+    "veepooBleSdkVersion": "2.2.101.15"
   },
   "upstreamReference": {
     "androidBleSdk": {
@@ -79,7 +79,7 @@
       "gitUrl": "https://github.com/HBandSDK/iOS_Ble_SDK.git",
       "defaultBranch": "master",
       "wikiUrl": "https://github.com/HBandSDK/iOS_Ble_SDK/wiki/VeepooSDK-iOS-API-Document",
-      "lastReviewedHeadSha": "cc8c0586037971fb1a43ff840fbd43dc10b69b35"
+      "lastReviewedHeadSha": "a72fdefe6398c54517807f6bbf38518dc0982d2a"
     }
   }
 }

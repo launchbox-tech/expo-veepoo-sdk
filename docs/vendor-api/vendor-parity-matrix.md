@@ -174,6 +174,10 @@ Aligned with maintainer backlog — vendor wiki may document these while this pa
 - Connection confirmation pop-up (Android v1.2.3; iOS v1.1.9)
 - QX17 IMU/GPS/HR flow control + vibration motor (Android v1.2.9)
 - JE136P TCM data distribution (iOS v1.2.0)
+- Manual emotion / MET / fatigue-level spot measurements (iOS framework 2.2.101.15 — `veepooSDK_emotionTest`, `veepooSDK_metTest`, `veepooSDK_fatigueLevelTest`, backed by `VPManualEmotionModel` / `VPManualMetModel` / `VPManualFatigueLevelModel`)
+- Fall + sedentary reminder events (iOS framework 2.2.101.15 — `veepooSDK_listenReminderEventReport`, `veepooSDK_readHistoricalDataReminderEvents`, `veepooSDK_triggerReminderEvent`)
+- Health-light indicator read/write (iOS framework 2.2.101.15 — `veepooSDKReadHealthLightStatus` / `veepooSDKSetHealthLightStatus` / `veepooSDKListenHealthLightStatus`)
+- IMEI read (iOS framework 2.2.101.15 — `veepooSDK_readIMEIInfo`); device power-off and DFU-exit commands (`veepooSDKPowerOffDevice`, `veepooSDKSendExitUpdateFirmCommand`)
 
 Treat gaps as **Not in JS** until a PR adds methods **and** updates this matrix.
 
