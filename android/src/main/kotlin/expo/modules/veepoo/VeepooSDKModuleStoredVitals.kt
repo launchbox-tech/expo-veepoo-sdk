@@ -2,6 +2,7 @@ package expo.modules.veepoo
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.inuker.bluetooth.library.Code
 import com.inuker.bluetooth.library.connect.response.BleWriteResponse
 import com.veepoo.protocol.VPOperateManager
@@ -89,6 +90,11 @@ fun ModuleDefinitionBuilder.defineStoredVitals(module: VeepooSDKModule) {
         }
         override fun onReadOriginProgress(progress: Float) {}
         override fun onReadOriginProgressDetail(i: Int, s: String?, i2: Int, i3: Int) {}
+        override fun onReadTimeout(seconds: Int) {
+          Log.w(TAG, "readStoredTemperatureData: device reported read timeout (${seconds}s)")
+          uiHandler.removeCallbacks(timeout)
+          if (resolved.compareAndSet(false, true)) promise.resolve(null)
+        }
         override fun onReadOriginComplete() {
           uiHandler.removeCallbacks(timeout)
           if (resolved.compareAndSet(false, true)) promise.resolve(null)

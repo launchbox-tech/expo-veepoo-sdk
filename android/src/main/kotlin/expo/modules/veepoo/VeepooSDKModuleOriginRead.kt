@@ -47,6 +47,8 @@ fun ModuleDefinitionBuilder.defineOriginRead(module: VeepooSDKModule) {
         }
       },
       object : IOriginData3Listener {
+        private val resolved = java.util.concurrent.atomic.AtomicBoolean(false)
+
         override fun onOriginFiveMinuteListDataChange(dataList3: List<OriginData3>?) {
           if (dataList3 != null && dataList3.isNotEmpty()) {
             Log.d(TAG, "onOriginFiveMinuteListDataChange: ${dataList3.size} records")
@@ -215,6 +217,11 @@ fun ModuleDefinitionBuilder.defineOriginRead(module: VeepooSDKModule) {
           }
         }
         
+        override fun onReadTimeout(seconds: Int) {
+          Log.w(TAG, "onReadTimeout: device reported read timeout (${seconds}s)")
+          if (resolved.compareAndSet(false, true)) promise.resolve(null)
+        }
+
         override fun onReadOriginComplete() {
           try {
             Log.d(TAG, "onReadOriginComplete")
@@ -233,15 +240,15 @@ fun ModuleDefinitionBuilder.defineOriginRead(module: VeepooSDKModule) {
               "deviceId" to (module.connectedDeviceId ?: ""),
               "success" to true
             ))
-            
-            promise.resolve(null)
+
+            if (resolved.compareAndSet(false, true)) promise.resolve(null)
           } catch (e: Exception) {
             Log.e(TAG, "Error in onReadOriginComplete", e)
             module.sendEvent(READ_ORIGIN_COMPLETE, mapOf(
               "deviceId" to (module.connectedDeviceId ?: ""),
               "success" to false
             ))
-            promise.resolve(null)
+            if (resolved.compareAndSet(false, true)) promise.resolve(null)
           }
         }
       },

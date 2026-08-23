@@ -146,6 +146,8 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
         override fun onResponse(code: Int) {}
       },
       object : IPwdDataListener {
+        private val settled = java.util.concurrent.atomic.AtomicBoolean(false)
+
         override fun onPwdDataChange(pwdData: PwdData?) {
           val rawStatus = pwdData?.getmStatus()?.toString() ?: "UNKNOWN"
           val status = normalizePasswordStatus(rawStatus)
@@ -178,8 +180,15 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
             "deviceId" to (module.connectedDeviceId ?: ""),
             "data" to resultData
           ))
-          
-          promise.resolve(resultData)
+
+          if (settled.compareAndSet(false, true)) promise.resolve(resultData)
+        }
+
+        override fun onConnectionConfirmTimeout() {
+          Log.w(TAG, "verifyPassword: device connection confirm timed out")
+          if (settled.compareAndSet(false, true)) {
+            promise.reject("CONNECTION_CONFIRM_TIMEOUT", "Device did not confirm the password within the timeout window", null)
+          }
         }
       },
       object : IDeviceFuctionDataListener {

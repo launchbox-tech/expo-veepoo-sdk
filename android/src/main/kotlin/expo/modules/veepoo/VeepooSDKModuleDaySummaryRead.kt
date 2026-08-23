@@ -119,7 +119,19 @@ fun ModuleDefinitionBuilder.defineDaySummaryRead(module: VeepooSDKModule) {
         override fun onReadOriginProgressDetail(day: Int, date: String?, allPack: Int, currentPack: Int) {}
         
         override fun onReadOriginProgress(progress: Float) {}
-        
+
+        override fun onReadTimeout(seconds: Int) {
+          Log.w(TAG, "readDaySummaryData: device reported read timeout (${seconds}s), returning collected data")
+          val result = mapOf(
+            "date" to dateStr,
+            "allStep" to allStep,
+            "sportList" to sportList.toList(),
+            "rateList" to rateList.toList(),
+            "bpList" to bpList.toList()
+          )
+          resolveOnce(result)
+        }
+
         override fun onReadOriginComplete() {
           Log.d(TAG, "readDaySummaryData complete: allStep=$allStep, sportList=${sportList.size}, rateList=${rateList.size}, bpList=${bpList.size}")
           

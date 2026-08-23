@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "Authoritative map of upstream HBandSDK native callbacks to the TS NATIVE_EMITTED_EVENTS they produce. Maintained manually; update when vendor-manifest.json SHAs change. Contract test (verify-upstream-sdk-coverage.ts) validates this against NATIVE_EMITTED_EVENTS.",
-  "androidSdkSha": "9fcada5278340881340021fce70c4b984e783d3c",
+  "androidSdkSha": "2856441eaa62e509f37fa19868341ff7d7bda883",
   "iosSdkSha": "a72fdefe6398c54517807f6bbf38518dc0982d2a",
   "events": {
     "deviceFound": {

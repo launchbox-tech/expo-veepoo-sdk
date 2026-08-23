@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import com.veepoo.protocol.VPOperateManager
 import com.veepoo.protocol.listener.base.IBleWriteResponse
 import com.veepoo.protocol.listener.data.ICustomSettingDataListener
@@ -175,6 +176,10 @@ fun VeepooSDKModule.verifyPasswordInternal(deviceId: String, password: String, i
             "deviceVersion" to (pwdData?.deviceVersion ?: "")
           )
         ))
+      }
+
+      override fun onConnectionConfirmTimeout() {
+        Log.w(TAG, "verifyPasswordInternal: device connection confirm timed out")
       }
     },
     object : IDeviceFuctionDataListener {

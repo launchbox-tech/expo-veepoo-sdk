@@ -51,11 +51,11 @@
       },
       {
         "name": "vpbluetooth",
-        "aarFilePath": "android/libs/vpbluetooth-1.18.aar"
+        "aarFilePath": "android/libs/vpbluetooth-1.20.aar"
       },
       {
         "name": "vpprotocol",
-        "aarFilePath": "android/libs/vpprotocol-2.3.37.15.aar"
+        "aarFilePath": "android/libs/vpprotocol-2.3.80.15.aar"
       }
     ]
   }

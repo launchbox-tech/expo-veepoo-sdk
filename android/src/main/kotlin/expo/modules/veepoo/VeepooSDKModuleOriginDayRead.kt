@@ -38,6 +38,7 @@ fun ModuleDefinitionBuilder.defineOriginDayRead(module: VeepooSDKModule) {
       },
       object : IOriginData3Listener {
         private val dataList = mutableListOf<Map<String, Any>>()
+        private val resolved = java.util.concurrent.atomic.AtomicBoolean(false)
         
         override fun onOriginFiveMinuteListDataChange(dataList3: List<OriginData3>?) {
           if (dataList3 != null && dataList3.isNotEmpty()) {
@@ -135,11 +136,17 @@ fun ModuleDefinitionBuilder.defineOriginDayRead(module: VeepooSDKModule) {
         override fun onReadOriginProgressDetail(day: Int, date: String?, allPack: Int, currentPack: Int) {}
         
         override fun onReadOriginProgress(progress: Float) {}
-        
+
+        override fun onReadTimeout(seconds: Int) {
+          Log.w(TAG, "readOriginData: device reported read timeout (${seconds}s), returning collected data")
+          val sortedList = dataList.sortedBy { it["time"] as? String ?: "" }
+          if (resolved.compareAndSet(false, true)) promise.resolve(sortedList)
+        }
+
         override fun onReadOriginComplete() {
           Log.d(TAG, "readOriginData complete: ${dataList.size} records")
           val sortedList = dataList.sortedBy { it["time"] as? String ?: "" }
-          promise.resolve(sortedList)
+          if (resolved.compareAndSet(false, true)) promise.resolve(sortedList)
         }
       },
       safeDayOffset,

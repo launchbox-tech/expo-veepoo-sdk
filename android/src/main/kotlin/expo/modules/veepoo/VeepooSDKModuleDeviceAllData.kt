@@ -54,6 +54,8 @@ fun ModuleDefinitionBuilder.defineReadDeviceAllData(module: VeepooSDKModule) {
         }
       },
       object : IOriginData3Listener {
+        private val settled = java.util.concurrent.atomic.AtomicBoolean(false)
+
         override fun onOriginFiveMinuteListDataChange(dataList3: List<OriginData3>?) {
           if (dataList3 != null && dataList3.isNotEmpty()) {
             Log.d(TAG, "readDeviceAllData: onOriginFiveMinuteListDataChange: ${dataList3.size} records")
@@ -188,9 +190,9 @@ fun ModuleDefinitionBuilder.defineReadDeviceAllData(module: VeepooSDKModule) {
           p = p.coerceIn(0.0, 100.0)
           val dayProgress = p / 100.0
           val currentDay = kotlin.math.floor(dayProgress * availableDays).toInt().plus(1).coerceIn(1, availableDays)
-          
+
           Log.d(TAG, "readDeviceAllData: onReadOriginProgress: $p")
-          
+
           module.sendEvent(READ_ORIGIN_PROGRESS, mapOf(
             "deviceId" to (module.connectedDeviceId ?: ""),
             "progress" to mapOf(
@@ -201,10 +203,15 @@ fun ModuleDefinitionBuilder.defineReadDeviceAllData(module: VeepooSDKModule) {
             )
           ))
         }
-        
+
+        override fun onReadTimeout(seconds: Int) {
+          Log.w(TAG, "readDeviceAllData: device reported read timeout (${seconds}s)")
+          if (settled.compareAndSet(false, true)) promise.resolve(false)
+        }
+
         override fun onReadOriginComplete() {
           Log.d(TAG, "readDeviceAllData: onReadOriginComplete")
-          
+
           module.sendEvent(READ_ORIGIN_PROGRESS, mapOf(
             "deviceId" to (module.connectedDeviceId ?: ""),
             "progress" to mapOf(
@@ -219,8 +226,8 @@ fun ModuleDefinitionBuilder.defineReadDeviceAllData(module: VeepooSDKModule) {
             "deviceId" to (module.connectedDeviceId ?: ""),
             "success" to true
           ))
-          
-          promise.resolve(true)
+
+          if (settled.compareAndSet(false, true)) promise.resolve(true)
         }
       },
       availableDays
