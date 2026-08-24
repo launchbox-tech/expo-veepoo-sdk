@@ -21,6 +21,31 @@ extension VeepooSDKModule {
     let password = options?["password"] as? String ?? "0000"
     let is24Hour = options?["is24Hour"] as? Bool ?? false
     let uuidString = options?["uuid"] as? String
+
+    // [CONNECT-ID] Fail fast, and say why, when neither id can address a
+    // peripheral. CoreBluetooth resolves ONLY a CBPeripheral UUID: a MAC makes
+    // `UUID(uuidString:)` nil below, so `retrievePeripherals` is skipped, and
+    // the scan fallback cannot match it either because `deviceAddress` is nil
+    // at scan time. The old behaviour was to spend ~5s in that doomed scan and
+    // reject DEVICE_NOT_FOUND — indistinguishable from a band that is simply
+    // out of range, which is how a MAC-keyed pairing went undiagnosed until it
+    // had stranded users behind an unpair/re-pair (launchbox-tech/rayu.ai#456).
+    //
+    // A cached model from THIS scan session is still a legal way in (the pair
+    // screen taps a device it just discovered), so only reject when there is no
+    // cache hit either.
+    if UUID(uuidString: deviceId) == nil,
+       uuidString.flatMap({ UUID(uuidString: $0) }) == nil,
+       self.discoveredDevices[deviceId] == nil {
+      print("[VeepooSDK] connect - 拒绝: deviceId 不是 UUID 且无缓存, deviceId: \(deviceId)")
+      self.emitConnectionStatus(deviceId: deviceId, status: "error")
+      promise.reject(
+        "INVALID_CONNECT_ID",
+        "'\(deviceId)' is not a CBPeripheral UUID. iOS can only reconnect by peripheral UUID — a MAC address is unresolvable. Re-pair the band to store a valid connect id."
+      )
+      return
+    }
+
     self.emitConnectionStatus(deviceId: deviceId, status: "connecting")
 
     // 优先使用当前扫描/缓存到的设备模型。

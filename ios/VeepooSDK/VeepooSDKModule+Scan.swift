@@ -21,7 +21,7 @@ extension VeepooSDKModule {
     }
     self.isScanning = true
     self.scanRearmedOnPowerOn = false // [SCAN-FIX] new scan session
-    self.emitBluetoothStatus()
+    self.emitBluetoothStatus(force: true)
     // [SCAN-FIX] Don't start the vendor scan inline — a scan issued before the
     // radio is poweredOn is silently dropped, and the cold first scan needs a
     // stop+start. ensureScanning() starts a clean scan when poweredOn, or defers
@@ -39,7 +39,7 @@ extension VeepooSDKModule {
       self.isScanning = false
       self.pendingScanStart = false
       self.scanRearmedOnPowerOn = false
-      self.emitBluetoothStatus()
+      self.emitBluetoothStatus(force: true)
     }
     promise.resolve(nil)
     #endif
@@ -53,7 +53,7 @@ extension VeepooSDKModule {
     self.isScanning = false
     self.scanRearmedOnPowerOn = false
     self.bleManager?.veepooSDKStopScanDevice()
-    self.emitBluetoothStatus()
+    self.emitBluetoothStatus(force: true)
     promise.resolve(nil)
     #endif
   }

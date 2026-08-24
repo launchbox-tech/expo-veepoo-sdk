@@ -29,6 +29,10 @@ exports.NATIVE_REJECT_MAPPING = {
     DEVICE_NOT_READY: { code: "DEVICE_NOT_READY" },
     DISCONNECTION_FAILED: { code: "DISCONNECTION_FAILED" },
     INVALID_ARGUMENT: { code: "INVALID_ARGUMENT" },
+    // iOS only: the connect id is not a CBPeripheral UUID, so it can never
+    // resolve. Distinct from DEVICE_NOT_FOUND (a band that is merely absent) —
+    // this one will fail forever until the pairing is rewritten.
+    INVALID_CONNECT_ID: { code: "INVALID_CONNECT_ID" },
     NOT_WEARING: { code: "NOT_WEARING" },
     OPERATION_FAILED: { code: "OPERATION_FAILED" },
     PASSWORD_REQUIRED: { code: "PASSWORD_REQUIRED" },
@@ -76,6 +80,7 @@ exports.ALLOWED_NATIVE_REJECT_CODES = [
     "INIT_ERROR",
     "INVALID_ACTIVITY",
     "INVALID_ARGUMENT",
+    "INVALID_CONNECT_ID",
     "INVALID_LANGUAGE",
     "INVALID_TYPE",
     "MODIFY_FAILED",
@@ -108,6 +113,7 @@ exports.ALLOWED_NATIVE_REJECT_CODES = [
 exports.VEEPOO_CODES = [
     "UNKNOWN",
     "INVALID_ARGUMENT",
+    "INVALID_CONNECT_ID",
     "PERMISSION_DENIED",
     "CONNECTION_FAILED",
     "DISCONNECTION_FAILED",

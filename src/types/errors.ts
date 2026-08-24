@@ -1,6 +1,13 @@
 export type VeepooErrorCode =
   | 'UNKNOWN'
   | 'INVALID_ARGUMENT'
+  /**
+   * iOS only: the id given to `connect()` is not a `CBPeripheral` UUID, so it
+   * can never resolve — distinct from `DEVICE_NOT_FOUND`, which means the band
+   * is merely absent right now. This one fails forever until the pairing is
+   * rewritten, so callers should surface it as "re-pair", not "out of range".
+   */
+  | 'INVALID_CONNECT_ID'
   | 'PERMISSION_DENIED'
   | 'CONNECTION_FAILED'
   | 'DISCONNECTION_FAILED'

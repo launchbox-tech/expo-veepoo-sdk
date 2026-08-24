@@ -274,7 +274,7 @@ extension VeepooSDKModule {
         return
       }
       self.isScanning = true
-      self.emitBluetoothStatus()
+      self.emitBluetoothStatus(force: true)
       print("[VeepooSDK] startScanConnectFallback - 启动扫描兜底, deviceId: \(deviceId)")
       manager.veepooSDKStartScanDeviceAndReceiveScanningDevice { [weak self] peripheralModel in
         guard let self = self, let model = peripheralModel else { return }
@@ -289,7 +289,7 @@ extension VeepooSDKModule {
         self.bleManager?.veepooSDKStopScanDevice()
         self.isScanning = false
         self.pendingScanStart = false
-        self.emitBluetoothStatus()
+        self.emitBluetoothStatus(force: true)
         if let pendingPromise = self.pendingConnectPromise {
           self.pendingConnectPromise = nil
           self.pendingConnectDeviceId = nil
@@ -309,7 +309,7 @@ extension VeepooSDKModule {
     manager.vpBleCentralManageChangeBlock = { [weak self] _ in
       DispatchQueue.main.async {
         guard let self = self else { return }
-        self.emitBluetoothStatus()
+        self.emitBluetoothStatus(force: true)
         // [SCAN-FIX] Backstop to the delegate path — same idempotent authority.
         self.ensureScanning(source: "vendorBlock")
       }
@@ -436,7 +436,7 @@ extension VeepooSDKModule {
         self.bleManager?.veepooSDKStopScanDevice()
         self.isScanning = false
         self.pendingScanStart = false
-        self.emitBluetoothStatus()
+        self.emitBluetoothStatus(force: true)
       }
 
       self.performConnect(
@@ -608,9 +608,18 @@ extension VeepooSDKModule {
   /// convenience snapshot. `isScanning` / `pendingScanStart` are SCAN state, not
   /// radio state — they ride along as context but are deliberately NOT part of
   /// the dedupe key, because a scan starting is not a bluetooth state change and
-  /// JS must not react to it as one. Pass `force: true` only when the consumer
-  /// genuinely has no prior value (a fresh `OnStartObserving`, or `cleanup()`
-  /// which resets the key anyway).
+  /// JS must not react to it as one.
+  ///
+  /// Pass `force: true` from the SCAN-LIFECYCLE sites — the ones that really do
+  /// mutate `isScanning` / `pendingScanStart`. The pair screen re-issues a lost
+  /// scan off exactly that signal (`band.scan.start_issued reason=bt_heal`), so
+  /// deduping those away would break pairing. Also force where the consumer has
+  /// no prior value at all: a fresh `OnStartObserving`, or `cleanup()` (which
+  /// resets the key anyway).
+  ///
+  /// What stays deduped is the majority — the connect path and the vendor
+  /// callbacks, which republished an unchanged radio state thousands of times
+  /// (2,572 of 2,618 events in a 19-hour trace) for no reader at all.
   func emitBluetoothStatus(force: Bool = false) {
     #if !targetEnvironment(simulator)
     var stateName = "unknown"
