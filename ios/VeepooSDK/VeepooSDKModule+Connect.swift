@@ -21,6 +21,12 @@ extension VeepooSDKModule {
     let password = options?["password"] as? String ?? "0000"
     let is24Hour = options?["is24Hour"] as? Bool ?? false
     let uuidString = options?["uuid"] as? String
+    // [PENDING-CONNECT] Opt-in, because the right answer differs by caller.
+    // A background reconnect WANTS the OS to hold the connect indefinitely —
+    // nobody is waiting on a screen, and the alternative is a poll loop. A
+    // pairing tap does NOT: a user is sitting in front of a modal, so that
+    // connect must be bounded and must be able to fail.
+    let holdPendingOpt = options?["hold_pending"] as? Bool ?? false
 
     // [CONNECT-ID] Fail fast, and say why, when neither id can address a
     // peripheral. CoreBluetooth resolves ONLY a CBPeripheral UUID: a MAC makes
@@ -116,13 +122,12 @@ extension VeepooSDKModule {
           password: password,
           is24Hour: is24Hour,
           promise: promise,
-          // The model is native to the vendor's central (cache hit from this
-          // scan session, or ADR-0014's retrieve on that same central), so the
-          // OS-level pending connect is valid: hold it instead of abandoning
-          // it after 15s and burning a 5s scan on a band that is simply out of
-          // range. `shouldUseScanFallbackDirectly` already routed the
-          // no-model case away from here.
-          holdPending: true,
+          // Only when the caller asked. The model here is native to the
+          // vendor's central (cache hit from this scan session, or ADR-0014's
+          // retrieve on that same central), so an OS-level pending connect is
+          // VALID — a pending connect on a foreign peripheral never fires —
+          // but validity is not the same as wanting it (see `holdPendingOpt`).
+          holdPending: holdPendingOpt,
           fallbackToScan: { [weak self] in
             // Do NOT capture `promise` here — this closure is strongly held by
             // the vendor deviceConnectBlock, and a captured Promise destroyed
