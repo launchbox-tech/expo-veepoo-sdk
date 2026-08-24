@@ -85,12 +85,24 @@ extension VeepooSDKModule {
     #endif
   }
 
+  /// - Parameter holdPending: when true, do NOT arm the 15s abandon timer.
+  ///   `veepooSDKConnectDevice` ends in `centralManager.connect(peripheral:)`,
+  ///   and on iOS that call has **no timeout** — CoreBluetooth keeps it armed
+  ///   indefinitely and delivers `didConnect` whenever the peripheral comes
+  ///   back into range, at zero cost to us (the radio scheduler does the
+  ///   waiting, not a poll loop). Abandoning it after 15s and falling back to a
+  ///   5s scan threw that away and forced the app into a retry loop: measured
+  ///   at 20.28s per doomed attempt on device, over and over, with the band
+  ///   simply out of range (2026-08-24 11:11–11:15). Only pass false when the
+  ///   peripheral is NOT native to the vendor's central — a pending connect on
+  ///   a foreign peripheral never fires (ADR-0014).
   func performConnect(
     model: VPPeripheralModel,
     deviceId: String,
     password: String,
     is24Hour: Bool,
     promise: Promise,
+    holdPending: Bool = false,
     fallbackToScan: (() -> Void)? = nil
   ) {
     #if !targetEnvironment(simulator)
@@ -121,19 +133,28 @@ extension VeepooSDKModule {
 
     var isSettled = false
 
-    connectionTimer = Timer.scheduledTimer(withTimeInterval: 15.0, repeats: false) { [weak self] _ in
-      guard let self = self else { return }
-      guard !isSettled else { return }
-      isSettled = true
-      print("[VeepooSDK] performConnect - 连接超时, deviceId: \(deviceId), state: \(self.connectionState.rawValue), connectedDeviceId: \(self.connectedDeviceId ?? "nil"), activeConnectDeviceId: \(self.activeConnectDeviceId ?? "nil")")
-      self.connectionState = .error("Connection timeout")
-      self.emitConnectionStatus(deviceId: deviceId, status: "error")
-      self.emitNativeError(code: "CONNECTION_TIMEOUT", message: "Connection timeout after 15 seconds", deviceId: deviceId)
-      if let fallbackToScan = fallbackToScan {
-        fallbackToScan()
-      } else {
-        self.pendingConnectPromise?.reject("CONNECTION_TIMEOUT", "Connection timeout after 15 seconds")
-        self.pendingConnectPromise = nil
+    if holdPending {
+      // The OS owns the wait from here. `isSettled` stays false, the promise
+      // stays unresolved, and the vendor's connect block is still the single
+      // settlement path — it fires on link-up, or on a real vendor-side
+      // failure. Nothing here abandons it.
+      print("[VeepooSDK] performConnect - 保持挂起连接(无超时), deviceId: \(deviceId)")
+      self.sendEvent(CONNECT_PENDING, ["deviceId": deviceId])
+    } else {
+      connectionTimer = Timer.scheduledTimer(withTimeInterval: 15.0, repeats: false) { [weak self] _ in
+        guard let self = self else { return }
+        guard !isSettled else { return }
+        isSettled = true
+        print("[VeepooSDK] performConnect - 连接超时, deviceId: \(deviceId), state: \(self.connectionState.rawValue), connectedDeviceId: \(self.connectedDeviceId ?? "nil"), activeConnectDeviceId: \(self.activeConnectDeviceId ?? "nil")")
+        self.connectionState = .error("Connection timeout")
+        self.emitConnectionStatus(deviceId: deviceId, status: "error")
+        self.emitNativeError(code: "CONNECTION_TIMEOUT", message: "Connection timeout after 15 seconds", deviceId: deviceId)
+        if let fallbackToScan = fallbackToScan {
+          fallbackToScan()
+        } else {
+          self.pendingConnectPromise?.reject("CONNECTION_TIMEOUT", "Connection timeout after 15 seconds")
+          self.pendingConnectPromise = nil
+        }
       }
     }
 

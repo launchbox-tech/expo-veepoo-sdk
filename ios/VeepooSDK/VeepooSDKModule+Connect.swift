@@ -116,6 +116,13 @@ extension VeepooSDKModule {
           password: password,
           is24Hour: is24Hour,
           promise: promise,
+          // The model is native to the vendor's central (cache hit from this
+          // scan session, or ADR-0014's retrieve on that same central), so the
+          // OS-level pending connect is valid: hold it instead of abandoning
+          // it after 15s and burning a 5s scan on a band that is simply out of
+          // range. `shouldUseScanFallbackDirectly` already routed the
+          // no-model case away from here.
+          holdPending: true,
           fallbackToScan: { [weak self] in
             // Do NOT capture `promise` here — this closure is strongly held by
             // the vendor deviceConnectBlock, and a captured Promise destroyed

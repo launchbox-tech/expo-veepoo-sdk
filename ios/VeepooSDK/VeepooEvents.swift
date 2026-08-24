@@ -9,6 +9,9 @@ enum VeepooEvent {
   static let connectionStatusChanged = "connectionStatusChanged"
   static let deviceReady = "deviceReady"
   static let bluetoothStateChanged = "bluetoothStateChanged"
+  /// A connect is armed at the OS level with no timeout — CoreBluetooth will
+  /// deliver it whenever the peripheral reappears. Nothing is polling.
+  static let connectPending = "connectPending"
   static let deviceFunction = "deviceFunction"
   static let deviceVersion = "deviceVersion"
   static let passwordData = "passwordData"
@@ -63,6 +66,7 @@ let DEVICE_CONNECT_STATUS = VeepooEvent.deviceConnectStatus
 let CONNECTION_STATUS_CHANGED = VeepooEvent.connectionStatusChanged
 let DEVICE_READY = VeepooEvent.deviceReady
 let BLUETOOTH_STATE_CHANGED = VeepooEvent.bluetoothStateChanged
+let CONNECT_PENDING = VeepooEvent.connectPending
 let DEVICE_FUNCTION = VeepooEvent.deviceFunction
 let DEVICE_VERSION = VeepooEvent.deviceVersion
 let PASSWORD_DATA = VeepooEvent.passwordData
