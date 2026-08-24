@@ -99,6 +99,17 @@ public class VeepooSDKModule: Module {
   var ecgIncludeWaveform: Bool = false
   var isFirmwareDfuActive: Bool = false
 
+  // [BT-TRANSITION] Last (state, authorization) pair published to JS via
+  // BLUETOOTH_STATE_CHANGED. `emitBluetoothStatus()` is called from a dozen
+  // scan/connect/cleanup sites as a SNAPSHOT, so without this the event fires
+  // on every scan start, connect attempt and vendor callback carrying an
+  // IDENTICAL radio state — 2,572 of 2,618 events in a 19h device trace were
+  // `powered_on` following `powered_on`, in runs of 214 consecutive. JS reads
+  // each one as "the radio just came back, reconnect now", which defeated the
+  // reconnect backoff (rayu.ai#447/#454). Only a real transition is an event;
+  // `connectionState` below already applies the same rule to its own event.
+  var lastEmittedBluetoothKey: String?
+
   var connectionState: ConnectionState = .idle {
     didSet {
       print("[VeepooSDK] 状态变化: \(oldValue.rawValue) -> \(connectionState.rawValue)")
@@ -386,7 +397,8 @@ public class VeepooSDKModule: Module {
 
     // MARK: Lifecycle
     OnStartObserving {
-      self.emitBluetoothStatus()
+      // A fresh subscriber has no prior state — force the current snapshot.
+      self.emitBluetoothStatus(force: true)
     }
 
     OnDestroy {

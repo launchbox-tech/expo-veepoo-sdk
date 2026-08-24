@@ -601,7 +601,17 @@ extension VeepooSDKModule {
     #endif
   }
 
-  func emitBluetoothStatus() {
+  /// Publish the radio's state to JS — but ONLY when it actually changed.
+  ///
+  /// [BT-TRANSITION] This is called from a dozen sites (scan start/stop, the
+  /// connect fallback timeout, the vendor central-manage block, cleanup) as a
+  /// convenience snapshot. `isScanning` / `pendingScanStart` are SCAN state, not
+  /// radio state — they ride along as context but are deliberately NOT part of
+  /// the dedupe key, because a scan starting is not a bluetooth state change and
+  /// JS must not react to it as one. Pass `force: true` only when the consumer
+  /// genuinely has no prior value (a fresh `OnStartObserving`, or `cleanup()`
+  /// which resets the key anyway).
+  func emitBluetoothStatus(force: Bool = false) {
     #if !targetEnvironment(simulator)
     var stateName = "unknown"
 
@@ -630,6 +640,10 @@ extension VeepooSDKModule {
     } else {
       authorizationName = "notDetermined"
     }
+
+    let key = "\(stateName)|\(authorizationName)"
+    if !force && lastEmittedBluetoothKey == key { return }
+    lastEmittedBluetoothKey = key
 
     self.sendEvent(BLUETOOTH_STATE_CHANGED, [
       "state": stateName,
@@ -670,6 +684,9 @@ extension VeepooSDKModule {
     discoveredDevices.removeAll()
     #endif
     connectionState = .idle
-    emitBluetoothStatus()
+    // Teardown drops the subscriber's context — the next emit must be truthful
+    // from scratch, not deduped against a key from the previous session.
+    lastEmittedBluetoothKey = nil
+    emitBluetoothStatus(force: true)
   }
 }
