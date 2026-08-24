@@ -192,6 +192,15 @@ export type VeepooEventPayload = {
         device_id: string;
         status: ConnectionStatus;
     };
+    /**
+     * [PENDING-CONNECT] A connect issued with `hold_pending` is now waiting on
+     * CoreBluetooth with NO application-level timeout — it settles only when the
+     * band comes back in range, or when something cancels it. Distinct from
+     * `connecting`, which implies an attempt that will time out on its own.
+     */
+    connect_pending: {
+        device_id: string;
+    };
     origin_spo2_data: {
         device_id: string;
         data: Spo2OriginData;

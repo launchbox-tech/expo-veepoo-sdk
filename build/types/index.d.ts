@@ -1,4 +1,4 @@
-export type { VeepooDevice, ConnectionStatus, ConnectionResult, ScanOptions, ScanResult, ConnectOptions, DeviceTimeSetting, BluetoothState, BluetoothAuthorization, PermissionStatus, PermissionsResult, BluetoothStatus, PasswordStatus, PasswordData, } from './connection';
+export type { VeepooDevice, ConnectionStatus, ConnectionResult, ScanOptions, ScanResult, ConnectOptions, DeviceTimeSetting, BluetoothState, BluetoothAuthorization, PermissionStatus, PermissionsResult, BluetoothStatus, PasswordStatus, PasswordData, RestorationState, } from './connection';
 export type { FunctionStatus, DeviceFunctionPackage1, DeviceFunctionPackage2, DeviceFunctionPackage3, DeviceFunctionPackage4, DeviceFunctionPackage5, DeviceFunctions, } from '../capabilities/device-functions/types';
 export type { DeviceVersion } from '../capabilities/device-version';
 export type { ChargeState, BatteryInfo } from '../capabilities/battery';

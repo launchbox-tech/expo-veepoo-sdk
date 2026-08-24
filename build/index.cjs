@@ -1748,6 +1748,12 @@ const EVENT_DEFINITIONS_CORE = {
 		logScope: "connection",
 		normalize: passthrough()
 	}),
+	connect_pending: defineEvent({
+		jsName: "connect_pending",
+		nativeName: "connectPending",
+		logScope: "connection",
+		normalize: passthrough()
+	}),
 	password_data: defineEvent({
 		jsName: "password_data",
 		nativeName: "passwordData",
@@ -3456,6 +3462,22 @@ var SessionCapability = class {
 			afterSuccess: () => {
 				if (this.ctx.connectedDeviceId() === id) this.ctx.setConnectedDeviceId(null);
 				this.ctx.log("info", "connection", "disconnect.success", "Device disconnected", { deviceId: id });
+			}
+		});
+	}
+	/**
+	* [RESTORATION] Whether iOS armed CoreBluetooth state restoration, and whether
+	* this launch was one iOS started to resume BLE work. Never throws — a failure
+	* to read it must not block session start, so it degrades to "unsupported".
+	*/
+	async getRestorationState() {
+		return this.ctx.invokeWithRecovery({
+			invoke: () => this.ctx.native.getRestorationState(),
+			errorCode: "UNKNOWN",
+			recoverWith: {
+				supported: false,
+				restoration_launch: false,
+				armed: false
 			}
 		});
 	}

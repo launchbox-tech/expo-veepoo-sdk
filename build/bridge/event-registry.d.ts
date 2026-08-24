@@ -50,6 +50,7 @@ export declare const EVENT_DEFINITIONS: {
     health_glance_test_result: EventDef<"health_glance_test_result">;
     battery_data: EventDef<"battery_data">;
     connection_status_changed: EventDef<"connection_status_changed">;
+    connect_pending: EventDef<"connect_pending">;
     origin_spo2_data: EventDef<"origin_spo2_data">;
     alarm_data: EventDef<"alarm_data">;
     heart_rate_alarm_data: EventDef<"heart_rate_alarm_data">;

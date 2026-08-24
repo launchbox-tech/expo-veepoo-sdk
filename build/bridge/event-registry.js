@@ -90,6 +90,12 @@ const EVENT_DEFINITIONS_CORE = {
         logScope: "connection",
         normalize: (0, event_envelope_1.passthrough)(),
     }),
+    connect_pending: defineEvent({
+        jsName: "connect_pending",
+        nativeName: "connectPending",
+        logScope: "connection",
+        normalize: (0, event_envelope_1.passthrough)(),
+    }),
     password_data: defineEvent({
         jsName: "password_data",
         nativeName: "passwordData",
