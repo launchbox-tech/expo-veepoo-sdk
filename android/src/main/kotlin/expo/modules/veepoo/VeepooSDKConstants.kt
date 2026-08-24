@@ -9,6 +9,11 @@ const val DEVICE_CONNECTED = "deviceConnected"
 const val DEVICE_DISCONNECTED = "deviceDisconnected"
 const val DEVICE_CONNECT_STATUS = "deviceConnectStatus"
 const val CONNECTION_STATUS_CHANGED = "connectionStatusChanged"
+
+// [PENDING-CONNECT] iOS-only in practice: a connect held open by CoreBluetooth
+// with no app-level timeout. Declared here so the cross-platform event contract
+// stays in parity; Android never emits it (its stack needs an app-driven retry).
+const val CONNECT_PENDING = "connectPending"
 const val DEVICE_READY = "deviceReady"
 const val BLUETOOTH_STATE_CHANGED = "bluetoothStateChanged"
 const val DEVICE_FUNCTION = "deviceFunction"

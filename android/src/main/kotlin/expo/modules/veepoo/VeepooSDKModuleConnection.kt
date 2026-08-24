@@ -104,6 +104,22 @@ fun ModuleDefinitionBuilder.defineConnection(module: VeepooSDKModule) {
     }
   }
 
+  // [RESTORATION] iOS-only concept: CoreBluetooth can relaunch a system-evicted
+  // app to resume BLE work. Android has no equivalent — background BLE there is
+  // a foreground service / CompanionDeviceService question, not restoration.
+  // Declared here so the cross-platform AsyncFunction surface stays in parity,
+  // and answers honestly rather than rejecting as unsupported: callers log this
+  // to explain why a launch was NOT a restoration launch.
+  AsyncFunction("getRestorationState") { promise: Promise ->
+    promise.resolve(
+      mapOf(
+        "supported" to false,
+        "restoration_launch" to false,
+        "armed" to false,
+      ),
+    )
+  }
+
   AsyncFunction("getConnectionStatus") { deviceId: String, promise: Promise ->
     val status = if (module.connectedDeviceId == deviceId) "connected" else "disconnected"
     promise.resolve(status)

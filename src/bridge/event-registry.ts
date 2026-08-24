@@ -127,6 +127,12 @@ const EVENT_DEFINITIONS_CORE = {
     logScope: "connection",
     normalize: passthrough<"connection_status_changed">(),
   }),
+  connect_pending: defineEvent({
+    jsName: "connect_pending",
+    nativeName: "connectPending",
+    logScope: "connection",
+    normalize: passthrough<"connect_pending">(),
+  }),
   password_data: defineEvent({
     jsName: "password_data",
     nativeName: "passwordData",

@@ -2,7 +2,13 @@ import type { CapabilityContext } from "@/capabilities/shared/context";
 import type { SessionNativeMethods } from "./native";
 import { normalizePasswordData } from "./normalizers";
 import { validateDeviceId, validateConnectOptions, validateDeviceName, validateConnectionConfirmTimeout } from "./validators";
-import type { ConnectOptions, ConnectionStatus, OperationStatus, PasswordData } from "@/types/index";
+import type {
+  ConnectOptions,
+  ConnectionStatus,
+  OperationStatus,
+  PasswordData,
+  RestorationState,
+} from "@/types/index";
 
 export class SessionCapability {
   constructor(private readonly ctx: CapabilityContext<SessionNativeMethods>) {}
@@ -37,6 +43,19 @@ export class SessionCapability {
         }
         this.ctx.log("info", "connection", "disconnect.success", "Device disconnected", { deviceId: id });
       },
+    });
+  }
+
+  /**
+   * [RESTORATION] Whether iOS armed CoreBluetooth state restoration, and whether
+   * this launch was one iOS started to resume BLE work. Never throws — a failure
+   * to read it must not block session start, so it degrades to "unsupported".
+   */
+  async getRestorationState(): Promise<RestorationState> {
+    return this.ctx.invokeWithRecovery({
+      invoke: () => this.ctx.native.getRestorationState(),
+      errorCode: "UNKNOWN",
+      recoverWith: { supported: false, restoration_launch: false, armed: false },
     });
   }
 

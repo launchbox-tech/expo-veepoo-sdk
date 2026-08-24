@@ -171,6 +171,11 @@ extension VeepooSDKModule {
         self.connectionTimer?.invalidate()
         self.connectionTimer = nil
         print("[VeepooSDK] performConnect - 连接成功")
+        // [RESTORATION] A band has now been connected on this install, so a
+        // later launch may arm state restoration. Gating on this keeps the
+        // Bluetooth permission prompt away from a first launch that has no
+        // paired band to restore.
+        VeepooRestorationSubscriber.markPaired()
         self.connectionState = .connected
         self.connectedDeviceId = deviceId
         self.sendEvent(DEVICE_CONNECTED, ["deviceId": deviceId, "isOadModel": false])

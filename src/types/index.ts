@@ -13,6 +13,7 @@ export type {
   BluetoothStatus,
   PasswordStatus,
   PasswordData,
+  RestorationState,
 } from './connection';
 
 export type {

@@ -1,11 +1,21 @@
 {
-  "platforms": ["apple", "android"],
+  "platforms": [
+    "apple",
+    "android"
+  ],
   "apple": {
-    "modules": ["VeepooSDKModule"],
-    "podspecPath": "ios/VeepooSDK.podspec"
+    "modules": [
+      "VeepooSDKModule"
+    ],
+    "podspecPath": "ios/VeepooSDK.podspec",
+    "appDelegateSubscribers": [
+      "VeepooRestorationSubscriber"
+    ]
   },
   "android": {
-    "modules": ["expo.modules.veepoo.VeepooSDKModule"],
+    "modules": [
+      "expo.modules.veepoo.VeepooSDKModule"
+    ],
     "gradleAarProjects": [
       {
         "name": "abpartool",

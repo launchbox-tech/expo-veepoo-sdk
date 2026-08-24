@@ -9,6 +9,7 @@
     "enterCameraMode",
     "exitCameraMode",
     "getConnectionStatus",
+    "getRestorationState",
     "init",
     "isBluetoothEnabled",
     "modifyAutoMeasureSetting",

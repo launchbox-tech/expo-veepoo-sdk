@@ -124,3 +124,21 @@ export interface PasswordData {
   find_phone_function?: FunctionStatus;
   wear_detect_function?: FunctionStatus;
 }
+
+/**
+ * [RESTORATION] Whether iOS CoreBluetooth state restoration is armed, and
+ * whether THIS launch was started by iOS to resume Bluetooth work.
+ *
+ * `supported` is false on Android, which has no equivalent mechanism —
+ * background BLE there is a foreground-service / CompanionDeviceService
+ * concern. A false `supported` is an honest answer, not a failure.
+ *
+ * `restoration_launch` is the field worth logging: it distinguishes a cold
+ * user-initiated launch from one iOS started for a pending connect or a
+ * subscribed characteristic.
+ */
+export interface RestorationState {
+  supported: boolean;
+  restoration_launch: boolean;
+  armed: boolean;
+}

@@ -20,6 +20,7 @@ export const NATIVE_ASYNC_METHOD_NAMES = [
   "connect",
   "disconnect",
   "getConnectionStatus",
+  "getRestorationState",
   "verifyPassword",
   "readBattery",
   "syncPersonalInfo",

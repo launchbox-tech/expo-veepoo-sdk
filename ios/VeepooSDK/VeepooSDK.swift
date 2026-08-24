@@ -254,6 +254,23 @@ public class VeepooSDKModule: Module {
 
     // MARK: Session
     AsyncFunction("init") { (promise: Promise) in self.handleInit(promise: promise) }
+    // [RESTORATION] Lets JS record, in the app's own pullable log sink, whether
+    // THIS launch was started by iOS to resume Bluetooth work — the Swift
+    // `print`s only reach the Xcode console, which a field device trace can't
+    // retrieve. Sync: it reads two already-resolved statics, no BLE work.
+    AsyncFunction("getRestorationState") { (promise: Promise) in
+      #if targetEnvironment(simulator)
+      promise.resolve(["supported": false, "restoration_launch": false, "armed": false])
+      #else
+      DispatchQueue.main.async {
+        promise.resolve([
+          "supported": true,
+          "restoration_launch": VeepooRestorationSubscriber.didLaunchForRestoration,
+          "armed": VPBleCentralManage.sharedBleManager()?.centralManager != nil,
+        ])
+      }
+      #endif
+    }
     AsyncFunction("isBluetoothEnabled") { (promise: Promise) in self.handleIsBluetoothEnabled(promise: promise) }
     AsyncFunction("requestPermissions") { (promise: Promise) in self.handleRequestPermissions(promise: promise) }
     AsyncFunction("startScan") { (options: [String: Any]?, promise: Promise) in self.handleStartScan(options: options, promise: promise) }
