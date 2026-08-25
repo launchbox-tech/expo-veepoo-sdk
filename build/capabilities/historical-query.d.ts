@@ -1,5 +1,6 @@
 import type { CapabilityContext } from "../capabilities/shared/context";
 import type { SportMode } from "../capabilities/sport-mode/types";
+import type { VeepooEventPayload } from "../types/index";
 import type { BloodGlucoseData, BloodOxygenData, BloodPressureData, StressData, TemperatureData } from "../capabilities/realtime-tests/types";
 export interface DailyHealthData {
     date: string;
@@ -166,6 +167,11 @@ export declare class HistoricalQueryCapability {
         /** Streams each session as it arrives — persist incrementally so a
          * mid-read death keeps everything received so far. */
         onSession?: (session: ExerciseSession) => void;
+        /** Read diagnostics from the completion event: which native path ran
+         * (`read_path`) and its per-round coverage (`block_outcomes`). Fires on
+         * success AND on a vendor abort. iOS-only — the fields are absent on
+         * Android, so treat every one of them as optional (rayu.ai #467). */
+        onComplete?: (info: VeepooEventPayload["exercise_read_complete"]) => void;
     }): Promise<ExerciseSession[]>;
 }
 //# sourceMappingURL=historical-query.d.ts.map

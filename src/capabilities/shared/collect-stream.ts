@@ -32,6 +32,12 @@ export function collectStream<
      * abort (e.g. `success: false`) — the collector rejects instead of
      * resolving partial data as if it were everything. */
     isFailure?: (payload: VeepooEventPayload[C]) => string | null;
+    /** Hands the raw completion payload to the caller. Fires on BOTH outcomes
+     * — a payload that carries read diagnostics explains a failure at least as
+     * often as a success, so it must not be reachable only via `resolve`.
+     * Kept as a hook rather than widening the resolved value: every other
+     * caller of this collector wants the items and nothing else. */
+    onComplete?: (payload: VeepooEventPayload[C]) => void;
     /** Progress stream of the same read: re-arms the watchdog; `onProgress`
      * forwards each payload to the caller (host progress bars). */
     progress?: {
@@ -42,7 +48,17 @@ export function collectStream<
     stallMs: number;
   },
 ): Promise<T[]> {
-  const { start, dataEvent, pick, onItem, completeEvent, isFailure, progress, stallMs } = opts;
+  const {
+    start,
+    dataEvent,
+    pick,
+    onItem,
+    completeEvent,
+    isFailure,
+    onComplete: onCompletePayload,
+    progress,
+    stallMs,
+  } = opts;
   return new Promise<T[]>((resolve, reject) => {
     const items: T[] = [];
     let stall: ReturnType<typeof setTimeout> | null = null;
@@ -84,6 +100,7 @@ export function collectStream<
       progress?.onProgress?.(payload as never);
     };
     const onComplete = (payload: VeepooEventPayload[C]) => {
+      onCompletePayload?.(payload);
       const failure = isFailure?.(payload) ?? null;
       settle(() =>
         failure === null

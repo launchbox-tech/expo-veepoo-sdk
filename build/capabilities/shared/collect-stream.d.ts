@@ -25,6 +25,12 @@ export declare function collectStream<D extends VeepooEvent, C extends VeepooEve
      * abort (e.g. `success: false`) — the collector rejects instead of
      * resolving partial data as if it were everything. */
     isFailure?: (payload: VeepooEventPayload[C]) => string | null;
+    /** Hands the raw completion payload to the caller. Fires on BOTH outcomes
+     * — a payload that carries read diagnostics explains a failure at least as
+     * often as a success, so it must not be reachable only via `resolve`.
+     * Kept as a hook rather than widening the resolved value: every other
+     * caller of this collector wants the items and nothing else. */
+    onComplete?: (payload: VeepooEventPayload[C]) => void;
     /** Progress stream of the same read: re-arms the watchdog; `onProgress`
      * forwards each payload to the caller (host progress bars). */
     progress?: {

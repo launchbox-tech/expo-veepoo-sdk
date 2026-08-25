@@ -75,6 +75,69 @@ describe('HistoricalQueryCapability', () => {
       expect(sessions[1]).toMatchObject({ type: 'outdoor_walk', begin_time: '2026-06-06 09:00:00' });
     });
 
+    // The native read has two paths — the CRC-addressed `sport-api` and the
+    // unbounded `start-db` sweep — and `blockOutcomes` names the coverage
+    // rounds outright. Both are emitted on completion and were previously
+    // typed away, leaving a 4.1s read with no attributable cause (rayu.ai #467).
+    it('forwards the completion diagnostics to onComplete', async () => {
+      const onComplete = jest.fn();
+      const promise = historicalQuery.readExerciseSessions({ onComplete });
+
+      native._emit('exerciseReadComplete', {
+        deviceId: 'AA:BB',
+        success: true,
+        sessionsEmitted: 3,
+        readPath: 'sport-api',
+        blockOutcomes: 'sport-crc:ok[1/2/3],r1:2 sessions, satisfied 2/3,r2:1 sessions, satisfied 3/3',
+        tableId: 'AA:BB',
+      });
+
+      await promise;
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(onComplete).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sessions_emitted: 3,
+          read_path: 'sport-api',
+          block_outcomes:
+            'sport-crc:ok[1/2/3],r1:2 sessions, satisfied 2/3,r2:1 sessions, satisfied 3/3',
+        }),
+      );
+    });
+
+    // Android does not emit them; a read must not become undiagnosable-OR-broken.
+    it('still resolves when the completion carries no diagnostics', async () => {
+      const onComplete = jest.fn();
+      const promise = historicalQuery.readExerciseSessions({ onComplete });
+
+      native._emit('exerciseReadComplete', { deviceId: 'AA:BB', success: true });
+
+      await expect(promise).resolves.toEqual([]);
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      const info = onComplete.mock.calls[0][0];
+      expect(info).toMatchObject({ success: true });
+      expect(info.read_path).toBeUndefined();
+      expect(info.block_outcomes).toBeUndefined();
+    });
+
+    // A vendor abort rejects — but the diagnostics explain WHY, so they must
+    // still reach the caller on the failure path.
+    it('forwards diagnostics even when the read is aborted by the Band', async () => {
+      const onComplete = jest.fn();
+      const promise = historicalQuery.readExerciseSessions({ onComplete });
+
+      native._emit('exerciseReadComplete', {
+        deviceId: 'AA:BB',
+        success: false,
+        readPath: 'start-db',
+        blockOutcomes: 'sport-crc:declined,start:invalid',
+      });
+
+      await expect(promise).rejects.toMatchObject({ code: 'OPERATION_FAILED' });
+      expect(onComplete).toHaveBeenCalledWith(
+        expect.objectContaining({ read_path: 'start-db' }),
+      );
+    });
+
     it('resolves [] when completion arrives with nothing stored', async () => {
       const promise = historicalQuery.readExerciseSessions();
 

@@ -106,6 +106,7 @@ class HistoricalQueryCapability {
             onItem: opts?.onSession,
             completeEvent: "exercise_read_complete",
             isFailure: (payload) => payload.success ? null : "exercise read aborted by the Band (invalid state)",
+            onComplete: opts?.onComplete,
             progress: {
                 event: "exercise_read_progress",
                 onProgress: (payload) => {

@@ -693,7 +693,7 @@ const SPORT_MODE_ORDINALS = [
 * path.
 */
 function collectStream(ctx, opts) {
-	const { start, dataEvent, pick, onItem, completeEvent, isFailure, progress, stallMs } = opts;
+	const { start, dataEvent, pick, onItem, completeEvent, isFailure, onComplete: onCompletePayload, progress, stallMs } = opts;
 	return new Promise((resolve, reject) => {
 		const items = [];
 		let stall = null;
@@ -726,6 +726,7 @@ function collectStream(ctx, opts) {
 			progress?.onProgress?.(payload);
 		};
 		const onComplete = (payload) => {
+			onCompletePayload?.(payload);
 			const failure = isFailure?.(payload) ?? null;
 			settle(() => failure === null ? resolve(items) : reject({
 				code: "OPERATION_FAILED",
@@ -820,6 +821,7 @@ var HistoricalQueryCapability = class {
 			onItem: opts?.onSession,
 			completeEvent: "exercise_read_complete",
 			isFailure: (payload) => payload.success ? null : "exercise read aborted by the Band (invalid state)",
+			onComplete: opts?.onComplete,
 			progress: {
 				event: "exercise_read_progress",
 				onProgress: (payload) => {

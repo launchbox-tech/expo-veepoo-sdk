@@ -3,6 +3,7 @@ import type { SportMode } from "@/capabilities/sport-mode/types";
 import { SPORT_MODE_ORDINALS } from "@/capabilities/sport-mode/types";
 import { collectStream } from "@/capabilities/shared/collect-stream";
 import { isRecord } from "@/shared/primitives";
+import type { VeepooEventPayload } from "@/types/index";
 import type {
   BloodGlucoseData,
   BloodOxygenData,
@@ -251,6 +252,11 @@ export class HistoricalQueryCapability {
     /** Streams each session as it arrives — persist incrementally so a
      * mid-read death keeps everything received so far. */
     onSession?: (session: ExerciseSession) => void;
+    /** Read diagnostics from the completion event: which native path ran
+     * (`read_path`) and its per-round coverage (`block_outcomes`). Fires on
+     * success AND on a vendor abort. iOS-only — the fields are absent on
+     * Android, so treat every one of them as optional (rayu.ai #467). */
+    onComplete?: (info: VeepooEventPayload["exercise_read_complete"]) => void;
   }): Promise<ExerciseSession[]> {
     this.ctx.log("info", "read", "read.exercise.start", "Starting exercise history read", {
     });
@@ -265,6 +271,7 @@ export class HistoricalQueryCapability {
       completeEvent: "exercise_read_complete",
       isFailure: (payload) =>
         payload.success ? null : "exercise read aborted by the Band (invalid state)",
+      onComplete: opts?.onComplete,
       progress: {
         event: "exercise_read_progress",
         onProgress: (payload: { progress: ExerciseReadProgress }) => {

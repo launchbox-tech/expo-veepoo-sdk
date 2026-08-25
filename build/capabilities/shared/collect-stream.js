@@ -13,7 +13,7 @@ exports.collectStream = collectStream;
  * path.
  */
 function collectStream(ctx, opts) {
-    const { start, dataEvent, pick, onItem, completeEvent, isFailure, progress, stallMs } = opts;
+    const { start, dataEvent, pick, onItem, completeEvent, isFailure, onComplete: onCompletePayload, progress, stallMs, } = opts;
     return new Promise((resolve, reject) => {
         const items = [];
         let stall = null;
@@ -51,6 +51,7 @@ function collectStream(ctx, opts) {
             progress?.onProgress?.(payload);
         };
         const onComplete = (payload) => {
+            onCompletePayload?.(payload);
             const failure = isFailure?.(payload) ?? null;
             settle(() => failure === null
                 ? resolve(items)
