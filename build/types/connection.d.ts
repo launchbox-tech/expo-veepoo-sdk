@@ -73,6 +73,14 @@ export interface BluetoothStatus {
 export type PasswordStatus = 'CHECK_SUCCESS' | 'CHECK_FAIL' | 'NOT_SET' | 'SUCCESS' | 'FAILED' | 'UNKNOWN';
 export interface PasswordData {
     status: PasswordStatus;
+    /**
+     * The vendor `PasswordSynchronTpye` behind {@link status}. `status` maps both
+     * 1 (password verified) and 6 (password verified AND time synchronized) to
+     * `SUCCESS`, which loses the distinction the vendor header draws between a
+     * complete handshake and its first half. Present only when native sent a
+     * number.
+     */
+    raw_status?: number;
     password: string;
     device_number?: string;
     device_version?: string;

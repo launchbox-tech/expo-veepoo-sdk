@@ -598,10 +598,17 @@ extension VeepooSDKModule {
         // keys device identity on this instead of the scan id (which flips to the
         // iOS CBPeripheral UUID on re-pair). This is the auto-verify-on-connect
         // path the app actually hits.
+        // `rawStatus` is the vendor's `PasswordSynchronTpye`, and 1 and 6 are not
+        // the same thing: 1 is "password verified", 6 is "password verified AND
+        // time synchronized" — the header calls 6 the value normally returned.
+        // Both reach `ready` here, so a consumer that only sees the event cannot
+        // tell a half-finished handshake from a complete one. Carry the number so
+        // it can (rayu.ai's deaf-link investigation, Addendum 5).
         self.sendEvent(DEVICE_READY, [
           "deviceId": deviceId,
           "mac": manager.peripheralModel?.deviceAddress ?? "",
           "isOadModel": false,
+          "rawStatus": result.rawValue,
         ])
       } else {
         print("[VeepooSDK] verifyPasswordInternal - 密码验证失败, result: \(result.rawValue)")

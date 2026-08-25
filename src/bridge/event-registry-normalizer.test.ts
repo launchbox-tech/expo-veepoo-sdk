@@ -180,6 +180,30 @@ describe('normalizeEventPayload', () => {
     expect(result.data.status).toBe('CHECK_SUCCESS');
   });
 
+  it('passwordData: keeps the numeric rawStatus that status collapses', () => {
+    // 1 and 6 both mean SUCCESS; only 6 means the band also synced its clock.
+    const verified = normalizeEventPayload('password_data', {
+      deviceId: 'd1',
+      data: { status: 'SUCCESS', rawStatus: 1 },
+    }) as any;
+    const verifiedAndSynced = normalizeEventPayload('password_data', {
+      deviceId: 'd1',
+      data: { status: 'SUCCESS', rawStatus: 6 },
+    }) as any;
+    expect(verified.data.status).toBe('SUCCESS');
+    expect(verifiedAndSynced.data.status).toBe('SUCCESS');
+    expect(verified.data.raw_status).toBe(1);
+    expect(verifiedAndSynced.data.raw_status).toBe(6);
+  });
+
+  it('passwordData: omits raw_status when native sent no number', () => {
+    const result = normalizeEventPayload('password_data', {
+      deviceId: 'd1',
+      data: { status: 'SUCCESS' },
+    }) as any;
+    expect(result.data.raw_status).toBeUndefined();
+  });
+
   it('socialMsgData: normalizes function status for each key', () => {
     const result = normalizeEventPayload('social_msg_data', {
       deviceId: 'd1',

@@ -27,8 +27,12 @@ function normalizePasswordData(value) {
         else if (normalized.includes('FAIL'))
             status = 'FAILED';
     }
+    // Keep the number alongside the collapsed string. `status` is 'SUCCESS' for
+    // both 1 and 6, and only 6 means the band also finished its time sync.
+    const numericStatus = record.rawStatus ?? record.raw_status;
     return {
         status,
+        ...(typeof numericStatus === 'number' && { raw_status: numericStatus }),
         password: (0, primitives_1.toStringValue)(record.password ?? record.pwd),
         device_number: (0, primitives_1.toStringValue)(record.deviceNumber ?? record.device_number),
         device_version: (0, primitives_1.toStringValue)(record.deviceVersion ?? record.device_version),

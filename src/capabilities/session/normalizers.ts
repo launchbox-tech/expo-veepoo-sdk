@@ -22,8 +22,13 @@ export function normalizePasswordData(value: unknown): PasswordData {
     else if (normalized.includes('FAIL')) status = 'FAILED';
   }
 
+  // Keep the number alongside the collapsed string. `status` is 'SUCCESS' for
+  // both 1 and 6, and only 6 means the band also finished its time sync.
+  const numericStatus = record.rawStatus ?? record.raw_status;
+
   return {
     status,
+    ...(typeof numericStatus === 'number' && { raw_status: numericStatus }),
     password: toStringValue(record.password ?? record.pwd),
     device_number: toStringValue(record.deviceNumber ?? record.device_number),
     device_version: toStringValue(record.deviceVersion ?? record.device_version),

@@ -232,10 +232,14 @@ extension VeepooSDKModule {
         // as their `tableID`, so it's proven correct. Pairing keys device
         // identity on THIS instead of the scan-time value, which flips to the iOS
         // CBPeripheral UUID on re-pair.
+        // See ConnectionHelpers' note: 1 is password-verified, 6 is
+        // password-verified AND time-synced. Both land here; only the number says
+        // which.
         self.sendEvent(DEVICE_READY, [
           "deviceId": self.connectedDeviceId ?? "",
           "mac": manager.peripheralModel?.deviceAddress ?? "",
           "isOadModel": false,
+          "rawStatus": result.rawValue,
         ])
       }
       promiseBox.resolve(resultData)

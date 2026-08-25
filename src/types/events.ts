@@ -155,7 +155,17 @@ export type VeepooEventPayload = {
   // `mac` is the real, stable hardware MAC read post-verification — use it as the
   // canonical device identity (the scan `device_id` flips to the iOS UUID on
   // re-pair). May be "" if the SDK couldn't resolve it.
-  device_ready: { device_id: string; is_oad_model?: boolean; mac?: string };
+  // `raw_status` is the vendor `PasswordSynchronTpye` that produced this ready:
+  // 1 = password verified, 6 = password verified AND device time synchronized
+  // (the value the vendor header says is normally returned). Both reach ready,
+  // so this is the only way to tell a complete handshake from a half-finished
+  // one. Absent on the simulator stubs and on any ready not raised by a verify.
+  device_ready: {
+    device_id: string;
+    is_oad_model?: boolean;
+    mac?: string;
+    raw_status?: number;
+  };
   bluetooth_state_changed: BluetoothStatus;
   device_function: {
     device_id: string;

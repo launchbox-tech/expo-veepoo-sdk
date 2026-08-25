@@ -1484,8 +1484,10 @@ function normalizePasswordData(value) {
 		else if (normalized.includes("SUCCESS")) status = "SUCCESS";
 		else if (normalized.includes("FAIL")) status = "FAILED";
 	}
+	const numericStatus = record.rawStatus ?? record.raw_status;
 	return {
 		status,
+		...typeof numericStatus === "number" && { raw_status: numericStatus },
 		password: toStringValue(record.password ?? record.pwd),
 		device_number: toStringValue(record.deviceNumber ?? record.device_number),
 		device_version: toStringValue(record.deviceVersion ?? record.device_version),
