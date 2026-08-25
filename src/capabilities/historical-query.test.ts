@@ -112,8 +112,16 @@ describe('HistoricalQueryCapability', () => {
     it('rejects TIMEOUT when the event stream stalls', async () => {
       jest.useFakeTimers();
       try {
-        const promise = historicalQuery.readExerciseSessions();
-        const assertion = expect(promise).rejects.toMatchObject({ code: 'TIMEOUT' });
+        // Settle the promise into a plain value instead of holding an
+        // unawaited `expect(...).rejects` matcher across the timer advance.
+        // That combination deadlocks under Bun: the rejection lands while the
+        // matcher is still pending, and neither side completes — it hung the
+        // ENTIRE repo test run indefinitely (issue #205). Attaching the
+        // handler up front also keeps the rejection handled the whole time.
+        const settled = historicalQuery.readExerciseSessions().then(
+          () => ({ rejected: false as const, err: undefined as unknown }),
+          (err: unknown) => ({ rejected: true as const, err }),
+        );
 
         // One session arrives, then the Band goes silent — the watchdog
         // re-arms on each event and fires after 30s of silence.
@@ -121,8 +129,17 @@ describe('HistoricalQueryCapability', () => {
           deviceId: 'AA:BB',
           session: { type: 'outdoorRun', beginTime: '2026-06-05 10:00:00', minuteData: [] },
         });
-        await jest.advanceTimersByTimeAsync(30_000);
-        await assertion;
+        // Bun 1.4.0 exposes `advanceTimersByTime` (sync) but NOT
+        // `advanceTimersByTimeAsync` — calling the async name threw a
+        // TypeError that left this test's pending BLE watchdog unresolved and
+        // hung the whole repo test run (issue #205). Advance synchronously,
+        // then yield once so the rejection's microtask can run.
+        jest.advanceTimersByTime(30_000);
+        await Promise.resolve();
+
+        const outcome = await settled;
+        expect(outcome.rejected).toBe(true);
+        expect(outcome.err).toMatchObject({ code: 'TIMEOUT' });
       } finally {
         jest.useRealTimers();
       }
@@ -139,7 +156,10 @@ describe('HistoricalQueryCapability', () => {
         // 3 × 20s of silence, each broken by a progress event — total 60s,
         // well past the 30s stall, but never 30s without a sign of life.
         for (let i = 1; i <= 3; i++) {
-          await jest.advanceTimersByTimeAsync(20_000);
+          // See the note above — Bun has no async variant.
+          jest.advanceTimersByTime(20_000);
+          // oxlint-disable-next-line no-await-in-loop -- sequential fake-clock steps
+          await Promise.resolve();
           native._emit('exerciseReadProgress', {
             deviceId: 'AA:BB',
             progress: { phase: 'transfer', readState: 'reading', total: 10, current: i, progress: 50 },
@@ -180,7 +200,8 @@ describe('HistoricalQueryCapability', () => {
         });
         // The read dies after the first session — the promise rejects, but
         // the streamed session was already delivered for persistence.
-        await jest.advanceTimersByTimeAsync(30_000);
+        jest.advanceTimersByTime(30_000);
+        await Promise.resolve();
         await assertion;
         expect(streamed).toEqual(['2026-06-05 10:00:00']);
       } finally {
