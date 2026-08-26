@@ -355,12 +355,23 @@ extension VeepooSDKModule {
       "temperatureFunction": device.temperatureType > 0 ? "support" : "unsupported"
     ]
     
-    let package2: [String: Any] = [
+    // `saveDays` is the band's on-device retention window — how many days of
+    // history it will re-serve. The vendor binds its read APIs to it
+    // (`dayNumber` "cannot be greater than saveDays"), and the app needs it to
+    // bound both the backfill loop and the pre-sync buffer sweep. Emitted under
+    // the snake_case key `DeviceFunctionPackage2` already declares, because the
+    // JS normalizer passes nested-package2 keys through verbatim.
+    // 0 means the band did not report it — left absent rather than sent as a
+    // zero, so JS can tell "unknown" from a real value.
+    var package2: [String: Any] = [
       "type": "DeviceFunctionPackage2",
       "ecgFunction": device.ecgType > 0 ? "support" : "unsupported",
       "precisionSleep": device.sleepType > 0 ? "support" : "unsupported",
       "hrvFunction": device.hrvType > 0 ? "support" : "unsupported"
     ]
+    if device.saveDays > 0 {
+      package2["watch_data_day_number"] = Int(device.saveDays)
+    }
     
     let package3: [String: Any] = [
       "type": "DeviceFunctionPackage3",

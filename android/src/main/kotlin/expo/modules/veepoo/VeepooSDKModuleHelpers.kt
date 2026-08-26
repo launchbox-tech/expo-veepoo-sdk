@@ -132,11 +132,17 @@ fun VeepooSDKModule.updateFunctionsFromSupportData(data: FunctionDeviceSupportDa
     "spoH" to toSupportedStatus(data.spo2H),
     "temperatureFunction" to toSupportedStatus(data.temperatureFunction)
   )
-  val package2 = mapOf(
-    "ecgFunction" to toSupportedStatus(data.ecg),
-    "precisionSleep" to toSupportedStatus(data.precisionSleep),
-    "hrvFunction" to "unsupported"
-  )
+  // `wathcDay` (vendor spelling) is the band's on-device retention window — how
+  // many days of history it will re-serve. It belongs INSIDE package2: the JS
+  // normalizer only reads the nested package object, so a value emitted beside
+  // it never reaches JS. 0 means the band did not report it — left absent rather
+  // than sent as a zero, so JS can tell "unknown" from a real value.
+  val package2 = buildMap<String, Any> {
+    put("ecgFunction", toSupportedStatus(data.ecg))
+    put("precisionSleep", toSupportedStatus(data.precisionSleep))
+    put("hrvFunction", "unsupported")
+    if (data.wathcDay > 0) put("watch_data_day_number", data.wathcDay)
+  }
   val package3 = mapOf(
     "stressFunction" to toSupportedStatus(data.stress),
     "agps" to toSupportedStatus(data.agps),

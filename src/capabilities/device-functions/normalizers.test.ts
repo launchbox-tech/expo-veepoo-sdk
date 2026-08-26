@@ -93,6 +93,34 @@ describe('normalizePackage2', () => {
     expect(result?.ecg_function).toBe('support');
     expect((result as any)?.type).toBeUndefined();
   });
+
+  // The retention window is the one package2 field a caller makes a DELETE
+  // decision on, so both directions are asserted: it must survive the nested
+  // pass-through, and its absence must stay distinguishable from a real value.
+  // Native emits it under this exact snake_case key precisely because the
+  // pass-through branch keeps nested keys verbatim.
+  it('carries watch_data_day_number through the nested package2 object', () => {
+    const record = {
+      package2: {
+        type: 'DeviceFunctionPackage2',
+        ecgFunction: 'support',
+        watch_data_day_number: 3,
+      },
+    };
+    expect(normalizePackage2(record)?.watch_data_day_number).toBe(3);
+  });
+
+  it('leaves watch_data_day_number undefined when package2 omits it', () => {
+    const record = {
+      package2: {
+        type: 'DeviceFunctionPackage2',
+        ecgFunction: 'support',
+      },
+    };
+    // Absent, NOT 0 — a band that does not report its window must not be
+    // indistinguishable from one that reports zero days.
+    expect(normalizePackage2(record)?.watch_data_day_number).toBeUndefined();
+  });
 });
 
 describe('normalizePackage3', () => {
