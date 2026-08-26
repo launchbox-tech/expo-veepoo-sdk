@@ -60,6 +60,14 @@
         "via": "VPBleConnectStateChangeBlock (all state changes)"
       }
     },
+    "connectPending": {
+      "android": {
+        "via": "not emitted — Android has no hold-pending connect path; CONNECT_PENDING is declared in VeepooSDKConstants.kt for parity only"
+      },
+      "ios": {
+        "via": "module-originated in VeepooSDKModule+ConnectionHelpers.performConnect(holdPending:); settlement still from the vendor's VPBleConnectStateChangeBlock"
+      }
+    },
     "passwordData": {
       "android": {
         "via": "IPwdDataListener.onPwdDataChange (full PwdData object)"

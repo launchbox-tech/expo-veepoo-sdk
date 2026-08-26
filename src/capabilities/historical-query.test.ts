@@ -273,10 +273,17 @@ describe('HistoricalQueryCapability', () => {
       jest.useFakeTimers();
       try {
         const streamed: string[] = [];
-        const promise = historicalQuery.readExerciseSessions({
-          onSession: (s) => streamed.push(s.begin_time),
-        });
-        const assertion = expect(promise).rejects.toMatchObject({ code: 'TIMEOUT' });
+        // Same shape as the watchdog test above: settle into a plain value
+        // rather than holding an unawaited `expect(...).rejects` matcher
+        // across the timer advance, which deadlocks under Bun (issue #205).
+        const settled = historicalQuery
+          .readExerciseSessions({
+            onSession: (s) => streamed.push(s.begin_time),
+          })
+          .then(
+            () => ({ rejected: false as const, err: undefined as unknown }),
+            (err: unknown) => ({ rejected: true as const, err }),
+          );
 
         native._emit('exerciseSessionData', {
           deviceId: 'AA:BB',
@@ -286,7 +293,10 @@ describe('HistoricalQueryCapability', () => {
         // the streamed session was already delivered for persistence.
         jest.advanceTimersByTime(30_000);
         await Promise.resolve();
-        await assertion;
+
+        const outcome = await settled;
+        expect(outcome.rejected).toBe(true);
+        expect(outcome.err).toMatchObject({ code: 'TIMEOUT' });
         expect(streamed).toEqual(['2026-06-05 10:00:00']);
       } finally {
         jest.useRealTimers();
