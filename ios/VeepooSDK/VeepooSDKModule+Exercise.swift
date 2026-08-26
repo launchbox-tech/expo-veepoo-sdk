@@ -310,6 +310,38 @@ extension VeepooSDKModule {
     tableID: String
   ) {
     let missing = wanted.subtracting(satisfied)
+    // [COVERAGE-STALL] Two terminal conditions the CRC bookkeeping alone misses,
+    // both measured on device 2026-08-26 (rayu.ai#472):
+    //
+    //   sport-crc:ok[10009/24629/21310],cap:3,
+    //   r1:3 sessions, satisfied 2/3, r2:0 sessions, r3:0 sessions,
+    //   coverage:missing[21310]                                    4381ms
+    //
+    // Round 1 delivered THREE sessions for three slots — everything the Band
+    // had — but marked only two CRCs satisfied, because the vendor returned a
+    // duplicate in place of one slot (the 2026-06-06 note this loop was built
+    // for). So `missing` stayed non-empty over data we already held, and rounds
+    // 2 and 3 each re-requested it, got nothing, and charged 1.5s of settle for
+    // the privilege. ~3s of a 4.4s read, for zero additional data.
+    //
+    // `emitted >= wanted.count` is the honest completion test: as many sessions
+    // as the Band has slots means there is nothing left to fetch, whatever the
+    // CRC ledger says. It cannot under-read — it only fires once the count is
+    // already met.
+    //
+    // A round that yields NOTHING is the second: the same firmware quirk that
+    // makes back-to-back reads return empty means the next round returns empty
+    // too. Both observed rounds did. Stopping is not giving up on the data —
+    // the slot keeps its CRC, so the next sync re-requests it with a fresh
+    // link, and `crcs_gone` reports it if the Band drops it first.
+    if emitted >= wanted.count && !missing.isEmpty {
+      finishExerciseRead(
+        emitted: emitted, readPath: "sport-api",
+        outcomes: outcomes + ["coverage:count-complete[\(emitted)/\(wanted.count)]"],
+        tableID: tableID
+      )
+      return
+    }
     guard !missing.isEmpty, round <= 3 else {
       let missingList = missing.map(String.init).joined(separator: "/")
       finishExerciseRead(
@@ -338,8 +370,19 @@ extension VeepooSDKModule {
           tableID: tableID
         )
       }
-      if wanted.subtracting(satisfiedNow).isEmpty || round >= 3 {
+      if wanted.subtracting(satisfiedNow).isEmpty || round >= 3 || emittedNow >= wanted.count {
+        // `emittedNow >= wanted.count` short-circuits HERE, not just at the top
+        // of the next pass: reaching it through `next()` would still sleep the
+        // 1.5s settle first, which is the whole cost being removed.
         next() // terminal guard above finishes immediately
+      } else if emittedNow == emitted {
+        // [COVERAGE-STALL] This round returned nothing new. Another will not
+        // either, and waiting 1.5s to prove it is the cost this fix removes.
+        self.finishExerciseRead(
+          emitted: emittedNow, readPath: "sport-api",
+          outcomes: outcomes + ["r\(round):\(outcome)", "coverage:stalled"],
+          tableID: tableID
+        )
       } else {
         // Settling delay before re-requesting — back-to-back reads return
         // empty on this firmware.
