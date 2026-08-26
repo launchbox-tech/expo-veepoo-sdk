@@ -257,20 +257,39 @@ extension VeepooSDKModule {
           }
           return
         }
-        // Closed-loop CRC coverage (device evidence 2026-06-06): the batch
-        // read delivered a DUPLICATE in place of one slot, and follow-up
-        // reads in the same pass return empty. Models carry their own `crc`
-        // — so read, mark which CRCs actually arrived, then re-request only
-        // the missing ones after a settling delay, up to 3 rounds.
-        let wanted = Set(crcs.map { $0.intValue })
-        let crcList = crcs.map { String($0.intValue) }.joined(separator: "/")
+        // [SLOT-ARRAY] The array is FIXED-LENGTH and its length is the device's
+        // MAXIMUM sport-record capacity, not the number of records it holds.
+        // A `0` entry is an EMPTY SLOT; the vendor header says to "directly
+        // skip" it (`veepooSDK_readDeviceRunningCrcResult`, VPPeripheralBaseManage.h).
+        //
+        // We did not. Every empty slot went into `wanted`, and a CRC of 0 can
+        // never be satisfied by a model that carries a real crc — so coverage
+        // could not complete, and the pass burned all 3 rounds paying the 1.5s
+        // settle between each. That is the ~3s in rayu.ai#472: 1055ms observed
+        // when the array happened to be full (no zeros) against a 4038-4508ms
+        // cluster at the SAME three sessions.
+        //
+        // `capacity` is kept for the log line: with zeros stripped it is the
+        // only remaining evidence of how many slots this device actually has,
+        // which decides whether the Band evicts old workouts (rayu.ai#473).
+        let capacity = crcs.count
+        let occupied = crcs.map { $0.intValue }.filter { $0 != 0 }
+        guard !occupied.isEmpty else {
+          self.finishExerciseRead(
+            emitted: 0, readPath: "sport-api",
+            outcomes: ["sport-crc:ok-empty[cap:\(capacity)]"], tableID: tableID
+          )
+          return
+        }
+        let wanted = Set(occupied)
+        let crcList = occupied.map(String.init).joined(separator: "/")
         self.readSportPass(
           peripheralManage: peripheralManage,
           wanted: wanted,
           satisfied: [],
           round: 1,
           emitted: 0,
-          outcomes: ["sport-crc:ok[\(crcList)]"],
+          outcomes: ["sport-crc:ok[\(crcList)],cap:\(capacity)"],
           tableID: tableID
         )
       }
