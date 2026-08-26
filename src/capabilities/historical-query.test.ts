@@ -138,6 +138,27 @@ describe('HistoricalQueryCapability', () => {
       );
     });
 
+    // A diagnostic hook must never be able to fail the read it describes.
+    // Unguarded, a throw here skips `settle`, leaves the listeners and the stall
+    // timer armed, and the read surfaces 30s later as a TIMEOUT that blames the
+    // Band for a bug in the caller.
+    it('a throwing onComplete cannot wedge or fail the read', async () => {
+      const promise = historicalQuery.readExerciseSessions({
+        onComplete: () => {
+          throw new Error('caller blew up');
+        },
+      });
+
+      native._emit('exerciseSessionData', {
+        deviceId: 'AA:BB',
+        session: { type: 'hiking', beginTime: '2026-06-04 08:00:00', minuteData: [] },
+      });
+      native._emit('exerciseReadComplete', { deviceId: 'AA:BB', success: true });
+
+      const sessions = await promise;
+      expect(sessions).toHaveLength(1);
+    });
+
     it('resolves [] when completion arrives with nothing stored', async () => {
       const promise = historicalQuery.readExerciseSessions();
 

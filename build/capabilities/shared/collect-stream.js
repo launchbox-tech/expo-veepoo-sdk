@@ -51,7 +51,17 @@ function collectStream(ctx, opts) {
             progress?.onProgress?.(payload);
         };
         const onComplete = (payload) => {
-            onCompletePayload?.(payload);
+            // Guarded: an unguarded throw here would skip `settle`, leaving the
+            // listeners and the stall timer armed, and the read would surface
+            // `stallMs` later as a TIMEOUT blaming the Band for a caller's bug. A
+            // diagnostic hook must never be able to fail the read it describes.
+            try {
+                onCompletePayload?.(payload);
+            }
+            catch {
+                // Swallowed deliberately — losing the diagnostics is strictly better
+                // than losing the data they were meant to explain.
+            }
             const failure = isFailure?.(payload) ?? null;
             settle(() => failure === null
                 ? resolve(items)

@@ -726,7 +726,9 @@ function collectStream(ctx, opts) {
 			progress?.onProgress?.(payload);
 		};
 		const onComplete = (payload) => {
-			onCompletePayload?.(payload);
+			try {
+				onCompletePayload?.(payload);
+			} catch {}
 			const failure = isFailure?.(payload) ?? null;
 			settle(() => failure === null ? resolve(items) : reject({
 				code: "OPERATION_FAILED",

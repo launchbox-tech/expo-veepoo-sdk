@@ -244,13 +244,13 @@ export type VeepooEventPayload = {
   exercise_session_data: { device_id: string; session: ExerciseSession };
   /** Emitted once when the exercise-history read finishes (ADR 0015 — never
    * signalled via `read_origin_complete`). `success: false` = vendor aborted
-   * (invalid state) — the collector rejects instead of resolving. */
-  /** Completion of an exercise-history read. The three diagnostic fields are
-   * iOS-only (the Android emit does not carry them) and are the ONLY signal
-   * that says which of the two native read paths ran — a bounded, CRC-addressed
-   * `sport-api` read or the unbounded `start-db` sweep. `block_outcomes` also
-   * names the per-round coverage, so a slow read is attributable without an
-   * instrumented build (rayu.ai #467). */
+   * (invalid state) — the collector rejects instead of resolving.
+   *
+   * The three diagnostic fields are iOS-only (the Android emit does not carry
+   * them) and are the ONLY signal that says which of the two native read paths
+   * ran — a bounded, CRC-addressed `sport-api` read or the unbounded `start-db`
+   * sweep. `block_outcomes` also names the per-round coverage, so a slow read is
+   * attributable without an instrumented build (rayu.ai #467). */
   exercise_read_complete: {
     device_id: string;
     success: boolean;

@@ -170,7 +170,9 @@ export declare class HistoricalQueryCapability {
         /** Read diagnostics from the completion event: which native path ran
          * (`read_path`) and its per-round coverage (`block_outcomes`). Fires on
          * success AND on a vendor abort. iOS-only — the fields are absent on
-         * Android, so treat every one of them as optional (rayu.ai #467). */
+         * Android, so treat every one of them as optional (rayu.ai #467).
+         *
+         * A throw here is caught and discarded: the hook cannot fail the read. */
         onComplete?: (info: VeepooEventPayload["exercise_read_complete"]) => void;
     }): Promise<ExerciseSession[]>;
 }
