@@ -35,6 +35,7 @@ import com.veepoo.protocol.model.datas.DeviceFunctionPackage3
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage4
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage5
 import com.veepoo.protocol.model.enums.DeviceManualDataType
+import com.veepoo.protocol.model.enums.EFunctionStatus
 import com.inuker.bluetooth.library.Code
 import com.veepoo.protocol.model.settings.CustomSettingData
 import expo.modules.kotlin.Promise
@@ -106,6 +107,25 @@ fun toSupportedStatus(value: Any?): String {
   }
 }
 
+/**
+ * Converts the vendor's `EFunctionStatus` to the `FunctionStatus` vocabulary JS
+ * declares. `toSupportedStatus` cannot: an enum matches none of its
+ * Boolean/Number/String branches, so every call fell through to "unsupported"
+ * and the band's real answer never left Kotlin.
+ *
+ * `UNKONW` (vendor spelling) maps to "unknown", NOT "unsupported" — a band that
+ * did not report a capability must stay distinguishable from one that said no.
+ */
+fun toFunctionStatus(status: EFunctionStatus?): String {
+  return when (status) {
+    EFunctionStatus.SUPPORT -> "support"
+    EFunctionStatus.SUPPORT_OPEN -> "open"
+    EFunctionStatus.SUPPORT_CLOSE -> "close"
+    EFunctionStatus.UNSUPPORT -> "unsupported"
+    else -> "unknown"
+  }
+}
+
 // 统一测试状态转换
 fun normalizeTestState(rawState: String?): String {
   if (rawState == null) return "unknown"
@@ -126,11 +146,14 @@ fun normalizeTestState(rawState: String?): String {
 
 // 功能包映射到统一结构
 fun VeepooSDKModule.updateFunctionsFromSupportData(data: FunctionDeviceSupportData) {
+  // Keys are the snake_case names `DeviceFunctionPackage1/2/3` declare. JS reads
+  // a nested package strictly by declared key, so a camelCase spelling here is
+  // silently dropped rather than surfaced — that was #210.
   val package1 = mapOf(
-    "bloodPressure" to toSupportedStatus(data.bp),
-    "heartRateDetect" to toSupportedStatus(data.heartDetect),
-    "spoH" to toSupportedStatus(data.spo2H),
-    "temperatureFunction" to toSupportedStatus(data.temperatureFunction)
+    "blood_pressure" to toFunctionStatus(data.bp),
+    "heart_rate_detect" to toFunctionStatus(data.heartDetect),
+    "spo_h" to toFunctionStatus(data.spo2H),
+    "temperature_function" to toFunctionStatus(data.temperatureFunction)
   )
   // `wathcDay` (vendor spelling) is the band's on-device retention window — how
   // many days of history it will re-serve. It belongs INSIDE package2: the JS
@@ -138,17 +161,17 @@ fun VeepooSDKModule.updateFunctionsFromSupportData(data: FunctionDeviceSupportDa
   // it never reaches JS. 0 means the band did not report it — left absent rather
   // than sent as a zero, so JS can tell "unknown" from a real value.
   val package2 = buildMap<String, Any> {
-    put("ecgFunction", toSupportedStatus(data.ecg))
-    put("precisionSleep", toSupportedStatus(data.precisionSleep))
-    put("hrvFunction", "unsupported")
+    put("ecg_function", toFunctionStatus(data.ecg))
+    put("precision_sleep", toFunctionStatus(data.precisionSleep))
+    put("hrv_function", toFunctionStatus(data.hrvFunction))
     if (data.wathcDay > 0) put("watch_data_day_number", data.wathcDay)
   }
   val package3 = mapOf(
-    "stressFunction" to toSupportedStatus(data.stress),
-    "agps" to toSupportedStatus(data.agps),
-    "bloodGlucose" to "unsupported",
-    "bloodComponent" to "unsupported",
-    "bodyComponent" to "unsupported"
+    "stress_function" to toFunctionStatus(data.stress),
+    "agps_function" to toFunctionStatus(data.agps),
+    "blood_glucose" to toFunctionStatus(data.bloodGlucose),
+    "blood_component" to toFunctionStatus(data.bloodComponent),
+    "body_component" to toFunctionStatus(data.bodyComponent)
   )
   cachedDeviceFunctions["package1"] = package1
   cachedDeviceFunctions["package2"] = package2

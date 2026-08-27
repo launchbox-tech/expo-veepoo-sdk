@@ -31,6 +31,7 @@
     "check:contract": "npm run build && node build/bridge-contract/run-contract-checks.js",
     "check:veepoo-events": "npm run build && node build/bridge-contract/run-contract-checks.js veepoo-events",
     "check:native-rejection": "npm run build && node build/bridge-contract/run-contract-checks.js native-rejection",
+    "check:device-function-keys": "npm run build && node build/bridge-contract/run-contract-checks.js device-function-keys",
     "check:upstream-sdk": "npm run build && node build/bridge-contract/run-contract-checks.js upstream-sdk",
     "android": "expo run:android",
     "ios": "expo run:ios",

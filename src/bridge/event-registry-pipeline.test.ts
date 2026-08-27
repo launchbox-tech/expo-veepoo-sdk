@@ -6,6 +6,7 @@
  * This verifies that every event, including pass-throughs, is correctly
  * normalized end-to-end (deepSnakeKeys + any value-level normalizer).
  */
+import goldenPayloads from "@/__tests__/fixtures/device-function-payloads.golden.json";
 import { normalizeEventPayload } from "./event-registry";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -748,25 +749,18 @@ describe("bluetooth and session events", () => {
     expect((result as any).data).toBeDefined();
   });
 
+  // The event path shares normalizeDeviceFunctions with readDeviceFunctions, so
+  // it is fed the shape native actually emits — an invented payload here is what
+  // let twelve fields arrive undefined unnoticed (#210).
   it("device_function: packages normalized", () => {
     const result = norm("device_function", {
       deviceId: "AA:BB",
-      data: {
-        package1: {
-          heartFunction: 0,
-          bloodOxygen: 1,
-          bloodPressure: 2,
-          isHasGps: false,
-          isHasNfc: false,
-          isHasEcg: false,
-          isHasBodyTemperature: false,
-          bloodGlucose: 0,
-          highBloodPressure: 0,
-        },
-      },
-    });
-    expect((result as any).device_id).toBe("AA:BB");
-    expect((result as any).data).toBeDefined();
+      data: goldenPayloads.ios,
+    }) as any;
+    expect(result.device_id).toBe("AA:BB");
+    expect(result.data.package1.blood_pressure).toBe("support");
+    expect(result.data.package2.watch_data_day_number).toBe(7);
+    expect(result.data.package3.stress_function).toBe("support");
   });
 
   it("device_version: version fields snake_cased", () => {

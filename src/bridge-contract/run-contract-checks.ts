@@ -16,6 +16,7 @@ import {
   NATIVE_EMITTED_EVENTS,
 } from "../bridge/event-registry";
 
+import { verifyDeviceFunctionKeysContract } from "./verify-device-function-keys";
 import { verifyNativeRejectionContract } from "./verify-native-rejection-contract";
 import { verifyUpstreamSdkCoverage } from "./verify-upstream-sdk-coverage";
 import { verifyVeepooEventsContract } from "./verify-veepoo-events";
@@ -38,6 +39,12 @@ const CHECKS: Check[] = [
     run: verifyNativeRejectionContract,
     onSuccess: () =>
       `Native rejection bridge contract OK (${ALLOWED_NATIVE_REJECT_CODES.length} observed codes, ${Object.keys(NATIVE_REJECT_MAPPING).length} mapping entries).`,
+  },
+  {
+    name: "device-function-keys",
+    run: verifyDeviceFunctionKeysContract,
+    onSuccess: () =>
+      "Device-function key contract OK — every native key is declared, and both platforms spell it the same.",
   },
   {
     name: "upstream-sdk",

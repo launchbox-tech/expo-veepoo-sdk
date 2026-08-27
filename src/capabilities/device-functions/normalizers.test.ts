@@ -1,3 +1,6 @@
+import { loadEmittedPackageKeys, REPO_ROOT } from '@/__tests__/helpers/emitted-device-function-keys';
+import goldenPayloads from '@/__tests__/fixtures/device-function-payloads.golden.json';
+import { normalizeDeviceFunctions } from './normalizers/index';
 import { normalizePackage1 } from './normalizers/package1';
 import { normalizePackage2 } from './normalizers/package2';
 import { normalizePackage3 } from './normalizers/package3';
@@ -38,18 +41,22 @@ describe('normalizePackage1', () => {
     expect(result?.spo_h).toBe('support');
   });
 
-  it('reads from nested package1 object', () => {
-    const record = {
-      package1: {
-        blood_pressure: 'support',
-        camera: 'close',
-        type: 'skip_this',
-      },
-    };
-    const result = normalizePackage1(record);
+  it('reads from the nested package1 object native actually sends', () => {
+    const result = normalizePackage1({ package1: goldenPayloads.ios.package1 });
     expect(result?.blood_pressure).toBe('support');
-    expect(result?.camera).toBe('close');
+    expect(result?.heart_rate_detect).toBe('support');
+    expect(result?.spo_h).toBe('support');
+    expect(result?.temperature_function).toBe('unsupported');
     expect((result as any)?.type).toBeUndefined();
+  });
+
+  // Native emitting a key no interface declares is the #210 defect. Dropping it
+  // keeps the returned object honest about its own type instead of carrying a
+  // field nothing can read.
+  it('drops an undeclared key rather than casting it into the result', () => {
+    const result = normalizePackage1({ package1: { bloodPressure: 'support' } });
+    expect((result as any)?.bloodPressure).toBeUndefined();
+    expect(result?.blood_pressure).toBeUndefined();
   });
 });
 
@@ -80,30 +87,31 @@ describe('normalizePackage2', () => {
     expect(result?.watch_data_day_number).toBe(7);
   });
 
-  it('reads from nested package2 object (values pass-through for numbers)', () => {
-    const record = {
-      package2: {
-        sleep_tag: 2,
-        ecg_function: 'support',
-        type: 'skip_this',
-      },
-    };
-    const result = normalizePackage2(record);
-    expect(result?.sleep_tag).toBe(2);
+  it('reads from the nested package2 object native actually sends', () => {
+    const result = normalizePackage2({ package2: goldenPayloads.ios.package2 });
     expect(result?.ecg_function).toBe('support');
+    expect(result?.precision_sleep).toBe('support');
+    expect(result?.hrv_function).toBe('unsupported');
+    expect(result?.watch_data_day_number).toBe(7);
     expect((result as any)?.type).toBeUndefined();
+  });
+
+  // Android reports the vendor's four-value EFunctionStatus, not just yes/no.
+  it('keeps the open/close statuses Android reports', () => {
+    const result = normalizePackage1({ package1: goldenPayloads.android.package1 });
+    expect(result?.heart_rate_detect).toBe('open');
+    expect(result?.spo_h).toBe('close');
+    expect(result?.temperature_function).toBe('unknown');
   });
 
   // The retention window is the one package2 field a caller makes a DELETE
   // decision on, so both directions are asserted: it must survive the nested
-  // pass-through, and its absence must stay distinguishable from a real value.
-  // Native emits it under this exact snake_case key precisely because the
-  // pass-through branch keeps nested keys verbatim.
+  // read, and its absence must stay distinguishable from a real value.
   it('carries watch_data_day_number through the nested package2 object', () => {
     const record = {
       package2: {
         type: 'DeviceFunctionPackage2',
-        ecgFunction: 'support',
+        ecg_function: 'support',
         watch_data_day_number: 3,
       },
     };
@@ -114,7 +122,7 @@ describe('normalizePackage2', () => {
     const record = {
       package2: {
         type: 'DeviceFunctionPackage2',
-        ecgFunction: 'support',
+        ecg_function: 'support',
       },
     };
     // Absent, NOT 0 — a band that does not report its window must not be
@@ -137,7 +145,8 @@ describe('normalizePackage3', () => {
       cpuType: 2,
       stress: 1,
       agps: 1,
-      bloodGlucoseType: 3,
+      bloodGlucose: 1,
+      bloodGlucoseTag: 3,
     };
     const result = normalizePackage3(record);
     expect(result?.temperature_function).toBe('support');
@@ -145,20 +154,17 @@ describe('normalizePackage3', () => {
     expect(result?.cpu_type).toBe(2);
     expect(result?.stress_function).toBe('support');
     expect(result?.agps_function).toBe('support');
-    expect(result?.blood_glucose).toBe(3);
+    expect(result?.blood_glucose).toBe('support');
+    expect(result?.blood_glucose_tag).toBe(3);
   });
 
-  it('reads from nested package3 object', () => {
-    const record = {
-      package3: {
-        cpu_type: 5,
-        blood_glucose: 1,
-        type: 'skip_this',
-      },
-    };
-    const result = normalizePackage3(record);
-    expect(result?.cpu_type).toBe(5);
-    expect(result?.blood_glucose).toBe(1);
+  it('reads from the nested package3 object native actually sends', () => {
+    const result = normalizePackage3({ package3: goldenPayloads.ios.package3 });
+    expect(result?.stress_function).toBe('support');
+    expect(result?.agps_function).toBe('unsupported');
+    expect(result?.blood_glucose).toBe('support');
+    expect(result?.blood_component).toBe('unsupported');
+    expect(result?.body_component).toBe('unsupported');
     expect((result as any)?.type).toBeUndefined();
   });
 });
@@ -192,4 +198,25 @@ describe('normalizePackage5', () => {
     expect(result?.body_composition).toBe('support');
     expect(result?.blood_glucose).toBe('close');
   });
+});
+
+
+// The defect this file failed to catch was a test asserting over input no native
+// layer sends. These cases take their input from the emitters themselves, so a
+// key renamed in Swift or Kotlin fails here rather than going quietly undefined.
+// (That the fixture matches those emitters is asserted in the key contract test.)
+describe('normalizeDeviceFunctions against the emitted native shape', () => {
+  const emitted = loadEmittedPackageKeys(REPO_ROOT);
+
+  for (const platform of ['ios', 'android'] as const) {
+    it(`every field ${platform} reports reaches JS under its declared name`, () => {
+      const payload = goldenPayloads[platform] as Record<string, Record<string, unknown>>;
+      const result = normalizeDeviceFunctions(payload) as Record<string, Record<string, unknown>>;
+      for (const [name, keys] of emitted[platform]) {
+        for (const key of keys) {
+          expect(`${name}.${key}=${String(result[name]?.[key])}`).not.toContain('=undefined');
+        }
+      }
+    });
+  }
 });

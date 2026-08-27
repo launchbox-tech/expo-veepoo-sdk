@@ -8,25 +8,17 @@ import { normalizePackage4, normalizePackage5 } from "./package4-5";
 export function normalizeDeviceFunctions(value: unknown): DeviceFunctions {
   const record = isRecord(value) ? value : {};
 
-  if (
-    isRecord(record.package1) ||
-    isRecord(record.package2) ||
-    isRecord(record.package3) ||
-    isRecord(record.package4) ||
-    isRecord(record.package5)
-  ) {
-    return {
-      package1: normalizePackage1(record),
-      package2: normalizePackage2(record),
-      package3: normalizePackage3(record),
-      package4: normalizePackage4(record),
-      package5: normalizePackage5(record),
-    };
-  }
+  // package4/5 have no flat-record form — each returns undefined unless the
+  // payload nests it — so they are added only when present, keeping the
+  // three-package shape callers see today.
+  const package4 = normalizePackage4(record);
+  const package5 = normalizePackage5(record);
 
   return {
     package1: normalizePackage1(record),
     package2: normalizePackage2(record),
     package3: normalizePackage3(record),
+    ...(package4 ? { package4 } : {}),
+    ...(package5 ? { package5 } : {}),
   };
 }

@@ -56,6 +56,9 @@ jobs:
       - name: Verify native rejection bridge contract
         run: node build/bridge-contract/run-contract-checks.js native-rejection
 
+      - name: Verify device-function key contract
+        run: node build/bridge-contract/run-contract-checks.js device-function-keys
+
       - name: Verify vendor manifest
         run: bun run vendor:check
 

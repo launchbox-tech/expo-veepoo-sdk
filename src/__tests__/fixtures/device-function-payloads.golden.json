@@ -1,0 +1,49 @@
+{
+  "description": "readDeviceFunctions payloads as the native layer emits them. Derived from the emitters in ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift (cacheDeviceFunctions) and android/.../VeepooSDKModuleHelpers.kt (updateFunctionsFromSupportData) — NOT captured from a band, so it proves key agreement, not the vendor's byte-level semantics.",
+  "provenance": "source-derived",
+  "ios": {
+    "package1": {
+      "type": "DeviceFunctionPackage1",
+      "blood_pressure": "support",
+      "heart_rate_detect": "support",
+      "spo_h": "support",
+      "temperature_function": "unsupported"
+    },
+    "package2": {
+      "type": "DeviceFunctionPackage2",
+      "ecg_function": "support",
+      "precision_sleep": "support",
+      "hrv_function": "unsupported",
+      "watch_data_day_number": 7
+    },
+    "package3": {
+      "type": "DeviceFunctionPackage3",
+      "stress_function": "support",
+      "agps_function": "unsupported",
+      "blood_glucose": "support",
+      "blood_component": "unsupported",
+      "body_component": "unsupported"
+    }
+  },
+  "android": {
+    "package1": {
+      "blood_pressure": "support",
+      "heart_rate_detect": "open",
+      "spo_h": "close",
+      "temperature_function": "unknown"
+    },
+    "package2": {
+      "ecg_function": "support",
+      "precision_sleep": "unsupported",
+      "hrv_function": "support",
+      "watch_data_day_number": 30
+    },
+    "package3": {
+      "stress_function": "support",
+      "agps_function": "support",
+      "blood_glucose": "unsupported",
+      "blood_component": "unknown",
+      "body_component": "support"
+    }
+  }
+}

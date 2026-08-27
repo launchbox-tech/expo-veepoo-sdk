@@ -61,7 +61,10 @@ export interface DeviceFunctionPackage3 {
   find_device_by_phone_function?: FunctionStatus;
   agps_function?: FunctionStatus;
   blood_glucose_tag?: number;
-  blood_glucose?: number;
+  // The vendor reports blood-glucose support as an EFunctionStatus on Android
+  // and a type code on iOS; `blood_glucose_tag` is the separate numeric field.
+  // Declared as a status so both platforms can emit it faithfully.
+  blood_glucose?: FunctionStatus;
   blood_glucose_adjusting?: FunctionStatus;
   blood_glucose_multiple_adjusting?: FunctionStatus;
   blood_glucose_risk_assessment?: FunctionStatus;

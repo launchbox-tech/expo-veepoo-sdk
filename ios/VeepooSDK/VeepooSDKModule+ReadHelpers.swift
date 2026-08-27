@@ -347,12 +347,15 @@ extension VeepooSDKModule {
       return
     }
     
+    // Keys are the snake_case names `DeviceFunctionPackage1/2/3` declare. JS reads
+    // a nested package strictly by declared key, so a camelCase spelling here is
+    // silently dropped rather than surfaced — that was #210.
     let package1: [String: Any] = [
       "type": "DeviceFunctionPackage1",
-      "bloodPressure": device.bloodPressureType > 0 ? "support" : "unsupported",
-      "heartRateDetect": device.deviceFuctionData[18] == 0 ? "support" : "unsupported",
-      "spoH": device.oxygenType > 0 ? "support" : "unsupported",
-      "temperatureFunction": device.temperatureType > 0 ? "support" : "unsupported"
+      "blood_pressure": device.bloodPressureType > 0 ? "support" : "unsupported",
+      "heart_rate_detect": device.deviceFuctionData[18] == 0 ? "support" : "unsupported",
+      "spo_h": device.oxygenType > 0 ? "support" : "unsupported",
+      "temperature_function": device.temperatureType > 0 ? "support" : "unsupported"
     ]
     
     // `saveDays` is the band's on-device retention window — how many days of
@@ -360,14 +363,14 @@ extension VeepooSDKModule {
     // (`dayNumber` "cannot be greater than saveDays"), and the app needs it to
     // bound both the backfill loop and the pre-sync buffer sweep. Emitted under
     // the snake_case key `DeviceFunctionPackage2` already declares, because the
-    // JS normalizer passes nested-package2 keys through verbatim.
+    // JS normalizer reads nested-package2 keys by their declared name.
     // 0 means the band did not report it — left absent rather than sent as a
     // zero, so JS can tell "unknown" from a real value.
     var package2: [String: Any] = [
       "type": "DeviceFunctionPackage2",
-      "ecgFunction": device.ecgType > 0 ? "support" : "unsupported",
-      "precisionSleep": device.sleepType > 0 ? "support" : "unsupported",
-      "hrvFunction": device.hrvType > 0 ? "support" : "unsupported"
+      "ecg_function": device.ecgType > 0 ? "support" : "unsupported",
+      "precision_sleep": device.sleepType > 0 ? "support" : "unsupported",
+      "hrv_function": device.hrvType > 0 ? "support" : "unsupported"
     ]
     if device.saveDays > 0 {
       package2["watch_data_day_number"] = Int(device.saveDays)
@@ -375,11 +378,12 @@ extension VeepooSDKModule {
     
     let package3: [String: Any] = [
       "type": "DeviceFunctionPackage3",
-      "stressFunction": device.stressType > 1 ? "support" : "unsupported",
-      "agpsFunction": device.agpsFunction > 0 ? "support" : "unsupported",
-      "bloodGlucose": device.bloodGlucoseType > 0 ? "support" : "unsupported",
-      "bloodComponent": device.bloodAnalysisType > 0 ? "support" : "unsupported",
-      "bodyComponent": device.bodyCompositionType > 0 ? "support" : "unsupported"
+      // `> 1`, not `> 0`: the vendor documents 0 AND 1 as "stress unsupported".
+      "stress_function": device.stressType > 1 ? "support" : "unsupported",
+      "agps_function": device.agpsFunction > 0 ? "support" : "unsupported",
+      "blood_glucose": device.bloodGlucoseType > 0 ? "support" : "unsupported",
+      "blood_component": device.bloodAnalysisType > 0 ? "support" : "unsupported",
+      "body_component": device.bodyCompositionType > 0 ? "support" : "unsupported"
     ]
     
     cachedDeviceFunctions = [

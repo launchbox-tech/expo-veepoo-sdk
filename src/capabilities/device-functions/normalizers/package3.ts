@@ -1,15 +1,11 @@
 import type { DeviceFunctions } from "@/types/index";
+import { PACKAGE3_FIELDS } from "../declared-keys";
+import { readDeclaredFields } from "./nested";
 import { isRecord, toInt, normalizeFunctionStatus } from "@/shared/primitives";
 
 export function normalizePackage3(record: Record<string, unknown>): DeviceFunctions["package3"] {
   if (isRecord(record.package3)) {
-    return Object.fromEntries(
-      Object.entries(record.package3).flatMap(([key, item]) =>
-        key === 'type'
-          ? []
-          : [[key, typeof item === 'number' ? item : normalizeFunctionStatus(item)]]
-      )
-    ) as unknown as DeviceFunctions["package3"];
+    return readDeclaredFields<DeviceFunctions["package3"]>(record.package3, PACKAGE3_FIELDS);
   }
 
   return {
@@ -25,7 +21,8 @@ export function normalizePackage3(record: Record<string, unknown>): DeviceFuncti
       record.findDeviceByPhone ?? record.findDeviceByPhoneFunction
     ),
     agps_function: normalizeFunctionStatus(record.agps),
-    blood_glucose: toInt(record.bloodGlucoseType ?? record.bloodGlucose),
+    blood_glucose_tag: toInt(record.bloodGlucoseTag),
+    blood_glucose: normalizeFunctionStatus(record.bloodGlucose),
     blood_glucose_adjusting: normalizeFunctionStatus(record.bloodGlucoseAdjusting),
     blood_component: normalizeFunctionStatus(record.bloodComponent),
     body_component: normalizeFunctionStatus(record.bodyComponent),

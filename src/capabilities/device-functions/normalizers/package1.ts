@@ -1,13 +1,11 @@
 import type { DeviceFunctions } from "@/types/index";
+import { PACKAGE1_FIELDS } from "../declared-keys";
+import { readDeclaredFields } from "./nested";
 import { isRecord, normalizeFunctionStatus } from "@/shared/primitives";
 
 export function normalizePackage1(record: Record<string, unknown>): DeviceFunctions["package1"] {
   if (isRecord(record.package1)) {
-    return Object.fromEntries(
-      Object.entries(record.package1).flatMap(([key, item]) =>
-        key === 'type' ? [] : [[key, normalizeFunctionStatus(item)]]
-      )
-    ) as unknown as DeviceFunctions["package1"];
+    return readDeclaredFields<DeviceFunctions["package1"]>(record.package1, PACKAGE1_FIELDS);
   }
 
   return {
