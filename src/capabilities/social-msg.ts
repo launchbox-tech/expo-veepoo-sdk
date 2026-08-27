@@ -30,7 +30,12 @@ export interface SocialMsgNativeMethods {
 
 // ── Normalizers ─────────────────────────────────────────────────────────────
 
-const supportedFunctionKeys = [
+/**
+ * The social-message channels this module bridges. The vendor reports 26; these
+ * 13 are the ones both native emitters produce, and a contract check holds the
+ * three lists in agreement.
+ */
+export const SOCIAL_MSG_CHANNELS = [
   "phone",
   "sms",
   "wechat",
@@ -50,7 +55,7 @@ export function normalizeSocialMsgData(value: unknown): SocialMsgData {
   const record =
     typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {};
   return Object.fromEntries(
-    supportedFunctionKeys.map((key) => [key, normalizeFunctionStatus(record[key])]),
+    SOCIAL_MSG_CHANNELS.map((key) => [key, normalizeFunctionStatus(record[key])]),
   ) as unknown as SocialMsgData;
 }
 

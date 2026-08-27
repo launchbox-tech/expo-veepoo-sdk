@@ -40,20 +40,24 @@ fun ModuleDefinitionBuilder.defineSocialMsgRead(module: VeepooSDKModule) {
             module.cachedSocialMsgData = data
             Log.d(TAG, "readSocialMsgData: received social message data")
             
+            // Every FunctionSocailMsgData field is the vendor's EFunctionStatus
+            // enum, so it must go through toFunctionStatus — the older
+            // toSupportedStatus could not read an enum and answered
+            // "unsupported" for all 13 channels whatever the band said (#212).
             val result = mapOf(
-              "phone" to toSupportedStatus(data.phone),
-              "sms" to toSupportedStatus(data.msg),
-              "wechat" to toSupportedStatus(data.wechat),
-              "qq" to toSupportedStatus(data.qq),
-              "facebook" to toSupportedStatus(data.facebook),
-              "twitter" to toSupportedStatus(data.twitter),
-              "instagram" to toSupportedStatus(data.instagram),
-              "linkedin" to toSupportedStatus(data.linkin),
-              "whatsapp" to toSupportedStatus(data.whats),
-              "line" to toSupportedStatus(data.line),
-              "skype" to toSupportedStatus(data.skype),
-              "email" to toSupportedStatus(data.gmail),
-              "other" to toSupportedStatus(data.other)
+              "phone" to toFunctionStatus(data.phone),
+              "sms" to toFunctionStatus(data.msg),
+              "wechat" to toFunctionStatus(data.wechat),
+              "qq" to toFunctionStatus(data.qq),
+              "facebook" to toFunctionStatus(data.facebook),
+              "twitter" to toFunctionStatus(data.twitter),
+              "instagram" to toFunctionStatus(data.instagram),
+              "linkedin" to toFunctionStatus(data.linkin),
+              "whatsapp" to toFunctionStatus(data.whats),
+              "line" to toFunctionStatus(data.line),
+              "skype" to toFunctionStatus(data.skype),
+              "email" to toFunctionStatus(data.gmail),
+              "other" to toFunctionStatus(data.other)
             )
             
             module.sendEvent(SOCIAL_MSG_DATA, mapOf(

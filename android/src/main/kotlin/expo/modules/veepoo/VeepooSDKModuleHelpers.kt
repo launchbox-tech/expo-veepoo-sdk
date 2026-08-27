@@ -94,24 +94,12 @@ fun normalizePasswordStatus(status: String): String {
   }
 }
 
-// 功能状态标准化
-fun toSupportedStatus(value: Any?): String {
-  return when (value) {
-    is Boolean -> if (value) "support" else "unsupported"
-    is Number -> if (value.toInt() > 0) "support" else "unsupported"
-    is String -> {
-      val normalized = value.lowercase()
-      if (normalized.contains("support") || normalized == "1" || normalized == "open") "support" else "unsupported"
-    }
-    else -> "unsupported"
-  }
-}
-
 /**
  * Converts the vendor's `EFunctionStatus` to the `FunctionStatus` vocabulary JS
- * declares. `toSupportedStatus` cannot: an enum matches none of its
- * Boolean/Number/String branches, so every call fell through to "unsupported"
- * and the band's real answer never left Kotlin.
+ * declares. This is the ONLY converter for a vendor status: the previous
+ * `toSupportedStatus` branched on Boolean/Number/String, so an enum matched
+ * nothing and fell through to "unsupported" — the band's real answer never left
+ * Kotlin (#210 for device functions, #212 for social messages).
  *
  * `UNKONW` (vendor spelling) maps to "unknown", NOT "unsupported" — a band that
  * did not report a capability must stay distinguishable from one that said no.

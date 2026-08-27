@@ -59,6 +59,9 @@ jobs:
       - name: Verify device-function key contract
         run: node build/bridge-contract/run-contract-checks.js device-function-keys
 
+      - name: Verify social-message key contract
+        run: node build/bridge-contract/run-contract-checks.js social-msg-keys
+
       - name: Verify vendor manifest
         run: bun run vendor:check
 

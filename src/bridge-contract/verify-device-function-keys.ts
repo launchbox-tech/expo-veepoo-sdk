@@ -5,22 +5,15 @@ import {
   isDeclaredPackage,
   type FieldKind,
 } from "@/capabilities/device-functions/declared-keys";
+import { NATIVE_SOURCES, sliceBody } from "./native-source";
 
-const SWIFT_PATH = "ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift";
-const KOTLIN_PATH = "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleHelpers.kt";
+const SWIFT_PATH = NATIVE_SOURCES.iosReadHelpers;
+const KOTLIN_PATH = NATIVE_SOURCES.androidHelpers;
 
 /** `type` is a package discriminator, not a field — the normalizers ignore it. */
 const NON_FIELD_KEYS = new Set(["type"]);
 
 export type PackageKeys = Map<string, Set<string>>;
-
-function sliceBody(source: string, startMarker: string, endMarker: string, label: string): string {
-  const start = source.indexOf(startMarker);
-  if (start === -1) throw new Error(`${label}: could not find "${startMarker}"`);
-  const end = source.indexOf(endMarker, start);
-  if (end === -1) throw new Error(`${label}: could not find end marker "${endMarker}"`);
-  return source.slice(start, end);
-}
 
 /**
  * Collects the literal keys each `packageN` map is built from. Both emitters

@@ -15,9 +15,11 @@ import {
   JS_LOCAL_ONLY_EVENTS,
   NATIVE_EMITTED_EVENTS,
 } from "../bridge/event-registry";
+import { SOCIAL_MSG_CHANNELS } from "../capabilities/social-msg";
 
 import { verifyDeviceFunctionKeysContract } from "./verify-device-function-keys";
 import { verifyNativeRejectionContract } from "./verify-native-rejection-contract";
+import { verifySocialMsgKeysContract } from "./verify-social-msg-keys";
 import { verifyUpstreamSdkCoverage } from "./verify-upstream-sdk-coverage";
 import { verifyVeepooEventsContract } from "./verify-veepoo-events";
 
@@ -47,6 +49,12 @@ const CHECKS: Check[] = [
       "Device-function key contract OK — every native key is declared, and both platforms spell it the same.",
   },
   {
+    name: "social-msg-keys",
+    run: verifySocialMsgKeysContract,
+    onSuccess: () =>
+      `Social-message key contract OK (${SOCIAL_MSG_CHANNELS.length} channels agree across iOS, Android and JS).`,
+  },
+  {
     name: "upstream-sdk",
     run: verifyUpstreamSdkCoverage,
     onSuccess: () =>
@@ -67,7 +75,14 @@ if (requested && toRun.length === 0) {
 
 let anyFailed = false;
 for (const check of toRun) {
-  const errors = check.run(repoRoot);
+  // A verifier that parses native source throws when its markers go stale.
+  // Reported as a named failure so the output says WHICH check broke.
+  let errors: string[];
+  try {
+    errors = check.run(repoRoot);
+  } catch (error) {
+    errors = [`check threw: ${error instanceof Error ? error.message : String(error)}`];
+  }
   if (errors.length > 0) {
     console.error(`✗ ${check.name} check FAILED:`);
     for (const e of errors) console.error("  " + e);
