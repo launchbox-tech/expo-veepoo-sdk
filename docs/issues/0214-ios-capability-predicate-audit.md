@@ -33,8 +33,11 @@ is the same shape.
 - `blood_glucose` stops reporting mode 3 as glucose.
 - The audit is written down, including the fields deliberately left alone and why.
 - The contract-check gap is documented rather than left as an open suggestion.
-- `isSupportHRVTest` / `isSupportBPTest` checked on a device (**outstanding** —
-  needs hardware; if populated, reading them beats every predicate in this file).
+- `isSupportHRVTest` / `isSupportBPTest` checked (**done** — no hardware needed).
+  The SDK never writes them: zero call sites to either setter across the 453-object
+  arm64 archive, and the only stores to both ivars are the synthesized setters
+  themselves. They stay `NO` on every band, so adopting them would have made
+  `hrv_function` a constant `unsupported`.
 
 ## Notes
 

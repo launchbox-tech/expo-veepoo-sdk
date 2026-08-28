@@ -55,10 +55,42 @@ neither is evidence about the other. Band reports `hrvType` 3 and `sleepType` 1;
 both predicates agree there.
 
 `VPPeripheralModel.h` also exposes derived booleans — `isSupportHRVTest`,
-`isSupportBPTest` — which would be the principled read, the same move that makes
-Android correct. **Not adopted:** they live inside a compiled framework and we
-have never observed them populated. Confirm on a device before trading a
-documented predicate for an unobserved one.
+`isSupportBPTest` — which look like the principled read, the same move that makes
+Android correct. **They must not be adopted: the SDK never writes them.**
+
+Measured against the bundled `VeepooBleSDK` arm64 static archive (453 objects):
+
+| selector | call sites | conclusion |
+| --- | --- | --- |
+| `setHrvType:` | 2 | populated during parsing |
+| `setEcgType:` | 2 | populated |
+| `setStressType:`, `setBloodGlucoseType:`, `setSaveDays:` | 1 each | populated |
+| `setIsSupportHRVTest:` | **0** | never called |
+| `setIsSupportBPTest:` | **0** | never called |
+| `setIsSupportMetTest:`, `setHrvSupportAllDay:` | **0** | never called |
+
+Three independent checks agree. No object file contains an
+`_objc_msgSend$setIsSupportHRVTest:` reference; the selector string appears in no
+object other than `VPPeripheralModel.o`, which merely defines the accessor; and
+disassembling that object shows the only stores to the two ivars are the
+synthesized setters themselves:
+
+    -[VPPeripheralModel setIsSupportHRVTest:]:  strb w2, [x0, #0xd]
+    -[VPPeripheralModel setIsSupportBPTest:]:   strb w2, [x0, #0xe]
+
+Nothing reaches them. The ivars are zero-initialised and stay `NO` for the life
+of the object, on every band.
+
+So reading `device.isSupportHRVTest` would have made `hrv_function` report
+`unsupported` **unconditionally** — trading a predicate that is correct per the
+iOS header for a constant `false`. That is not a refactor, it is a fresh
+instance of the *plumbing built, data never arrives* family this audit exists to
+close.
+
+Note this is stronger evidence than a device run could give: a device shows one
+band's value and cannot distinguish "this band lacks HRV" from "the property is
+never written". The archive answers it for all bands. Re-check when the vendor
+SDK is upgraded — this is a fact about the bundled version, not about the API.
 
 ### Left alone — sources confirm the current predicate
 
