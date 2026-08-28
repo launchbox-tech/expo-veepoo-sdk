@@ -1,6 +1,17 @@
 pre-commit:
   commands:
     build-sdk:
+      # Triggered by source changes: that is when the dist needs regenerating.
       glob: "src/**/*.{ts,tsx}"
-      run: npm run build
-      stage_fixed: true
+      # `stage_fixed` cannot do this job, which is why the dist drifted three
+      # commits behind source before the rebuild in this branch. It only
+      # re-stages files that were ALREADY in the staged set, so generated output
+      # — never staged by hand — is invisible to it no matter what the glob
+      # says. Widening the glob to include `build/**` was tried and measured:
+      # the rebuild ran and its output still stayed unstaged.
+      #
+      # `git add build` stages it explicitly, which is measured to work. The
+      # package installs from GitHub rather than npm, so the tracked dist is
+      # what consumers get, and it belongs in the same commit as the source that
+      # generated it.
+      run: npm run build && git add build
