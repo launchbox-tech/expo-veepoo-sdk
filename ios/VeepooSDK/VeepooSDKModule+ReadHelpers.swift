@@ -368,6 +368,27 @@ extension VeepooSDKModule {
     #endif
   }
 
+  /// `bloodGlucoseType` is a mode, not a flag, and one of its modes means the
+  /// band calibrates glucose without measuring it. Both vendor SDKs say so
+  /// independently — the iOS header lists 3 as 仅有校准, "calibration ONLY",
+  /// against 1/2/4/5/6/7 which all carry glucose, and the Android parser drops
+  /// the same value out of the supported set while keeping its calibration
+  /// flag:
+  ///
+  ///     } else if (i22 == 3) {
+  ///         setBloodGlucose(UNSUPPORT);
+  ///         setBloodGlucoseAdjusting(SUPPORT);
+  ///     // C8887y.java, package-3 branch (bArr[19] == 3), i22 = arr[15]
+  ///
+  /// So `> 0` reports glucose on a band that only calibrates it. The numeric
+  /// mode itself belongs in `blood_glucose_tag`, which is what the declared
+  /// type has it for. #210 established the same shape for byte 18.
+  ///
+  /// Latent, not live: the band traced on 2026-08-28 reports mode 4.
+  func bloodGlucoseSupported(_ type: NSUInteger) -> Bool {
+    return type != 0 && type != 3
+  }
+
   func cacheDeviceFunctions() {
     #if !targetEnvironment(simulator)
     guard let manager = self.bleManager,
@@ -414,7 +435,7 @@ extension VeepooSDKModule {
       // `> 1`, not `> 0`: the vendor documents 0 AND 1 as "stress unsupported".
       "stress_function": device.stressType > 1 ? "support" : "unsupported",
       "agps_function": device.agpsFunction > 0 ? "support" : "unsupported",
-      "blood_glucose": device.bloodGlucoseType > 0 ? "support" : "unsupported",
+      "blood_glucose": bloodGlucoseSupported(device.bloodGlucoseType) ? "support" : "unsupported",
       "blood_component": device.bloodAnalysisType > 0 ? "support" : "unsupported",
       "body_component": device.bodyCompositionType > 0 ? "support" : "unsupported"
     ]
