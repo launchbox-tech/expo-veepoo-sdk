@@ -50,6 +50,20 @@ describe('normalizePackage1', () => {
     expect((result as any)?.type).toBeUndefined();
   });
 
+  // iOS omits `heart_rate_detect` when the band has not sent the package-1
+  // frame, so that "did not report" stays distinct from "said no". Defaulting
+  // an absent field to 'unsupported' would make a silent band indistinguishable
+  // from one that answered no — the #210 family's whole shape.
+  it('leaves heart_rate_detect absent when native omits it', () => {
+    const { heart_rate_detect: _omitted, ...withoutHeartRate } =
+      goldenPayloads.ios.package1;
+    const result = normalizePackage1({ package1: withoutHeartRate });
+    expect(result).not.toHaveProperty('heart_rate_detect');
+    expect(result?.heart_rate_detect).toBeUndefined();
+    // The siblings still arrive — absence is scoped to the omitted field.
+    expect(result?.blood_pressure).toBe('support');
+  });
+
   // Native emitting a key no interface declares is the #210 defect. Dropping it
   // keeps the returned object honest about its own type instead of carrying a
   // field nothing can read.
