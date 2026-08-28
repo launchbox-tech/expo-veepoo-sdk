@@ -1,8 +1,8 @@
 # Device-function normalizers: 12 of 12 native keys miss their declared type — every package field is undefined at runtime
 
 **Issue:** #210
-**Status:** Open
-**Labels:** bug
+**Status:** Open — code fix landed in `48e643f`; open solely on the hardware criterion
+**Labels:** bug, ready-for-agent
 
 ## What to build
 
@@ -34,6 +34,29 @@ test.
 - A test fails if native and the declared type ever disagree on a key again.
 - Verified against a real band (**outstanding** — cannot be proven in a unit
   test alone).
+
+## Status
+
+The code fix landed in `48e643f`. Both platforms emit the declared snake_case
+keys, Android's `toFunctionStatus` reads the vendor `EFunctionStatus` enum
+(`UNKONW` maps to `"unknown"`, not `"unsupported"`), `declared-keys.ts` ties the
+field tables to the interfaces via `satisfies`, and
+`npm run check:device-function-keys` fails the build if native emits an
+undeclared key or the two platforms spell one differently.
+
+The first three acceptance criteria are met. The fourth is not: no band was
+involved, and the golden fixture is source-derived rather than device-captured,
+so it proves the keys agree and not that the vendor's bytes are read correctly.
+Two things a band would settle:
+
+1. iOS `heart_rate_detect` reads `deviceFuctionData[18] == 0` for "support",
+   while every sibling check is `> 0`. The vendor doc is ambiguous, so the
+   existing logic was preserved rather than flipped on a guess.
+2. Whether the twelve newly-arriving fields carry plausible values, versus
+   arriving structurally correct but semantically wrong.
+
+Do not close on green tests alone — a prior fix here auto-closed while fixing
+nothing.
 
 ## Notes
 
