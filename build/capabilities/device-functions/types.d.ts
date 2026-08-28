@@ -58,7 +58,7 @@ export interface DeviceFunctionPackage3 {
     find_device_by_phone_function?: FunctionStatus;
     agps_function?: FunctionStatus;
     blood_glucose_tag?: number;
-    blood_glucose?: number;
+    blood_glucose?: FunctionStatus;
     blood_glucose_adjusting?: FunctionStatus;
     blood_glucose_multiple_adjusting?: FunctionStatus;
     blood_glucose_risk_assessment?: FunctionStatus;

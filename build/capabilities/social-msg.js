@@ -1,11 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocialMsgCapability = void 0;
+exports.SocialMsgCapability = exports.SOCIAL_MSG_CHANNELS = void 0;
 exports.normalizeSocialMsgData = normalizeSocialMsgData;
 const deep_keys_1 = require("../shared/deep-keys");
 const primitives_1 = require("../shared/primitives");
 // ── Normalizers ─────────────────────────────────────────────────────────────
-const supportedFunctionKeys = [
+/**
+ * The social-message channels this module bridges. The vendor reports 26; these
+ * 13 are the ones both native emitters produce, and a contract check holds the
+ * three lists in agreement.
+ */
+exports.SOCIAL_MSG_CHANNELS = [
     "phone",
     "sms",
     "wechat",
@@ -22,7 +27,7 @@ const supportedFunctionKeys = [
 ];
 function normalizeSocialMsgData(value) {
     const record = typeof value === "object" && value !== null ? value : {};
-    return Object.fromEntries(supportedFunctionKeys.map((key) => [key, (0, primitives_1.normalizeFunctionStatus)(record[key])]));
+    return Object.fromEntries(exports.SOCIAL_MSG_CHANNELS.map((key) => [key, (0, primitives_1.normalizeFunctionStatus)(record[key])]));
 }
 // ── Validators ──────────────────────────────────────────────────────────────
 const VALID_FUNCTION_STATUSES = new Set([

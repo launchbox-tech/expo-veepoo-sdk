@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizePackage2 = normalizePackage2;
+const declared_keys_1 = require("../declared-keys");
+const nested_1 = require("./nested");
 const primitives_1 = require("../../../shared/primitives");
 function normalizePackage2(record) {
     if ((0, primitives_1.isRecord)(record.package2)) {
-        return Object.fromEntries(Object.entries(record.package2).flatMap(([key, item]) => key === 'type'
-            ? []
-            : [[key, typeof item === 'number' ? item : (0, primitives_1.normalizeFunctionStatus)(item)]]));
+        return (0, nested_1.readDeclaredFields)(record.package2, declared_keys_1.PACKAGE2_FIELDS);
     }
     return {
         count_down: (0, primitives_1.normalizeFunctionStatus)(record.CountDown ?? record.countDown),

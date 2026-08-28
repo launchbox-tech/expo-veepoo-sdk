@@ -326,9 +326,98 @@ function normalizeContactList(value) {
 	});
 }
 //#endregion
+//#region src/capabilities/device-functions/declared-keys.ts
+const PACKAGE1_FIELDS = {
+	blood_pressure: "status",
+	drinking: "status",
+	sedentary_remind: "status",
+	heart_rate_warning: "status",
+	we_chat_sport: "status",
+	camera: "status",
+	fatigue: "status",
+	spo_h: "status",
+	spo2_h_adjustment: "status",
+	spo_h_breath_break: "status",
+	woman: "status",
+	alarm: "status",
+	new_calc_sport: "status",
+	ambulatory_bp_adjustment: "status",
+	screen_light: "status",
+	heart_rate_detect: "status",
+	night_turn_setting: "status",
+	text_alarm: "status",
+	temperature_function: "status"
+};
+const PACKAGE2_FIELDS = {
+	count_down: "status",
+	sport_model_function: "status",
+	hid_function: "status",
+	screen_style_function: "status",
+	breath_function: "status",
+	hrv_function: "status",
+	weather_function: "status",
+	screen_light_time: "status",
+	precision_sleep: "status",
+	ecg_function: "status",
+	mult_sport_mode: "status",
+	low_power: "status",
+	sleep_tag: "number",
+	watch_data_day_number: "number",
+	contact_msg_length: "number",
+	all_msg_length: "number",
+	sport_model_day: "number",
+	screenstyle: "number",
+	weather_style: "number",
+	origin_protocol_version: "number",
+	ecg_type: "number"
+};
+const PACKAGE3_FIELDS = {
+	big_data_tran_type: "number",
+	watch_ui_server_count: "number",
+	watch_ui_custom_count: "number",
+	temperature_function: "status",
+	temperature_type: "number",
+	cpu_type: "number",
+	stress_function: "status",
+	stress_type: "number",
+	contact_function: "status",
+	contact_type: "number",
+	music_style: "number",
+	find_device_by_phone_function: "status",
+	agps_function: "status",
+	blood_glucose_tag: "number",
+	blood_glucose: "status",
+	blood_glucose_adjusting: "status",
+	blood_glucose_multiple_adjusting: "status",
+	blood_glucose_risk_assessment: "status",
+	blood_component: "status",
+	body_component: "status"
+};
+//#endregion
+//#region src/capabilities/device-functions/normalizers/nested.ts
+/**
+* Reads a nested native package (`{ package2: { … } }`) through the declared
+* field table.
+*
+* Only declared keys are kept: a native key that no interface declares used to
+* be spread through verbatim behind a cast, which is how twelve camelCase keys
+* reached JS under names nothing could read (#210). An absent field stays
+* absent — never defaulted to `0` or `'unknown'` — so callers can still tell
+* "the band did not report it" from a real value.
+*/
+function readDeclaredFields(nested, fields) {
+	const result = {};
+	for (const [key, value] of Object.entries(nested)) {
+		const kind = fields[key];
+		if (kind === void 0 || value === void 0 || value === null) continue;
+		result[key] = kind === "number" ? toInt(value) : normalizeFunctionStatus(value);
+	}
+	return result;
+}
+//#endregion
 //#region src/capabilities/device-functions/normalizers/package1.ts
 function normalizePackage1(record) {
-	if (isRecord(record.package1)) return Object.fromEntries(Object.entries(record.package1).flatMap(([key, item]) => key === "type" ? [] : [[key, normalizeFunctionStatus(item)]]));
+	if (isRecord(record.package1)) return readDeclaredFields(record.package1, PACKAGE1_FIELDS);
 	return {
 		blood_pressure: normalizeFunctionStatus(record.Bp ?? record.bp),
 		drinking: normalizeFunctionStatus(record.Drink ?? record.drink),
@@ -354,7 +443,7 @@ function normalizePackage1(record) {
 //#endregion
 //#region src/capabilities/device-functions/normalizers/package2.ts
 function normalizePackage2(record) {
-	if (isRecord(record.package2)) return Object.fromEntries(Object.entries(record.package2).flatMap(([key, item]) => key === "type" ? [] : [[key, typeof item === "number" ? item : normalizeFunctionStatus(item)]]));
+	if (isRecord(record.package2)) return readDeclaredFields(record.package2, PACKAGE2_FIELDS);
 	return {
 		count_down: normalizeFunctionStatus(record.CountDown ?? record.countDown),
 		sport_model_function: normalizeFunctionStatus(record.SportModel ?? record.sportModel),
@@ -382,7 +471,7 @@ function normalizePackage2(record) {
 //#endregion
 //#region src/capabilities/device-functions/normalizers/package3.ts
 function normalizePackage3(record) {
-	if (isRecord(record.package3)) return Object.fromEntries(Object.entries(record.package3).flatMap(([key, item]) => key === "type" ? [] : [[key, typeof item === "number" ? item : normalizeFunctionStatus(item)]]));
+	if (isRecord(record.package3)) return readDeclaredFields(record.package3, PACKAGE3_FIELDS);
 	return {
 		big_data_tran_type: toInt(record.bitDataTranType ?? record.bigDataTranType),
 		watch_ui_server_count: toInt(record.watchUiServerCount),
@@ -394,7 +483,8 @@ function normalizePackage3(record) {
 		music_style: toInt(record.musicStyle),
 		find_device_by_phone_function: normalizeFunctionStatus(record.findDeviceByPhone ?? record.findDeviceByPhoneFunction),
 		agps_function: normalizeFunctionStatus(record.agps),
-		blood_glucose: toInt(record.bloodGlucoseType ?? record.bloodGlucose),
+		blood_glucose_tag: toInt(record.bloodGlucoseTag),
+		blood_glucose: normalizeFunctionStatus(record.bloodGlucose),
 		blood_glucose_adjusting: normalizeFunctionStatus(record.bloodGlucoseAdjusting),
 		blood_component: normalizeFunctionStatus(record.bloodComponent),
 		body_component: normalizeFunctionStatus(record.bodyComponent)
@@ -414,17 +504,14 @@ function normalizePackage5(record) {
 //#region src/capabilities/device-functions/normalizers/index.ts
 function normalizeDeviceFunctions(value) {
 	const record = isRecord(value) ? value : {};
-	if (isRecord(record.package1) || isRecord(record.package2) || isRecord(record.package3) || isRecord(record.package4) || isRecord(record.package5)) return {
-		package1: normalizePackage1(record),
-		package2: normalizePackage2(record),
-		package3: normalizePackage3(record),
-		package4: normalizePackage4(record),
-		package5: normalizePackage5(record)
-	};
+	const package4 = normalizePackage4(record);
+	const package5 = normalizePackage5(record);
 	return {
 		package1: normalizePackage1(record),
 		package2: normalizePackage2(record),
-		package3: normalizePackage3(record)
+		package3: normalizePackage3(record),
+		...package4 ? { package4 } : {},
+		...package5 ? { package5 } : {}
 	};
 }
 //#endregion
@@ -1572,7 +1659,12 @@ function normalizeSleepDataList(value) {
 }
 //#endregion
 //#region src/capabilities/social-msg.ts
-const supportedFunctionKeys = [
+/**
+* The social-message channels this module bridges. The vendor reports 26; these
+* 13 are the ones both native emitters produce, and a contract check holds the
+* three lists in agreement.
+*/
+const SOCIAL_MSG_CHANNELS = [
 	"phone",
 	"sms",
 	"wechat",
@@ -1589,7 +1681,7 @@ const supportedFunctionKeys = [
 ];
 function normalizeSocialMsgData(value) {
 	const record = typeof value === "object" && value !== null ? value : {};
-	return Object.fromEntries(supportedFunctionKeys.map((key) => [key, normalizeFunctionStatus(record[key])]));
+	return Object.fromEntries(SOCIAL_MSG_CHANNELS.map((key) => [key, normalizeFunctionStatus(record[key])]));
 }
 const VALID_FUNCTION_STATUSES = new Set([
 	"unsupported",
