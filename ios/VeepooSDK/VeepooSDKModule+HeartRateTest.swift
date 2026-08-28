@@ -11,10 +11,11 @@ extension VeepooSDKModule {
     guard let peripheralManage = self.peripheralManage else { return }
     
     // 检查设备是否支持心率功能
-    if let manager = self.bleManager {
-      let heartRateType = manager.peripheralModel?.deviceFuctionData[18] ?? 0
-      print("[HeartRate] Starting test - Device heartRate support: \(heartRateType == 0 ? "support" : "unsupported")")
-    }
+    // Byte 18 is the vendor's inverted heart-rate flag; `heartRateDetectSupported()`
+    // holds the one spelling of that rule. #210.
+    let heartRateSupport = heartRateDetectSupported()
+      .map { $0 ? "support" : "unsupported" } ?? "unreported"
+    print("[HeartRate] Starting test - Device heartRate support: \(heartRateSupport)")
     
     let progressWrapper = ProgressWrapper()
     let heartRateValueWrapper = ValueWrapper<Int>(value: 0)  // 保存最后的心率值

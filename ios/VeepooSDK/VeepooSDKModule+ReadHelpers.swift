@@ -3,6 +3,34 @@ import VeepooBleSDK
 
 /// 读取数据辅助方法
 extension VeepooSDKModule {
+  /// Byte 18 of the package-1 function frame carries the band's heart-rate
+  /// capability, and it is one of the vendor's documented inversions. The iOS
+  /// header spells it out — 「心率功能（因后加1带表没有、0代表有）」: 1 means ABSENT,
+  /// 0 means present — after stating the general rule as the opposite
+  /// (「每个位置0代表没有此功能，1代表有此功能（特殊除外）」, "except special cases").
+  ///
+  /// The vendor's own Android parser agrees and is wider than a 0/1 test:
+  ///
+  ///     if (b26 == 1) setHeartDetect(UNSUPPORT); else setHeartDetect(SUPPORT);
+  ///     // C8887y.java, package-1 branch (bArr[19] == 1), b26 = bArr[18]
+  ///
+  /// So EVERY value except 1 means supported. Reading `== 0` for "support" is
+  /// right for 0 and 1 and wrong for everything else — notably 7 and 8, which
+  /// the same parser treats as heart rate WITH manual detection
+  /// (`if (b26 == 8 || b26 == 7) supportManualDetectTypes.add(HEART_RATE)`).
+  /// Android reads the vendor's already-parsed `heartDetect` and was always
+  /// correct; only iOS re-derived the byte, and derived it wrong. #210.
+  ///
+  /// Returns nil when the band has not reported the frame, so an absent
+  /// capability stays absent rather than defaulting to either answer.
+  func heartRateDetectSupported() -> Bool? {
+    guard let data = self.bleManager?.peripheralModel?.deviceFuctionData,
+          data.count > 18 else {
+      return nil
+    }
+    return data[18] != 1
+  }
+
   func mergeBloodGlucoseData(into item: inout [String: Any], from bgData: [String: Any]) {
     if let bgValue = bgData["bloodGlucoses"] as? [String],
        let firstStr = bgValue.first,
@@ -350,13 +378,18 @@ extension VeepooSDKModule {
     // Keys are the snake_case names `DeviceFunctionPackage1/2/3` declare. JS reads
     // a nested package strictly by declared key, so a camelCase spelling here is
     // silently dropped rather than surfaced — that was #210.
-    let package1: [String: Any] = [
+    var package1: [String: Any] = [
       "type": "DeviceFunctionPackage1",
       "blood_pressure": device.bloodPressureType > 0 ? "support" : "unsupported",
-      "heart_rate_detect": device.deviceFuctionData[18] == 0 ? "support" : "unsupported",
       "spo_h": device.oxygenType > 0 ? "support" : "unsupported",
       "temperature_function": device.temperatureType > 0 ? "support" : "unsupported"
     ]
+    // Left absent when the band has not reported the frame, so JS can tell
+    // "did not report" from "said no" — the same distinction `toFunctionStatus`
+    // preserves on Android by mapping UNKONW to "unknown".
+    if let heartRateDetect = heartRateDetectSupported() {
+      package1["heart_rate_detect"] = heartRateDetect ? "support" : "unsupported"
+    }
     
     // `saveDays` is the band's on-device retention window — how many days of
     // history it will re-serve. The vendor binds its read APIs to it
