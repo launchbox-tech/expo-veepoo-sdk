@@ -212,14 +212,8 @@ jobs:
         # config plugin resolves to. `expo prebuild` fails without it.
         run: bun run build
 
-      - name: Compile iOS Swift sources (device SDK)
-        # `iphoneos` only, not the script's default of both SDKs. The simulator
-        # pass is ~2 of the job's ~7 minutes, and at the 10x private-repo macOS
-        # multiplier that is the cheapest thing to cut: the simulator slice is
-        # what every `expo run:ios` compiles all day, so a break on that side of
-        # `#if targetEnvironment(simulator)` surfaces in minutes anyway. The
-        # device slice is the one nobody exercises by accident — and the one
-        # that let NSUInteger reach a consumer's release build.
-        #
-        # scripts/ci-local.sh still runs both; see its header.
-        run: bash scripts/ios-swift-gate.sh iphoneos
+      - name: Compile iOS Swift sources
+        # No SDK argument: the script defaults to iphoneos, which is what this
+        # job wants, and scripts/ci-local.sh invokes it the same way. See the
+        # script's header for why the simulator pass is not in that default.
+        run: bash scripts/ios-swift-gate.sh

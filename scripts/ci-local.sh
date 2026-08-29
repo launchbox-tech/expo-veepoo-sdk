@@ -24,15 +24,9 @@
 #     order" means the same order for the steps the Linux job actually has.
 #     Locally it needs macOS + Xcode + CocoaPods; missing any of those is a
 #     loud SKIP in the summary, exactly like the Kotlin step.
-#
-#     It is also the only step where this script does MORE than ci.yml, not
-#     less. CI compiles the device SDK alone (`ios-swift-gate.sh iphoneos`) to
-#     hold down 10x-billed macOS minutes; here we compile both, because locally
-#     the extra ~2 minutes are free. So a green CI does not prove the
-#     `#if targetEnvironment(simulator)` side still compiles — this script does.
-#     In practice that side is covered anyway by every `expo run:ios`, which is
-#     why CI can afford to drop it; the device slice is the one nobody builds by
-#     accident, and the one that let NSUInteger reach a consumer.
+#     Both invoke scripts/ios-swift-gate.sh with no SDK argument, so both
+#     compile the same thing: the device slice only. See that script's header
+#     for why the simulator pass is not in the default.
 #
 # Usage: bash scripts/ci-local.sh
 set -euo pipefail
@@ -134,8 +128,8 @@ fi
 # Kotlin, or file parsing; a Swift type error reaches consumers otherwise — which
 # is how `NSUInteger` (an ObjC typedef with no Swift spelling) sat on main until
 # a downstream app's xcodebuild stopped on it. See scripts/ios-swift-gate.sh for
-# why this compiles the VeepooSDK pod target against both SDKs.
-step "Compile iOS Swift sources (device + simulator SDK)"
+# why this compiles the VeepooSDK pod target against the device SDK.
+step "Compile iOS Swift sources"
 set +e
 bash scripts/ios-swift-gate.sh
 gate_status=$?

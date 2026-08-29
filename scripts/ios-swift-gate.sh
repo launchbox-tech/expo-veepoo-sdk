@@ -18,26 +18,32 @@
 #     same sources, without the app's JS bundle, Hermes, or the final link step —
 #     where the vendor's bitcode-carrying device binary buys us nothing (see the
 #     0xb17c0de note in scripts/build-xcframeworks.sh).
-#   * `iphoneos` FIRST, and in CI, only. Swift parses but does not type-check an
-#     inactive `#if` branch, and 52 of the 54 files here sit behind
+#   * The `iphoneos` SDK, and only that one. Swift parses but does not type-check
+#     an inactive `#if` branch, and 52 of the 54 files here sit behind
 #     `#if !targetEnvironment(simulator)` — so the device SDK is the one that
 #     activates that code and checks our calls against the real vendor headers.
 #     It is also the slice nobody exercises by accident: the simulator side is
 #     what every `expo run:ios` compiles all day, so a break there surfaces in
-#     minutes, whereas a device-only type error can reach a release build (which
-#     is exactly what happened). Running both by default costs nothing locally;
-#     CI passes `iphoneos` explicitly, because macOS minutes bill at 10x.
+#     minutes, whereas a device-only type error can reach a release build — which
+#     is exactly what happened. Adding the simulator pass roughly doubles the
+#     wall time (3m38s -> 6m41s on a CI runner) to cover the side that is already
+#     self-catching, so it is not in the default. It stays available as an
+#     explicit argument for anyone touching the `#if targetEnvironment(simulator)`
+#     branches:
+#
+#         bash scripts/ios-swift-gate.sh iphoneos iphonesimulator
 #
 # Exit codes: 0 pass, 1 fail, 3 prerequisites missing (caller may treat as skip).
 #
 # Usage: bash scripts/ios-swift-gate.sh [iphoneos|iphonesimulator ...]
+#        defaults to iphoneos; both are run when both are named.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
 SDKS=("$@")
-[ ${#SDKS[@]} -eq 0 ] && SDKS=(iphoneos iphonesimulator)
+[ ${#SDKS[@]} -eq 0 ] && SDKS=(iphoneos)
 
 missing() { echo "ios-swift-gate: $*" >&2; exit 3; }
 
