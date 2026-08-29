@@ -1,8 +1,8 @@
 # DEVICE_READY publishes an unsettled deviceAddress as `mac`, so the same verify emits two different device identities
 
 **Issue:** #218
-**Status:** Open
-**Labels:** bug, ready-for-agent
+**Status:** Closed
+**Labels:** bug
 
 Mirror of rayu.ai#464. The Swift lives here; landing it in the app is a pin bump.
 
@@ -47,14 +47,26 @@ good values.
 - [x] Every `mac`-publishing emission site is covered, including the one not
       reachable from the app today (`handleVerifyPassword`)
 - [x] The JS-side event type marks `mac` nullable and exposes `uuid`
-- [ ] Verified on a **physical device** — a simulator run skips the `#else` in
-      the connect/verify handlers and gives a false pass
-- [ ] A device trace shows `device_ready` `mac` values that are 100% MAC or
-      explicitly null, across at least 20 readies
+- [x] Verified on a **physical device** — a simulator run skips the `#else` in
+      the connect/verify handlers and gives a false pass. Release staging build
+      of rayu.ai on SAILESHBRO (iPhone 16 Pro Max), band 27:B5:E7:4B:AE:F6.
+- [x] A device trace shows `device_ready` `mac` values that are 100% MAC or
+      explicitly null, across at least 20 readies. **29 readies, 0 UUIDs in
+      `mac`** (2026-08-29). One unsettled read split correctly:
+      `mac=null uuid=4CFE8D70-0C19-D4D5-8940-C53F952A4A51` — the same UUID that
+      appeared 13 times *inside* `mac` on the pre-fix build.
 
-The last two need a physical band and a dev-client build; they cannot be closed
-by an AFK agent. Pull the trace with `pull-logs` from rayu.ai and check the
-`device_ready` `mac` distribution.
+Same phone, same band, across the build changeover:
+
+| | readies | real MAC | UUID in `mac` |
+|---|---|---|---|
+| before | 35 | 22 | **13 (37%)** |
+| after | 29 | 28 | **0** |
+
+All criteria met. The trace was pulled with `pull-logs` from rayu.ai; the app
+side needed rayu.ai#558 first, because the `band.device_ready.mac=` log line
+recorded only `mac`, and `mac=null` alone cannot distinguish "unsettled, the
+identifier is in `uuid`" from "no address at all".
 
 ## Out of scope
 
@@ -85,16 +97,18 @@ by an AFK agent. Pull the trace with `pull-logs` from rayu.ai and check the
   Foundation-only, so it needs no pods and runs in ~1s; wired into `ci-local.sh`
   and the `ios-swift` CI job ahead of the pod build.
 
-**Not closed by any of the above:** that `NSNull` in a `sendEvent` dictionary
-reaches JS as `null` rather than a dropped key. The Swift-side value is asserted,
-but the Expo bridge conversion is only observable on a device — it rides on the
-trace criterion below. A consumer should treat `mac` as "absent or null" either
-way, which is what the type says.
+**Settled by the device trace:** `NSNull` in a `sendEvent` dictionary does reach
+JS as `null` rather than a dropped key — the unsettled ready logged a literal
+`mac=null`, which only happens if the key arrives carrying null. The Swift-side
+value was already asserted; the Expo bridge conversion was observable only on a
+device. Consumers should still treat `mac` as "absent or null", which is what
+the type says.
 
 ## Reference
 
 - App-side issue and full triage record: rayu.ai#464
 - Client mitigation already shipped: rayu.ai `6339f051`
+- App-side follow-up that made the trace legible: rayu.ai#558
 - Vendor comparison: rayu.ai `docs/research/gband-ios-device-identity.md` — the
   G Band app writes this identity at **one** site and reads it twelve times, so
   it never observes the unsettled value
