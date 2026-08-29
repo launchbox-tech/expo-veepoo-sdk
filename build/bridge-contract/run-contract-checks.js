@@ -12,6 +12,7 @@ const native_rejection_mapping_1 = require("../errors/native-rejection-mapping")
 const event_registry_1 = require("../bridge/event-registry");
 const social_msg_1 = require("../capabilities/social-msg");
 const verify_device_function_keys_1 = require("./verify-device-function-keys");
+const verify_device_ready_identity_1 = require("./verify-device-ready-identity");
 const verify_native_rejection_contract_1 = require("./verify-native-rejection-contract");
 const verify_social_msg_keys_1 = require("./verify-social-msg-keys");
 const verify_upstream_sdk_coverage_1 = require("./verify-upstream-sdk-coverage");
@@ -31,6 +32,11 @@ const CHECKS = [
         name: "device-function-keys",
         run: verify_device_function_keys_1.verifyDeviceFunctionKeysContract,
         onSuccess: () => "Device-function key contract OK — every native key is declared, and both platforms spell it the same.",
+    },
+    {
+        name: "device-ready-identity",
+        run: verify_device_ready_identity_1.verifyDeviceReadyIdentityContract,
+        onSuccess: () => `device_ready identity contract OK (${verify_device_ready_identity_1.EXPECTED_IDENTITY_EMISSION_COUNT} iOS emissions split deviceAddress into mac/uuid).`,
     },
     {
         name: "social-msg-keys",

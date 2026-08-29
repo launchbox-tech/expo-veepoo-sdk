@@ -55,6 +55,36 @@ describe("connection events", () => {
     expect(result).toMatchObject({ device_id: "AA:BB", is_oad_model: true });
   });
 
+  // #218: an unsettled deviceAddress arrives as an explicit null `mac` with the
+  // CBPeripheral identifier under `uuid`. The null must survive the normalizer
+  // — a consumer that sees the key absent cannot distinguish "no MAC" from
+  // "this build doesn't send one".
+  it("device_ready: an unsettled address keeps mac null and carries uuid", () => {
+    const result = norm("device_ready", {
+      deviceId: "6E0E7A2C-1111-4E2F-9C0B-8A4D3F5B7C21",
+      mac: null,
+      uuid: "6E0E7A2C-1111-4E2F-9C0B-8A4D3F5B7C21",
+      isOadModel: false,
+      rawStatus: 6,
+    });
+    expect(result).toMatchObject({
+      mac: null,
+      uuid: "6E0E7A2C-1111-4E2F-9C0B-8A4D3F5B7C21",
+      raw_status: 6,
+    });
+    expect("mac" in (result as object)).toBe(true);
+  });
+
+  it("device_ready: a settled address passes the hardware MAC through untouched", () => {
+    const result = norm("device_ready", {
+      deviceId: "DB:BC:B7:33:AB:CD",
+      mac: "DB:BC:B7:33:AB:CD",
+      uuid: null,
+      rawStatus: 6,
+    });
+    expect(result).toMatchObject({ mac: "DB:BC:B7:33:AB:CD", uuid: null });
+  });
+
   it("connection_status_changed: snake_cases correctly", () => {
     const result = norm("connection_status_changed", { deviceId: "AA:BB", status: "connected" });
     expect(result).toMatchObject({ device_id: "AA:BB", status: "connected" });

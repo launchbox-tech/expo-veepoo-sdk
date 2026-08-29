@@ -598,6 +598,12 @@ extension VeepooSDKModule {
         // keys device identity on this instead of the scan id (which flips to the
         // iOS CBPeripheral UUID on re-pair). This is the auto-verify-on-connect
         // path the app actually hits.
+        // The vendor re-sends the password on every service discovery, so this
+        // block runs more than once per verify and reads `deviceAddress` at both
+        // ends of the settle. `VeepooDeviceIdentity` sorts whatever it finds into
+        // `mac` or `uuid` so neither emission can mislabel a UUID as a MAC (#218).
+        let identity = VeepooDeviceIdentity.from(
+          deviceAddress: manager.peripheralModel?.deviceAddress)
         // `rawStatus` is the vendor's `PasswordSynchronTpye`, and 1 and 6 are not
         // the same thing: 1 is "password verified", 6 is "password verified AND
         // time synchronized" — the header calls 6 the value normally returned.
@@ -606,7 +612,8 @@ extension VeepooSDKModule {
         // it can (rayu.ai's deaf-link investigation, Addendum 5).
         self.sendEvent(DEVICE_READY, [
           "deviceId": deviceId,
-          "mac": manager.peripheralModel?.deviceAddress ?? "",
+          "mac": identity.macPayload,
+          "uuid": identity.uuidPayload,
           "isOadModel": false,
           "rawStatus": result.rawValue,
         ])

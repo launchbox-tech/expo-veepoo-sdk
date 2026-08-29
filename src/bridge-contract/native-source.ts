@@ -4,6 +4,9 @@ export const NATIVE_SOURCES = {
   androidHelpers: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleHelpers.kt",
   androidSocialMsgRead:
     "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleSocialMsgRead.kt",
+  iosConnect: "ios/VeepooSDK/VeepooSDKModule+Connect.swift",
+  iosConnectionHelpers: "ios/VeepooSDK/VeepooSDKModule+ConnectionHelpers.swift",
+  iosDeviceIdentity: "ios/VeepooSDK/VeepooDeviceIdentity.swift",
 } as const;
 
 /**

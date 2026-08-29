@@ -232,12 +232,23 @@ extension VeepooSDKModule {
         // as their `tableID`, so it's proven correct. Pairing keys device
         // identity on THIS instead of the scan-time value, which flips to the iOS
         // CBPeripheral UUID on re-pair.
+        // "Settles" is the operative word: the vendor re-sends the password on
+        // each service discovery and re-runs this block, so the address is read
+        // both before and after the transition. `VeepooDeviceIdentity` sorts it
+        // into `mac` or `uuid` by shape, which is what keeps a CBPeripheral UUID
+        // out of a field named `mac` (#218). This site is only reachable through
+        // the `verifyPassword` JS export — the app auto-verifies on connect and
+        // never calls it — but it publishes the same field, so it gets the same
+        // treatment rather than being left as a trap for the next consumer.
+        let identity = VeepooDeviceIdentity.from(
+          deviceAddress: manager.peripheralModel?.deviceAddress)
         // See ConnectionHelpers' note: 1 is password-verified, 6 is
         // password-verified AND time-synced. Both land here; only the number says
         // which.
         self.sendEvent(DEVICE_READY, [
           "deviceId": self.connectedDeviceId ?? "",
-          "mac": manager.peripheralModel?.deviceAddress ?? "",
+          "mac": identity.macPayload,
+          "uuid": identity.uuidPayload,
           "isOadModel": false,
           "rawStatus": result.rawValue,
         ])

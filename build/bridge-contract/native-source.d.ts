@@ -3,6 +3,9 @@ export declare const NATIVE_SOURCES: {
     readonly iosReadHelpers: "ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift";
     readonly androidHelpers: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleHelpers.kt";
     readonly androidSocialMsgRead: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleSocialMsgRead.kt";
+    readonly iosConnect: "ios/VeepooSDK/VeepooSDKModule+Connect.swift";
+    readonly iosConnectionHelpers: "ios/VeepooSDK/VeepooSDKModule+ConnectionHelpers.swift";
+    readonly iosDeviceIdentity: "ios/VeepooSDK/VeepooDeviceIdentity.swift";
 };
 /**
  * Returns the span of `source` between two literal markers.
