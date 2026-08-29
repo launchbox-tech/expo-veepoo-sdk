@@ -86,6 +86,31 @@ point (rayu.ai#457). What is missing there is the dump, not the field.
       nothing extra. No test was added on purpose: a hand-written fixture is
       what let this family of defects ship.
 
+## `Wear` semantics — independently reproduced
+
+The issue body's `Wear`/PPG table was measured against the vendor's sqlite. It
+now reproduces through the **bridge**, on 1039 buckets across four days
+(2026-08-26..29, three of them complete at 288 five-minute slots), all with
+`origin_source: "original_table"`:
+
+| `Wear` | buckets | % of all | PPG>0 | steps>0 | sport>0 | stress>0 | issue claimed |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0 | 558 | 53.7% | **100%** | 23% | 67% | 43% | 100% → worn |
+| 1 | 88 | 8.5% | **9%** | 7% | 26% | 2% | 6% → transitional |
+| 2 | 393 | 37.8% | **0%** | 0% | 0% | 0% | 0% → NOT worn |
+
+`0` = worn and `2` = NOT worn holds. `Wear:2` is not merely PPG-less — it is
+inert on every channel at once (no steps, no sport, no stress), which is what a
+band on a nightstand looks like and what a "quiet log" would otherwise be
+mistaken for. `Wear:6` did not occur in this window.
+
+**Every value in a slot is a STRING** (`"SportValue": "78"`, `ppgs: ["81",
+"81", ...]`). Coerce before comparing: a naive `value != 0` in a dynamically
+typed consumer is true for `"0"` and silently reports every bucket as active.
+That is not a bridge defect — it is the vendor's own storage format, passed
+through verbatim as criterion 2 requires — but it is the first thing a parser
+gets wrong.
+
 ## Notes
 
 Blocks launchbox-tech/rayu.ai#477. Ninth instance of the rayu.ai-tracked family
