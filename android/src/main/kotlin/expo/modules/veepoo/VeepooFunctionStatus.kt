@@ -102,6 +102,7 @@ fun deviceFunctionPackages(data: FunctionDeviceSupportData): Map<String, Map<Str
     put("ecg_function", toFunctionStatus(data.ecg))
     put("precision_sleep", toFunctionStatus(data.precisionSleep))
     put("hrv_function", toFunctionStatus(data.hrvFunction))
+    put("weather_function", toFunctionStatus(data.weatherFunction))
     if (data.wathcDay > 0) put("watch_data_day_number", data.wathcDay)
   }
   val package3 = mapOf(
@@ -110,6 +111,12 @@ fun deviceFunctionPackages(data: FunctionDeviceSupportData): Map<String, Map<Str
     "blood_glucose" to toFunctionStatus(data.bloodGlucose),
     "blood_component" to toFunctionStatus(data.bloodComponent),
     "body_component" to toFunctionStatus(data.bodyComponent),
+    "contact_function" to toFunctionStatus(data.contactFunction),
+    // Emitted unconditionally, unlike the retention window: the vendor
+    // documents 0 as "no contacts", 1 as contacts and 2 as contacts with SOS,
+    // so a zero is an answer rather than a silence. It also agrees with
+    // contact_function, which reads UNSUPPORT in the same case.
+    "contact_type" to data.contactType,
   )
   // The keys below are package NAMES, not fields. The contract check stops its
   // slice here for that reason, exactly as it does on the iOS side.

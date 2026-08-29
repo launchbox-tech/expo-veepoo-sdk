@@ -41,6 +41,9 @@ private fun expect(actual: Any?, expected: Any?, why: String) {
   }
 }
 
+/** Package entries that carry an Int rather than a status. */
+private val NUMERIC_KEYS = setOf("watch_data_day_number", "contact_type")
+
 /** The `FunctionStatus` vocabulary src/capabilities/device-functions/types.ts declares. */
 private val DECLARED_STATUSES = setOf("unsupported", "support", "open", "close", "unknown")
 
@@ -104,11 +107,13 @@ private val PACKAGE_FIELDS:
     Triple("package2", "ecg_function") { data, status -> data.ecg = status },
     Triple("package2", "precision_sleep") { data, status -> data.precisionSleep = status },
     Triple("package2", "hrv_function") { data, status -> data.hrvFunction = status },
+    Triple("package2", "weather_function") { data, status -> data.weatherFunction = status },
     Triple("package3", "stress_function") { data, status -> data.stress = status },
     Triple("package3", "agps_function") { data, status -> data.agps = status },
     Triple("package3", "blood_glucose") { data, status -> data.bloodGlucose = status },
     Triple("package3", "blood_component") { data, status -> data.bloodComponent = status },
     Triple("package3", "body_component") { data, status -> data.bodyComponent = status },
+    Triple("package3", "contact_function") { data, status -> data.contactFunction = status },
   )
 
 private fun allFunctions(status: EFunctionStatus): FunctionDeviceSupportData {
@@ -260,7 +265,7 @@ fun main() {
   )) {
     val values = deviceFunctionPackages(allFunctions(status))
       .values
-      .flatMap { entries -> entries.filterKeys { it != "watch_data_day_number" }.values }
+      .flatMap { entries -> entries.filterKeys { it !in NUMERIC_KEYS }.values }
       .toSet()
     expect(
       values,
@@ -317,9 +322,25 @@ fun main() {
     expect(value, 7, "a reported retention window must reach JS as the Int the band sent")
   }
 
+  // ── contact_type is an Int, and NOT conditional ───────────────────────────
+  // The vendor documents 0 as no contacts, 1 as contacts, 2 as contacts with
+  // SOS. Unlike the retention window a zero is an answer, so the key is always
+  // emitted — and `setContactType` has no coercion, so the value that goes in
+  // is the value that comes out. Two native call sites reject when this is
+  // below 2, and they rejected EVERY call while the key went unemitted.
+  for (contactType in listOf(0, 1, 2)) {
+    val data = FunctionDeviceSupportData()
+    data.contactType = contactType
+    expect(
+      deviceFunctionPackages(data)["package3"]?.get("contact_type"),
+      contactType,
+      "contact_type must reach JS as the Int the band sent — the SOS guards read it",
+    )
+  }
+
   for (values in deviceFunctionPackages(allFunctions(EFunctionStatus.SUPPORT)).values) {
     for ((key, value) in values) {
-      if (key == "watch_data_day_number") continue
+      if (key in NUMERIC_KEYS) continue
       if (value !in DECLARED_STATUSES) {
         failures.add("deviceFunctionPackages emitted $key=\"$value\", which FunctionStatus does not declare")
       }

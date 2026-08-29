@@ -104,12 +104,20 @@ extension VeepooSDKModule {
     let repeatDays = alarm["repeat"] as? [Any] ?? []
     let repeatDecimal = isoWeekdaysToRepeatDecimal(repeatDays)
 
-    let supportsTextAlarm: Bool = {
-      if let p1 = self.cachedDeviceFunctions["package1"] as? [String: Any] {
-        return p1["textAlarm"] as? String == "support"
-      }
-      return false
-    }()
+    // Was a lookup of `package1["textAlarm"]`, a key iOS has never emitted:
+    // the right package, the wrong name, so it read nil and this was ALWAYS
+    // false — alarm text silently dropped on every band. Deleted rather than
+    // repointed, because unlike weather and contacts there is nothing to point
+    // at: VPPeripheralModel carries no text-alarm capability (the SDK exposes
+    // the setter, `veepooSDKSettingDeviceTextAlarmWithTextAlarmModel:`, but no
+    // flag). Android's vendor struct does report `textAlarm`, so this is a
+    // genuine platform asymmetry, not an oversight to copy.
+    //
+    // Behaviour is deliberately UNCHANGED: still no text alarm from iOS. Making
+    // it unconditional would start sending a text model to bands that may
+    // reject it, turning a dropped string into a failed alarm — a call that
+    // needs a band to settle, not a guess. Tracked for that test.
+    let supportsTextAlarm = false
 
     let promiseBox = self.makePromiseBox(promise)
     if let textContent = text, !textContent.isEmpty, supportsTextAlarm {

@@ -1,5 +1,5 @@
 {
-  "description": "readDeviceFunctions payloads as the native layer emits them. Derived from the emitters in ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift (cacheDeviceFunctions) and android/.../VeepooSDKModuleHelpers.kt (updateFunctionsFromSupportData) — NOT captured from a band, so it proves key agreement, not the vendor's byte-level semantics.",
+  "description": "readDeviceFunctions payloads as the native layer emits them. Derived from the emitters in ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift (cacheDeviceFunctions) and android/.../VeepooFunctionStatus.kt (deviceFunctionPackages) \u2014 NOT captured from a band, so it proves key agreement, not the vendor's byte-level semantics.",
   "provenance": "source-derived",
   "ios": {
     "package1": {
@@ -14,7 +14,8 @@
       "ecg_function": "support",
       "precision_sleep": "support",
       "hrv_function": "unsupported",
-      "watch_data_day_number": 7
+      "watch_data_day_number": 7,
+      "weather_function": "support"
     },
     "package3": {
       "type": "DeviceFunctionPackage3",
@@ -22,7 +23,9 @@
       "agps_function": "unsupported",
       "blood_glucose": "support",
       "blood_component": "unsupported",
-      "body_component": "unsupported"
+      "body_component": "unsupported",
+      "contact_function": "support",
+      "contact_type": 2
     }
   },
   "android": {
@@ -36,14 +39,17 @@
       "ecg_function": "support",
       "precision_sleep": "unsupported",
       "hrv_function": "support",
-      "watch_data_day_number": 30
+      "watch_data_day_number": 30,
+      "weather_function": "open"
     },
     "package3": {
       "stress_function": "support",
       "agps_function": "support",
       "blood_glucose": "unsupported",
       "blood_component": "unknown",
-      "body_component": "support"
+      "body_component": "support",
+      "contact_function": "support",
+      "contact_type": 2
     }
   }
 }

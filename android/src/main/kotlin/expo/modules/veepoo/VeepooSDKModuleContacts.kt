@@ -19,8 +19,8 @@ fun ModuleDefinitionBuilder.defineContacts(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    val pkg3 = module.cachedDeviceFunctions["pkg3"]
-    if (pkg3?.get("contactFunction") as? String == "unsupported") {
+    val pkg3 = module.cachedDeviceFunctions["package3"]
+    if (pkg3?.get("contact_function") as? String == "unsupported") {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts", null)
       return@AsyncFunction
     }
@@ -75,8 +75,8 @@ fun ModuleDefinitionBuilder.defineContacts(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    val pkg3 = module.cachedDeviceFunctions["pkg3"]
-    if (pkg3?.get("contactFunction") as? String == "unsupported") {
+    val pkg3 = module.cachedDeviceFunctions["package3"]
+    if (pkg3?.get("contact_function") as? String == "unsupported") {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts", null)
       return@AsyncFunction
     }
@@ -126,8 +126,8 @@ fun ModuleDefinitionBuilder.defineContacts(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    val pkg3 = module.cachedDeviceFunctions["pkg3"]
-    if (pkg3?.get("contactFunction") as? String == "unsupported") {
+    val pkg3 = module.cachedDeviceFunctions["package3"]
+    if (pkg3?.get("contact_function") as? String == "unsupported") {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts", null)
       return@AsyncFunction
     }
@@ -168,13 +168,13 @@ fun ModuleDefinitionBuilder.defineContacts(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    val pkg3 = module.cachedDeviceFunctions["pkg3"]
-    if (pkg3?.get("contactFunction") as? String == "unsupported") {
+    val pkg3 = module.cachedDeviceFunctions["package3"]
+    if (pkg3?.get("contact_function") as? String == "unsupported") {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support contacts", null)
       return@AsyncFunction
     }
     // contactType == 2 means SOS supported
-    val contactType = (pkg3?.get("contactType") as? Number)?.toInt() ?: 0
+    val contactType = (pkg3?.get("contact_type") as? Number)?.toInt() ?: 0
     if (contactType < 2) {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts", null)
       return@AsyncFunction
@@ -217,8 +217,8 @@ fun ModuleDefinitionBuilder.defineContacts(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    val pkg3 = module.cachedDeviceFunctions["pkg3"]
-    val contactType = (pkg3?.get("contactType") as? Number)?.toInt() ?: 0
+    val pkg3 = module.cachedDeviceFunctions["package3"]
+    val contactType = (pkg3?.get("contact_type") as? Number)?.toInt() ?: 0
     if (contactType < 2) {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts", null)
       return@AsyncFunction
@@ -257,8 +257,8 @@ fun ModuleDefinitionBuilder.defineContacts(module: VeepooSDKModule) {
       promise.reject("DEVICE_NOT_CONNECTED", "Device not connected", null)
       return@AsyncFunction
     }
-    val pkg3 = module.cachedDeviceFunctions["pkg3"]
-    val contactType = (pkg3?.get("contactType") as? Number)?.toInt() ?: 0
+    val pkg3 = module.cachedDeviceFunctions["package3"]
+    val contactType = (pkg3?.get("contact_type") as? Number)?.toInt() ?: 0
     if (contactType < 2) {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support SOS contacts", null)
       return@AsyncFunction

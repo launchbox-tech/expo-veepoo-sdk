@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import {
   DECLARED_PACKAGE_FIELDS,
@@ -119,6 +119,99 @@ export function verifyAndroidPackageEmitter(source: string): string[] {
   return errors;
 }
 
+/** Where the native sources live, for the cache-read sweep below. */
+const NATIVE_DIRS = {
+  android: "android/src/main/kotlin/expo/modules/veepoo",
+  ios: "ios/VeepooSDK",
+} as const;
+
+export type CacheRead = { file: string; packageName: string; key: string };
+
+/**
+ * Every `cachedDeviceFunctions["package"]…["key"]` read in one native source.
+ *
+ * Both platforms take the package into a local first and subscript that local
+ * afterwards, so the two halves are matched by variable name: an assignment
+ * binds the name to a package, and later subscripts of that name are reads of
+ * it. Each function rebinds before it reads, so the latest binding is the right
+ * one — no scope tracking needed, and a name read before any binding is simply
+ * not a cache read.
+ */
+export function extractCacheReads(file: string, source: string): CacheRead[] {
+  const reads: CacheRead[] = [];
+  const bound = new Map<string, string>();
+
+  for (const line of source.split("\n")) {
+    const binding = /\b(?:let|val|var)\s+(\w+)\s*=\s*(?:\w+\.)?cachedDeviceFunctions\[\s*"([^"]+)"\s*\]/.exec(
+      line,
+    );
+    if (binding?.[1] && binding[2]) {
+      bound.set(binding[1], binding[2]);
+      continue;
+    }
+    // Kotlin `name?.get("key")` / Swift `name?["key"]`, and the non-optional forms.
+    for (const match of line.matchAll(/\b(\w+)\s*\??(?:\.get\(\s*"([^"]+)"|\[\s*"([^"]+)"\s*\])/g)) {
+      const packageName = bound.get(match[1] as string);
+      const key = match[2] ?? match[3];
+      if (packageName && key) reads.push({ file, packageName, key });
+    }
+  }
+  return reads;
+}
+
+function collectCacheReads(repoRoot: string, dir: string, extension: string): CacheRead[] {
+  return readdirSync(join(repoRoot, dir))
+    .filter((name) => name.endsWith(extension))
+    .flatMap((name) => {
+      const file = `${dir}/${name}`;
+      return extractCacheReads(file, readFileSync(join(repoRoot, file), "utf8"));
+    });
+}
+
+/**
+ * Fails when native code reads a device-function key its own platform never
+ * writes.
+ *
+ * This is the general shape of #210, and of the dead guards found while fixing
+ * it: `cachedDeviceFunctions["pkg1"]?.get("weatherFunction")` where the writer
+ * emits `package2` / `weather_function`. The lookup returns null forever, so
+ * the guard's answer never depends on the band — fail-open for the weather and
+ * contact checks, fail-CLOSED for the SOS ones, which rejected every call.
+ *
+ * Swept over whole directories rather than a list of files, because the next
+ * one of these will be written in a file that does not exist yet.
+ */
+export function verifyCacheReads(repoRoot: string, emitted: Record<string, PackageKeys>): string[] {
+  const errors: string[] = [];
+  const reads = {
+    android: collectCacheReads(repoRoot, NATIVE_DIRS.android, ".kt"),
+    ios: collectCacheReads(repoRoot, NATIVE_DIRS.ios, ".swift"),
+  };
+
+  for (const [platform, found] of Object.entries(reads)) {
+    const packages = emitted[platform] as PackageKeys;
+    for (const { file, packageName, key } of found) {
+      const keys = packages.get(packageName);
+      if (!keys) {
+        errors.push(
+          `${file} reads cachedDeviceFunctions["${packageName}"], which nothing writes — ` +
+            `the emitter writes [${sorted(packages.keys()).join(", ")}], so this lookup is ` +
+            `always null and the code around it never sees what the band reported`,
+        );
+        continue;
+      }
+      if (!keys.has(key)) {
+        errors.push(
+          `${file} reads ${packageName}.${key}, which this platform does not emit — ` +
+            `${packageName} carries [${sorted(keys).join(", ")}]`,
+        );
+      }
+    }
+  }
+
+  return errors;
+}
+
 function sorted(keys: Iterable<string>): string[] {
   return [...keys].sort();
 }
@@ -137,6 +230,7 @@ export function verifyDeviceFunctionKeysContract(repoRoot: string): string[] {
   const ios = extractIosPackageKeys(readFileSync(join(repoRoot, SWIFT_PATH), "utf8"));
   const android = extractAndroidPackageKeys(readFileSync(join(repoRoot, KOTLIN_PATH), "utf8"));
   errors.push(...verifyAndroidPackageEmitter(readFileSync(join(repoRoot, EMITTER_PATH), "utf8")));
+  errors.push(...verifyCacheReads(repoRoot, { android, ios }));
 
   for (const [platform, path, packages] of [
     ["iOS", SWIFT_PATH, ios],

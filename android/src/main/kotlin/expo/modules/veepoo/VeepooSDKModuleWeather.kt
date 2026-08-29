@@ -140,8 +140,8 @@ fun ModuleDefinitionBuilder.defineWeather(module: VeepooSDKModule) {
     val util = VpSpGetUtil.getVpSpVariInstance(ctx)
 
     // Guard: weatherFunction capability flag
-    val weatherFunctions = module.cachedDeviceFunctions["pkg1"]
-    val weatherFlag = weatherFunctions?.get("weatherFunction") as? String
+    val weatherFunctions = module.cachedDeviceFunctions["package2"]
+    val weatherFlag = weatherFunctions?.get("weather_function") as? String
     if (weatherFlag != null && weatherFlag == "unsupported") {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function", null)
       return@AsyncFunction
@@ -162,8 +162,8 @@ fun ModuleDefinitionBuilder.defineWeather(module: VeepooSDKModule) {
       return@AsyncFunction
     }
 
-    val weatherFunctions = module.cachedDeviceFunctions["pkg1"]
-    val weatherFlag = weatherFunctions?.get("weatherFunction") as? String
+    val weatherFunctions = module.cachedDeviceFunctions["package2"]
+    val weatherFlag = weatherFunctions?.get("weather_function") as? String
     if (weatherFlag != null && weatherFlag == "unsupported") {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function", null)
       return@AsyncFunction
@@ -211,8 +211,8 @@ fun ModuleDefinitionBuilder.defineWeather(module: VeepooSDKModule) {
       return@AsyncFunction
     }
 
-    val weatherFunctions = module.cachedDeviceFunctions["pkg1"]
-    val weatherFlag = weatherFunctions?.get("weatherFunction") as? String
+    val weatherFunctions = module.cachedDeviceFunctions["package2"]
+    val weatherFlag = weatherFunctions?.get("weather_function") as? String
     if (weatherFlag != null && weatherFlag == "unsupported") {
       promise.reject("CAPABILITY_UNSUPPORTED", "Band does not support weather function", null)
       return@AsyncFunction

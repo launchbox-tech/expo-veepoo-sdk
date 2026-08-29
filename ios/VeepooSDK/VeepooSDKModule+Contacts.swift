@@ -6,14 +6,14 @@ extension VeepooSDKModule {
   // MARK: - Helpers
 
   private func contactsSupported() -> Bool {
-    let pkg3 = cachedDeviceFunctions["pkg3"] as? [String: Any]
-    return pkg3?["contactFunction"] as? String != "unsupported"
+    let pkg3 = cachedDeviceFunctions["package3"] as? [String: Any]
+    return pkg3?["contact_function"] as? String != "unsupported"
   }
 
   private func sosSupported() -> Bool {
-    let pkg3 = cachedDeviceFunctions["pkg3"] as? [String: Any]
+    let pkg3 = cachedDeviceFunctions["package3"] as? [String: Any]
     // contactType == 2 means SOS contacts supported
-    let contactType = (pkg3?["contactType"] as? NSNumber)?.intValue ?? 0
+    let contactType = (pkg3?["contact_type"] as? NSNumber)?.intValue ?? 0
     return contactType >= 2
   }
 

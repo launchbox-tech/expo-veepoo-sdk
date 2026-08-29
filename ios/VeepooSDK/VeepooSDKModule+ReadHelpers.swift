@@ -428,7 +428,10 @@ extension VeepooSDKModule {
       "type": "DeviceFunctionPackage2",
       "ecg_function": device.ecgType > 0 ? "support" : "unsupported",
       "precision_sleep": device.sleepType > 0 ? "support" : "unsupported",
-      "hrv_function": device.hrvType > 0 ? "support" : "unsupported"
+      "hrv_function": device.hrvType > 0 ? "support" : "unsupported",
+      // The header documents weatherType as "if 1 means there is, if not 1
+      // means no" — so `== 1`, not `> 0`.
+      "weather_function": device.weatherType == 1 ? "support" : "unsupported"
     ]
     if device.saveDays > 0 {
       package2["watch_data_day_number"] = Int(device.saveDays)
@@ -441,7 +444,11 @@ extension VeepooSDKModule {
       "agps_function": device.agpsFunction > 0 ? "support" : "unsupported",
       "blood_glucose": bloodGlucoseSupported(device.bloodGlucoseType) ? "support" : "unsupported",
       "blood_component": device.bloodAnalysisType > 0 ? "support" : "unsupported",
-      "body_component": device.bodyCompositionType > 0 ? "support" : "unsupported"
+      "body_component": device.bodyCompositionType > 0 ? "support" : "unsupported",
+      // contactType: 0 none, 1 contacts, 2 contacts with SOS. Both keys come
+      // from it, so they cannot disagree.
+      "contact_function": device.contactType > 0 ? "support" : "unsupported",
+      "contact_type": Int(device.contactType)
     ]
     
     cachedDeviceFunctions = [
