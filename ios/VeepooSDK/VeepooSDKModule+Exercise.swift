@@ -415,7 +415,26 @@ extension VeepooSDKModule {
     }
     DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: watchdog)
 
-    let request = missing.map { NSNumber(value: $0) }
+    // [REQUEST-ORDER] `missing` is a Set, so `.map` emitted the CRCs in
+    // UNSPECIFIED order — we do not know what order went out on any of the five
+    // failures traced for rayu.ai#472. Sort it, and log it.
+    //
+    // Sorting is also the cheapest probe available for the 60075 pattern. Across
+    // nine device reads the duplicate was ALWAYS 60075, which is first in the
+    // band's own slot index (`crcs_offered: [60075, 10009, 24629]`). Two
+    // mechanisms fit: the vendor falls back to the first entry of OUR request
+    // array, or to the first entry of ITS index. Ascending order sends
+    // 10009/24629/60075 — 60075 last — so the next duplicate discriminates:
+    //
+    //   dup becomes 10009  -> it follows our array; a batching artifact
+    //   dup stays  60075   -> it follows the band's index; serialising the reads
+    //                         cannot fix it, and that is the answer #472 asked
+    //
+    // Run this before reshaping the read into one call per CRC. That experiment
+    // is only interpretable once the request order is known and deterministic.
+    let requested = missing.sorted()
+    let request = requested.map { NSNumber(value: $0) }
+    let requestedList = requested.map(String.init).joined(separator: "/")
     peripheralManage.readDeviceSport(withCRC: request) { [weak self] sportModels, gpsModels in
       DispatchQueue.main.async {
         guard let self = self, !settled else { return }
@@ -472,7 +491,8 @@ extension VeepooSDKModule {
         if !gpsCrcs.isEmpty {
           sources.append("gps:" + gpsCrcs.map(String.init).joined(separator: "/"))
         }
-        var detail = sources.isEmpty ? "" : ", got[\(sources.joined(separator: ","))]"
+        var detail = ", req[\(requestedList)]"
+        detail += sources.isEmpty ? "" : ", got[\(sources.joined(separator: ","))]"
         let received = sportCrcs + gpsCrcs
         let repeated = Set(received.filter { crc in received.filter { $0 == crc }.count > 1 })
         if !repeated.isEmpty {
