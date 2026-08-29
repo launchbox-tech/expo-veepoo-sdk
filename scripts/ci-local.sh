@@ -15,6 +15,24 @@
 #     installs both; locally we run it when they are present and SKIP it loudly
 #     when they are not. A skip is reported again in the closing summary so it
 #     can never be mistaken for a pass.
+#   * The iOS Swift compile gate is the one step whose SHAPE differs, not just
+#     its setup. In ci.yml it is a SEPARATE macos-latest job with no `needs:`,
+#     because the Linux runner that carries every other step has no Xcode and
+#     could never run it, and because a parallel job keeps the fast Linux
+#     feedback from queueing behind an Xcode build. So it does not sit at any
+#     position in ci.yml's step order — this script runs it last, and "same
+#     order" means the same order for the steps the Linux job actually has.
+#     Locally it needs macOS + Xcode + CocoaPods; missing any of those is a
+#     loud SKIP in the summary, exactly like the Kotlin step.
+#
+#     It is also the only step where this script does MORE than ci.yml, not
+#     less. CI compiles the device SDK alone (`ios-swift-gate.sh iphoneos`) to
+#     hold down 10x-billed macOS minutes; here we compile both, because locally
+#     the extra ~2 minutes are free. So a green CI does not prove the
+#     `#if targetEnvironment(simulator)` side still compiles — this script does.
+#     In practice that side is covered anyway by every `expo run:ios`, which is
+#     why CI can afford to drop it; the device slice is the one nobody builds by
+#     accident, and the one that let NSUInteger reach a consumer.
 #
 # Usage: bash scripts/ci-local.sh
 set -euo pipefail
@@ -111,6 +129,23 @@ else
     org.junit.runner.JUnitCore expo.modules.veepoo.AsyncFunctionSurfaceTest
   ok "Kotlin AsyncFunction surface test passed"
 fi
+
+# The one gate that compiles ios/VeepooSDK/*.swift. Everything above is JS,
+# Kotlin, or file parsing; a Swift type error reaches consumers otherwise — which
+# is how `NSUInteger` (an ObjC typedef with no Swift spelling) sat on main until
+# a downstream app's xcodebuild stopped on it. See scripts/ios-swift-gate.sh for
+# why this compiles the VeepooSDK pod target against both SDKs.
+step "Compile iOS Swift sources (device + simulator SDK)"
+set +e
+bash scripts/ios-swift-gate.sh
+gate_status=$?
+set -e
+case "$gate_status" in
+  0) ok "iOS Swift sources compiled" ;;
+  3) skip "macOS + Xcode + CocoaPods required (see message above)"
+     SKIPPED+=("iOS Swift compile gate") ;;
+  *) exit "$gate_status" ;;
+esac
 
 echo
 if [ ${#SKIPPED[@]} -eq 0 ]; then
