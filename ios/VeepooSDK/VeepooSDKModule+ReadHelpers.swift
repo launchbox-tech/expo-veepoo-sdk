@@ -385,7 +385,11 @@ extension VeepooSDKModule {
   /// type has it for. #210 established the same shape for byte 18.
   ///
   /// Latent, not live: the band traced on 2026-08-28 reports mode 4.
-  func bloodGlucoseSupported(_ type: NSUInteger) -> Bool {
+  /// Takes any integer rather than a named width: the vendor declares
+  /// `bloodGlucoseType` as `NSUInteger`, which is an ObjC typedef with no
+  /// Swift spelling — writing `NSUInteger` here does not compile, and whether
+  /// the import lands as `Int` or `UInt` is not worth pinning a build on.
+  func bloodGlucoseSupported(_ type: some BinaryInteger) -> Bool {
     return type != 0 && type != 3
   }
 
