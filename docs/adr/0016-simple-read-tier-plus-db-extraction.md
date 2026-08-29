@@ -78,3 +78,18 @@ crossing the bridge.
   ObjC projection `VeepooBleSDK-Swift.h` is retained).
 - The slot-phase progress events now describe DB iteration (instant), so the
   visible progress weight lives almost entirely in the transfer phase.
+- **Amendment 2026-08-29 (#211), one table only:** `veepooSDKGetOriginalData`
+  is not the passthrough the decision above assumes. Disassembly of
+  VeepooBleSDK 2.2.101.15 shows it reads the stored row and then runs it
+  through the private `+[VPDataBaseOperation vpChangeOneDayOriginalDict:]`,
+  which rebuilds each 5-minute slot from a 12-key whitelist and drops nine
+  stored fields — including `Wear`, the band's own per-bucket "was this on a
+  wrist" flag. `readOriginRawDump` therefore reproduces the getter's first two
+  hops (`[[DBStoreManager shareStoreManager] getYTKKeyValueItemByDate:…
+  fromTable:@"original_table"].objectValue`) and stops before the narrowing
+  one. This is the SAME tier, one layer lower — not the CRC/block protocol,
+  and not a new tier. It applies **only** to the `origin` slot of the raw
+  dump; every other extraction still goes through the public getter. Because
+  the entry points are absent from the public headers, each hop is guarded and
+  a miss degrades to the public getter, with the path taken reported in the
+  payload's `origin_source` so the degradation is visible rather than silent.

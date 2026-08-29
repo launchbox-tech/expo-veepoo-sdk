@@ -108,6 +108,7 @@ Domain language follows **AGENTS.md** (**Band**, **Session**, **Band Discovery**
 | Vendor area (summary) | JS methods / events | Status | Device tested |
 |----------------------|---------------------|--------|---------------|
 | Read-all / sync pipeline | `startReadOriginData`, `readOriginComplete`, `readOriginProgress`, `readDeviceAllData` | Shipped | TBD |
+| Per-day local-DB dump (ADR-0016 "get-everything" sink) | `readOriginRawDump(dayOffset)` | **iOS only.** Android rejects `CAPABILITY_UNSUPPORTED` — the vendor protocol streams via listeners and exposes no local-DB table getters. Note the data is not missing on Android: `com.veepoo.protocol.model.datas.OriginData` carries `private int wear`, so the field arrives for free once Android has a dump entry point. iOS `origin` is the verbatim `original_table` row (capital `Wear`/`Step`/`SportValue`), with the SDK's narrowed 12-key view under `origin_normalized` and the path taken reported in `origin_source` (#211) | TBD — `origin_source` must read `original_table` on a real band |
 | Five-minute origin | `readOriginData`; `originFiveMinuteData` | Shipped | TBD |
 | Half-hour summaries | `readDaySummaryData`; `originHalfHourData` | Shipped | TBD |
 | SpO2 origin stream | `originSpo2Data` | Shipped | TBD |

@@ -16,6 +16,19 @@ fun ModuleDefinitionBuilder.defineReadDeviceAllData(module: VeepooSDKModule) {
   // iOS-only for now: Android's vendor protocol streams via listeners and has
   // no equivalent local-DB table getters to dump (cross-platform rule:
   // reject CAPABILITY_UNSUPPORTED when no vendor entry point exists).
+  //
+  // On the per-bucket "was this on a wrist" flag that iOS now passes through
+  // verbatim: nothing is missing from the Android data itself.
+  // `com.veepoo.protocol.model.datas.OriginData` carries `private int wear`,
+  // so the field arrives for free the day this dump has an entry point to
+  // build on. Note the spelling differs by platform and neither is renamed:
+  // Android's model field is lowercase `wear`, while iOS's stored row uses the
+  // vendor's capital `Wear`. What is missing here is the dump, not the field.
+  //
+  // Do NOT paper over that by synthesising `wear` from `readDeviceAllData`'s
+  // listener stream — that is a different read path with a different shape,
+  // and a partial dump that looks whole is exactly the failure this bridge
+  // keeps hitting. Gap recorded in docs/vendor-api/vendor-parity-matrix.md.
   AsyncFunction("readOriginRawDump") { _: Int, promise: Promise ->
     promise.reject("CAPABILITY_UNSUPPORTED", "readOriginRawDump is iOS-only (no Android vendor DB getters)", null)
   }

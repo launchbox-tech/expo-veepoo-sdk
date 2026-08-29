@@ -53,6 +53,61 @@ extension VeepooSDKModule {
     }
   }
 
+  /// The vendor's own one-day `original_table` row, before the SDK narrows it.
+  ///
+  /// `+[VPDataBaseOperation veepooSDKGetOriginalDataWithDate:andTableID:]` is
+  /// not a passthrough. Disassembly of VeepooBleSDK 2.2.101.15 shows it does:
+  ///
+  ///   item = [[DBStoreManager shareStoreManager]
+  ///             getYTKKeyValueItemByDate:date
+  ///                       DeviceAddress:mac
+  ///                           fromTable:@"original_table"];
+  ///   return [VPDataBaseOperation vpChangeOneDayOriginalDict:item.objectValue];
+  ///
+  /// That last hop rebuilds every 5-minute slot from a 12-key whitelist
+  /// (heartValue/ppgs/ecgs/disValue/calValue/met/motionState/stress/
+  /// sportValue/stepValue/diastolic/systolic), so nine stored fields never
+  /// reach a caller: `Wear`, `resRates`, `sleepStates`, `sleepAddStates`,
+  /// `resets`, `gesture`, `bloodGlucoses`, `bloodGlucoseLevels`, and the
+  /// vendor's own `Step`/`SportValue` spellings.
+  ///
+  /// `Wear` is the one that matters: it is the band's answer to "was this on a
+  /// wrist for this bucket", and in captured data 55-61% of buckets were NOT
+  /// worn. Without it a quiet log is indistinguishable from a nightstand. So
+  /// we reproduce the first two hops and stop before the narrowing one.
+  ///
+  /// Nothing here is in the public headers, so every hop is guarded and any
+  /// miss returns nil — the caller then degrades to the narrowed public getter
+  /// rather than crashing on a vendor SDK bump.
+  private func originRawRows(dateStr: String, deviceAddress: String) -> Any? {
+    guard let storeClass = NSClassFromString("DBStoreManager") else { return nil }
+    let shareSel = NSSelectorFromString("shareStoreManager")
+    let storeClassObj = storeClass as AnyObject
+    guard storeClassObj.responds(to: shareSel),
+          let manager = storeClassObj.perform(shareSel)?.takeUnretainedValue() as? NSObject
+    else { return nil }
+
+    let getSel = NSSelectorFromString("getYTKKeyValueItemByDate:DeviceAddress:fromTable:")
+    guard manager.responds(to: getSel), let imp = manager.method(for: getSel) else { return nil }
+    // `Unmanaged` return, not a plain `AnyObject?`: a `get`-prefixed ObjC
+    // method hands back an autoreleased +0 value, and spelling that out makes
+    // the ownership explicit instead of leaving it to what Swift infers for an
+    // unsafeBitCast IMP. `takeUnretainedValue()` retains it into `item` before
+    // the pool drains.
+    typealias GetItemFn = @convention(c)
+      (AnyObject, Selector, NSString, NSString, NSString) -> Unmanaged<AnyObject>?
+    let getItem = unsafeBitCast(imp, to: GetItemFn.self)
+    // Lowercase `original_table` — the binary also carries an `Original_table`
+    // literal, and the wrong case reads back nil in silence.
+    guard let item = getItem(
+      manager, getSel, dateStr as NSString, deviceAddress as NSString, "original_table" as NSString
+    )?.takeUnretainedValue() as? NSObject else { return nil }
+
+    let valueSel = NSSelectorFromString("objectValue")
+    guard item.responds(to: valueSel) else { return nil }
+    return item.value(forKey: "objectValue")
+  }
+
   func handleReadOriginRawDump(dayOffset: Int, promise: Promise) {
     #if targetEnvironment(simulator)
     rejectUnavailableOnSimulator(promise, "readOriginRawDump")
@@ -81,7 +136,26 @@ extension VeepooSDKModule {
       dump[key] = safe
     }
 
-    put("origin", VPDataBaseOperation.veepooSDKGetOriginalData(withDate: dateStr, andTableID: deviceAddress))
+    // `origin` is the verbatim stored row: 19 fields per slot under the
+    // vendor's own key spellings (capital `Wear`, `Step`, `SportValue`). No
+    // re-mapping, no friendlier names, no `isWorn` boolean — `Wear` 0 means
+    // worn and 2 means NOT worn, the inverse of the natural guess, and burying
+    // that here would put it where nobody can check it. The SDK's own narrowed
+    // view stays under `origin_normalized` for callers reading `stepValue`.
+    let normalizedOrigin = VPDataBaseOperation.veepooSDKGetOriginalData(
+      withDate: dateStr, andTableID: deviceAddress)
+    let rawOrigin = originRawRows(dateStr: dateStr, deviceAddress: deviceAddress)
+    put("origin", rawOrigin ?? normalizedOrigin)
+    put("origin_normalized", normalizedOrigin)
+    // The fallback restores exactly the 10-key shape this whole change exists
+    // to fix, and resolves the promise as if nothing happened — the "absence
+    // looks like a quiet log" failure, one level up. `origin_source` is what
+    // makes it visible, so a caller must read it rather than diff key sets.
+    // Only meaningful when a row was actually found: `put` drops an empty
+    // dict, and naming a source for an absent `origin` would be a lie.
+    if dump["origin"] != nil {
+      dump["origin_source"] = rawOrigin != nil ? "original_table" : "veepooSDKGetOriginalData"
+    }
     put("half_hour", VPDataBaseOperation.veepooSDKGetOriginalChangeHalfHourData(withDate: dateStr, andTableID: deviceAddress))
     put("oxygen", VPDataBaseOperation.veepooSDKGetDeviceOxygenData(withDate: dateStr, andTableID: deviceAddress))
     put("hrv", VPDataBaseOperation.veepooSDKGetDeviceHrvData(withDate: dateStr, andTableID: deviceAddress))

@@ -188,6 +188,21 @@ export class HistoricalQueryCapability {
    * Android rejects CAPABILITY_UNSUPPORTED). Raw vendor field names and
    * units — the "get-everything" sink for host-side raw capture; promote
    * modalities to typed storage after the real shapes are known.
+   *
+   * `origin` is the verbatim `original_table` row and uses the vendor's own
+   * key spellings — capital `Wear`, `Step`, `SportValue`, not the camelCase
+   * the SDK's narrowed view uses. `Wear` is passed through unmapped on
+   * purpose: 0 means worn and 2 means NOT worn, so pin the enum against
+   * captured data rather than guessing.
+   *
+   * `origin_normalized` is the SDK's own narrowed 12-key view of the same
+   * slots, kept for callers already reading `stepValue` et al.
+   *
+   * **Check `origin_source` before trusting `origin`.** The verbatim read goes
+   * through vendor internals that are not in the public headers; if a vendor
+   * SDK bump moves them, `origin` silently degrades to the narrowed 10-key
+   * shape and `Wear` disappears again. `origin_source` is `"original_table"`
+   * on the real path and `"veepooSDKGetOriginalData"` on the fallback.
    */
   readOriginRawDump(dayOffset: number): Promise<Record<string, unknown>> {
     return this.ctx.invoke({
