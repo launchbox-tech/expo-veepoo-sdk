@@ -335,9 +335,28 @@ extension VeepooSDKModule {
     // the slot keeps its CRC, so the next sync re-requests it with a fresh
     // link, and `crcs_gone` reports it if the Band drops it first.
     if emitted >= wanted.count && !missing.isEmpty {
+      // [UNDELIVERED] `emitted` counts MODELS, not distinct slots, so reaching
+      // `wanted.count` does not mean every slot arrived. Measured 2026-08-29
+      // (rayu.ai#546): got[gps:60075/60075/10009], dup[60075] — three models for
+      // three slots, but 24629 was never delivered. The old label read
+      // `count-complete[3/3]`, which claims a completeness this read did not earn.
+      //
+      // `missing` is non-empty by this branch's own guard, so name it. Ending
+      // here is still right — the count test is what removed #472's two 1.5s
+      // settles, and the slot keeps its CRC for the next sync. Only the CLAIM
+      // was wrong, so only the claim changes; timing is untouched.
+      //
+      // Do NOT "fix" this by deduping `emitted` by CRC. Worked through on the
+      // trace above: distinct = 2 < wanted.count = 3, so this test stops firing,
+      // `emittedNow != emitted` skips the stall exit, and the pass takes the
+      // settle branch — one full 1.5s round that returns nothing and STILL does
+      // not recover 24629. Slower, equally lossy. See rayu.ai#546.
+      let undelivered = missing.sorted().map(String.init).joined(separator: "/")
       finishExerciseRead(
         emitted: emitted, readPath: "sport-api",
-        outcomes: outcomes + ["coverage:count-complete[\(emitted)/\(wanted.count)]"],
+        outcomes: outcomes + [
+          "coverage:count-complete[\(satisfied.count) distinct/\(wanted.count)],undelivered[\(undelivered)]"
+        ],
         tableID: tableID
       )
       return
