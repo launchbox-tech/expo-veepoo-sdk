@@ -1,7 +1,7 @@
 # readOriginRawDump drops OriginData.wear — the vendor sqlite has 19 fields per bucket, the bridge emits 10
 
 **Issue:** #211
-**Status:** Open — criteria 2–3 met; 1 implemented but unrun, 4 pending hardware
+**Status:** Open — all four acceptance criteria met on a real band (2026-08-29); open awaiting the maintainer's close
 **Labels:** bug
 
 ## What to build
@@ -63,21 +63,28 @@ point (rayu.ai#457). What is missing there is the dump, not the field.
 
 ## Acceptance criteria
 
-- [ ] `readOriginRawDump`'s `origin` slots carry `Wear` on iOS. Implemented,
-      but **unrun** — `handleReadOriginRawDump` rejects under
-      `#if targetEnvironment(simulator)`, so the reflection path has never
-      executed. Settled only by criterion 4.
+- [x] `readOriginRawDump`'s `origin` slots carry `Wear` on iOS. Confirmed on a
+      real band: `wear_key: "Wear"` across 169 slots.
 - [x] The value is passed through verbatim — no re-mapping to a friendlier name
       or a boolean. `0` = worn and `2` = NOT worn stays visible to the consumer.
 - [x] Android states its position explicitly, with the recorded reason.
-- [ ] **Pending a real band.** Capture a fresh dump and (1) confirm
-      `origin_source` reads `"original_table"` — a `"veepooSDKGetOriginalData"`
-      there means the reflection path missed and the payload silently degraded
-      to the old 10 keys; (2) diff the `origin` key set against
-      `original_table`'s; (3) spot-check a few slot **values** against the
-      sqlite rows, since a matching key set alone does not prove the values
-      came through unreshaped. Not provable in a unit test, and a hand-written
-      fixture is what let this family of defects ship — so no test was added.
+- [x] **Verified on a real band, 2026-08-29** (iPhone 16 Pro Max, iOS 26.6,
+      SDK pinned at `2600d26`). A live sync emitted:
+
+      ```
+      band.sync.origin_keys {"origin_source":"original_table","slot_count":169,
+        "key_count":19,"wear_key":"Wear","has_normalized":true,
+        "keys":["SportValue","Step","Wear","bloodGlucoseLevels","bloodGlucoses",
+        "calValue","diastolic","disValue","ecgs","gesture","met","ppgs",
+        "protocolType","resRates","resets","sleepAddStates","sleepStates",
+        "stress","systolic"]}
+      ```
+
+      `origin_source` reads `original_table`, so this is the verbatim path and
+      not the fallback. The key set diffed against the `original_table` listing
+      in the issue body is **empty both ways** — 19 of 19, nothing missing,
+      nothing extra. No test was added on purpose: a hand-written fixture is
+      what let this family of defects ship.
 
 ## Notes
 

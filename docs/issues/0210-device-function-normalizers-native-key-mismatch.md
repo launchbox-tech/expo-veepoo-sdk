@@ -32,7 +32,22 @@ test.
   native layer reports it.
 - Tests feed the real native shape, not an invented snake_case record.
 - A test fails if native and the declared type ever disagree on a key again.
-- Verified against a real band (met — see Status).
+- Verified against a real band (met — see Status). **Re-confirmed 2026-08-29**
+  on SDK `2600d26`, after `07a5707` briefly broke the iOS build of this very
+  file (`NSUInteger` has no Swift spelling). A live sync emitted every declared
+  field populated and zero camelCase keys on all three packages:
+
+  ```
+  band.device_functions.keys {
+    "package1":{"keys":["temperature_function","heart_rate_detect","spo_h","blood_pressure"],"defined":4,"camel":[]},
+    "package2":{"keys":["watch_data_day_number","hrv_function","precision_sleep","ecg_function"],"defined":4,"camel":[]},
+    "package3":{"keys":["blood_component","agps_function","stress_function","blood_glucose","body_component"],"defined":5,"camel":[]}}
+  ```
+
+  Note the earlier evidence rested on `band.retention.read`, which only ever
+  proved `watch_data_day_number` — the one field #209 already emitted
+  snake_case, so it would have stayed green while the other twelve were
+  `undefined`. The line above checks all thirteen.
 
 ## Status
 
