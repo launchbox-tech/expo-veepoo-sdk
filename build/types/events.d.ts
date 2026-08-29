@@ -90,7 +90,8 @@ export type VeepooEventPayload = {
     device_ready: {
         device_id: string;
         is_oad_model?: boolean;
-        mac?: string;
+        mac?: string | null;
+        uuid?: string | null;
         raw_status?: number;
     };
     bluetooth_state_changed: BluetoothStatus;

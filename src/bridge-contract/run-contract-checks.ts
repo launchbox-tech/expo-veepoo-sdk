@@ -18,6 +18,10 @@ import {
 import { SOCIAL_MSG_CHANNELS } from "../capabilities/social-msg";
 
 import { verifyDeviceFunctionKeysContract } from "./verify-device-function-keys";
+import {
+  EXPECTED_IDENTITY_EMISSION_COUNT,
+  verifyDeviceReadyIdentityContract,
+} from "./verify-device-ready-identity";
 import { verifyNativeRejectionContract } from "./verify-native-rejection-contract";
 import { verifySocialMsgKeysContract } from "./verify-social-msg-keys";
 import { verifyUpstreamSdkCoverage } from "./verify-upstream-sdk-coverage";
@@ -47,6 +51,12 @@ const CHECKS: Check[] = [
     run: verifyDeviceFunctionKeysContract,
     onSuccess: () =>
       "Device-function key contract OK — every native key is declared, and both platforms spell it the same.",
+  },
+  {
+    name: "device-ready-identity",
+    run: verifyDeviceReadyIdentityContract,
+    onSuccess: () =>
+      `device_ready identity contract OK (${EXPECTED_IDENTITY_EMISSION_COUNT} iOS emissions split deviceAddress into mac/uuid).`,
   },
   {
     name: "social-msg-keys",

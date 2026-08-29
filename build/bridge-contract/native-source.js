@@ -7,6 +7,9 @@ exports.NATIVE_SOURCES = {
     iosReadHelpers: "ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift",
     androidHelpers: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleHelpers.kt",
     androidSocialMsgRead: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleSocialMsgRead.kt",
+    iosConnect: "ios/VeepooSDK/VeepooSDKModule+Connect.swift",
+    iosConnectionHelpers: "ios/VeepooSDK/VeepooSDKModule+ConnectionHelpers.swift",
+    iosDeviceIdentity: "ios/VeepooSDK/VeepooDeviceIdentity.swift",
 };
 /**
  * Returns the span of `source` between two literal markers.
