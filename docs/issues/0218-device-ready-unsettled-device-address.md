@@ -23,8 +23,10 @@ different identities under the same field name, ~15–480 ms apart, and
 events carried a UUID in `mac` — 40%.
 
 Fix: `mac` carries a hardware MAC or nothing. An unsettled address yields
-`mac: null` and surfaces the identifier under its own `uuid` field, the same
-`mac`/`uuid` split `DEVICE_FOUND` already uses.
+`mac: null` and surfaces the identifier under its own `uuid` field — the same
+two-field shape `DEVICE_FOUND` already publishes. Note the shape is all that is
+shared: `DEVICE_FOUND` sets `mac` to `rawAddr ?? uuid`, so it still falls back to
+the UUID. Changing that is out of scope here.
 
 **The discriminating predicate:** a UUID-format check on `deviceAddress`. *Not*
 `mac == deviceId` equality — traces contain readies where `deviceId` is itself
@@ -36,8 +38,12 @@ good values.
 - [x] No `DEVICE_READY` payload carries a CBPeripheral UUID in `mac`; an
       unsettled address yields `mac: null` plus a populated `uuid`
 - [x] A settled address yields the hardware MAC in `mac` unchanged — the fix
-      must not null out good values (the split is one-directional: only a
-      canonical UUID is diverted, everything else falls through as `mac`)
+      must not null out good values. The split is one-directional: only a
+      canonical UUID is diverted, everything else falls through as `mac`.
+      Regression-tested including the `deviceId`-is-a-MAC case, by
+      `scripts/ios-device-identity-check.sh`, which compiles and runs the
+      shipped `VeepooDeviceIdentity.swift`. Verified load-bearing: inverting the
+      predicate to recognise MACs instead fails 5 of its 15 cases.
 - [x] Every `mac`-publishing emission site is covered, including the one not
       reachable from the app today (`handleVerifyPassword`)
 - [x] The JS-side event type marks `mac` nullable and exposes `uuid`
@@ -66,10 +72,24 @@ by an AFK agent. Pull the trace with `pull-logs` from rayu.ai and check the
 - Both emission sites route through it: `VeepooSDKModule+ConnectionHelpers.swift`
   (`verifyPasswordInternal`, the auto-verify path the app hits) and
   `VeepooSDKModule+Connect.swift` (`handleVerifyPassword`, the unused export).
-- `check:device-ready-identity` — a contract check that parses both Swift files
-  and fails if any `DEVICE_READY` emission assigns `deviceAddress` to `mac`, or
-  publishes `mac` without `uuid`. The JS type is fenced against the Swift rather
-  than hand-copied from it.
+- `check:device-ready-identity` — a contract check that scans every
+  `ios/VeepooSDK/*.swift` for the emission (not an allowlist, so a third emitting
+  file added later is covered too) and fails if any `DEVICE_READY` emission
+  assigns `deviceAddress` to `mac`, or publishes `mac` without `uuid`. It also
+  reads `src/types/events.ts` and fails if `mac`/`uuid` are declared without
+  `| null`, so the JS type is fenced against the Swift rather than hand-copied
+  from it.
+- `check:ios-device-identity` — compiles `VeepooDeviceIdentity.swift` with
+  `swiftc` and runs 15 behavioural cases against it. The contract check proves
+  the emission sites *call* the type; this proves the type *decides* correctly.
+  Foundation-only, so it needs no pods and runs in ~1s; wired into `ci-local.sh`
+  and the `ios-swift` CI job ahead of the pod build.
+
+**Not closed by any of the above:** that `NSNull` in a `sendEvent` dictionary
+reaches JS as `null` rather than a dropped key. The Swift-side value is asserted,
+but the Expo bridge conversion is only observable on a device — it rides on the
+trace criterion below. A consumer should treat `mac` as "absent or null" either
+way, which is what the type says.
 
 ## Reference
 

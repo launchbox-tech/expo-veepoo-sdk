@@ -158,10 +158,12 @@ export type VeepooEventPayload = {
   // holds the iOS CBPeripheral UUID until verification settles it, and because
   // the password is re-sent on every service discovery, one verify emits this
   // event at both ends of that transition. An unsettled read yields `mac: null`
-  // and puts the identifier in `uuid` instead, the same split `device_found`
-  // uses — so a `mac` you receive is always a MAC (#218). Absent on the
-  // simulator stubs and on any ready not raised by a verify; Android never
-  // populates either field.
+  // and puts the identifier in `uuid` instead — so a `mac` you receive here is
+  // always a MAC (#218). Absent on the simulator stubs and on any ready not
+  // raised by a verify; Android never populates either field.
+  // The `mac`/`uuid` field pair mirrors `device_found`, but the guarantee does
+  // not: `device_found.device.mac` still falls back to the CBPeripheral UUID
+  // when the address is unresolved. Only this event promises `mac` is a MAC.
   // `raw_status` is the vendor `PasswordSynchronTpye` that produced this ready:
   // 1 = password verified, 6 = password verified AND device time synchronized
   // (the value the vendor header says is normally returned). Both reach ready,
