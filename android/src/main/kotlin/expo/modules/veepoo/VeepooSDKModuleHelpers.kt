@@ -112,37 +112,13 @@ fun normalizeTestState(rawState: String?): String {
 }
 
 // 功能包映射到统一结构
+// The packages are BUILT in VeepooFunctionStatus.kt, which imports the vendor
+// types and nothing else, so scripts/android-function-status-check.sh can
+// compile and RUN the mapping against the band's real vocabulary. Build one
+// here and it goes back to being checked by reading source text — which is
+// what let #210 and #212 ship. This assigns; it does not decide.
 fun VeepooSDKModule.updateFunctionsFromSupportData(data: FunctionDeviceSupportData) {
-  // Keys are the snake_case names `DeviceFunctionPackage1/2/3` declare. JS reads
-  // a nested package strictly by declared key, so a camelCase spelling here is
-  // silently dropped rather than surfaced — that was #210.
-  val package1 = mapOf(
-    "blood_pressure" to toFunctionStatus(data.bp),
-    "heart_rate_detect" to toFunctionStatus(data.heartDetect),
-    "spo_h" to toFunctionStatus(data.spo2H),
-    "temperature_function" to toFunctionStatus(data.temperatureFunction)
-  )
-  // `wathcDay` (vendor spelling) is the band's on-device retention window — how
-  // many days of history it will re-serve. It belongs INSIDE package2: the JS
-  // normalizer only reads the nested package object, so a value emitted beside
-  // it never reaches JS. 0 means the band did not report it — left absent rather
-  // than sent as a zero, so JS can tell "unknown" from a real value.
-  val package2 = buildMap<String, Any> {
-    put("ecg_function", toFunctionStatus(data.ecg))
-    put("precision_sleep", toFunctionStatus(data.precisionSleep))
-    put("hrv_function", toFunctionStatus(data.hrvFunction))
-    if (data.wathcDay > 0) put("watch_data_day_number", data.wathcDay)
-  }
-  val package3 = mapOf(
-    "stress_function" to toFunctionStatus(data.stress),
-    "agps_function" to toFunctionStatus(data.agps),
-    "blood_glucose" to toFunctionStatus(data.bloodGlucose),
-    "blood_component" to toFunctionStatus(data.bloodComponent),
-    "body_component" to toFunctionStatus(data.bodyComponent)
-  )
-  cachedDeviceFunctions["package1"] = package1
-  cachedDeviceFunctions["package2"] = package2
-  cachedDeviceFunctions["package3"] = package3
+  cachedDeviceFunctions.putAll(deviceFunctionPackages(data))
 }
 
 fun VeepooSDKModule.verifyPasswordInternal(deviceId: String, password: String, is24Hour: Boolean) {

@@ -1,9 +1,9 @@
-// Behavioural regression test for the Android vendor-status mappers (#212).
+// Behavioural regression test for the Android vendor-status mappers (#212, #210).
 //
-// Covers `toFunctionStatus` — which #210's device-function packages share, and
-// so inherit — and the 13-channel social-message map. Not #210's own key->field
-// wiring: that sits in VeepooSDKModuleHelpers.kt behind Android imports, out of
-// reach of a standalone compile.
+// Covers `toFunctionStatus`, the 13-channel social-message map, and the 12
+// device-function package keys. VeepooSDKModuleHelpers.kt keeps only the
+// assignment into the module's cache, which a contract check guards; everything
+// that DECIDES a value lives in VeepooFunctionStatus.kt and is run here.
 //
 // Compiled and run by scripts/android-function-status-check.sh together with
 // android/src/main/kotlin/expo/modules/veepoo/VeepooFunctionStatus.kt itself —
@@ -23,6 +23,7 @@
 // vendor enum actually declares, which is the only way the defect shows up.
 package expo.modules.veepoo
 
+import com.veepoo.protocol.model.datas.FunctionDeviceSupportData
 import com.veepoo.protocol.model.datas.FunctionSocailMsgData
 import com.veepoo.protocol.model.enums.EFunctionStatus
 
@@ -80,6 +81,41 @@ private val CHANNEL_SETTERS: List<Pair<String, (FunctionSocailMsgData, EFunction
     "email" to { data, status -> data.gmail = status },
     "other" to { data, status -> data.other = status },
   )
+
+/**
+ * The device-function packages, each key paired with the setter that feeds it.
+ * Same shape as [CHANNEL_SETTERS], and used the same way: one field at a time,
+ * so a key reading another key's vendor field fails.
+ *
+ * The keys are the snake_case names src/capabilities/device-functions/declared-keys.ts
+ * declares — JS reads a nested package strictly by declared key, and #210 was a
+ * camelCase spelling being dropped in silence.
+ *
+ * `watch_data_day_number` is absent here on purpose: it is an Int, not a status,
+ * and it is emitted conditionally. It gets its own cases below.
+ */
+private val PACKAGE_FIELDS:
+  List<Triple<String, String, (FunctionDeviceSupportData, EFunctionStatus) -> Unit>> =
+  listOf(
+    Triple("package1", "blood_pressure") { data, status -> data.bp = status },
+    Triple("package1", "heart_rate_detect") { data, status -> data.heartDetect = status },
+    Triple("package1", "spo_h") { data, status -> data.spo2H = status },
+    Triple("package1", "temperature_function") { data, status -> data.temperatureFunction = status },
+    Triple("package2", "ecg_function") { data, status -> data.ecg = status },
+    Triple("package2", "precision_sleep") { data, status -> data.precisionSleep = status },
+    Triple("package2", "hrv_function") { data, status -> data.hrvFunction = status },
+    Triple("package3", "stress_function") { data, status -> data.stress = status },
+    Triple("package3", "agps_function") { data, status -> data.agps = status },
+    Triple("package3", "blood_glucose") { data, status -> data.bloodGlucose = status },
+    Triple("package3", "blood_component") { data, status -> data.bloodComponent = status },
+    Triple("package3", "body_component") { data, status -> data.bodyComponent = status },
+  )
+
+private fun allFunctions(status: EFunctionStatus): FunctionDeviceSupportData {
+  val data = FunctionDeviceSupportData()
+  for ((_, _, set) in PACKAGE_FIELDS) set(data, status)
+  return data
+}
 
 private fun allChannels(status: EFunctionStatus): FunctionSocailMsgData {
   val data = FunctionSocailMsgData()
@@ -183,9 +219,117 @@ fun main() {
       "\"unsupported\" sees it",
   )
 
+  // ── deviceFunctionPackages wires each key to its own vendor field ─────────
+  // #210 was the key half of the same defect: a package key JS could not read.
+  // These cases hold the wiring underneath it — a key that reports another
+  // field's answer is as wrong as one JS drops, and neither shows up in text.
+  expect(
+    deviceFunctionPackages(FunctionDeviceSupportData()).keys.sorted(),
+    PACKAGE_FIELDS.map { it.first }.distinct().sorted(),
+    "deviceFunctionPackages must emit exactly the packages it bridges",
+  )
+
+  for ((packageName, key) in PACKAGE_FIELDS.map { it.first to it.second }) {
+    val emitted = deviceFunctionPackages(FunctionDeviceSupportData())[packageName]
+    if (emitted == null || key !in emitted) {
+      failures.add("$packageName is missing $key — JS reads a package strictly by declared key")
+    }
+  }
+
+  for ((packageName, key, set) in PACKAGE_FIELDS) {
+    val data = allFunctions(EFunctionStatus.SUPPORT_CLOSE)
+    set(data, EFunctionStatus.SUPPORT_OPEN)
+    val packages = deviceFunctionPackages(data)
+    expect(packages[packageName]?.get(key), "open", "$packageName.$key must read its own vendor field")
+    for ((otherPackage, otherKey, _) in PACKAGE_FIELDS) {
+      if (otherPackage == packageName && otherKey == key) continue
+      expect(
+        packages[otherPackage]?.get(otherKey),
+        "close",
+        "$otherPackage.$otherKey changed when only $packageName.$key was set — " +
+          "the two read the same vendor field",
+      )
+    }
+  }
+
+  for ((status, expected) in listOf(
+    EFunctionStatus.SUPPORT to "support",
+    EFunctionStatus.SUPPORT_OPEN to "open",
+    EFunctionStatus.SUPPORT_CLOSE to "close",
+    EFunctionStatus.UNSUPPORT to "unsupported",
+  )) {
+    val values = deviceFunctionPackages(allFunctions(status))
+      .values
+      .flatMap { entries -> entries.filterKeys { it != "watch_data_day_number" }.values }
+      .toSet()
+    expect(
+      values,
+      setOf<Any>(expected),
+      "a band answering ${status.name} on every function must read back as \"$expected\"",
+    )
+  }
+
+  // ── watch_data_day_number is an Int, and conditionally emitted ────────────
+  // The band's on-device retention window, and the one entry that is not a
+  // status. Our emitter guards it with `if (data.wathcDay > 0)`, on the stated
+  // reasoning that 0 means the band did not report one and JS should be able to
+  // tell that from a real value.
+  //
+  // MEASURED, and it does not hold on vpprotocol-2.3.80.15: the field is seeded
+  // to 3, and `setWathcDay` substitutes 3 for 0 in bytecode
+  // (`iload_1; ifne 6; iconst_3; istore_1`). So a band that reported nothing —
+  // or reported zero — reaches JS as a three-day window indistinguishable from
+  // a band that really said three. The guard only ever fires on a negative,
+  // which the protocol has no way to send.
+  //
+  // These cases pin that vendor behaviour rather than the intent, so the day it
+  // changes, this fails instead of a consumer quietly trusting an invented 3.
+  expect(
+    deviceFunctionPackages(FunctionDeviceSupportData())["package2"]
+      ?.get("watch_data_day_number"),
+    3,
+    "the vendor seeds wathcDay to 3, so an unreported window is emitted as 3, not left out",
+  )
+  run {
+    val data = FunctionDeviceSupportData()
+    data.wathcDay = 0
+    expect(
+      deviceFunctionPackages(data)["package2"]?.get("watch_data_day_number"),
+      3,
+      "setWathcDay coerces 0 to 3 — if this is now 0 or absent, the vendor dropped the " +
+        "coercion and the > 0 guard finally means what it claims",
+    )
+  }
+  run {
+    // The only input that reaches the absent branch. Kept so the branch is
+    // exercised at all, not because a band can produce it.
+    val data = FunctionDeviceSupportData()
+    data.wathcDay = -1
+    val package2 = deviceFunctionPackages(data)["package2"]
+    if (package2 != null && "watch_data_day_number" in package2) {
+      failures.add("package2 emitted watch_data_day_number for a negative retention window")
+    }
+  }
+  run {
+    val data = FunctionDeviceSupportData()
+    data.wathcDay = 7
+    val value = deviceFunctionPackages(data)["package2"]?.get("watch_data_day_number")
+    expect(value, 7, "a reported retention window must reach JS as the Int the band sent")
+  }
+
+  for (values in deviceFunctionPackages(allFunctions(EFunctionStatus.SUPPORT)).values) {
+    for ((key, value) in values) {
+      if (key == "watch_data_day_number") continue
+      if (value !in DECLARED_STATUSES) {
+        failures.add("deviceFunctionPackages emitted $key=\"$value\", which FunctionStatus does not declare")
+      }
+    }
+  }
+
   if (failures.isEmpty()) {
     println("  ✓ android function-status mappers: ${constants.size} vendor constants, " +
-      "${CHANNEL_SETTERS.size} social-message channels")
+      "${CHANNEL_SETTERS.size} social-message channels, " +
+      "${PACKAGE_FIELDS.size} device-function keys")
     return
   }
   println("android-function-status-check: ${failures.size} failure(s)")

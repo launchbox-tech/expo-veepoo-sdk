@@ -1,5 +1,10 @@
+import { readFileSync } from "fs";
+import { join } from "path";
+
+import { NATIVE_SOURCES } from "@/bridge-contract/native-source";
 import {
   extractIosPackageKeys,
+  verifyAndroidPackageEmitter,
   verifyDeviceFunctionKeysContract,
 } from "@/bridge-contract/verify-device-function-keys";
 import { DECLARED_PACKAGE_FIELDS } from "@/capabilities/device-functions/declared-keys";
@@ -10,6 +15,44 @@ import {
 import goldenPayloads from "./fixtures/device-function-payloads.golden.json";
 
 const { ios: iosKeys, android: androidKeys } = loadEmittedPackageKeys(repoRoot);
+
+// The packages moved into VeepooFunctionStatus.kt so the executable check can
+// compile and RUN them (#212's follow-up). The keys above are therefore read
+// from the mapper, not from the helper that caches them — so the helper needs
+// its own guard, or it could go back to building a map of its own with the
+// mapper sitting correct and untouched beside it.
+describe("the Android helper caches what the mapper built", () => {
+  const emitterSource = readFileSync(join(repoRoot, NATIVE_SOURCES.androidHelpers), "utf8");
+
+  it("passes on the shipped helper", () => {
+    expect(verifyAndroidPackageEmitter(emitterSource)).toEqual([]);
+  });
+
+  it.each([
+    [
+      "a helper that builds its own map",
+      "cachedDeviceFunctions.putAll(deviceFunctionPackages(data))",
+      'cachedDeviceFunctions["package1"] = mapOf("blood_pressure" to "unsupported")',
+      /must fill the cache from deviceFunctionPackages\(data\)/,
+    ],
+    [
+      "a helper that names a key itself",
+      "cachedDeviceFunctions.putAll(deviceFunctionPackages(data))",
+      "cachedDeviceFunctions.putAll(deviceFunctionPackages(data) + mapOf(\"package4\" to mapOf(\"ecg_function\" to \"open\")))",
+      /names the keys \[package4, ecg_function\] itself/,
+    ],
+    [
+      "a helper that stops calling the mapper at all",
+      "cachedDeviceFunctions.putAll(deviceFunctionPackages(data))",
+      "cachedDeviceFunctions.clear()",
+      /must fill the cache from deviceFunctionPackages\(data\)/,
+    ],
+  ])("reports %s", (_label, from, to, expected) => {
+    expect(verifyAndroidPackageEmitter(emitterSource.replace(from, to)).join("\n")).toMatch(
+      expected,
+    );
+  });
+});
 
 describe("device-function key contract", () => {
   it("every key both platforms emit is a declared package field", () => {

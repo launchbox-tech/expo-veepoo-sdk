@@ -2,13 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.extractIosPackageKeys = extractIosPackageKeys;
 exports.extractAndroidPackageKeys = extractAndroidPackageKeys;
+exports.verifyAndroidPackageEmitter = verifyAndroidPackageEmitter;
 exports.verifyDeviceFunctionKeysContract = verifyDeviceFunctionKeysContract;
 const fs_1 = require("fs");
 const path_1 = require("path");
 const declared_keys_1 = require("../capabilities/device-functions/declared-keys");
 const native_source_1 = require("./native-source");
 const SWIFT_PATH = native_source_1.NATIVE_SOURCES.iosReadHelpers;
-const KOTLIN_PATH = native_source_1.NATIVE_SOURCES.androidHelpers;
+const KOTLIN_PATH = native_source_1.NATIVE_SOURCES.androidFunctionStatus;
+const EMITTER_PATH = native_source_1.NATIVE_SOURCES.androidHelpers;
 /** `type` is a package discriminator, not a field — the normalizers ignore it. */
 const NON_FIELD_KEYS = new Set(["type"]);
 /**
@@ -54,7 +56,33 @@ function extractIosPackageKeys(source) {
     "cachedDeviceFunctions = [", "iOS cacheDeviceFunctions"));
 }
 function extractAndroidPackageKeys(source) {
-    return extractPackageKeys((0, native_source_1.sliceBody)(source, "fun VeepooSDKModule.updateFunctionsFromSupportData", "cachedDeviceFunctions[", "Android updateFunctionsFromSupportData"));
+    return extractPackageKeys((0, native_source_1.sliceBody)(source, "fun deviceFunctionPackages(", 
+    // Stops before the wrapper literal, whose keys are package NAMES, not fields.
+    "return mapOf(", "Android deviceFunctionPackages"));
+}
+/**
+ * Fails when `updateFunctionsFromSupportData` stops handing the cache what
+ * [deviceFunctionPackages] built.
+ *
+ * The keys above are read from the mapper's file, which is not where #210 was
+ * filed. A helper that builds its own map bypasses both this check's real
+ * subject and the executable one that runs the mapper, with the mapper sitting
+ * correct and untouched beside it — the hole the #212 follow-up shipped and had
+ * to close.
+ */
+function verifyAndroidPackageEmitter(source) {
+    const errors = [];
+    const body = (0, native_source_1.sliceBody)(source, "fun VeepooSDKModule.updateFunctionsFromSupportData", "\n}", "Android updateFunctionsFromSupportData");
+    if (!/cachedDeviceFunctions\.putAll\(\s*deviceFunctionPackages\(\s*data\s*\)\s*\)/.test(body)) {
+        errors.push(`Android updateFunctionsFromSupportData must fill the cache from ` +
+            `deviceFunctionPackages(data) (${EMITTER_PATH})`);
+    }
+    const built = [...body.matchAll(/"([^"]+)"\s+to\b|\bput\(\s*"([^"]+)"/g)].map((match) => (match[1] ?? match[2]));
+    if (built.length) {
+        errors.push(`Android updateFunctionsFromSupportData names the keys [${built.join(", ")}] itself — a map ` +
+            `built here bypasses deviceFunctionPackages and the check that runs it (${EMITTER_PATH})`);
+    }
+    return errors;
 }
 function sorted(keys) {
     return [...keys].sort();
@@ -72,6 +100,7 @@ function verifyDeviceFunctionKeysContract(repoRoot) {
     const errors = [];
     const ios = extractIosPackageKeys((0, fs_1.readFileSync)((0, path_1.join)(repoRoot, SWIFT_PATH), "utf8"));
     const android = extractAndroidPackageKeys((0, fs_1.readFileSync)((0, path_1.join)(repoRoot, KOTLIN_PATH), "utf8"));
+    errors.push(...verifyAndroidPackageEmitter((0, fs_1.readFileSync)((0, path_1.join)(repoRoot, EMITTER_PATH), "utf8")));
     for (const [platform, path, packages] of [
         ["iOS", SWIFT_PATH, ios],
         ["Android", KOTLIN_PATH, android],

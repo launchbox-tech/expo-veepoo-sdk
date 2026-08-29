@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # android-function-status-check.sh
-# Compile and RUN the Android vendor-status mappers (#212) against the real
-# vendor classes.
+# Compile and RUN the Android vendor-status mappers (#212, #210) against the
+# real vendor classes.
 #
-# Scope: `toFunctionStatus` and the 13-channel social-message map. The
-# device-function packages (#210) share the converter, so they inherit its
-# coverage, but their own key->field wiring stays in VeepooSDKModuleHelpers.kt
-# behind Android imports and is checked by reading source text only.
+# Scope: `toFunctionStatus`, the 13-channel social-message map, and the 12
+# device-function package keys — each driven one field at a time against the
+# vendor's own structs, so a crossed field fails as loudly as a constant.
 #
 # The contract check (`bun run check:social-msg-keys`) proves the emitter names
 # the right 13 channels and routes each through `toFunctionStatus`. It cannot

@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
+import { NATIVE_SOURCES } from "@/bridge-contract/native-source";
 import {
   extractAndroidPackageKeys,
   extractIosPackageKeys,
@@ -7,8 +8,9 @@ import {
 } from "@/bridge-contract/verify-device-function-keys";
 
 const SOURCES = {
-  ios: "ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift",
-  android: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleHelpers.kt",
+  ios: NATIVE_SOURCES.iosReadHelpers,
+  // The packages are built here; VeepooSDKModuleHelpers.kt only assigns them.
+  android: NATIVE_SOURCES.androidFunctionStatus,
 } as const;
 
 export type Platform = keyof typeof SOURCES;

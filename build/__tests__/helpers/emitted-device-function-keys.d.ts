@@ -1,7 +1,7 @@
 import { type PackageKeys } from "../../bridge-contract/verify-device-function-keys";
 declare const SOURCES: {
     readonly ios: "ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift";
-    readonly android: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleHelpers.kt";
+    readonly android: "android/src/main/kotlin/expo/modules/veepoo/VeepooFunctionStatus.kt";
 };
 export type Platform = keyof typeof SOURCES;
 /**

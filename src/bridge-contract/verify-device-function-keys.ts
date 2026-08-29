@@ -8,7 +8,8 @@ import {
 import { NATIVE_SOURCES, sliceBody } from "./native-source";
 
 const SWIFT_PATH = NATIVE_SOURCES.iosReadHelpers;
-const KOTLIN_PATH = NATIVE_SOURCES.androidHelpers;
+const KOTLIN_PATH = NATIVE_SOURCES.androidFunctionStatus;
+const EMITTER_PATH = NATIVE_SOURCES.androidHelpers;
 
 /** `type` is a package discriminator, not a field — the normalizers ignore it. */
 const NON_FIELD_KEYS = new Set(["type"]);
@@ -71,11 +72,51 @@ export function extractAndroidPackageKeys(source: string): PackageKeys {
   return extractPackageKeys(
     sliceBody(
       source,
-      "fun VeepooSDKModule.updateFunctionsFromSupportData",
-      "cachedDeviceFunctions[",
-      "Android updateFunctionsFromSupportData",
+      "fun deviceFunctionPackages(",
+      // Stops before the wrapper literal, whose keys are package NAMES, not fields.
+      "return mapOf(",
+      "Android deviceFunctionPackages",
     ),
   );
+}
+
+/**
+ * Fails when `updateFunctionsFromSupportData` stops handing the cache what
+ * [deviceFunctionPackages] built.
+ *
+ * The keys above are read from the mapper's file, which is not where #210 was
+ * filed. A helper that builds its own map bypasses both this check's real
+ * subject and the executable one that runs the mapper, with the mapper sitting
+ * correct and untouched beside it — the hole the #212 follow-up shipped and had
+ * to close.
+ */
+export function verifyAndroidPackageEmitter(source: string): string[] {
+  const errors: string[] = [];
+  const body = sliceBody(
+    source,
+    "fun VeepooSDKModule.updateFunctionsFromSupportData",
+    "\n}",
+    "Android updateFunctionsFromSupportData",
+  );
+
+  if (!/cachedDeviceFunctions\.putAll\(\s*deviceFunctionPackages\(\s*data\s*\)\s*\)/.test(body)) {
+    errors.push(
+      `Android updateFunctionsFromSupportData must fill the cache from ` +
+        `deviceFunctionPackages(data) (${EMITTER_PATH})`,
+    );
+  }
+
+  const built = [...body.matchAll(/"([^"]+)"\s+to\b|\bput\(\s*"([^"]+)"/g)].map(
+    (match) => (match[1] ?? match[2]) as string,
+  );
+  if (built.length) {
+    errors.push(
+      `Android updateFunctionsFromSupportData names the keys [${built.join(", ")}] itself — a map ` +
+        `built here bypasses deviceFunctionPackages and the check that runs it (${EMITTER_PATH})`,
+    );
+  }
+
+  return errors;
 }
 
 function sorted(keys: Iterable<string>): string[] {
@@ -95,6 +136,7 @@ export function verifyDeviceFunctionKeysContract(repoRoot: string): string[] {
   const errors: string[] = [];
   const ios = extractIosPackageKeys(readFileSync(join(repoRoot, SWIFT_PATH), "utf8"));
   const android = extractAndroidPackageKeys(readFileSync(join(repoRoot, KOTLIN_PATH), "utf8"));
+  errors.push(...verifyAndroidPackageEmitter(readFileSync(join(repoRoot, EMITTER_PATH), "utf8")));
 
   for (const [platform, path, packages] of [
     ["iOS", SWIFT_PATH, ios],

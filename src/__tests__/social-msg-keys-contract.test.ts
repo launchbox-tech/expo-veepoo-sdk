@@ -144,6 +144,7 @@ describe("social-message key contract", () => {
   it("the mapper file stays compilable on its own", () => {
     const imports = [...kotlinSource.matchAll(/^import\s+(\S+)/gm)].map((match) => match[1]);
     expect(imports).toEqual([
+      "com.veepoo.protocol.model.datas.FunctionDeviceSupportData",
       "com.veepoo.protocol.model.datas.FunctionSocailMsgData",
       "com.veepoo.protocol.model.enums.EFunctionStatus",
     ]);
