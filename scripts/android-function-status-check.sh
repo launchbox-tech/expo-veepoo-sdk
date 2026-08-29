@@ -34,7 +34,10 @@ for file in "$SOURCE" "$CASES" "$AAR"; do
   [ -f "$file" ] || { echo "android-function-status-check: $file missing" >&2; exit 1; }
 done
 
-WORK="$(mktemp -d -t veepoo-function-status)"
+# Explicit XXXXXX template, not `mktemp -t NAME`: the BSD spelling the iOS
+# check uses is fine there because that script is guarded to macOS, but this
+# one runs on the Linux CI job, where GNU mktemp rejects a template with no X.
+WORK="$(mktemp -d "${TMPDIR:-/tmp}/veepoo-function-status.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
 
 # The vendor's own enum, not a hand-written stand-in — a stub would go green
