@@ -30,6 +30,29 @@ export type AndroidSocialMsgChannel = {
 export declare function extractAndroidSocialMsgChannels(source: string): AndroidSocialMsgChannel[];
 export declare function extractAndroidSocialMsgKeys(source: string): string[];
 /**
+ * Fails when `readSocialMsgData` stops handing JS what [socialMsgStatusMap]
+ * built.
+ *
+ * The channel rules below read the mapper's file. That file is not the one
+ * #212 was filed against — the emitter is, and an emitter that builds its own
+ * map reproduces the defect with the mapper sitting correct and untouched
+ * beside it. So the emitter is held to delegating: one `socialMsgStatusMap(data)`
+ * call, resolved and emitted verbatim, and not a channel key of its own.
+ */
+export declare function verifyAndroidEmitterDelegates(source: string): string[];
+/**
+ * Fails when a channel's value would stop tracking what the band said.
+ *
+ * Every vendor field is an `EFunctionStatus`, so every channel must go through
+ * the enum-aware converter — and through a field of its own. A literal, a
+ * Boolean/Number/String converter, or two channels sharing one field all
+ * produce a value independent of the input, which is #212.
+ *
+ * Exported so the test can drive this rule rather than restate it: a rule a
+ * test reimplements is a rule that stays green after you delete it.
+ */
+export declare function verifyAndroidChannelWiring(channels: AndroidSocialMsgChannel[]): string[];
+/**
  * Fails when the social-message channel names drift between the two native
  * emitters and the JS list that reads them.
  *

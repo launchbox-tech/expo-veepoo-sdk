@@ -5,6 +5,7 @@ import { NATIVE_SOURCES, sliceBody } from "./native-source";
 
 const SWIFT_PATH = NATIVE_SOURCES.iosReadHelpers;
 const KOTLIN_PATH = NATIVE_SOURCES.androidFunctionStatus;
+const EMITTER_PATH = NATIVE_SOURCES.androidSocialMsgRead;
 
 export type IosSocialMsgKeys = {
   /** Channels in the "all unsupported" dictionary the function starts from. */
@@ -71,6 +72,90 @@ export function extractAndroidSocialMsgKeys(source: string): string[] {
 }
 
 /**
+ * Fails when `readSocialMsgData` stops handing JS what [socialMsgStatusMap]
+ * built.
+ *
+ * The channel rules below read the mapper's file. That file is not the one
+ * #212 was filed against — the emitter is, and an emitter that builds its own
+ * map reproduces the defect with the mapper sitting correct and untouched
+ * beside it. So the emitter is held to delegating: one `socialMsgStatusMap(data)`
+ * call, resolved and emitted verbatim, and not a channel key of its own.
+ */
+export function verifyAndroidEmitterDelegates(source: string): string[] {
+  const errors: string[] = [];
+  const body = sliceBody(
+    source,
+    'AsyncFunction("readSocialMsgData")',
+    'promise.reject("READ_FAILED"',
+    "Android readSocialMsgData",
+  );
+
+  const built = [...body.matchAll(/val\s+result\s*=\s*(\w+)\(\s*data\s*\)/g)].map(
+    (match) => match[1] as string,
+  );
+  if (built.length !== 1 || built[0] !== "socialMsgStatusMap") {
+    errors.push(
+      `Android readSocialMsgData must build its result from exactly one ` +
+        `socialMsgStatusMap(data) call — found [${built.join(", ") || "none"}] (${EMITTER_PATH})`,
+    );
+  }
+
+  const inlined = [...SOCIAL_MSG_CHANNELS].filter((channel) => body.includes(`"${channel}"`));
+  if (inlined.length) {
+    errors.push(
+      `Android readSocialMsgData names the channels [${inlined.join(", ")}] itself — a map built ` +
+        `here bypasses socialMsgStatusMap and the check that runs it (${EMITTER_PATH})`,
+    );
+  }
+
+  for (const required of ["promise.resolve(result)", '"data" to result']) {
+    if (!body.includes(required)) {
+      errors.push(
+        `Android readSocialMsgData no longer passes the mapped result on verbatim — ` +
+          `expected \`${required}\` (${EMITTER_PATH})`,
+      );
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Fails when a channel's value would stop tracking what the band said.
+ *
+ * Every vendor field is an `EFunctionStatus`, so every channel must go through
+ * the enum-aware converter — and through a field of its own. A literal, a
+ * Boolean/Number/String converter, or two channels sharing one field all
+ * produce a value independent of the input, which is #212.
+ *
+ * Exported so the test can drive this rule rather than restate it: a rule a
+ * test reimplements is a rule that stays green after you delete it.
+ */
+export function verifyAndroidChannelWiring(channels: AndroidSocialMsgChannel[]): string[] {
+  const errors: string[] = [];
+  const seenFields = new Map<string, string>();
+  for (const { key, converter, field } of channels) {
+    if (converter !== "toFunctionStatus") {
+      errors.push(
+        `Android reads ${key} through ${converter}(), not toFunctionStatus() — every ` +
+          `FunctionSocailMsgData field is an EFunctionStatus, and a converter that cannot ` +
+          `read the enum returns a constant (${KOTLIN_PATH})`,
+      );
+    }
+    const claimed = seenFields.get(field);
+    if (claimed) {
+      errors.push(
+        `Android reads data.${field} for both ${claimed} and ${key} — one of them reports the ` +
+          `wrong channel's setting (${KOTLIN_PATH})`,
+      );
+    } else {
+      seenFields.set(field, key);
+    }
+  }
+  return errors;
+}
+
+/**
  * Fails when the social-message channel names drift between the two native
  * emitters and the JS list that reads them.
  *
@@ -104,29 +189,8 @@ export function verifySocialMsgKeysContract(repoRoot: string): string[] {
     }
   }
 
-  // Every vendor field is an EFunctionStatus, so every channel must go through
-  // the enum-aware converter — and through a field of its own. A literal, a
-  // Boolean/Number/String converter, or two channels sharing one field all
-  // produce a value that does not track what the band said, which is #212.
-  const seenFields = new Map<string, string>();
-  for (const { key, converter, field } of android) {
-    if (converter !== "toFunctionStatus") {
-      errors.push(
-        `Android reads ${key} through ${converter}(), not toFunctionStatus() — every ` +
-          `FunctionSocailMsgData field is an EFunctionStatus, and a converter that cannot ` +
-          `read the enum returns a constant (${KOTLIN_PATH})`,
-      );
-    }
-    const claimed = seenFields.get(field);
-    if (claimed) {
-      errors.push(
-        `Android reads data.${field} for both ${claimed} and ${key} — one of them reports the ` +
-          `wrong channel's setting (${KOTLIN_PATH})`,
-      );
-    } else {
-      seenFields.set(field, key);
-    }
-  }
+  errors.push(...verifyAndroidChannelWiring(android));
+  errors.push(...verifyAndroidEmitterDelegates(readFileSync(join(repoRoot, EMITTER_PATH), "utf8")));
 
   return errors;
 }

@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 # android-function-status-check.sh
-# Compile and RUN the Android vendor-status mappers (#212, #210) against the
-# real vendor classes.
+# Compile and RUN the Android vendor-status mappers (#212) against the real
+# vendor classes.
+#
+# Scope: `toFunctionStatus` and the 13-channel social-message map. The
+# device-function packages (#210) share the converter, so they inherit its
+# coverage, but their own key->field wiring stays in VeepooSDKModuleHelpers.kt
+# behind Android imports and is checked by reading source text only.
 #
 # The contract check (`bun run check:social-msg-keys`) proves the emitter names
 # the right 13 channels and routes each through `toFunctionStatus`. It cannot
@@ -29,10 +34,22 @@ command -v unzip >/dev/null 2>&1 || { echo "android-function-status-check: unzip
 
 SOURCE="android/src/main/kotlin/expo/modules/veepoo/VeepooFunctionStatus.kt"
 CASES="scripts/AndroidFunctionStatusCheck.kt"
-AAR="android/libs/vpprotocol-2.3.80.15.aar"
-for file in "$SOURCE" "$CASES" "$AAR"; do
+for file in "$SOURCE" "$CASES"; do
   [ -f "$file" ] || { echo "android-function-status-check: $file missing" >&2; exit 1; }
 done
+
+# Resolved by glob, not pinned: a vendor bump should send the NEW enum through
+# these cases, not fail with "file missing" and leave the mappers untested at
+# the one moment their input might have changed. `bun run vendor:check` is what
+# tracks the version; this only needs whichever vpprotocol ships.
+shopt -s nullglob
+AARS=(android/libs/vpprotocol-*.aar)
+shopt -u nullglob
+case ${#AARS[@]} in
+  1) AAR="${AARS[0]}" ;;
+  0) echo "android-function-status-check: no android/libs/vpprotocol-*.aar found" >&2; exit 1 ;;
+  *) echo "android-function-status-check: ${#AARS[@]} vpprotocol AARs in android/libs — ${AARS[*]}; leave one" >&2; exit 1 ;;
+esac
 
 # Explicit XXXXXX template, not `mktemp -t NAME`: the BSD spelling the iOS
 # check uses is fine there because that script is guarded to macOS, but this

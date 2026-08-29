@@ -6,6 +6,8 @@ import {
   extractAndroidSocialMsgChannels,
   extractAndroidSocialMsgKeys,
   extractIosSocialMsgKeys,
+  verifyAndroidChannelWiring,
+  verifyAndroidEmitterDelegates,
   verifySocialMsgKeysContract,
 } from "@/bridge-contract/verify-social-msg-keys";
 import { SOCIAL_MSG_CHANNELS } from "@/capabilities/social-msg";
@@ -67,20 +69,17 @@ describe("social-message key contract", () => {
       /data\.other for both/,
     ],
   ])("the converter contract reports %s", (_label, replacement, expected) => {
+    // The shipped rule, driven over a drifted extraction — not a copy of it.
+    // Feeding the real function is the whole point: a restated rule keeps
+    // passing after the one that runs in CI is deleted.
     const drifted = extractAndroidSocialMsgChannels(
       kotlinSource.replace('"phone" to toFunctionStatus(data.phone)', replacement),
     );
-    // Re-run the verifier's own rules over the drifted extraction rather than
-    // writing to disk: the rule under test is the pairing, not the file I/O.
-    const seen = new Map<string, string>();
-    const errors: string[] = [];
-    for (const { key, converter, field } of drifted) {
-      if (converter !== "toFunctionStatus") errors.push(`${key} through ${converter}()`);
-      const claimed = seen.get(field);
-      if (claimed) errors.push(`data.${field} for both ${claimed} and ${key}`);
-      else seen.set(field, key);
-    }
-    expect(errors.join("\n")).toMatch(expected);
+    expect(verifyAndroidChannelWiring(drifted).join("\n")).toMatch(expected);
+  });
+
+  it("passes the shipped wiring it is asked to judge", () => {
+    expect(verifyAndroidChannelWiring(extractAndroidSocialMsgChannels(kotlinSource))).toEqual([]);
   });
 
   // Nothing above demonstrates the comparison CAN fail — a check that only ever
@@ -92,6 +91,42 @@ describe("social-message key contract", () => {
     expect(drifted).toContain("whats_app");
     expect(drifted).not.toContain("whatsapp");
     expect([...SOCIAL_MSG_CHANNELS].filter((key) => !drifted.includes(key))).toEqual(["whatsapp"]);
+  });
+
+  // The mapper's file is not the one #212 was filed against. An emitter that
+  // builds its own map reproduces the defect with the mapper sitting correct
+  // and untouched beside it, so the emitter is held to delegating.
+  describe("the emitter hands JS what the mapper built", () => {
+    const emitterSource = readFileSync(join(repoRoot, NATIVE_SOURCES.androidSocialMsgRead), "utf8");
+
+    it("passes on the shipped emitter", () => {
+      expect(verifyAndroidEmitterDelegates(emitterSource)).toEqual([]);
+    });
+
+    it.each([
+      [
+        "an emitter that builds its own map",
+        "val result = socialMsgStatusMap(data)",
+        'val result = mapOf("phone" to "unsupported", "sms" to "unsupported")',
+        /must build its result from exactly one socialMsgStatusMap\(data\) call/,
+      ],
+      [
+        "an emitter that names channels itself",
+        "val result = socialMsgStatusMap(data)",
+        'val result = socialMsgStatusMap(data) + ("phone" to "open")',
+        /names the channels \[phone\] itself/,
+      ],
+      [
+        "an emitter that resolves something else",
+        "promise.resolve(result)",
+        "promise.resolve(emptyMap<String, String>())",
+        /no longer passes the mapped result on verbatim/,
+      ],
+    ])("reports %s", (_label, from, to, expected) => {
+      expect(verifyAndroidEmitterDelegates(emitterSource.replace(from, to)).join("\n")).toMatch(
+        expected,
+      );
+    });
   });
 
   it("the enum-blind converter is gone, with no callers left", () => {

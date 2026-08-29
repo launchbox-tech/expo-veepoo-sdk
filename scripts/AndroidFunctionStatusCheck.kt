@@ -1,4 +1,9 @@
-// Behavioural regression test for the Android vendor-status mappers (#212, #210).
+// Behavioural regression test for the Android vendor-status mappers (#212).
+//
+// Covers `toFunctionStatus` — which #210's device-function packages share, and
+// so inherit — and the 13-channel social-message map. Not #210's own key->field
+// wiring: that sits in VeepooSDKModuleHelpers.kt behind Android imports, out of
+// reach of a standalone compile.
 //
 // Compiled and run by scripts/android-function-status-check.sh together with
 // android/src/main/kotlin/expo/modules/veepoo/VeepooFunctionStatus.kt itself —
