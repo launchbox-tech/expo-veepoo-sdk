@@ -1,3 +1,5 @@
+/** Repo-relative paths of the iOS sources that emit `DEVICE_READY`. */
+export declare function findEmittingSources(repoRoot: string): string[];
 /**
  * Every `DEVICE_READY` emission in the sources above, including the simulator
  * stubs. A drop below this means an emission site was renamed or removed and
@@ -29,5 +31,5 @@ export declare function extractDeviceReadyEmissions(source: string, file: string
  */
 export declare function verifyDeviceReadyIdentityContract(repoRoot: string): string[];
 /** The payload half of the contract, over already-parsed emissions. */
-export declare function verifyEmissions(emissions: DeviceReadyEmission[]): string[];
+export declare function verifyDeviceReadyPayloads(emissions: DeviceReadyEmission[]): string[];
 //# sourceMappingURL=verify-device-ready-identity.d.ts.map

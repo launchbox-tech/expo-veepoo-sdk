@@ -16,6 +16,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Run the device-identity split (#218)
+        # Foundation-only compile-and-run of ios/VeepooSDK/VeepooDeviceIdentity.swift
+        # — no pods, no prebuild, ~1s. Placed before the setup below so a broken
+        # predicate fails in seconds instead of behind a four-minute pod build.
+        # The contract check on the `test` job proves the emission sites CALL the
+        # type; this proves it DECIDES correctly.
+        run: bash scripts/ios-device-identity-check.sh
+
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
 
@@ -172,6 +180,14 @@ jobs:
         # itself; pin with `sudo xcode-select -s /Applications/Xcode_<v>.app`
         # here if the default turns out to be too old.
         run: xcodebuild -version && xcode-select -p
+
+      - name: Run the device-identity split (#218)
+        # Foundation-only compile-and-run of ios/VeepooSDK/VeepooDeviceIdentity.swift
+        # — no pods, no prebuild, ~1s. Placed before the setup below so a broken
+        # predicate fails in seconds instead of behind a four-minute pod build.
+        # The contract check on the `test` job proves the emission sites CALL the
+        # type; this proves it DECIDES correctly.
+        run: bash scripts/ios-device-identity-check.sh
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2

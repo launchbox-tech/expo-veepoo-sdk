@@ -124,6 +124,21 @@ else
   ok "Kotlin AsyncFunction surface test passed"
 fi
 
+# Runs the #218 identity split against the shipped Swift. Foundation-only, so it
+# needs no pods and finishes in about a second — kept ahead of the compile gate
+# below so a broken predicate fails fast rather than after a four-minute build.
+step "Run the iOS device-identity split"
+set +e
+bash scripts/ios-device-identity-check.sh
+identity_status=$?
+set -e
+case "$identity_status" in
+  0) ok "VeepooDeviceIdentity cases passed" ;;
+  3) skip "macOS + Xcode required (see message above)"
+     SKIPPED+=("iOS device-identity split") ;;
+  *) exit "$identity_status" ;;
+esac
+
 # The one gate that compiles ios/VeepooSDK/*.swift. Everything above is JS,
 # Kotlin, or file parsing; a Swift type error reaches consumers otherwise — which
 # is how `NSUInteger` (an ObjC typedef with no Swift spelling) sat on main until
