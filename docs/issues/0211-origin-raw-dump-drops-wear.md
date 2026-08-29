@@ -1,7 +1,7 @@
 # readOriginRawDump drops OriginData.wear — the vendor sqlite has 19 fields per bucket, the bridge emits 10
 
 **Issue:** #211
-**Status:** Open — all four acceptance criteria met on a real band (2026-08-29); open awaiting the maintainer's close
+**Status:** Closed 2026-08-29 — all four acceptance criteria met on a real band; fixed by #220
 **Labels:** bug
 
 ## What to build
@@ -115,3 +115,11 @@ gets wrong.
 
 Blocks launchbox-tech/rayu.ai#477. Ninth instance of the rayu.ai-tracked family
 *plumbing built, data never arrives, absence looks like a quiet log*.
+
+Consumer side landed in launchbox-tech/rayu.ai#545. Worth knowing before the
+next consumer pins this: `stepValue` and `sportValue` are **absent** from the
+new payload, so a parser still reading them gets `0` — and because `calValue`
+and `disValue` are spelled the same in both shapes, the row is still written
+rather than skipped. Half-populated, nothing thrown. That is the same failure
+mode as this issue, one layer up, and it is why the shape change and the
+parser change had to land together.

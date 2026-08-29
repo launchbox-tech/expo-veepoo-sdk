@@ -1,7 +1,7 @@
 # Device-function normalizers: 12 of 12 native keys miss their declared type — every package field is undefined at runtime
 
 **Issue:** #210
-**Status:** Open — all four acceptance criteria met; open awaiting the maintainer's close
+**Status:** Closed 2026-08-29 — all four acceptance criteria met, re-confirmed on a real band
 **Labels:** bug, ready-for-agent
 
 ## What to build
