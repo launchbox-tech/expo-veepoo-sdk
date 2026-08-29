@@ -33,6 +33,7 @@
     "check:native-rejection": "npm run build && node build/bridge-contract/run-contract-checks.js native-rejection",
     "check:device-function-keys": "npm run build && node build/bridge-contract/run-contract-checks.js device-function-keys",
     "check:ios-device-identity": "bash scripts/ios-device-identity-check.sh",
+    "check:android-function-status": "bash scripts/android-function-status-check.sh",
     "check:device-ready-identity": "npm run build && node build/bridge-contract/run-contract-checks.js device-ready-identity",
     "check:social-msg-keys": "npm run build && node build/bridge-contract/run-contract-checks.js social-msg-keys",
     "check:upstream-sdk": "npm run build && node build/bridge-contract/run-contract-checks.js upstream-sdk",

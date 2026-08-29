@@ -144,6 +144,18 @@ jobs:
           java -cp "/tmp/native-async-surface-test.jar:/tmp/native-test-deps/junit-4.13.2.jar:/tmp/native-test-deps/hamcrest-core-1.3.jar:$KOTLIN_STDLIB" \
             org.junit.runner.JUnitCore expo.modules.veepoo.AsyncFunctionSurfaceTest
 
+      - name: Run the Android vendor-status mappers (#212)
+        # Compiles and RUNS android/.../VeepooFunctionStatus.kt against the
+        # EFunctionStatus constants unzipped from the committed
+        # vpprotocol AAR. The contract check on this job proves the emitter
+        # routes all 13 channels through toFunctionStatus; this proves
+        # toFunctionStatus reads the vendor enum at all — #212 was a mapper
+        # whose output did not depend on its input. Reuses the kotlinc the
+        # step above installed.
+        run: |
+          export PATH="$HOME/.kotlinc-2.0.21/kotlinc/bin:$PATH"
+          bash scripts/android-function-status-check.sh
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v5
         if: always()

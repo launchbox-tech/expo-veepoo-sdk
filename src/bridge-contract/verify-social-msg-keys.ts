@@ -4,7 +4,7 @@ import { SOCIAL_MSG_CHANNELS } from "@/capabilities/social-msg";
 import { NATIVE_SOURCES, sliceBody } from "./native-source";
 
 const SWIFT_PATH = NATIVE_SOURCES.iosReadHelpers;
-const KOTLIN_PATH = NATIVE_SOURCES.androidSocialMsgRead;
+const KOTLIN_PATH = NATIVE_SOURCES.androidFunctionStatus;
 
 export type IosSocialMsgKeys = {
   /** Channels in the "all unsupported" dictionary the function starts from. */
@@ -35,15 +35,39 @@ export function extractIosSocialMsgKeys(source: string): IosSocialMsgKeys {
   };
 }
 
-/** Android builds the same channels in one `mapOf(...)`. */
-export function extractAndroidSocialMsgKeys(source: string): string[] {
+export type AndroidSocialMsgChannel = {
+  /** The key JS reads. */
+  key: string;
+  /** The Kotlin function the value is passed through. */
+  converter: string;
+  /** The `FunctionSocailMsgData` field it reads. */
+  field: string;
+};
+
+/**
+ * Android builds the same channels in one `mapOf(...)`, each entry of the shape
+ * `"key" to converter(data.field)`.
+ *
+ * The converter and field are captured, not just the key: #212 was a converter
+ * that could not read the vendor's enum and answered a constant, so a check
+ * that only collected keys would have watched it happen.
+ */
+export function extractAndroidSocialMsgChannels(source: string): AndroidSocialMsgChannel[] {
   const body = sliceBody(
     source,
-    "val result = mapOf(",
-    "module.sendEvent(",
-    "Android readSocialMsgData",
+    "fun socialMsgStatusMap(",
+    "\n}",
+    "Android socialMsgStatusMap",
   );
-  return [...body.matchAll(/"([^"]+)"\s+to\b/g)].map((match) => match[1] as string);
+  return [...body.matchAll(/"([^"]+)"\s+to\s+(\w+)\(\s*data\.(\w+)\s*\)/g)].map((match) => ({
+    key: match[1] as string,
+    converter: match[2] as string,
+    field: match[3] as string,
+  }));
+}
+
+export function extractAndroidSocialMsgKeys(source: string): string[] {
+  return extractAndroidSocialMsgChannels(source).map((channel) => channel.key);
 }
 
 /**
@@ -62,14 +86,11 @@ export function verifySocialMsgKeysContract(repoRoot: string): string[] {
   const expected: string[] = [...SOCIAL_MSG_CHANNELS].sort();
 
   const ios = extractIosSocialMsgKeys(readFileSync(join(repoRoot, SWIFT_PATH), "utf8"));
+  const android = extractAndroidSocialMsgChannels(readFileSync(join(repoRoot, KOTLIN_PATH), "utf8"));
   const sources = [
     ["iOS seed", SWIFT_PATH, ios.seeded],
     ["iOS ANCS decode", SWIFT_PATH, ios.assigned],
-    [
-      "Android",
-      KOTLIN_PATH,
-      extractAndroidSocialMsgKeys(readFileSync(join(repoRoot, KOTLIN_PATH), "utf8")),
-    ],
+    ["Android", KOTLIN_PATH, android.map((channel) => channel.key)],
   ] as const;
 
   for (const [platform, path, keys] of sources) {
@@ -80,6 +101,30 @@ export function verifySocialMsgKeysContract(repoRoot: string): string[] {
         `${platform} social-message channels disagree with SOCIAL_MSG_CHANNELS — ` +
           `missing: [${missing.join(", ")}], unexpected: [${extra.join(", ")}] (${path})`,
       );
+    }
+  }
+
+  // Every vendor field is an EFunctionStatus, so every channel must go through
+  // the enum-aware converter — and through a field of its own. A literal, a
+  // Boolean/Number/String converter, or two channels sharing one field all
+  // produce a value that does not track what the band said, which is #212.
+  const seenFields = new Map<string, string>();
+  for (const { key, converter, field } of android) {
+    if (converter !== "toFunctionStatus") {
+      errors.push(
+        `Android reads ${key} through ${converter}(), not toFunctionStatus() — every ` +
+          `FunctionSocailMsgData field is an EFunctionStatus, and a converter that cannot ` +
+          `read the enum returns a constant (${KOTLIN_PATH})`,
+      );
+    }
+    const claimed = seenFields.get(field);
+    if (claimed) {
+      errors.push(
+        `Android reads data.${field} for both ${claimed} and ${key} — one of them reports the ` +
+          `wrong channel's setting (${KOTLIN_PATH})`,
+      );
+    } else {
+      seenFields.set(field, key);
     }
   }
 

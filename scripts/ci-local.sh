@@ -124,6 +124,23 @@ else
   ok "Kotlin AsyncFunction surface test passed"
 fi
 
+# Compiles and RUNS the #212 vendor-status mappers against vpprotocol's own
+# EFunctionStatus, unzipped from the committed AAR. The contract check above
+# proves the emitter routes all 13 channels through toFunctionStatus; only this
+# proves toFunctionStatus reads the enum. Needs kotlinc + java like the step
+# above, and skips just as loudly without them.
+step "Run the Android vendor-status mappers"
+set +e
+bash scripts/android-function-status-check.sh
+status_check=$?
+set -e
+case "$status_check" in
+  0) ok "Android vendor-status mappers passed" ;;
+  3) skip "kotlinc and/or java not on PATH (see message above)"
+     SKIPPED+=("Android vendor-status mappers") ;;
+  *) exit "$status_check" ;;
+esac
+
 # Runs the #218 identity split against the shipped Swift. Foundation-only, so it
 # needs no pods and finishes in about a second — kept ahead of the compile gate
 # below so a broken predicate fails fast rather than after a four-minute build.

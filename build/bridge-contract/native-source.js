@@ -7,6 +7,12 @@ exports.NATIVE_SOURCES = {
     iosReadHelpers: "ios/VeepooSDK/VeepooSDKModule+ReadHelpers.swift",
     androidHelpers: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleHelpers.kt",
     androidSocialMsgRead: "android/src/main/kotlin/expo/modules/veepoo/VeepooSDKModuleSocialMsgRead.kt",
+    /**
+     * The vendor-status mappers. Kept apart from `androidHelpers` because it
+     * imports the vendor types and nothing else, which is what lets
+     * scripts/android-function-status-check.sh compile and RUN it (#212).
+     */
+    androidFunctionStatus: "android/src/main/kotlin/expo/modules/veepoo/VeepooFunctionStatus.kt",
     iosConnect: "ios/VeepooSDK/VeepooSDKModule+Connect.swift",
     iosConnectionHelpers: "ios/VeepooSDK/VeepooSDKModule+ConnectionHelpers.swift",
     iosDeviceIdentity: "ios/VeepooSDK/VeepooDeviceIdentity.swift",

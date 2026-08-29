@@ -41,25 +41,14 @@ fun ModuleDefinitionBuilder.defineSocialMsgRead(module: VeepooSDKModule) {
             Log.d(TAG, "readSocialMsgData: received social message data")
             
             // Every FunctionSocailMsgData field is the vendor's EFunctionStatus
-            // enum, so it must go through toFunctionStatus — the older
+            // enum, so every one goes through toFunctionStatus — the older
             // toSupportedStatus could not read an enum and answered
             // "unsupported" for all 13 channels whatever the band said (#212).
-            val result = mapOf(
-              "phone" to toFunctionStatus(data.phone),
-              "sms" to toFunctionStatus(data.msg),
-              "wechat" to toFunctionStatus(data.wechat),
-              "qq" to toFunctionStatus(data.qq),
-              "facebook" to toFunctionStatus(data.facebook),
-              "twitter" to toFunctionStatus(data.twitter),
-              "instagram" to toFunctionStatus(data.instagram),
-              "linkedin" to toFunctionStatus(data.linkin),
-              "whatsapp" to toFunctionStatus(data.whats),
-              "line" to toFunctionStatus(data.line),
-              "skype" to toFunctionStatus(data.skype),
-              "email" to toFunctionStatus(data.gmail),
-              "other" to toFunctionStatus(data.other)
-            )
-            
+            // The map lives in VeepooFunctionStatus.kt, which imports the vendor
+            // types and nothing else, so scripts/android-function-status-check.sh
+            // can compile and RUN it against the band's real vocabulary.
+            val result = socialMsgStatusMap(data)
+
             module.sendEvent(SOCIAL_MSG_DATA, mapOf(
               "deviceId" to (module.connectedDeviceId ?: ""),
               "data" to result

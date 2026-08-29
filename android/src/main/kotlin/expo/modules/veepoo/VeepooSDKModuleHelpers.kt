@@ -35,7 +35,6 @@ import com.veepoo.protocol.model.datas.DeviceFunctionPackage3
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage4
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage5
 import com.veepoo.protocol.model.enums.DeviceManualDataType
-import com.veepoo.protocol.model.enums.EFunctionStatus
 import com.inuker.bluetooth.library.Code
 import com.veepoo.protocol.model.settings.CustomSettingData
 import expo.modules.kotlin.Promise
@@ -91,26 +90,6 @@ fun normalizePasswordStatus(status: String): String {
     normalized.contains("success") -> "SUCCESS"
     normalized.contains("fail") -> "FAILED"
     else -> "UNKNOWN"
-  }
-}
-
-/**
- * Converts the vendor's `EFunctionStatus` to the `FunctionStatus` vocabulary JS
- * declares. This is the ONLY converter for a vendor status: the previous
- * `toSupportedStatus` branched on Boolean/Number/String, so an enum matched
- * nothing and fell through to "unsupported" — the band's real answer never left
- * Kotlin (#210 for device functions, #212 for social messages).
- *
- * `UNKONW` (vendor spelling) maps to "unknown", NOT "unsupported" — a band that
- * did not report a capability must stay distinguishable from one that said no.
- */
-fun toFunctionStatus(status: EFunctionStatus?): String {
-  return when (status) {
-    EFunctionStatus.SUPPORT -> "support"
-    EFunctionStatus.SUPPORT_OPEN -> "open"
-    EFunctionStatus.SUPPORT_CLOSE -> "close"
-    EFunctionStatus.UNSUPPORT -> "unsupported"
-    else -> "unknown"
   }
 }
 

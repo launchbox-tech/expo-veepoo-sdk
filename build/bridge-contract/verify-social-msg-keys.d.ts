@@ -11,7 +11,23 @@ export type IosSocialMsgKeys = {
  * just reached a different way.
  */
 export declare function extractIosSocialMsgKeys(source: string): IosSocialMsgKeys;
-/** Android builds the same channels in one `mapOf(...)`. */
+export type AndroidSocialMsgChannel = {
+    /** The key JS reads. */
+    key: string;
+    /** The Kotlin function the value is passed through. */
+    converter: string;
+    /** The `FunctionSocailMsgData` field it reads. */
+    field: string;
+};
+/**
+ * Android builds the same channels in one `mapOf(...)`, each entry of the shape
+ * `"key" to converter(data.field)`.
+ *
+ * The converter and field are captured, not just the key: #212 was a converter
+ * that could not read the vendor's enum and answered a constant, so a check
+ * that only collected keys would have watched it happen.
+ */
+export declare function extractAndroidSocialMsgChannels(source: string): AndroidSocialMsgChannel[];
 export declare function extractAndroidSocialMsgKeys(source: string): string[];
 /**
  * Fails when the social-message channel names drift between the two native
