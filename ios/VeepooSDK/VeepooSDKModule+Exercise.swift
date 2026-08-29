@@ -404,9 +404,12 @@ extension VeepooSDKModule {
         watchdog.cancel()
 
         var sessionsThisRound = 0
+        var sportCrcs: [Int] = []
+        var gpsCrcs: [Int] = []
         for model in sportModels ?? [] {
           emittedNow += 1
           sessionsThisRound += 1
+          sportCrcs.append(Int(model.crc))
           satisfiedNow.insert(Int(model.crc))
           self.sendEvent(EXERCISE_SESSION_DATA, [
             "deviceId": self.connectedDeviceId ?? "",
@@ -416,13 +419,51 @@ extension VeepooSDKModule {
         for model in gpsModels ?? [] {
           emittedNow += 1
           sessionsThisRound += 1
+          gpsCrcs.append(Int(model.crc))
           satisfiedNow.insert(Int(model.crc))
           self.sendEvent(EXERCISE_SESSION_DATA, [
             "deviceId": self.connectedDeviceId ?? "",
             "session": self.parseSportGpsModel(model)
           ])
         }
-        finishRound("\(sessionsThisRound) sessions, satisfied \(satisfiedNow.count)/\(wanted.count)")
+
+        // [ROUND-EVIDENCE] `satisfiedNow` is a Set and the outcome reported only
+        // its COUNT, so the crc values the vendor actually sent were discarded at
+        // the one place they exist. That is why rayu.ai#472 could measure the cost
+        // of the duplicate but never name it.
+        //
+        // The arithmetic already narrows what we are looking for. `insert` runs
+        // unconditionally, including for a crc that is not in `wanted` — so three
+        // models carrying three DISTINCT crcs would have printed "satisfied 3/3"
+        // even with an alien among them. The observed "3 sessions, satisfied 2/3"
+        // therefore requires a REPEATED value. What is still open is which crc
+        // repeated, whether an alien rides along ([A, A, X] also gives 2/3), and:
+        //
+        // The two vendor arrays are drained into the same counters. A GPS-bearing
+        // session present in BOTH `sportModels` and `gpsModels` yields
+        // "3 sessions, satisfied 2/3" from two REAL sessions — a double-count we
+        // cause, not a vendor quirk we tolerate — and it inflates `emittedNow`,
+        // which is what `emitted >= wanted.count` terminates on. `native_sessions
+        // == sessions` cannot catch it: both sides derive from this emission.
+        // Hence `got` is tagged by source rather than flattened.
+        var sources: [String] = []
+        if !sportCrcs.isEmpty {
+          sources.append("sport:" + sportCrcs.map(String.init).joined(separator: "/"))
+        }
+        if !gpsCrcs.isEmpty {
+          sources.append("gps:" + gpsCrcs.map(String.init).joined(separator: "/"))
+        }
+        var detail = sources.isEmpty ? "" : ", got[\(sources.joined(separator: ","))]"
+        let received = sportCrcs + gpsCrcs
+        let repeated = Set(received.filter { crc in received.filter { $0 == crc }.count > 1 })
+        if !repeated.isEmpty {
+          detail += ", dup[\(repeated.sorted().map(String.init).joined(separator: "/"))]"
+        }
+        let alien = Set(received.filter { !wanted.contains($0) })
+        if !alien.isEmpty {
+          detail += ", alien[\(alien.sorted().map(String.init).joined(separator: "/"))]"
+        }
+        finishRound("\(sessionsThisRound) sessions, satisfied \(satisfiedNow.count)/\(wanted.count)\(detail)")
       }
     }
   }
