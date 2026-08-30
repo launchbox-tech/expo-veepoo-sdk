@@ -364,6 +364,10 @@ extension VeepooSDKModule {
         status = "error"
       }
 
+      print(
+        "[VeepooSDK][VERIFY-TRACE] vp_connect_state=\(state.rawValue) mapped_status=\(status) device_id=\(deviceId) session_state=\(self.connectionState.rawValue)"
+      )
+
       if !deviceId.isEmpty {
         self.emitConnectionStatus(deviceId: deviceId, status: status, code: state.rawValue)
       }
