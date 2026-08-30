@@ -353,6 +353,13 @@ extension VeepooSDKModule {
         status = "connecting"
       case 2:
         status = "connected"
+      case 3:
+        // VPBleConnectStateChangeBlock carries VPDeviceConnectState, not the
+        // DeviceConnectState used by deviceConnectBlock. Raw 3 is therefore
+        // VerifyPasswordSuccess — the completed verify tail — not a connect
+        // failure. Publishing it as error made every healthy completion look
+        // like a late connection failure to JS.
+        status = "ready"
       default:
         status = "error"
       }
