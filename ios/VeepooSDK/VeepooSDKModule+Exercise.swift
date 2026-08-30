@@ -102,10 +102,45 @@ extension VeepooSDKModule {
   #if !targetEnvironment(simulator)
   // Vendor-typed helpers — no simulator slice carries these classes, so they
   // are compiled out. Every call site is inside a matching guard.
+  /// [SAMPLE-OVERRUN] rayu.ai#566. The vendor hands back a session's minute
+  /// array at the buffer's LENGTH, not its fill. Past the session's own data it
+  /// continues into the PREVIOUSLY-recorded session's slots at the same offset,
+  /// then repeats that buffer's final slot to the end. Proven by index-aligning
+  /// two stored sessions: 08-28 aerobics (301 samples) matched 08-25 strength
+  /// (69) in lockstep from index 34, then pinned on slot 68 for 233 frames; the
+  /// 08-07/08-05 pair shows the same shape. The band was measuring throughout —
+  /// the all-day table holds 58 distinct PPG values over the pinned span.
+  ///
+  /// Both vendor models declare the real fill on `recordCount` (the GPS header
+  /// states it outright: "总记录条数，与分钟数量应相等" — should equal the
+  /// minute count), and we mapped the whole array and dropped that field. The
+  /// bound was always on the wire; this costs no extra BLE read.
+  ///
+  /// NOT the same buffer as rayu.ai#472. That one is the CRC *slot* array, whose
+  /// length genuinely is the device's capacity and whose empty slots are already
+  /// stripped in `readSportViaCrcApi`. This is the per-minute array inside one
+  /// returned session.
+  ///
+  /// `declared == 0` is NOT read as "no samples". A zero means the band told us
+  /// nothing about the fill, and per ADR-0060 that is not evidence of absence —
+  /// so the array passes through whole and `deliveredSampleCount` carries the
+  /// disagreement to JS, which annotates the session rather than trusting a
+  /// silently trimmed stream. Same for `declared > delivered`: we never
+  /// fabricate the missing tail, and we never drop a sample the band sent.
+  private func boundedMinuteCount(declared: Int, delivered: Int) -> Int {
+    guard declared > 0 else { return delivered }
+    return min(declared, delivered)
+  }
+
   /// New-API typed session (`VPDeviceSportModel`, framework ≥2.2.88).
   /// Header-documented units: totalDis = m, totalCal = kcal, times = s.
   private func parseSportModel(_ m: VPDeviceSportModel) -> [String: Any] {
-    let minuteData: [[String: Any]] = (m.oneMinuteData).map { item in
+    // [SAMPLE-OVERRUN] See `boundedMinuteCount` — `recordCount` is the band's
+    // own fill; the array's length is the buffer's.
+    let delivered = m.oneMinuteData.count
+    let declared = Int(m.recordCount)
+    let kept = boundedMinuteCount(declared: declared, delivered: delivered)
+    let minuteData: [[String: Any]] = m.oneMinuteData.prefix(kept).map { item in
       return [
         "heartRate": Int(item.heartValue),
         "distance": Double(item.disValue) / 1000.0, // m → km
@@ -113,9 +148,18 @@ extension VeepooSDKModule {
         "steps": Int(item.stepValue),
         "sportValue": Int(item.sportValue),
         "isPaused": item.isPause == 1,
+        // The band's own minute index. An overrun tail repeats the PRIOR
+        // session's final index, so this is a second, independent witness to
+        // the defect that does not depend on trusting `recordCount`.
+        "packetIndex": Int(item.packageCount),
       ]
     }
     return [
+      // Both counts ride out: `recordCount` is what the band declared,
+      // `deliveredSampleCount` is what its array actually held. Equal means a
+      // clean read; any disagreement is the signal JS annotates on.
+      "recordCount": declared,
+      "deliveredSampleCount": delivered,
       "type": exerciseOrdinalToMode(Int(m.type)) as Any,
       "crc": Int(m.crc),
       "beginTime": exerciseDateString(m.beginTime),
@@ -138,7 +182,12 @@ extension VeepooSDKModule {
   /// the same session shape; GPS tracks are not carried (no schema for them
   /// yet). Timestamps are unix seconds.
   private func parseSportGpsModel(_ m: VPDeviceSportWithGPSModel) -> [String: Any] {
-    let minuteData: [[String: Any]] = (m.minutes).map { item in
+    // [SAMPLE-OVERRUN] Same bound as the non-GPS path; this model's header is
+    // the one that spells the invariant out ("should equal the minute count").
+    let delivered = m.minutes.count
+    let declared = Int(m.recordCount)
+    let kept = boundedMinuteCount(declared: declared, delivered: delivered)
+    let minuteData: [[String: Any]] = m.minutes.prefix(kept).map { item in
       return [
         "heartRate": Int(item.heart),
         "distance": Double(item.dis) / 1000.0, // m → km
@@ -146,9 +195,20 @@ extension VeepooSDKModule {
         "steps": Int(item.step),
         "sportValue": Int(item.sport),
         "isPaused": item.pause == 1,
+        "packetIndex": Int(item.packageCount),
       ]
     }
     return [
+      "recordCount": declared,
+      "deliveredSampleCount": delivered,
+      // [BAND-OWN-EXTREMA] The band measures min/max HR itself. We were
+      // dropping both and recomputing them from `minuteData` on the app side —
+      // i.e. from the very array that overruns, so an affected session stored
+      // the PREVIOUS session's extrema. Carry the band's values; the app
+      // prefers them and falls back to the sample scan only where absent (the
+      // non-GPS model has no such field).
+      "maxHeartRate": Int(m.maxHeart),
+      "minHeartRate": Int(m.minHeart),
       "type": exerciseOrdinalToMode(Int(m.sportType)) as Any,
       "crc": Int(m.crc),
       "beginTime": exerciseTimestampString(m.startTimestamp),

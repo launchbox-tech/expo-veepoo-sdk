@@ -23,6 +23,15 @@ export interface ExerciseMinuteData {
     steps: number;
     sport_value: number;
     is_paused: boolean;
+    /**
+     * The band's own minute index for this sample (vendor `packageCount`).
+     * Absent on the legacy DB-dict read path, which does not carry it.
+     *
+     * A clean stream's indices run monotonically; an overrun tail repeats the
+     * PRIOR session's final index (rayu.ai#566). Independent of `record_count`,
+     * so the two can disagree and that disagreement is itself evidence.
+     */
+    packet_index?: number;
 }
 export interface StoredTemperatureData {
     /** "YYYY-MM-DD HH:MM" */
@@ -106,6 +115,40 @@ export interface ExerciseSession {
     pause_count: number;
     /** Total paused time in seconds */
     pause_total_time: number;
+    /**
+     * How many per-minute records the BAND says this session has (vendor
+     * `recordCount`). Absent on the legacy DB-dict read path.
+     *
+     * `0` means the band declared nothing — NOT that the session has no samples
+     * (ADR-0060). Compare against `delivered_sample_count` to tell a clean read
+     * from an overrun one; see `minute_data`.
+     */
+    record_count?: number;
+    /**
+     * How many per-minute records the vendor's array actually held, BEFORE
+     * `minute_data` was bounded by `record_count`.
+     *
+     * When this exceeds `record_count`, the vendor returned the buffer's length
+     * rather than the session's fill and the excess was the previous session's
+     * data (rayu.ai#566) — `minute_data` has already been trimmed, but the
+     * session's stream is still suspect and should be annotated, not trusted.
+     */
+    delivered_sample_count?: number;
+    /**
+     * Band-reported max/min heart rate for the session. Present only on the
+     * GPS-bearing read path — the plain sport model carries no such field, so
+     * consumers fall back to scanning `minute_data`.
+     *
+     * Prefer these where present: the sample scan reads the array that overruns,
+     * so on an affected session it yields the PREVIOUS session's extrema.
+     */
+    max_heart_rate?: number;
+    min_heart_rate?: number;
+    /**
+     * Per-minute stream, bounded at the native boundary by `record_count`
+     * (rayu.ai#566). Where the band declared no count, it is passed through
+     * unbounded and `delivered_sample_count` equals its length.
+     */
     minute_data: ExerciseMinuteData[];
 }
 /**
