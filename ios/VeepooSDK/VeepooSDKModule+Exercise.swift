@@ -64,12 +64,35 @@ extension VeepooSDKModule {
     ((v as? String) ?? "").replacingOccurrences(of: "/", with: "-")
   }
 
+  /// The band's epoch is NOT an absolute instant — it is a wall clock the band
+  /// converted using a hard-coded +08:00, so it must be read back at +08:00.
+  ///
+  /// `setDeviceTime` pushes bare calendar components (year/month/day/h/m/s) with
+  /// no zone, so the band knows a wall clock and nothing else. When it stamps a
+  /// sport session it invents an offset — the vendor's own Asia/Shanghai — and
+  /// encodes `wall − 08:00`. Rendering that with `TimeZone.current` therefore
+  /// lands every session `08:00 − localOffset` away from when it happened:
+  /// 2h15m early in Asia/Kathmandu (+05:45), 8h early in London, and exactly
+  /// right in China, which is why the vendor never saw it.
+  ///
+  /// Reading it back at +08:00 recovers the wall clock the band meant, which is
+  /// the same shape `parseSportModel` and `parseRunningDict` already return as
+  /// strings — so all three exercise parsers now agree, and the JS side keeps
+  /// labelling one wall clock with the phone's offset (ADR-0013).
+  ///
+  /// Ground truth: session epoch 1788042239 was a workout performed 06:23:59
+  /// local in Asia/Kathmandu on 2026-08-30. At +08:00 it reads 06:23:59; at
+  /// +05:45 it reads 04:08:59. The vendor docs use `Asia/Shanghai` for this
+  /// same conversion.
+  private static let bandEpochTimeZone = TimeZone(secondsFromGMT: 8 * 3600)
+
   private func exerciseTimestampString(_ unixSeconds: UInt32) -> String {
     let date = Date(timeIntervalSince1970: TimeInterval(unixSeconds))
     let formatter = DateFormatter()
     // Without an explicit POSIX locale, iOS rewrites fixed formats to the
     // user's 12-hour clock setting ("3:30:10 AM") — which no consumer parses.
     formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = Self.bandEpochTimeZone
     formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
     return formatter.string(from: date)
   }
