@@ -36,6 +36,7 @@ export type {
   SleepData,
   AccurateSleepSession,
   DailyHealthData,
+  ExerciseGpsFix,
   ExerciseMinuteData,
   ExerciseReadProgress,
   ExerciseSession,

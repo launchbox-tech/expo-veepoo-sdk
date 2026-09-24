@@ -174,13 +174,26 @@ extension VeepooSDKModule {
       "averagePace": Int(m.averPace),
       "pauseCount": Int(m.pauseCount),
       "pauseTotalTime": Int(m.pauseTotalTime),
+      // [RAW-571] rayu.ai#571. Raw, unscaled. Unverified on device: this band
+      // has only ever answered on the GPS path, so the plain model is unread.
+      // `totalSport` (uint32) is the same key the GPS path fills from `sport`.
+      "totalSport": Int(m.totalSport),
+      // uint32; header says seconds. Kept apart from the GPS model's
+      // `aerobicCount` (uint16, no unit) — same meaning, unproven same unit.
+      "aerobTime": Int(m.aerobTime),
       "minuteData": minuteData,
     ]
   }
 
   /// New-API GPS session (`VPDeviceSportWithGPSModel`) — summary mapped to
-  /// the same session shape; GPS tracks are not carried (no schema for them
-  /// yet). Timestamps are unix seconds.
+  /// the same session shape, plus every other field the model measures
+  /// (rayu.ai#571), including the per-minute GPS track. Timestamps are unix
+  /// seconds.
+  ///
+  /// [RAW-571] The #571 fields cross RAW: no unit scaling here. The header
+  /// names a unit only for altitude (cm); speed, cadence, climb/decline and
+  /// `aerobicCount` have none, and even the cm is unverified on device. Units
+  /// are derived from a real session downstream, not guessed at the bridge.
   private func parseSportGpsModel(_ m: VPDeviceSportWithGPSModel) -> [String: Any] {
     // [SAMPLE-OVERRUN] Same bound as the non-GPS path; this model's header is
     // the one that spells the invariant out ("should equal the minute count").
@@ -196,6 +209,18 @@ extension VeepooSDKModule {
         "sportValue": Int(item.sport),
         "isPaused": item.pause == 1,
         "packetIndex": Int(item.packageCount),
+        // int32, SIGNED (header: cm). Below sea level is legal — no clamp.
+        "altitude": Int(item.altitude),
+        // Passed through UNFILTERED, (0,0) empty fixes included: dropping
+        // them here would make "the band sent an empty fix" and "the band
+        // sent nothing" indistinguishable downstream. The app filters.
+        "gpsDatas": item.gpsDatas.map { fix -> [String: Any] in
+          return [
+            "rssi": Int(fix.rssi), // uint8 signal strength
+            "longitude": fix.longitude, // double, degrees
+            "latitude": fix.latitude, // double, degrees
+          ]
+        },
       ]
     }
     return [
@@ -222,6 +247,32 @@ extension VeepooSDKModule {
       "averagePace": Int(m.avePace),
       "pauseCount": Int(m.pauseCount),
       "pauseTotalTime": Int(m.pauseDuration),
+      // ── [RAW-571] everything else the model measures, raw ──
+      // uint8 availability enum (0 unknown … 7); see the TS doc for the table.
+      "showType": Int(m.showType),
+      // uint16 each; unit not in the header.
+      "maxSpeed": Int(m.maxSpeed),
+      "aveSpeed": Int(m.aveSpeed),
+      "minSpeed": Int(m.minSpeed),
+      "maxCadence": Int(m.maxCadence),
+      "aveCadence": Int(m.aveCadence),
+      "minCadence": Int(m.minCadence),
+      // uint16, same treatment as `averagePace` above.
+      "maxPace": Int(m.maxPace),
+      "minPace": Int(m.minPace),
+      // int32, SIGNED (header: cm). No clamping.
+      "maxAltitude": Int(m.maxAltitude),
+      "aveAltitude": Int(m.aveAltitude),
+      "minAltitude": Int(m.minAltitude),
+      // int32, signed; unit not in the header.
+      "cumulativeClimb": Int(m.cumulativeClimb),
+      "cumulativeDecline": Int(m.cumulativeDecline),
+      // uint16; header says "total aerobic time", no unit.
+      "aerobicCount": Int(m.aerobicCount),
+      // uint32 session activity total (vendor `sport`). Renamed so it can't
+      // be confused with the per-minute `sportValue`; the plain path fills
+      // the same key from `totalSport`.
+      "totalSport": Int(m.sport),
       "minuteData": minuteData,
     ]
   }

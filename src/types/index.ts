@@ -109,6 +109,7 @@ export type {
 } from '@/capabilities/origin-data/types';
 export type {
   DailyHealthData,
+  ExerciseGpsFix,
   ExerciseMinuteData,
   ExerciseReadProgress,
   ExerciseSession,
