@@ -32,6 +32,27 @@ export interface ExerciseMinuteData {
      * so the two can disagree and that disagreement is itself evidence.
      */
     packet_index?: number;
+    /**
+     * Elevation for this minute — vendor `VPDSOneMinuteModel.altitude`, int32,
+     * SIGNED, raw. The header says centimetres; unverified on device. Negative
+     * is legal (below sea level). GPS read path only (rayu.ai#571).
+     */
+    altitude?: number;
+    /**
+     * This minute's GPS fixes — vendor `VPDSOneMinuteModel.gpsDatas`, raw and
+     * UNFILTERED: the vendor's empty fix `(0, 0)` is passed through, so filter
+     * it before treating a fix as a location. GPS read path only (rayu.ai#571).
+     */
+    gps_datas?: ExerciseGpsFix[];
+}
+/** One vendor GPS fix (`VPDSMinuteGPSModel`), raw. */
+export interface ExerciseGpsFix {
+    /** Vendor signal-strength byte, uint8. Scale unverified. */
+    rssi: number;
+    /** Degrees (double). `0` with `latitude` `0` is the vendor's empty fix. */
+    longitude: number;
+    /** Degrees (double). */
+    latitude: number;
 }
 export interface StoredTemperatureData {
     /** "YYYY-MM-DD HH:MM" */
@@ -144,6 +165,63 @@ export interface ExerciseSession {
      */
     max_heart_rate?: number;
     min_heart_rate?: number;
+    /**
+     * Vendor `showType`, uint8 — the band's own statement of what this session
+     * recorded. 0 unknown; 1 GPS + steps; 2 GPS, no steps (e.g. cycling);
+     * 3 no GPS, steps; 4 no GPS, no steps (so no distance); 5 GPS + steps +
+     * altitude; 6 GPS, no steps, altitude; 7 no GPS, steps, altitude.
+     * GPS read path only.
+     */
+    show_type?: number;
+    /** Vendor `maxSpeed`, uint16, raw. Unit unverified. GPS path only. */
+    max_speed?: number;
+    /** Vendor `aveSpeed`, uint16, raw. Unit unverified. GPS path only. */
+    ave_speed?: number;
+    /** Vendor `minSpeed`, uint16, raw. Unit unverified. GPS path only. */
+    min_speed?: number;
+    /** Vendor `maxCadence`, uint16, raw. Unit unverified. GPS path only. */
+    max_cadence?: number;
+    /** Vendor `aveCadence`, uint16, raw. Unit unverified. GPS path only. */
+    ave_cadence?: number;
+    /** Vendor `minCadence`, uint16, raw. Unit unverified. GPS path only. */
+    min_cadence?: number;
+    /**
+     * Vendor `maxPace`, uint16, raw — same encoding as `average_pace`, which
+     * crosses unscaled too. Unit unverified. GPS path only.
+     */
+    max_pace?: number;
+    /** Vendor `minPace`, uint16, raw — as `max_pace`. GPS path only. */
+    min_pace?: number;
+    /**
+     * Vendor `maxAltitude`, int32, SIGNED, raw. Header says centimetres;
+     * unverified on device. Negative is legal. GPS path only.
+     */
+    max_altitude?: number;
+    /** Vendor `aveAltitude`, int32, SIGNED, raw — as `max_altitude`. */
+    ave_altitude?: number;
+    /** Vendor `minAltitude`, int32, SIGNED, raw — as `max_altitude`. */
+    min_altitude?: number;
+    /** Vendor `cumulativeClimb`, int32, signed, raw. Unit unverified. GPS path only. */
+    cumulative_climb?: number;
+    /** Vendor `cumulativeDecline`, int32, signed, raw. Unit unverified. GPS path only. */
+    cumulative_decline?: number;
+    /**
+     * Vendor `aerobicCount`, uint16, raw. The header describes it as total
+     * aerobic TIME despite the name; unit unverified. GPS path only. Kept apart
+     * from `aerob_time` (plain path) until the two are shown to share a unit.
+     */
+    aerobic_count?: number;
+    /**
+     * Vendor `aerobTime`, uint32, raw. Header says seconds; unverified on device
+     * (this band has never selected the plain read path). Plain path only.
+     */
+    aerob_time?: number;
+    /**
+     * Session total activity amount, uint32, raw, vendor-relative — the
+     * session-level peer of per-minute `sport_value`. From `sport` on the GPS
+     * path and `totalSport` on the plain path. Absent on the legacy path.
+     */
+    total_sport?: number;
     /**
      * Per-minute stream, bounded at the native boundary by `record_count`
      * (rayu.ai#566). Where the band declared no count, it is passed through
