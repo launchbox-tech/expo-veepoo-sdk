@@ -35,10 +35,14 @@ _Avoid_: bonding, linking
 - Full data scope required: real-time health tests (HR, BP, SpO2, temperature, stress, glucose), historical data (5-min origin, half-hour, sleep, steps), and device config (battery, auto-measure, language).
 - A minimal example app lives under `example/` in the repo for testing scan → connect → read data in isolation.
 - Distribution: private, GitHub-only. Installed via `npm install github:launchbox-tech/expo-veepoo-sdk`. Not published to npm.
+- `build/` is committed alongside source: the `lefthook` pre-commit hook runs `npm run build && git add build` (see `lefthook.yml`), since the package installs from GitHub rather than npm, so the tracked dist is what consumers get. Stage source explicitly (`git add src ios android docs ...`), never `git add -A`, and let the hook stage `build/` on top — `stage_fixed` cannot do this job, only `git add build` can.
 
 ## Workflow
 
 - After each GitHub issue is implemented, commit only that issue's diff with `Fixes #N` in the commit message body, then push immediately before starting the next issue.
+- `Fixes #N` auto-closes the issue the moment the commit is pushed, even when the issue's acceptance criterion needs verification against a real band. If the push closes an issue that isn't actually verified, `gh issue reopen N` and comment stating what landed, which criteria are met, and what a device would still need to settle.
+- `gh pr create` targets the fork parent (the `upstream` remote) by default and fails with a misleading "No commits between" error. Always pass `--repo launchbox-tech/expo-veepoo-sdk` to `gh pr` and `gh issue` commands.
+- Open plain PRs, not `gh stack`. The `gh stack` extension resolves the repo itself and has no `--repo` flag, so `submit`, `link` and `sync` report that PRs which exist have no PR. To stack, set the base by hand: `gh pr edit <top> --repo launchbox-tech/expo-veepoo-sdk --base <lower-branch>`.
 
 ## Docs structure
 
