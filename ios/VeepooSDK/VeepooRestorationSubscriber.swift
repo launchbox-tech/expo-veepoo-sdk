@@ -44,7 +44,8 @@ public final class VeepooRestorationSubscriber: ExpoAppDelegateSubscriber {
 
   /// True when THIS launch was started by iOS to restore Bluetooth work: set
   /// from the launch options or, when those arrive empty, by iOS calling
-  /// `centralManager(_:willRestoreState:)` on the armed manager.
+  /// `centralManager(_:willRestoreState:)` while the app is still in the
+  /// background.
   public private(set) static var didLaunchForRestoration = false
 
   /// The restore ids iOS passed in the launch options, empty on a normal launch.
@@ -158,11 +159,15 @@ public final class VeepooRestorationSubscriber: ExpoAppDelegateSubscriber {
         let peripherals = (dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral]) ?? []
         let described = peripherals.map { "\($0.identifier.uuidString):\($0.state.rawValue)" }
         let services = (dict[CBCentralManagerRestoredStateScanServicesKey] as? [CBUUID])?.map { $0.uuidString } ?? []
-        // iOS calls this only on a launch it started to hand back Bluetooth
-        // state. The launch-options key is not a reliable second witness: on
-        // device (2026-10-04) a real Bluetooth relaunch arrived with no
-        // launch options at all, so this callback is what marks the launch.
-        Self.didLaunchForRestoration = true
+        // iOS hands back preserved state to ANY launch that rebuilds the
+        // restore-keyed manager, including one the user opened after a kill
+        // (seen on device 2026-10-04 with app_state=1). Only a launch still in
+        // the background when state arrives is one iOS started for Bluetooth.
+        // The launch-options key can't decide it: a real Bluetooth relaunch
+        // arrived with no launch options at all.
+        if UIApplication.shared.applicationState == .background {
+          Self.didLaunchForRestoration = true
+        }
         Self.trace("will_restore_state peripherals=\(described) scan_services=\(services) is_armed_central=\(central === Self.armedCentral) app_state=\(UIApplication.shared.applicationState.rawValue)")
         original(target, restoreSel, central, dict)
       }
