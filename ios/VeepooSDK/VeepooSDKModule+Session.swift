@@ -27,11 +27,8 @@ extension VeepooSDKModule {
       self.ensureCentralManager()
       // [RESTORATION] Report whether the manager armed at launch is still the
       // one the vendor holds. If the vendor rebuilt its own central during its
-      // init, restoration is silently disarmed and this is the only place that
-      // would show it — `armed` false here with a paired band means the seam
-      // moved and the launch subscriber needs revisiting.
-      let armed = manager.centralManager?.delegate === manager
-      print("[VeepooSDK] [RESTORATION] post-init vendor_central_present=\(manager.centralManager != nil) delegate_is_vendor=\(armed) restoration_launch=\(VeepooRestorationSubscriber.didLaunchForRestoration)")
+      // init, restoration is silently disarmed and this is the line that shows it.
+      VeepooRestorationSubscriber.trace(VeepooRestorationSubscriber.describeState("post_init"))
       promiseBox.resolve(nil)
       #endif
     }
