@@ -263,10 +263,20 @@ public class VeepooSDKModule: Module {
       promise.resolve(["supported": false, "restoration_launch": false, "armed": false])
       #else
       DispatchQueue.main.async {
+        let vendor = VPBleCentralManage.sharedBleManager()?.centralManager
         promise.resolve([
           "supported": true,
           "restoration_launch": VeepooRestorationSubscriber.didLaunchForRestoration,
-          "armed": VPBleCentralManage.sharedBleManager()?.centralManager != nil,
+          // Armed only when the vendor still holds the exact manager built with
+          // the restore identifier. A non-nil manager alone proves nothing: the
+          // vendor's own one carries no identifier and restores nothing.
+          "armed": VeepooRestorationSubscriber.vendorCentralIsArmed(),
+          "arm_outcome": VeepooRestorationSubscriber.armOutcome,
+          "launch_restore_ids": VeepooRestorationSubscriber.launchRestoreIds,
+          "vendor_central_present": vendor != nil,
+          "vendor_central_state": vendor?.state.rawValue ?? -1,
+          "app_state": UIApplication.shared.applicationState.rawValue,
+          "trace": VeepooRestorationSubscriber.drainTrace(),
         ])
       }
       #endif

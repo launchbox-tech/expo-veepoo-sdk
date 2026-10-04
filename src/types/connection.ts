@@ -148,5 +148,17 @@ export interface PasswordData {
 export interface RestorationState {
   supported: boolean;
   restoration_launch: boolean;
+  /** True only when the vendor holds the exact manager built with the restore identifier. */
   armed: boolean;
+  /** `armed`, or why the launch-time arming was skipped. iOS only. */
+  arm_outcome?: string;
+  /** Restore ids iOS passed at launch; empty on a normal launch. iOS only. */
+  launch_restore_ids?: string[];
+  vendor_central_present?: boolean;
+  /** CBManagerState raw value, -1 when there is no manager. iOS only. */
+  vendor_central_state?: number;
+  /** UIApplication.State raw value: 0 active, 1 inactive, 2 background. iOS only. */
+  app_state?: number;
+  /** Restoration lines recorded natively since the last call, oldest first. iOS only. */
+  trace?: string[];
 }

@@ -176,6 +176,7 @@ extension VeepooSDKModule {
         // Bluetooth permission prompt away from a first launch that has no
         // paired band to restore.
         VeepooRestorationSubscriber.markPaired()
+        VeepooRestorationSubscriber.trace(VeepooRestorationSubscriber.describeState("connected device=\(deviceId)"))
         self.connectionState = .connected
         self.connectedDeviceId = deviceId
         self.sendEvent(DEVICE_CONNECTED, ["deviceId": deviceId, "isOadModel": false])
